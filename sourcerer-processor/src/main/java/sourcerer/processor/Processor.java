@@ -20,6 +20,7 @@ import com.google.auto.service.AutoService;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -31,6 +32,8 @@ import javax.lang.model.element.TypeElement;
 
 @AutoService(javax.annotation.processing.Processor.class)
 public class Processor extends javax.annotation.processing.AbstractProcessor {
+    private static final String ALL_ANNOTATION_TYPES = "*";
+
     private final List<Template> templates;
 
     public Processor() {
@@ -60,7 +63,19 @@ public class Processor extends javax.annotation.processing.AbstractProcessor {
     }
 
     @Override public final Set<String> getSupportedAnnotationTypes() {
-        return Collections.singleton("*");
+        Set<String> types = new HashSet<>();
+        OUTER:
+        for (Template template : templates) {
+            for (String supportedAnnotationType : template.supportedAnnotationTypes()) {
+                if (ALL_ANNOTATION_TYPES.equals(supportedAnnotationType)) {
+                    types = Collections.singleton("*");
+                    break OUTER;
+                }
+                types.add(supportedAnnotationType);
+            }
+        }
+        System.out.printf("\ngetSupportedAnnotationTypes() -> %s\n", types);
+        return types;
     }
 
     @Override public SourceVersion getSupportedSourceVersion() {

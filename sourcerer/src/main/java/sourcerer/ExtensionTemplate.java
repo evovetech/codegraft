@@ -22,8 +22,8 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,13 +41,10 @@ import sourcerer.processor.Template;
 
 @AutoService(Template.class)
 public class ExtensionTemplate extends Template {
-    private final Set<String> annotationTypes;
     private final Map<ExtensionDescriptor, Type> extensions;
 
     public ExtensionTemplate() {
-        this.annotationTypes = new HashSet<>();
         this.extensions = new HashMap<>();
-        annotationTypes.add(Extension.class.getCanonicalName());
     }
 
     @Override public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
@@ -59,9 +56,6 @@ public class ExtensionTemplate extends Template {
             }
 
             Type type = addExtensionType(extension, annotationElement);
-            synchronized (annotationTypes) {
-                annotationTypes.add(annotationElement.getQualifiedName().toString());
-            }
             for (Element typeElement : env.getElementsAnnotatedWith(annotationElement)) {
                 // Ensure it is a class element
                 if (typeElement.getKind() != ElementKind.CLASS) {
@@ -92,9 +86,8 @@ public class ExtensionTemplate extends Template {
     }
 
     @Override public Set<String> supportedAnnotationTypes() {
-        synchronized (annotationTypes) {
-            return new HashSet<>(annotationTypes);
-        }
+        // We need to process all annotation types
+        return Collections.singleton("*");
     }
 
     private Type addExtensionType(Extension extension, TypeElement annotationElement) {
