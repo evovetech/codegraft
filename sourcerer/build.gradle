@@ -22,7 +22,6 @@ dependencies {
     compile "org.codehaus.groovy:groovy-all:${appGroovyVersion}"
     compile "com.squareup:javapoet:${appJavaPoetGradleVersion}"
     compile "com.squareup.okio:okio:${appOkioVersion}"
-    compile project(':core')
     compile project(':annotations')
     compile project(':processor')
 

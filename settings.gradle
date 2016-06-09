@@ -15,13 +15,11 @@
  */
 
 include ':sourcerer',
-        ':sourcerer-core',
         ':sourcerer-annotations',
         ':sourcerer-processor',
         ':sourcerer-sample',
         ':sourcerer-sample-annotations'
 
-findProject(':sourcerer-core')?.name = 'core'
 findProject(':sourcerer-annotations')?.name = 'annotations'
 findProject(':sourcerer-processor')?.name = 'processor'
 findProject(':sourcerer-sample')?.name = 'sample'

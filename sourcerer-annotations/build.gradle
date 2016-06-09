@@ -22,7 +22,6 @@ apply plugin: 'provided-base'
 
 dependencies {
     compile "org.codehaus.groovy:groovy-all:${appGroovyVersion}"
-    provided project(':core')
 
     // testing
     testCompile "junit:junit:${appJunitVersion}"

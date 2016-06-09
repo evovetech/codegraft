@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.TYPE})
 @Extension(
-        kind = Source.Kind.InstanceDelegate,
+        kind = Extension.Kind.InstanceDelegate,
         packageName = "sourcerer",
         className = "SourceModule"
 )

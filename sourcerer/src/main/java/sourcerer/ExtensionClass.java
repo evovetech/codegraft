@@ -54,12 +54,12 @@ import static sourcerer.Util.writeTypeParams;
 import static sourcerer.Util.writeUtf8Entry;
 
 final class ExtensionClass {
-    private final Source.Kind kind;
+    private final Extension.Kind kind;
     private final TypeElement element;
     private final ExtensionMethod instanceMethod;
     private final List<ExtensionMethod> methods;
 
-    private ExtensionClass(Source.Kind kind, TypeElement element, ExtensionMethod instanceMethod,
+    private ExtensionClass(Extension.Kind kind, TypeElement element, ExtensionMethod instanceMethod,
             List<ExtensionMethod> methods) {
         if (instanceMethod == null) {
             throw new IllegalArgumentException(element.getQualifiedName() + " must have an instance method specified");
@@ -75,7 +75,7 @@ final class ExtensionClass {
         this.methods = Collections.unmodifiableList(methods);
     }
 
-    static ExtensionClass parse(Source.Kind kind, TypeElement element) {
+    static ExtensionClass parse(Extension.Kind kind, TypeElement element) {
         ExtensionMethod instanceMethod = null;
         List<ExtensionMethod> methods = new ArrayList<>();
         for (Element memberElement : element.getEnclosedElements()) {

@@ -137,7 +137,7 @@ public class ExtensionTemplate extends Template {
         }
 
         @Override protected void writeExtension(BufferedSink sink, ExtensionClass extensionClass) throws IOException {
-            if (descriptor().kind() == Source.Kind.StaticDelegate) {
+            if (descriptor().kind() == Extension.Kind.StaticDelegate) {
                 extensionClass.writeMethods(sink, Modifier.STATIC);
             } else {
                 extensionClass.writeMethods(sink);

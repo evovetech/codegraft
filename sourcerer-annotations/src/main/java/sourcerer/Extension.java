@@ -26,9 +26,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.ANNOTATION_TYPE})
 public @interface Extension {
-    Source.Kind kind();
+    Kind kind();
 
     String packageName();
 
     String className();
+
+    enum Kind {
+        InstanceDelegate,
+        StaticDelegate
+    }
 }
