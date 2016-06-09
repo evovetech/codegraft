@@ -1,0 +1,46 @@
+/*
+ * Copyright 2016 Layne Mobile, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+buildscript {
+    repositories {
+        jcenter()
+        maven { url 'https://dl.bintray.com/laynemobile/maven/' }
+    }
+
+    dependencies {
+        classpath "com.squareup:javapoet:${appJavaPoetGradleVersion}"
+        classpath "com.squareup.okio:okio:${appOkioVersion}"
+        classpath "com.neenbedankt.gradle.plugins:android-apt:${appAptGradleVersion}"
+        classpath "com.netflix.nebula:gradle-extra-configurations-plugin:${appNebulaGradleVersion}"
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:${appBintrayGradlePlugin}"
+        classpath "com.github.dcendents:android-maven-gradle-plugin:${appAndroidMavenGradleVersion}"
+    }
+}
+
+ext {
+    LICENSES = ["Apache-2.0"]
+}
+
+allprojects {
+    version "${VERSION_NAME}"
+}
+
+subprojects {
+    repositories {
+        jcenter()
+        maven { url 'https://dl.bintray.com/laynemobile/maven/' }
+    }
+}

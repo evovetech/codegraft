@@ -1,0 +1,17 @@
+# IDEA/Android Studio project files, because
+# the project can be imported from settings.gradle
+/**/.idea/*
+*.iml
+
+# Gradle cache
+.gradle
+
+# Others
+build
+local.properties
+.DS_Store
+
+# unignore some .idea stuff
+!/**/.idea/copyright
+!/**/.idea/inspectionProfiles/
+!/**/.idea/codeStyleSettings.xml
