@@ -63,8 +63,7 @@ public class ExtensionTemplate extends Template {
                 return true; // Exit processing
             }
 
-            Extension extension = annotationElement.getAnnotation(annotationType);
-            Type type = addExtensionType(extension);
+            Type type = addExtensionType((TypeElement) annotationElement);
             types.remove(type);
             TypeElement typeAnnotation = (TypeElement) annotationElement;
             synchronized (annotationTypes) {
@@ -106,13 +105,14 @@ public class ExtensionTemplate extends Template {
         }
     }
 
-    private Type addExtensionType(Extension extension) {
+    private Type addExtensionType(TypeElement annotationElement) {
+        final Extension extension = annotationElement.getAnnotation(Extension.class);
         final ExtensionDescriptor key
                 = new ExtensionDescriptor(extension.kind(), extension.packageName(), extension.className());
         synchronized (extensions) {
             Type ext = extensions.get(key);
             if (ext == null) {
-                ext = new Type(key);
+                ext = new Type(annotationElement, key);
                 extensions.put(key, ext);
             }
             return ext;
