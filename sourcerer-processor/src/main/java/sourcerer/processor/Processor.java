@@ -36,7 +36,7 @@ public class Processor extends javax.annotation.processing.AbstractProcessor {
 
     public Processor() {
         List<Template> templates = new ArrayList<>();
-        for (Template template : ServiceLoader.load(Template.class)) {
+        for (Template template : ServiceLoader.load(Template.class, Template.class.getClassLoader())) {
             templates.add(template);
         }
         this.templates = Collections.unmodifiableList(templates);

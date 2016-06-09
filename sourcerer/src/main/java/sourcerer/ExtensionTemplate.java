@@ -50,45 +50,37 @@ public class ExtensionTemplate extends Template {
     }
 
     @Override public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        List<Type> types;
-        synchronized (extensions) {
-            types = new ArrayList<>(extensions.values());
-        }
-        final Class<Extension> annotationType = Extension.class;
         boolean processed = false;
-        for (Element annotationElement : env.getElementsAnnotatedWith(annotationType)) {
+        for (Element annotationElement : env.getElementsAnnotatedWith(Extension.class)) {
             // Ensure it is an annotation element
             if (annotationElement.getKind() != ElementKind.ANNOTATION_TYPE) {
-                error(annotationElement, "Only annotations can be annotated with @%s", annotationType.getSimpleName());
+                error(annotationElement, "Only annotations can be annotated with @%s", Extension.class.getSimpleName());
                 return true; // Exit processing
             }
 
             Type type = addExtensionType((TypeElement) annotationElement);
-            types.remove(type);
             TypeElement typeAnnotation = (TypeElement) annotationElement;
             synchronized (annotationTypes) {
                 annotationTypes.add(typeAnnotation.getQualifiedName().toString());
             }
             for (Element typeElement : env.getElementsAnnotatedWith(typeAnnotation)) {
                 // Ensure it is a class element
-                if (annotationElement.getKind() != ElementKind.CLASS) {
-                    error(annotationElement, "Only annotations can be annotated with @%s",
-                            annotationType.getSimpleName());
+                if (typeElement.getKind() != ElementKind.CLASS) {
+                    error(typeElement, "Only classes can be annotated with @%s", annotationElement.getSimpleName());
                     return true; // Exit processing
                 }
                 type.process((TypeElement) typeElement);
             }
             processed = true;
         }
-        for (Type type : types) {
-            for (Element typeElement : env.getElementsAnnotatedWith(type.annotationType)) {
-                type.process((TypeElement) typeElement);
-                processed = true;
-            }
-        }
         if (processed) {
+            List<Type> types;
+            synchronized (extensions) {
+                types = new ArrayList<>(extensions.values());
+            }
             for (Type type : types) {
                 try {
+                    System.out.printf("\nwriting type: %s\n", type.annotationType);
                     type.write(env().processingEnvironment().getFiler());
                 } catch (IOException e) {
                     error(type.annotationType, "error processing");
@@ -139,6 +131,7 @@ public class ExtensionTemplate extends Template {
 
         private void process(TypeElement typeElement) {
             ExtensionClass extensionClass = ExtensionClass.parse(descriptor().kind(), typeElement);
+            System.out.printf("\nparsed type: %s, extClass: %s\n", typeElement, extensionClass);
             synchronized (extensionClasses) {
                 extensionClasses.add(extensionClass);
             }

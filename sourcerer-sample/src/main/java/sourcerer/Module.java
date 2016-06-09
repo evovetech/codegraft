@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-include ':sourcerer',
-        ':sourcerer-core',
-        ':sourcerer-annotations',
-        ':sourcerer-processor',
-        ':sourcerer-sample'
+package sourcerer;
 
-findProject(':sourcerer-core')?.name = 'core'
-findProject(':sourcerer-annotations')?.name = 'annotations'
-findProject(':sourcerer-processor')?.name = 'processor'
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-//include ':sourcerer-plugin'
-//findProject(':sourcerer-plugin')?.name = 'plugin'
+@Documented
+@Retention(RetentionPolicy.SOURCE)
+@Target({ElementType.TYPE})
+@Extension(
+        kind = Source.Kind.InstanceDelegate,
+        packageName = "sourcerer",
+        className = "SourceModule"
+)
+public @interface Module {}
