@@ -25,3 +25,5 @@ dependencies {
     testCompile "junit:junit:${appJunitVersion}"
     testCompile "org.mockito:mockito-core:${appMockitoVersion}"
 }
+
+apply from: "${rootDir}/gradle/groovyArtifacts.gradle"

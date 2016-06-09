@@ -50,6 +50,10 @@ public class ExtensionTemplate extends Template {
     }
 
     @Override public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+        List<Type> types;
+        synchronized (extensions) {
+            types = new ArrayList<>(extensions.values());
+        }
         final Class<Extension> annotationType = Extension.class;
         boolean processed = false;
         for (Element annotationElement : env.getElementsAnnotatedWith(annotationType)) {
@@ -60,7 +64,8 @@ public class ExtensionTemplate extends Template {
             }
 
             Extension extension = annotationElement.getAnnotation(annotationType);
-            Type type = extensionType(extension);
+            Type type = addExtensionType(extension);
+            types.remove(type);
             TypeElement typeAnnotation = (TypeElement) annotationElement;
             synchronized (annotationTypes) {
                 annotationTypes.add(typeAnnotation.getQualifiedName().toString());
@@ -73,7 +78,23 @@ public class ExtensionTemplate extends Template {
                     return true; // Exit processing
                 }
                 type.process((TypeElement) typeElement);
+            }
+            processed = true;
+        }
+        for (Type type : types) {
+            for (Element typeElement : env.getElementsAnnotatedWith(type.annotationType)) {
+                type.process((TypeElement) typeElement);
                 processed = true;
+            }
+        }
+        if (processed) {
+            for (Type type : types) {
+                try {
+                    type.write(env().processingEnvironment().getFiler());
+                } catch (IOException e) {
+                    error(type.annotationType, "error processing");
+                    return true; // Exit processing
+                }
             }
         }
         return processed;
@@ -85,7 +106,7 @@ public class ExtensionTemplate extends Template {
         }
     }
 
-    private Type extensionType(Extension extension) {
+    private Type addExtensionType(Extension extension) {
         final ExtensionDescriptor key
                 = new ExtensionDescriptor(extension.kind(), extension.packageName(), extension.className());
         synchronized (extensions) {
@@ -102,10 +123,12 @@ public class ExtensionTemplate extends Template {
         private static final String OUTPUT_DIR = "META-INF/sourcerer";
         private static final String FILE_EXTENSION = ".sourcerer";
 
+        private final TypeElement annotationType;
         private final LinkedHashSet<ExtensionClass> extensionClasses = new LinkedHashSet<>();
 
-        private Type(ExtensionDescriptor descriptor) {
+        private Type(TypeElement annotationType, ExtensionDescriptor descriptor) {
             super(descriptor, OUTPUT_DIR, FILE_EXTENSION);
+            this.annotationType = annotationType;
         }
 
         @Override public List<ExtensionClass> extensionClasses() {
