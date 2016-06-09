@@ -16,6 +16,7 @@
 
 package sourcerer;
 
+import com.google.common.base.MoreObjects;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
@@ -212,5 +213,12 @@ final class ExtensionClass {
             // Add method to classbuilder
             classBuilder.addMethod(methodBuilder.build());
         }
+    }
+
+    @Override public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("element", element)
+                .add("kind", kind)
+                .toString();
     }
 }

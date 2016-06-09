@@ -16,6 +16,8 @@
 
 package sourcerer.processor;
 
+import com.google.common.base.MoreObjects;
+
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -56,5 +58,11 @@ public abstract class Template {
         if (env != null) {
             env.error(message, args);
         }
+    }
+
+    @Override public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("supportedAnnotationTypes", supportedAnnotationTypes())
+                .toString();
     }
 }

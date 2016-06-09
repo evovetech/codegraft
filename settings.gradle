@@ -18,11 +18,14 @@ include ':sourcerer',
         ':sourcerer-core',
         ':sourcerer-annotations',
         ':sourcerer-processor',
-        ':sourcerer-sample'
+        ':sourcerer-sample',
+        ':sourcerer-sample-annotations'
 
 findProject(':sourcerer-core')?.name = 'core'
 findProject(':sourcerer-annotations')?.name = 'annotations'
 findProject(':sourcerer-processor')?.name = 'processor'
+findProject(':sourcerer-sample')?.name = 'sample'
+findProject(':sourcerer-sample-annotations')?.name = 'sample-annotations'
 
 //include ':sourcerer-plugin'
 //findProject(':sourcerer-plugin')?.name = 'plugin'

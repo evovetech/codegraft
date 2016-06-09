@@ -17,6 +17,7 @@
 package sourcerer;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.MoreObjects;
 import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
@@ -51,19 +52,17 @@ public class ExtensionTemplate extends Template {
 
     @Override public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         boolean processed = false;
-        for (Element annotationElement : env.getElementsAnnotatedWith(Extension.class)) {
-            // Ensure it is an annotation element
-            if (annotationElement.getKind() != ElementKind.ANNOTATION_TYPE) {
-                error(annotationElement, "Only annotations can be annotated with @%s", Extension.class.getSimpleName());
-                return true; // Exit processing
+        for (TypeElement annotationElement : annotations) {
+            Extension extension = annotationElement.getAnnotation(Extension.class);
+            if (extension == null) {
+                continue;
             }
 
-            Type type = addExtensionType((TypeElement) annotationElement);
-            TypeElement typeAnnotation = (TypeElement) annotationElement;
+            Type type = addExtensionType(extension, annotationElement);
             synchronized (annotationTypes) {
-                annotationTypes.add(typeAnnotation.getQualifiedName().toString());
+                annotationTypes.add(annotationElement.getQualifiedName().toString());
             }
-            for (Element typeElement : env.getElementsAnnotatedWith(typeAnnotation)) {
+            for (Element typeElement : env.getElementsAnnotatedWith(annotationElement)) {
                 // Ensure it is a class element
                 if (typeElement.getKind() != ElementKind.CLASS) {
                     error(typeElement, "Only classes can be annotated with @%s", annotationElement.getSimpleName());
@@ -73,6 +72,7 @@ public class ExtensionTemplate extends Template {
             }
             processed = true;
         }
+
         if (processed) {
             List<Type> types;
             synchronized (extensions) {
@@ -97,13 +97,13 @@ public class ExtensionTemplate extends Template {
         }
     }
 
-    private Type addExtensionType(TypeElement annotationElement) {
-        final Extension extension = annotationElement.getAnnotation(Extension.class);
+    private Type addExtensionType(Extension extension, TypeElement annotationElement) {
         final ExtensionDescriptor key
                 = new ExtensionDescriptor(extension.kind(), extension.packageName(), extension.className());
         synchronized (extensions) {
             Type ext = extensions.get(key);
             if (ext == null) {
+                System.out.printf("\ncreating type for annotation: %s\n", annotationElement);
                 ext = new Type(annotationElement, key);
                 extensions.put(key, ext);
             }
@@ -131,10 +131,11 @@ public class ExtensionTemplate extends Template {
 
         private void process(TypeElement typeElement) {
             ExtensionClass extensionClass = ExtensionClass.parse(descriptor().kind(), typeElement);
-            System.out.printf("\nparsed type: %s, extClass: %s\n", typeElement, extensionClass);
+            System.out.printf("\nparsed class: %s, extClass: %s\n", typeElement, extensionClass);
             synchronized (extensionClasses) {
                 extensionClasses.add(extensionClass);
             }
+            System.out.printf("\nthis = %s\n", this);
         }
 
         @Override
@@ -148,6 +149,13 @@ public class ExtensionTemplate extends Template {
             } else {
                 extensionClass.writeMethods(sink);
             }
+        }
+
+        @Override public String toString() {
+            return MoreObjects.toStringHelper(this)
+                    .add("annotationType", annotationType)
+                    .add("extensionClasses", extensionClasses())
+                    .toString();
         }
     }
 }

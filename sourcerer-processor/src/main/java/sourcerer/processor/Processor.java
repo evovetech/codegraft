@@ -20,7 +20,6 @@ import com.google.auto.service.AutoService;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -40,6 +39,7 @@ public class Processor extends javax.annotation.processing.AbstractProcessor {
             templates.add(template);
         }
         this.templates = Collections.unmodifiableList(templates);
+        System.out.printf("\ntemplates: %s\n", templates);
     }
 
     @Override public final synchronized void init(ProcessingEnvironment env) {
@@ -50,19 +50,17 @@ public class Processor extends javax.annotation.processing.AbstractProcessor {
     }
 
     @Override public final boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+        System.out.printf("\nprocessing... annotations: %s\n", annotations);
         boolean processed = false;
         for (Template template : templates) {
             processed |= template.process(annotations, env);
         }
+        System.out.printf("\nprocessed? %s\n", processed);
         return processed;
     }
 
     @Override public final Set<String> getSupportedAnnotationTypes() {
-        Set<String> types = new HashSet<>();
-        for (Template template : templates) {
-            types.addAll(template.supportedAnnotationTypes());
-        }
-        return types;
+        return Collections.singleton("*");
     }
 
     @Override public SourceVersion getSupportedSourceVersion() {
