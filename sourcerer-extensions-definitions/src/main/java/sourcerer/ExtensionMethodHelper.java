@@ -25,12 +25,12 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
-final class ExtensionMethod {
+final class ExtensionMethodHelper {
     final ExtensionMethodKind kind;
     final ExecutableElement method;
     final List<TypeElement> returnAnnotations;
 
-    private ExtensionMethod(ExtensionMethodKind kind, ExecutableElement method, List<TypeElement> returnAnnotations) {
+    private ExtensionMethodHelper(ExtensionMethodKind kind, ExecutableElement method, List<TypeElement> returnAnnotations) {
         if (kind == ExtensionMethodKind.Instance && method.getParameters().size() > 0) {
             throw new IllegalArgumentException("instance method cannot have parameters");
         }
@@ -39,7 +39,7 @@ final class ExtensionMethod {
         this.returnAnnotations = Collections.unmodifiableList(returnAnnotations);
     }
 
-    public static ExtensionMethod parse(Element memberElement) {
+    public static ExtensionMethodHelper parse(Element memberElement) {
         ExtensionMethodKind methodKind = null;
         List<TypeElement> others = new ArrayList<>();
         for (AnnotationMirror am : memberElement.getAnnotationMirrors()) {
@@ -55,7 +55,7 @@ final class ExtensionMethod {
         }
         return (methodKind == null)
                 ? null
-                : new ExtensionMethod(methodKind, (ExecutableElement) memberElement, others);
+                : new ExtensionMethodHelper(methodKind, (ExecutableElement) memberElement, others);
     }
 
     private static ExtensionMethodKind parseAnnotation(AnnotationMirror am, List<TypeElement> others) {

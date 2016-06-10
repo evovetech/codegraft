@@ -18,9 +18,7 @@ package sourcerer;
 
 import okio.ByteString;
 
-final class Constants {
-    static final ByteString EXTENSION_FILE_HEADER = ByteString.encodeUtf8("sourcerer");
-    static final int EXTENSION_FILE_VERSION = 1;
-
-    private Constants() { throw new AssertionError("no instances"); }
+public interface Constants {
+    ByteString HEADER = ByteString.encodeUtf8("sourcerer");
+    int VERSION = 1;
 }

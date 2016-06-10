@@ -23,7 +23,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Documented
-@Retention(RetentionPolicy.SOURCE)
-@Target({ElementType.METHOD})
-public @interface InstanceMethod {
+@Retention(RetentionPolicy.CLASS)
+@Target({ElementType.ANNOTATION_TYPE})
+public @interface ExtensionClass {
+    Kind kind();
+
+    String packageName();
+
+    String className();
+
+    enum Kind {
+        InstanceDelegate,
+        StaticDelegate
+    }
 }

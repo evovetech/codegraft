@@ -28,11 +28,7 @@ import javax.tools.StandardLocation;
 
 import okio.BufferedSink;
 import okio.BufferedSource;
-import okio.ByteString;
 import okio.Okio;
-
-import static sourcerer.Constants.EXTENSION_FILE_HEADER;
-import static sourcerer.Constants.EXTENSION_FILE_VERSION;
 
 public abstract class ExtensionType {
     private final ExtensionDescriptor descriptor;
@@ -45,20 +41,14 @@ public abstract class ExtensionType {
         this.fileExtension = fileExtension;
     }
 
-    public abstract List<? extends ExtensionClass> extensionClasses();
+    public abstract List<? extends ExtensionClassHelper> extensionClasses();
 
     protected abstract void readExtension(BufferedSource source, TypeSpec.Builder classBuilder) throws IOException;
 
-    protected abstract void writeExtension(BufferedSink sink, ExtensionClass extensionClass) throws IOException;
+    protected abstract void writeExtension(BufferedSink sink, ExtensionClassHelper extensionClassHelper) throws IOException;
 
     public final void read(BufferedSource source, TypeSpec.Builder classBuilder) throws IOException {
-        ByteString header = source.readByteString(EXTENSION_FILE_HEADER.size());
-        if (!EXTENSION_FILE_HEADER.equals(header)) {
-            throw new IOException("Cannot read from the source. Header is not set");
-        } else if (source.readInt() != EXTENSION_FILE_VERSION) {
-            throw new IOException("Cannot read from the source. Version is not current");
-        }
-
+        ExtensionMetadata meta = ExtensionMetadata.from(source);
         int size = source.readInt();
         for (int i = 0; i < size; i++) {
             readExtension(source, classBuilder);
@@ -66,7 +56,7 @@ public abstract class ExtensionType {
     }
 
     public final void write(Filer filer) throws IOException {
-        final List<? extends ExtensionClass> extensionClasses = new ArrayList<>(extensionClasses());
+        final List<? extends ExtensionClassHelper> extensionClasses = new ArrayList<>(extensionClasses());
         if (extensionClasses.size() == 0) {
             return;
         }
@@ -79,15 +69,15 @@ public abstract class ExtensionType {
         }
     }
 
-    private void writeExtensions(BufferedSink sink, List<? extends ExtensionClass> extensions) throws IOException {
-        sink.write(EXTENSION_FILE_HEADER);
-        sink.writeInt(EXTENSION_FILE_VERSION);
+    private void writeExtensions(BufferedSink sink, List<? extends ExtensionClassHelper> extensions) throws IOException {
+        ExtensionMetadata meta = ExtensionMetadata.create();
+        meta.writeTo(sink);
 
         int size = extensions.size();
         sink.writeInt(size);
         for (int i = 0; i < size; i++) {
-            ExtensionClass extensionClass = extensions.get(i);
-            writeExtension(sink, extensionClass);
+            ExtensionClassHelper extensionClassHelper = extensions.get(i);
+            writeExtension(sink, extensionClassHelper);
         }
     }
 

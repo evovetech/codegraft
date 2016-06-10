@@ -24,12 +24,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
-import okio.BufferedSink;
-import okio.BufferedSource;
-
-import static sourcerer.Util.readUtf8Entry;
-import static sourcerer.Util.writeUtf8Entry;
-
 enum ExtensionMethodKind {
     Instance(sourcerer.InstanceMethod.class),
     Void(sourcerer.VoidMethod.class),
@@ -42,8 +36,8 @@ enum ExtensionMethodKind {
         this.annotationType = annotationType;
     }
 
-    static ExtensionMethodKind read(BufferedSource source) throws IOException {
-        String name = readUtf8Entry(source);
+    static ExtensionMethodKind read(Reader reader) throws IOException {
+        String name = reader.readString();
         for (ExtensionMethodKind kind : values()) {
             if (name.equalsIgnoreCase(kind.name())) {
                 return kind;
@@ -52,8 +46,8 @@ enum ExtensionMethodKind {
         throw new IllegalStateException("invalid method kind: " + name);
     }
 
-    void write(BufferedSink sink) throws IOException {
-        writeUtf8Entry(sink, name());
+    void write(Writer writer) throws IOException {
+        writer.writeString(name());
     }
 
     void validate(Element element) {

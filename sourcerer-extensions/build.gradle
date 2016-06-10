@@ -22,7 +22,7 @@ dependencies {
     compile "com.google.guava:guava:${appGuavaVersion}"
     compile "com.squareup:javapoet:${appJavaPoetGradleVersion}"
     compile "com.squareup.okio:okio:${appOkioVersion}"
-    compile project(':extensions-annotations')
+    compile project(':extensions-definitions')
 
     // testing
     testCompile "junit:junit:${appJunitVersion}"

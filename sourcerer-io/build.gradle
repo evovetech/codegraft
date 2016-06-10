@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-package sourcerer;
+version "${VERSION_NAME}"
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+apply from: "${rootDir}/gradle/javaArtifacts.gradle"
 
-@Documented
-@Retention(RetentionPolicy.CLASS)
-@Target({ElementType.ANNOTATION_TYPE})
-public @interface Extension {
-    Kind kind();
+dependencies {
+    compile "com.google.guava:guava:${appGuavaVersion}"
+    compile "com.squareup:javapoet:${appJavaPoetGradleVersion}"
+    compile "com.squareup.okio:okio:${appOkioVersion}"
 
-    String packageName();
-
-    String className();
-
-    enum Kind {
-        InstanceDelegate,
-        StaticDelegate
-    }
+    // testing
+    testCompile "junit:junit:${appJunitVersion}"
+    testCompile "org.mockito:mockito-core:${appMockitoVersion}"
 }

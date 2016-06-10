@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-include ':sourcerer-abstract-processor',
+include ':sourcerer-io',
+        ':sourcerer-abstract-processor',
         ':sourcerer-extensions',
         ':sourcerer-extensions-annotations',
+        ':sourcerer-extensions-definitions',
         ':sourcerer-extensions-processor',
         ':sourcerer-extensions-plugin',
         ':sourcerer-extensions-sample-lib',
         ':sourcerer-extensions-sample-lib-annotations'
 
+findProject(':sourcerer-io')?.name = 'io'
 findProject(':sourcerer-abstract-processor')?.name = 'abstract-processor'
 findProject(':sourcerer-extensions')?.name = 'extensions'
 findProject(':sourcerer-extensions-annotations')?.name = 'extensions-annotations'
+findProject(':sourcerer-extensions-definitions')?.name = 'extensions-definitions'
 findProject(':sourcerer-extensions-processor')?.name = 'extensions-processor'
 findProject(':sourcerer-extensions-plugin')?.name = 'extensions-plugin'
 findProject(':sourcerer-extensions-sample-lib')?.name = 'extensions-sample-lib'
 findProject(':sourcerer-extensions-sample-lib-annotations')?.name = 'extensions-sample-lib-annotations'
+

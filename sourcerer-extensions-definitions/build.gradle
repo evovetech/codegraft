@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package sourcerer;
+version "${VERSION_NAME}"
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+apply from: "${rootDir}/gradle/javaArtifacts.gradle"
 
-@Documented
-@Retention(RetentionPolicy.CLASS)
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR})
-public @interface Keep {}
+dependencies {
+    project(':extensions-annotations')
+
+    // testing
+    testCompile "junit:junit:${appJunitVersion}"
+    testCompile "org.mockito:mockito-core:${appMockitoVersion}"
+}

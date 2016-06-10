@@ -50,12 +50,12 @@ public class ExtensionProcessor extends BaseProcessor {
     @Override public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         boolean processed = false;
         for (TypeElement annotationElement : annotations) {
-            Extension extension = annotationElement.getAnnotation(Extension.class);
-            if (extension == null) {
+            ExtensionClass extensionClass = annotationElement.getAnnotation(ExtensionClass.class);
+            if (extensionClass == null) {
                 continue;
             }
 
-            Type type = addExtensionType(extension, annotationElement);
+            Type type = addExtensionType(extensionClass, annotationElement);
             for (Element typeElement : env.getElementsAnnotatedWith(annotationElement)) {
                 // Ensure it is a class element
                 if (typeElement.getKind() != ElementKind.CLASS) {
@@ -90,9 +90,9 @@ public class ExtensionProcessor extends BaseProcessor {
         return BaseProcessor.ALL_ANNOTATION_TYPES;
     }
 
-    private Type addExtensionType(Extension extension, TypeElement annotationElement) {
+    private Type addExtensionType(ExtensionClass extensionClass, TypeElement annotationElement) {
         final ExtensionDescriptor key
-                = new ExtensionDescriptor(extension.kind(), extension.packageName(), extension.className());
+                = new ExtensionDescriptor(extensionClass.kind(), extensionClass.packageName(), extensionClass.className());
         synchronized (extensions) {
             Type ext = extensions.get(key);
             if (ext == null) {
@@ -109,38 +109,38 @@ public class ExtensionProcessor extends BaseProcessor {
         private static final String FILE_EXTENSION = ".sourcerer";
 
         private final TypeElement annotationType;
-        private final LinkedHashSet<ExtensionClass> extensionClasses = new LinkedHashSet<>();
+        private final LinkedHashSet<ExtensionClassHelper> extensionClassHelpers = new LinkedHashSet<>();
 
         private Type(TypeElement annotationType, ExtensionDescriptor descriptor) {
             super(descriptor, OUTPUT_DIR, FILE_EXTENSION);
             this.annotationType = annotationType;
         }
 
-        @Override public List<ExtensionClass> extensionClasses() {
-            synchronized (extensionClasses) {
-                return new ArrayList<>(extensionClasses);
+        @Override public List<ExtensionClassHelper> extensionClasses() {
+            synchronized (extensionClassHelpers) {
+                return new ArrayList<>(extensionClassHelpers);
             }
         }
 
         private void process(TypeElement typeElement) {
-            ExtensionClass extensionClass = ExtensionClass.parse(descriptor().kind(), typeElement);
-            System.out.printf("\nparsed class: %s, extClass: %s\n", typeElement, extensionClass);
-            synchronized (extensionClasses) {
-                extensionClasses.add(extensionClass);
+            ExtensionClassHelper extensionClassHelper = ExtensionClassHelper.parse(descriptor().kind(), typeElement);
+            System.out.printf("\nparsed class: %s, extClass: %s\n", typeElement, extensionClassHelper);
+            synchronized (extensionClassHelpers) {
+                extensionClassHelpers.add(extensionClassHelper);
             }
             System.out.printf("\nthis = %s\n", this);
         }
 
         @Override
         protected void readExtension(BufferedSource source, TypeSpec.Builder classBuilder) throws IOException {
-            ExtensionClass.readMethods(source, this, classBuilder);
+            ExtensionClassHelper.readMethods(source, this, classBuilder);
         }
 
-        @Override protected void writeExtension(BufferedSink sink, ExtensionClass extensionClass) throws IOException {
-            if (descriptor().kind() == Extension.Kind.StaticDelegate) {
-                extensionClass.writeMethods(sink, Modifier.STATIC);
+        @Override protected void writeExtension(BufferedSink sink, ExtensionClassHelper extensionClassHelper) throws IOException {
+            if (descriptor().kind() == ExtensionClass.Kind.StaticDelegate) {
+                extensionClassHelper.writeMethods(sink, Modifier.STATIC);
             } else {
-                extensionClass.writeMethods(sink);
+                extensionClassHelper.writeMethods(sink);
             }
         }
 

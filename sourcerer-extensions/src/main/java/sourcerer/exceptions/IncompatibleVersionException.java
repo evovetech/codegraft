@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package sourcerer;
+package sourcerer.exceptions;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class IncompatibleVersionException extends MetadataException {
+    public IncompatibleVersionException() {}
 
-@Documented
-@Retention(RetentionPolicy.SOURCE)
-@Target({ElementType.TYPE})
-@ExtensionClass(
-        kind = ExtensionClass.Kind.InstanceDelegate,
-        packageName = "sourcerer",
-        className = "SourceModule"
-)
-public @interface Module {}
+    public IncompatibleVersionException(Throwable cause) {
+        super(cause);
+    }
+
+    public IncompatibleVersionException(String message) {
+        super(message);
+    }
+
+    public IncompatibleVersionException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

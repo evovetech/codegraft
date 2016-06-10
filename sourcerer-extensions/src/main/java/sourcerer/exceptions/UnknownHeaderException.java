@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package sourcerer;
+package sourcerer.exceptions;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class UnknownHeaderException extends MetadataException {
+    public UnknownHeaderException() {}
 
-@Documented
-@Retention(RetentionPolicy.SOURCE)
-@Target({ElementType.METHOD})
-public @interface ReturnMethod {
+    public UnknownHeaderException(Throwable cause) {
+        super(cause);
+    }
+
+    public UnknownHeaderException(String message) {
+        super(message);
+    }
+
+    public UnknownHeaderException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

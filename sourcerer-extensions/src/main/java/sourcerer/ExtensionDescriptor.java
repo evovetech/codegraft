@@ -19,13 +19,13 @@ package sourcerer;
 import com.squareup.javapoet.ClassName;
 
 public final class ExtensionDescriptor {
-    private final Extension.Kind kind;
+    private final ExtensionClass.Kind kind;
     private final String packageName;
     private final String className;
     private final String qualifiedName;
     private final ClassName typeName;
 
-    public ExtensionDescriptor(Extension.Kind kind, String packageName, String className) {
+    public ExtensionDescriptor(ExtensionClass.Kind kind, String packageName, String className) {
         this.kind = kind;
         this.packageName = packageName;
         this.className = className;
@@ -49,7 +49,7 @@ public final class ExtensionDescriptor {
         return result;
     }
 
-    public Extension.Kind kind() {
+    public ExtensionClass.Kind kind() {
         return kind;
     }
 

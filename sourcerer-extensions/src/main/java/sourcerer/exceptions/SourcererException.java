@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package sourcerer;
+package sourcerer.exceptions;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.IOException;
 
-@Documented
-@Retention(RetentionPolicy.SOURCE)
-@Target({ElementType.METHOD})
-public @interface VoidMethod {}
+public class SourcererException extends IOException {
+    public SourcererException() {}
+
+    public SourcererException(Throwable cause) {
+        super(cause);
+    }
+
+    public SourcererException(String message) {
+        super(message);
+    }
+
+    public SourcererException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

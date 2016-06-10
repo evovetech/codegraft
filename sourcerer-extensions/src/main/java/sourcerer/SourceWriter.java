@@ -51,18 +51,18 @@ public final class SourceWriter {
         this.classBuilder = TypeSpec.classBuilder(descriptor.className())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
-        final Extension.Kind kind = descriptor.kind();
+        final ExtensionClass.Kind kind = descriptor.kind();
 
         // Constructor
         MethodSpec.Builder constructor = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PRIVATE);
-        if (kind == Extension.Kind.StaticDelegate) {
+        if (kind == ExtensionClass.Kind.StaticDelegate) {
             ClassName exception = ClassName.get(AssertionError.class);
             constructor.addStatement("throw new $T($S)", exception, "no instances");
         }
         classBuilder.addMethod(constructor.build());
 
-        if (kind != Extension.Kind.StaticDelegate) {
+        if (kind != ExtensionClass.Kind.StaticDelegate) {
             // Instance field
             ClassName instanceType = descriptor.typeName();
             FieldSpec instanceField

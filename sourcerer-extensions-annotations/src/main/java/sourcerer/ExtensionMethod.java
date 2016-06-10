@@ -23,7 +23,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Documented
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.CLASS)
 @Target({ElementType.METHOD})
-public @interface ReturnThisMethod {
+public @interface ExtensionMethod {
+    Kind value() default Kind.Void;
+
+    enum Kind {
+        Instance,
+        Return,
+        ReturnThis,
+        Void
+    }
 }

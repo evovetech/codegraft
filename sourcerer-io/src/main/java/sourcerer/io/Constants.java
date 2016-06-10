@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-package sourcerer;
+package sourcerer.io;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import okio.ByteString;
 
-@Documented
-@Retention(RetentionPolicy.SOURCE)
-@Target({ElementType.TYPE})
-@ExtensionClass(
-        kind = ExtensionClass.Kind.InstanceDelegate,
-        packageName = "sourcerer",
-        className = "SourceModule"
-)
-public @interface Module {}
+public interface Constants {
+    ByteString HEADER = ByteString.encodeUtf8("sourcerer");
+    int VERSION = 1;
+}

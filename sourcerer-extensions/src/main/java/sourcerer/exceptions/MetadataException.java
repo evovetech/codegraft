@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package sourcerer;
+package sourcerer.exceptions;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class MetadataException extends SourcererException {
+    public MetadataException() {}
 
-@Documented
-@Retention(RetentionPolicy.SOURCE)
-@Target({ElementType.TYPE})
-@ExtensionClass(
-        kind = ExtensionClass.Kind.InstanceDelegate,
-        packageName = "sourcerer",
-        className = "SourceModule"
-)
-public @interface Module {}
+    public MetadataException(Throwable cause) {
+        super(cause);
+    }
+
+    public MetadataException(String message) {
+        super(message);
+    }
+
+    public MetadataException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

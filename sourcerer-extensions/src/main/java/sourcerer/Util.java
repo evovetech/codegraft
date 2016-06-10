@@ -428,7 +428,7 @@ final class Util {
         return null;
     }
 
-    private static void log(TypeName typeName) {
+    static void log(TypeName typeName) {
         System.out.println("typeName: " + typeName + ", class: " + typeName.getClass());
     }
 
