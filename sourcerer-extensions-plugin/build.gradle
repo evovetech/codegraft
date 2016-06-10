@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.FieldSpec
-import com.squareup.javapoet.JavaFile
-import com.squareup.javapoet.TypeSpec
-import com.squareup.javapoet.TypeName
+
+import com.squareup.javapoet.*
 
 import javax.lang.model.element.Modifier
 
 version "${VERSION_NAME}"
 
-apply plugin: 'groovy'
-apply plugin: 'provided-base'
+apply from: "${rootDir}/gradle/groovyArtifacts.gradle"
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
     compile "com.neenbedankt.gradle.plugins:android-apt:${appAptGradleVersion}"
-    compile(project(':sourcerer')) {
-        exclude group: 'org.codehaus.groovy'
-    }
+    compile project(':extensions')
 }
 
 FieldSpec versionName = FieldSpec.builder(ClassName.get(String.class), 'NAME', Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
@@ -52,5 +46,3 @@ dir.mkdirs()
 JavaFile.builder("sourcerer", classSpec)
         .build()
         .writeTo(dir)
-
-apply from: "${rootDir}/gradle/groovyArtifacts.gradle"

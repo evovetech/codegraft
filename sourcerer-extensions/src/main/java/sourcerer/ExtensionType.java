@@ -31,8 +31,8 @@ import okio.BufferedSource;
 import okio.ByteString;
 import okio.Okio;
 
-import static sourcerer.Constants.FILE_HEADER;
-import static sourcerer.Constants.FILE_VERSION;
+import static sourcerer.Constants.EXTENSION_FILE_HEADER;
+import static sourcerer.Constants.EXTENSION_FILE_VERSION;
 
 public abstract class ExtensionType {
     private final ExtensionDescriptor descriptor;
@@ -52,12 +52,13 @@ public abstract class ExtensionType {
     protected abstract void writeExtension(BufferedSink sink, ExtensionClass extensionClass) throws IOException;
 
     public final void read(BufferedSource source, TypeSpec.Builder classBuilder) throws IOException {
-        ByteString header = source.readByteString(FILE_HEADER.size());
-        if (!FILE_HEADER.equals(header)) {
+        ByteString header = source.readByteString(EXTENSION_FILE_HEADER.size());
+        if (!EXTENSION_FILE_HEADER.equals(header)) {
             throw new IOException("Cannot read from the source. Header is not set");
-        } else if (source.readInt() != FILE_VERSION) {
+        } else if (source.readInt() != EXTENSION_FILE_VERSION) {
             throw new IOException("Cannot read from the source. Version is not current");
         }
+
         int size = source.readInt();
         for (int i = 0; i < size; i++) {
             readExtension(source, classBuilder);
@@ -79,8 +80,8 @@ public abstract class ExtensionType {
     }
 
     private void writeExtensions(BufferedSink sink, List<? extends ExtensionClass> extensions) throws IOException {
-        sink.write(FILE_HEADER);
-        sink.writeInt(FILE_VERSION);
+        sink.write(EXTENSION_FILE_HEADER);
+        sink.writeInt(EXTENSION_FILE_VERSION);
 
         int size = extensions.size();
         sink.writeInt(size);

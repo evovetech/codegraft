@@ -20,7 +20,7 @@ apply from: "${rootDir}/gradle/javaArtifacts.gradle"
 
 dependencies {
     compile project(':extensions')
-    compile project(':processor')
+    compile project(':abstract-processor')
 
     // testing
     testCompile "junit:junit:${appJunitVersion}"
