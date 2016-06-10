@@ -22,13 +22,13 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -37,13 +37,13 @@ import javax.lang.model.element.TypeElement;
 
 import okio.BufferedSink;
 import okio.BufferedSource;
-import sourcerer.processor.Template;
+import sourcerer.processor.BaseProcessor;
 
-@AutoService(Template.class)
-public class ExtensionTemplate extends Template {
+@AutoService(Processor.class)
+public class ExtensionProcessor extends BaseProcessor {
     private final Map<ExtensionDescriptor, Type> extensions;
 
-    public ExtensionTemplate() {
+    public ExtensionProcessor() {
         this.extensions = new HashMap<>();
     }
 
@@ -85,9 +85,9 @@ public class ExtensionTemplate extends Template {
         return processed;
     }
 
-    @Override public Set<String> supportedAnnotationTypes() {
+    @Override public Set<String> getSupportedAnnotationTypes() {
         // We need to process all annotation types
-        return Collections.singleton("*");
+        return ALL_ANNOTATION_TYPES;
     }
 
     private Type addExtensionType(Extension extension, TypeElement annotationElement) {

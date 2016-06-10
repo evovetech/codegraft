@@ -18,29 +18,36 @@ package sourcerer.processor;
 
 import com.google.common.base.MoreObjects;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
 
-public abstract class Template {
+public abstract class BaseProcessor extends AbstractProcessor {
+    protected static final String ALL_ANNOTATIONS = "*";
+    protected static final Set<String> ALL_ANNOTATION_TYPES = Collections.singleton(ALL_ANNOTATIONS);
+
     private final AtomicReference<Env> env = new AtomicReference<>();
 
-    public final void init(ProcessingEnvironment processingEnvironment) {
+    @Override public final synchronized void init(ProcessingEnvironment processingEnvironment) {
+        super.init(processingEnvironment);
         env.compareAndSet(null, new Env(processingEnvironment));
         init(env.get());
     }
 
     protected void init(Env env) {
-        // subclass implementation
+        // subclass override
     }
 
-    public abstract boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env);
+    @Override public abstract Set<String> getSupportedAnnotationTypes();
 
-    public abstract Set<String> supportedAnnotationTypes();
+    @Override public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
+    }
 
     public final Env env() {
         return env.get();
@@ -62,7 +69,7 @@ public abstract class Template {
 
     @Override public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("supportedAnnotationTypes", supportedAnnotationTypes())
+                .add("supportedAnnotationTypes", getSupportedAnnotationTypes())
                 .toString();
     }
 }
