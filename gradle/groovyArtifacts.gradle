@@ -14,44 +14,8 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
-
-version = VERSION_NAME
-group = GROUP
-
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
-
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'jar'
-                name POM_DESCRIPTION
-                url POM_URL
-                licenses {
-                    license {
-                        name POM_LICENSE_NAME
-                        url POM_LICENSE_URL
-                    }
-                }
-                developers {
-                    developer {
-                        id POM_DEVELOPER_ID
-                        name POM_DEVELOPER_NAME
-                        email POM_DEVELOPER_EMAIL
-                    }
-                }
-                scm {
-                    connection POM_SCM_CONNECTION
-                    developerConnection POM_SCM_DEV_CONNECTION
-                    url POM_SCM_URL
-                }
-            }
-        }
-    }
-}
+apply plugin: 'groovy'
+apply from: "${rootDir}/gradle/abstractArtifacts.gradle"
 
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource.srcDirs
@@ -74,32 +38,4 @@ artifacts {
     archives sourcesJar
     archives javadocJar
     archives groovydocJar
-}
-
-bintray {
-    configurations = ['archives']
-
-    publish = true
-
-    pkg {
-        repo = BINTRAY_REPO
-        name = POM_NAME
-        userOrg = BINTRAY_ORG
-        desc = POM_DESCRIPTION
-        websiteUrl = POM_URL
-        vcsUrl = POM_SCM_URL
-        licenses = rootProject.ext.LICENSES
-    }
-}
-
-if (project.hasProperty('bintrayUser') && project.hasProperty('bintrayKey')) {
-    bintray.user = project.bintrayUser
-    bintray.key = project.bintrayKey
-}
-
-if (project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
-    def sync = bintray.pkg.version.mavenCentralSync
-    sync.sync = true
-    sync.user = project.sonatypeUsername
-    sync.password = project.sonatypePassword
 }

@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-include ':sourcerer',
-        ':sourcerer-annotations',
+include ':sourcerer-annotations',
+        ':sourcerer-extensions',
         ':sourcerer-processor',
+        ':sourcerer-extensions-processor',
         ':sourcerer-sample',
         ':sourcerer-sample-annotations'
 
 findProject(':sourcerer-annotations')?.name = 'annotations'
+findProject(':sourcerer-extensions')?.name = 'extensions'
 findProject(':sourcerer-processor')?.name = 'processor'
+findProject(':sourcerer-extensions-processor')?.name = 'extensions-processor'
 findProject(':sourcerer-sample')?.name = 'sample'
 findProject(':sourcerer-sample-annotations')?.name = 'sample-annotations'
 

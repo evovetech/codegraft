@@ -19,6 +19,9 @@ version "${VERSION_NAME}"
 apply from: "${rootDir}/gradle/javaArtifacts.gradle"
 
 dependencies {
+    compile project(':extensions')
+    compile project(':processor')
+
     // testing
     testCompile "junit:junit:${appJunitVersion}"
     testCompile "org.mockito:mockito-core:${appMockitoVersion}"

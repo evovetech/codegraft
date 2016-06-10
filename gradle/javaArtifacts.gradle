@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-version "${VERSION_NAME}"
+apply plugin: 'java'
+apply from: "${rootDir}/gradle/abstractArtifacts.gradle"
 
-apply plugin: 'groovy'
-
-dependencies {
-    compile "org.codehaus.groovy:groovy-all:${appGroovyVersion}"
-    compile "com.squareup:javapoet:${appJavaPoetGradleVersion}"
-    compile "com.squareup.okio:okio:${appOkioVersion}"
-    compile project(':annotations')
-    compile project(':processor')
-
-    // testing
-    testCompile "junit:junit:${appJunitVersion}"
-    testCompile "org.mockito:mockito-core:${appMockitoVersion}"
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource.srcDirs
+    classifier = 'sources'
 }
 
-apply from: "${rootDir}/gradle/groovyArtifacts.gradle"
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+    encoding = 'UTF-8'
+}
 
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}

@@ -87,7 +87,7 @@ public class ExtensionProcessor extends BaseProcessor {
 
     @Override public Set<String> getSupportedAnnotationTypes() {
         // We need to process all annotation types
-        return ALL_ANNOTATION_TYPES;
+        return BaseProcessor.ALL_ANNOTATION_TYPES;
     }
 
     private Type addExtensionType(Extension extension, TypeElement annotationElement) {
