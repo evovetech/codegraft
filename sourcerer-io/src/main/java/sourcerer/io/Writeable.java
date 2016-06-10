@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-version "${VERSION_NAME}"
+package sourcerer.io;
 
-apply from: "${rootDir}/gradle/javaArtifacts.gradle"
+import java.io.IOException;
 
-dependencies {
-    compile project(':extensions-annotations')
-    compile project(':io')
+public interface Writeable {
+    Writeable Null = new Writeable() {
+        @Override public void writeTo(Writer writer) throws IOException {
+            writer.writeString("null");
+        }
+    };
 
-    // testing
-    testCompile "junit:junit:${appJunitVersion}"
-    testCompile "org.mockito:mockito-core:${appMockitoVersion}"
+    void writeTo(Writer writer) throws IOException;
 }

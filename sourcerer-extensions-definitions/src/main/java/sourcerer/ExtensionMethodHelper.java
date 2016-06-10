@@ -30,7 +30,8 @@ final class ExtensionMethodHelper {
     final ExecutableElement method;
     final List<TypeElement> returnAnnotations;
 
-    private ExtensionMethodHelper(ExtensionMethodKind kind, ExecutableElement method, List<TypeElement> returnAnnotations) {
+    private ExtensionMethodHelper(ExtensionMethodKind kind, ExecutableElement method,
+            List<TypeElement> returnAnnotations) {
         if (kind == ExtensionMethodKind.Instance && method.getParameters().size() > 0) {
             throw new IllegalArgumentException("instance method cannot have parameters");
         }

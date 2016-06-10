@@ -34,6 +34,9 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
+import sourcerer.io.Reader;
+import sourcerer.io.Writer;
+
 final class ExtensionClassHelper {
     private final ExtensionClass.Kind kind;
     private final TypeElement element;
@@ -63,7 +66,7 @@ final class ExtensionClassHelper {
             ExtensionMethodHelper method = ExtensionMethodHelper.parse(memberElement);
             if (method == null) continue;
             switch (method.kind) {
-                case ExtensionMethodKind.Instance:
+                case Instance:
                     if (instanceMethod != null) {
                         String format = "Cannot have instance method '%s' when '%s' is already defined";
                         String message = String.format(format, method.name(), instanceMethod.name());
@@ -96,8 +99,8 @@ final class ExtensionClassHelper {
         writer.writeList(methods, new MethodInk(modifiers));
     }
 
-    static List<MethodSpec> readMethods(Reader reader, ExtensionType kind) throws IOException {
-        return reader.readList(new MethodParser(kind));
+    static List<MethodSpec> readMethods(Reader reader, TypeName type) throws IOException {
+        return reader.readList(new MethodParser(type));
     }
 
     @Override public String toString() {
@@ -147,12 +150,12 @@ final class ExtensionClassHelper {
             ExtensionMethodKind methodKind = extensionMethodHelper.kind;
             writer.writeString(methodKind.name());
             switch (methodKind) {
-                case ExtensionMethodKind.Return:
+                case Return:
                     TypeName returnType = TypeName.get(methodElement.getReturnType());
                     writer.writeTypeName(returnType);
                     break;
-                case ExtensionMethodKind.ReturnThis:
-                case ExtensionMethodKind.Void:
+                case ReturnThis:
+                case Void:
                     break;
                 default:
                     throw new IllegalStateException("invalid method kind");
@@ -161,10 +164,10 @@ final class ExtensionClassHelper {
     }
 
     private static final class MethodParser implements Reader.Parser<MethodSpec> {
-        private final ExtensionType kind;
+        private final TypeName type;
 
-        private MethodParser(ExtensionType kind) {
-            this.kind = kind;
+        private MethodParser(TypeName type) {
+            this.type = type;
         }
 
         @Override public MethodSpec parse(Reader reader) throws IOException {
@@ -193,18 +196,18 @@ final class ExtensionClassHelper {
             // Read method kind
             ExtensionMethodKind methodKind = ExtensionMethodKind.read(reader);
             switch (methodKind) {
-                case ExtensionMethodKind.Return:
+                case Return:
                     TypeName returnType = reader.readTypeName();
                     methodBuilder.returns(returnType);
                     statement = "return " + statement;
                     methodBuilder.addStatement(statement, classType);
                     break;
-                case ExtensionMethodKind.ReturnThis:
-                    methodBuilder.returns(kind.descriptor().typeName());
+                case ReturnThis:
+                    methodBuilder.returns(type);
                     methodBuilder.addStatement(statement, classType);
                     methodBuilder.addStatement("return this");
                     break;
-                case ExtensionMethodKind.Void:
+                case Void:
                     methodBuilder.addStatement(statement, classType);
                     break;
                 default:

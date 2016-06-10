@@ -16,61 +16,90 @@
 
 package sourcerer.io;
 
-import java.util.zip.ZipEntry;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 
-public final class Descriptor {
+public abstract class Descriptor {
     private final String dir;
-    private final String fileExtension;
+    private final String ext;
 
-    public Descriptor(String dir, String fileExtension) {
+    protected Descriptor(String dir, String ext) {
         this.dir = dir;
-        this.fileExtension = fileExtension;
+        this.ext = ext;
     }
 
-    public String dir() {
+    public final String dir() {
         return dir;
     }
 
-    public String fileExtension() {
-        return fileExtension;
+    public final String fileExtension() {
+        return ext;
     }
 
-    public File parseFile(ZipEntry entry) {
-        final String path = entry.getName();
-        if (path.startsWith(dir)) {
-            String other = path.substring(dir.length(), path.length());
-            if (other.length() >= 2 && other.startsWith("/")) {
-                return file(other.substring(1, other.length()));
-            }
-        }
-        return null;
+    public abstract File file(String fileName);
+
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Descriptor)) return false;
+        Descriptor that = (Descriptor) o;
+        return Objects.equal(dir, that.dir) &&
+                Objects.equal(ext, that.ext);
     }
 
-    public File file(String fileName) {
-        return new File(fileName);
+    @Override public int hashCode() {
+        return Objects.hashCode(dir, ext);
     }
 
-    public final class File {
+    @Override public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("dir", dir)
+                .add("fileExtension", ext)
+                .toString();
+    }
+
+    public abstract class File {
         private final String fileName;
 
-        private File(String fileName) {
+        protected File(File file) {
+            this(file.fileName);
+        }
+
+        protected File(String fileName) {
             this.fileName = fileName;
         }
 
-        public String fileName() {
+        public final String fileName() {
             return fileName;
         }
 
-        public String extFileName() {
-            return fileName + fileExtension;
+        public final String extFileName() {
+            return fileName + ext;
         }
 
-        public String extFilePath() {
+        public final String extFilePath() {
             return dir + "/" + extFileName();
         }
 
-        public boolean matches(ZipEntry entry) {
-            return extFilePath().equals(entry.getName());
+        public abstract Descriptor descriptor();
+
+        public abstract Writer newWriter();
+
+        @Override public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof File)) return false;
+            File that = (File) o;
+            return Objects.equal(descriptor(), that.descriptor())
+                    && Objects.equal(fileName, that.fileName);
+        }
+
+        @Override public int hashCode() {
+            return Objects.hashCode(fileName);
+        }
+
+        @Override public String toString() {
+            return MoreObjects.toStringHelper(this)
+                    .add("fileName", fileName)
+                    .toString();
         }
     }
 }

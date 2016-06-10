@@ -17,23 +17,26 @@
 package sourcerer;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.util.Set;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
+import sourcerer.io.Reader;
+import sourcerer.io.Writer;
+
 enum ExtensionMethodKind {
-    Instance(sourcerer.InstanceMethod.class),
-    Void(sourcerer.VoidMethod.class),
-    Return(sourcerer.ReturnMethod.class),
-    ReturnThis(sourcerer.ReturnThisMethod.class);
+    Instance(ExtensionMethod.Kind.Instance),
+    Return(ExtensionMethod.Kind.Return),
+    ReturnThis(ExtensionMethod.Kind.ReturnThis),
+    Void(ExtensionMethod.Kind.Void);
 
-    final Class<? extends Annotation> annotationType;
+    final Class<ExtensionMethod> annotationType = ExtensionMethod.class;
+    final ExtensionMethod.Kind kind;
 
-    ExtensionMethodKind(Class<? extends Annotation> annotationType) {
-        this.annotationType = annotationType;
+    ExtensionMethodKind(ExtensionMethod.Kind kind) {
+        this.kind = kind;
     }
 
     static ExtensionMethodKind read(Reader reader) throws IOException {
@@ -52,7 +55,7 @@ enum ExtensionMethodKind {
 
     void validate(Element element) {
         String name = element.getSimpleName().toString();
-        String format = String.format("'%s' element with annotation '%s' %s", name, annotationType, "%s");
+        String format = String.format("'%s' element with method kind '%s' %s", name, kind, "%s");
         if (element.getKind() != ElementKind.METHOD) {
             String message = String.format(format, "must be a method");
             throw new IllegalArgumentException(message);

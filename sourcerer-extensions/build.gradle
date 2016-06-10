@@ -19,9 +19,6 @@ version "${VERSION_NAME}"
 apply from: "${rootDir}/gradle/javaArtifacts.gradle"
 
 dependencies {
-    compile "com.google.guava:guava:${appGuavaVersion}"
-    compile "com.squareup:javapoet:${appJavaPoetGradleVersion}"
-    compile "com.squareup.okio:okio:${appOkioVersion}"
     compile project(':extensions-definitions')
 
     // testing

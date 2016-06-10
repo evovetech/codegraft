@@ -24,6 +24,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeVariableName;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,14 +34,23 @@ import java.util.Set;
 import javax.lang.model.element.Modifier;
 
 import okio.BufferedSource;
+import okio.Okio;
 
 public class Reader {
     private final Descriptor.File file;
     private final BufferedSource source;
 
-    Reader(Descriptor.File file, BufferedSource source) {
+    protected Reader(Descriptor.File file, BufferedSource source) {
         this.file = file;
         this.source = source;
+    }
+
+    public static Reader newReader(Descriptor.File file, InputStream is) {
+        return new Reader(file, Okio.buffer(Okio.source(is)));
+    }
+
+    public static Reader newReader(Descriptor.File file, BufferedSource source) {
+        return new Reader(file, source);
     }
 
     public Descriptor.File file() {
@@ -90,11 +100,11 @@ public class Reader {
     }
 
     public TypeName readTypeName() throws IOException {
-        return TypeNameKind.read(this);
+        return SrcType.read(this);
     }
 
     public List<TypeName> readTypeNames() throws IOException {
-        return readList(TypeNameKind.PARSER);
+        return SrcType.readList(this);
     }
 
     public List<ParameterSpec> readParams() throws IOException {
@@ -156,12 +166,12 @@ public class Reader {
 
     private static final Parser<ParameterSpec> PARAM_PARSER = new Parser<ParameterSpec>() {
         @Override public ParameterSpec parse(Reader reader) throws IOException {
-            // Read name
-            String name = reader.readString();
-
             // Read type
             TypeName type = reader.readTypeName();
             if (type != null) {
+                // Read name
+                String name = reader.readString();
+
                 // Read modifiers
                 Set<Modifier> paramModifiers = reader.readModifiers();
 

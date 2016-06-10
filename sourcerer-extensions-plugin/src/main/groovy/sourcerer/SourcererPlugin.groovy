@@ -30,7 +30,7 @@ class SourcererPlugin implements Plugin<Project> {
         project.apply(plugin: 'com.neenbedankt.android-apt')
         project.android.applicationVariants.all { variant ->
             String taskName = "generate${variant.name.capitalize()}StashExtensionSources"
-            SourcesTask task = project.tasks.create(taskName, SourcesTask)
+            SourcesTask task = project.tasks.newReader(taskName, SourcesTask)
             task.inputFiles = new ArrayList<>(variant.getCompileLibraries())
             task.outputDir = new File(project.buildDir, "generated/source/stash/${variant.dirName}")
             task.init()

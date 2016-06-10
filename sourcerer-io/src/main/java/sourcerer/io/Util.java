@@ -16,9 +16,12 @@
 
 package sourcerer.io;
 
-import okio.ByteString;
+import com.squareup.javapoet.TypeName;
 
-public interface Constants {
-    ByteString HEADER = ByteString.encodeUtf8("sourcerer");
-    int VERSION = 1;
+final class Util {
+    private Util() { throw new AssertionError("no instances"); }
+
+    static void log(TypeName typeName) {
+        System.out.println("typeName: " + typeName + ", class: " + typeName.getClass());
+    }
 }
