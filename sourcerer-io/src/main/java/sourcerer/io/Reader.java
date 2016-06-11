@@ -23,6 +23,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeVariableName;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,25 +37,19 @@ import javax.lang.model.element.Modifier;
 import okio.BufferedSource;
 import okio.Okio;
 
-public class Reader {
-    private final Descriptor.File file;
+public class Reader implements Closeable {
     private final BufferedSource source;
 
-    protected Reader(Descriptor.File file, BufferedSource source) {
-        this.file = file;
+    protected Reader(BufferedSource source) {
         this.source = source;
     }
 
-    public static Reader newReader(Descriptor.File file, InputStream is) {
-        return new Reader(file, Okio.buffer(Okio.source(is)));
+    public static Reader newReader(InputStream is) {
+        return new Reader(Okio.buffer(Okio.source(is)));
     }
 
-    public static Reader newReader(Descriptor.File file, BufferedSource source) {
-        return new Reader(file, source);
-    }
-
-    public Descriptor.File file() {
-        return file;
+    public static Reader newReader(BufferedSource source) {
+        return new Reader(source);
     }
 
     public String readString() throws IOException {
@@ -113,6 +108,10 @@ public class Reader {
 
     public List<AnnotationSpec> readAnnotations() throws IOException {
         return readList(ANNOTATION_PARSER);
+    }
+
+    @Override public void close() throws IOException {
+        source.close();
     }
 
     public interface Parser<T> {

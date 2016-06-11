@@ -40,12 +40,12 @@ import okio.BufferedSource;
 import okio.Okio;
 
 public final class SourceWriter {
-    private final ExtensionType ext;
-    private final ExtensionDescriptor descriptor;
+    private final Extensions ext;
+    private final Extension descriptor;
     private final TypeSpec.Builder classBuilder;
 
-    SourceWriter(ExtensionType ext) {
-        final ExtensionDescriptor descriptor = ext.descriptor();
+    SourceWriter(Extensions ext) {
+        final Extension descriptor = ext.descriptor();
         this.ext = ext;
         this.descriptor = descriptor;
         this.classBuilder = TypeSpec.classBuilder(descriptor.className())

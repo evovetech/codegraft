@@ -24,13 +24,26 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
 import sourcerer.io.Reader;
+import sourcerer.io.Writeable;
 import sourcerer.io.Writer;
 
-enum ExtensionMethodKind {
+enum ExtensionMethodKind implements Writeable {
     Instance(ExtensionMethod.Kind.Instance),
     Return(ExtensionMethod.Kind.Return),
     ReturnThis(ExtensionMethod.Kind.ReturnThis),
     Void(ExtensionMethod.Kind.Void);
+
+    public static Reader.Parser<ExtensionMethodKind> PARSER = new Reader.Parser<ExtensionMethodKind>() {
+        @Override public ExtensionMethodKind parse(Reader reader) throws IOException {
+            String name = reader.readString();
+            for (ExtensionMethodKind kind : values()) {
+                if (name.equalsIgnoreCase(kind.name())) {
+                    return kind;
+                }
+            }
+            throw new IllegalStateException("invalid method kind: " + name);
+        }
+    };
 
     final Class<ExtensionMethod> annotationType = ExtensionMethod.class;
     final ExtensionMethod.Kind kind;
@@ -40,16 +53,10 @@ enum ExtensionMethodKind {
     }
 
     static ExtensionMethodKind read(Reader reader) throws IOException {
-        String name = reader.readString();
-        for (ExtensionMethodKind kind : values()) {
-            if (name.equalsIgnoreCase(kind.name())) {
-                return kind;
-            }
-        }
-        throw new IllegalStateException("invalid method kind: " + name);
+        return PARSER.parse(reader);
     }
 
-    void write(Writer writer) throws IOException {
+    @Override public void writeTo(Writer writer) throws IOException {
         writer.writeString(name());
     }
 

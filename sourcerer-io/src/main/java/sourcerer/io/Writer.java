@@ -23,6 +23,7 @@ import com.squareup.javapoet.TypeName;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -36,20 +37,28 @@ import javax.lang.model.type.TypeMirror;
 
 import okio.BufferedSink;
 import okio.ByteString;
+import okio.Okio;
 
 import static sourcerer.io.Writeable.Null;
 
 public class Writer implements Closeable, Flushable {
-    private final Descriptor.File file;
     private final BufferedSink sink;
 
-    Writer(Descriptor.File file, BufferedSink sink) {
-        this.file = file;
+    protected Writer(BufferedSink sink) {
         this.sink = sink;
     }
 
-    public Descriptor.File file() {
-        return file;
+    public static Writer newWriter(OutputStream out) {
+        return new Writer(Okio.buffer(Okio.sink(out)));
+    }
+
+    public static Writer newWriter(BufferedSink sink) {
+        return new Writer(sink);
+    }
+
+    public Writer write(Writeable writeable) throws IOException {
+        writeable.writeTo(this);
+        return this;
     }
 
     public Writer writeString(String entry) throws IOException {

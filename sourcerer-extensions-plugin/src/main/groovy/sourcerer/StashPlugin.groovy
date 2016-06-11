@@ -36,7 +36,7 @@ class StashPlugin implements Plugin<Project> {
             variant.registerJavaGeneratingTask(task, task.outputDir)
         }
         project.android.packagingOptions {
-            for (ExtensionType kind : ExtensionType.values()) {
+            for (Extensions kind : Extensions.values()) {
                 exclude kind.resourceFilePath()
             }
         }

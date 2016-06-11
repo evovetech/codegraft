@@ -17,15 +17,13 @@
 package sourcerer;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableList;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -35,13 +33,15 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
 import sourcerer.io.Reader;
+import sourcerer.io.Writeable;
 import sourcerer.io.Writer;
 
-final class ExtensionClassHelper {
+final class ExtensionClassHelper implements Writeable {
     private final ExtensionClass.Kind kind;
     private final TypeElement element;
     private final ExtensionMethodHelper instanceMethod;
-    private final List<ExtensionMethodHelper> methods;
+    private final ImmutableList<ExtensionMethodHelper> methods;
+    private final MethodInk methodInk;
 
     private ExtensionClassHelper(ExtensionClass.Kind kind, TypeElement element, ExtensionMethodHelper instanceMethod,
             List<ExtensionMethodHelper> methods) {
@@ -56,7 +56,8 @@ final class ExtensionClassHelper {
         this.kind = kind;
         this.element = element;
         this.instanceMethod = instanceMethod;
-        this.methods = Collections.unmodifiableList(methods);
+        this.methods = ImmutableList.copyOf(methods);
+        this.methodInk = new MethodInk();
     }
 
     static ExtensionClassHelper parse(ExtensionClass.Kind kind, TypeElement element) {
@@ -95,13 +96,17 @@ final class ExtensionClassHelper {
         return element.getQualifiedName().toString().hashCode();
     }
 
-    void writeMethods(Writer writer, Modifier... modifiers) throws IOException {
-        writer.writeList(methods, new MethodInk(modifiers));
+    @Override public void writeTo(Writer writer) throws IOException {
+        writer.writeList(methods, methodInk);
     }
 
-    static List<MethodSpec> readMethods(Reader reader, TypeName type) throws IOException {
-        return reader.readList(new MethodParser(type));
-    }
+    //    void writeMethods(Writer writer, Modifier... modifiers) throws IOException {
+//        writer.writeList(methods, new MethodInk(modifiers));
+//    }
+//
+//    static List<MethodSpec> readMethods(Reader reader, TypeName type) throws IOException {
+//        return reader.readList(new MethodParser(type));
+//    }
 
     @Override public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -111,13 +116,9 @@ final class ExtensionClassHelper {
     }
 
     private final class MethodInk implements Writer.Inker<ExtensionMethodHelper> {
-        private final Modifier[] modifiers;
+        private MethodInk() {}
 
-        private MethodInk(Modifier[] modifiers) {
-            this.modifiers = modifiers;
-        }
-
-        @Override public void pen(Writer writer, ExtensionMethodHelper extensionMethodHelper) throws IOException {
+        @Override public boolean pen(Writer writer, ExtensionMethodHelper extensionMethodHelper) throws IOException {
             ExecutableElement methodElement = extensionMethodHelper.method;
 
             // Write method name
@@ -125,9 +126,7 @@ final class ExtensionClassHelper {
             writer.writeString(methodName);
 
             // Write modifiers
-            Set<Modifier> mods = new HashSet<>(methodElement.getModifiers());
-            mods.addAll(Arrays.asList(modifiers));
-            writer.writeModifiers(mods);
+            writer.writeModifiers(methodElement.getModifiers());
 
             // Write type parameters
             writer.writeTypeParams(methodElement.getTypeParameters());
@@ -160,6 +159,7 @@ final class ExtensionClassHelper {
                 default:
                     throw new IllegalStateException("invalid method kind");
             }
+            return true;
         }
     }
 

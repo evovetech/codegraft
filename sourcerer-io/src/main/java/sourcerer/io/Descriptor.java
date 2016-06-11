@@ -82,8 +82,6 @@ public abstract class Descriptor {
 
         public abstract Descriptor descriptor();
 
-        public abstract Writer newWriter();
-
         @Override public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof File)) return false;

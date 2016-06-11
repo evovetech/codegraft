@@ -25,8 +25,13 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.zip.ZipInputStream;
 
+import javax.annotation.processing.Filer;
+import javax.tools.FileObject;
+import javax.tools.StandardLocation;
+
 import sourcerer.io.Descriptor;
 import sourcerer.io.Reader;
+import sourcerer.io.Writer;
 
 public class MetaInf extends Descriptor {
     private static final String DIR = "META-INF/sourcerer";
@@ -38,6 +43,11 @@ public class MetaInf extends Descriptor {
 
     public static MetaInf create(String dir) {
         return new MetaInf(dir);
+    }
+
+    public static MetaInf.File file(String dir, String fileName) {
+        return new MetaInf(dir)
+                .file(fileName);
     }
 
     public static <T> ListMultimap<MetaInf, Entry<T>> fromJar(List<MetaInf> metaList, JarInputStream jar,
@@ -79,7 +89,7 @@ public class MetaInf extends Descriptor {
     private <T> Entry<T> entry(ZipInputStream zis, JarEntry jarEntry, Reader.Parser<T> parser) throws IOException {
         MetaInf.File metaFile = parseFile(jarEntry);
         if (metaFile != null) {
-            T value = parser.parse(Reader.newReader(metaFile, zis));
+            T value = parser.parse(Reader.newReader(zis));
             return new Entry<>(metaFile, value);
         }
         return null;
@@ -94,7 +104,12 @@ public class MetaInf extends Descriptor {
             super(fileName);
         }
 
-        @Override protected MetaInf descriptor() {
+        public Writer newWriter(Filer filer) throws IOException {
+            FileObject output = filer.createResource(StandardLocation.CLASS_OUTPUT, "", extFilePath());
+            return Writer.newWriter(output.openOutputStream());
+        }
+
+        @Override public MetaInf descriptor() {
             return MetaInf.this;
         }
     }

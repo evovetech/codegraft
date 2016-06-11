@@ -43,7 +43,7 @@ public class SourcesTask extends DefaultTask {
     }
 
     public void write() {
-        Set<SourceWriter> sourceWriters = ExtensionType.sourceWriters()
+        Set<SourceWriter> sourceWriters = Extensions.sourceWriters()
         inputFiles.each { file ->
             if (file.name.contains(".aar")) {
                 def zip = new ZipFile(file)

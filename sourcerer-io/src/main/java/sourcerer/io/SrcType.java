@@ -27,43 +27,22 @@ import java.io.IOException;
 import java.util.List;
 
 public final class SrcType {
-    private static final Reader.Parser<SrcType> SRC_PARSER = new Reader.Parser<SrcType>() {
-        @Override public SrcType parse(Reader reader) throws IOException {
-            String name = reader.readString();
-            Kind kind = Kind.find(name);
-            return new SrcType(kind, kind.parse(reader));
-        }
-    };
-    private static final Writer.Inker<SrcType> SRC_INKER = new Writer.Inker<SrcType>() {
-        @Override public boolean pen(Writer writer, SrcType srcType) throws IOException {
-            Kind kind = srcType.kind;
-            writer.writeString(kind.name());
-            return kind.pen(writer, srcType.typeName);
-        }
-    };
     private static final Reader.Parser<TypeName> TYPE_PARSER = new Reader.Parser<TypeName>() {
         @Override public TypeName parse(Reader reader) throws IOException {
-            return SRC_PARSER.parse(reader)
-                    .typeName;
+            String name = reader.readString();
+            Kind kind = Kind.find(name);
+            return kind.parse(reader);
         }
     };
     private static final Writer.Inker<TypeName> TYPE_INKER = new Writer.Inker<TypeName>() {
         @Override public boolean pen(Writer writer, TypeName typeName) throws IOException {
-            return SRC_INKER.pen(writer, new SrcType(typeName));
+            Kind kind = Kind.find(typeName);
+            writer.writeString(kind.name());
+            return kind.pen(writer, typeName);
         }
     };
 
-    private final Kind kind;
-    private final TypeName typeName;
-
-    private SrcType(TypeName typeName) {
-        this(Kind.find(typeName), typeName);
-    }
-
-    private SrcType(Kind kind, TypeName typeName) {
-        this.kind = kind;
-        this.typeName = typeName;
-    }
+    private SrcType() { throw new AssertionError("no instances"); }
 
     public static TypeName read(Reader reader) throws IOException {
         return TYPE_PARSER.parse(reader);
@@ -79,10 +58,6 @@ public final class SrcType {
 
     public static void writeList(Writer writer, List<TypeName> typeNames) throws IOException {
         writer.writeList(typeNames, TYPE_INKER);
-    }
-
-    public TypeName typeName() {
-        return typeName;
     }
 
     private enum Kind implements ReadWriter<TypeName> {

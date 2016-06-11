@@ -34,6 +34,16 @@ public @interface ExtensionClass {
 
     enum Kind {
         InstanceDelegate,
-        StaticDelegate
+        StaticDelegate,
+        Unknown;
+
+        public static Kind fromName(String name) {
+            for (Kind kind : values()) {
+                if (kind.name().equals(name)) {
+                    return kind;
+                }
+            }
+            return Unknown;
+        }
     }
 }
