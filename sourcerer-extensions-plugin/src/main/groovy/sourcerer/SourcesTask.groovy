@@ -17,14 +17,16 @@
 package sourcerer
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 
 import java.util.zip.ZipFile
 
 public class SourcesTask extends DefaultTask {
+
     @InputFiles
-    Collection<File> inputFiles
+    FileCollection inputFiles
 
     @OutputDirectory
     File outputDir
@@ -43,7 +45,7 @@ public class SourcesTask extends DefaultTask {
     }
 
     public void write() {
-        Set<SourceWriter> sourceWriters = Extensions.sourceWriters()
+        final SourceWriters writers = new SourceWriters();
         inputFiles.each { file ->
             if (file.name.contains(".aar")) {
                 def zip = new ZipFile(file)
@@ -52,16 +54,14 @@ public class SourcesTask extends DefaultTask {
                     if (zipEntry == null) {
                         throw new IllegalStateException("can't find classes")
                     }
-                    Util.read(zip.getInputStream(zipEntry), sourceWriters)
+                    writers.read(zip.getInputStream(zipEntry))
                 } finally {
                     zip.close()
                 }
             } else if (file.name.contains(".jar")) {
-                Util.read(new FileInputStream(file), sourceWriters)
+                writers.read(new FileInputStream(file))
             }
         }
-        for (SourceWriter writer : sourceWriters) {
-            writer.write(outputDir)
-        }
+        writers.writeTo(outputDir)
     }
 }

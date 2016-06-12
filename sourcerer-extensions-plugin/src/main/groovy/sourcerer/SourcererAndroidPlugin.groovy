@@ -20,7 +20,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 
-class StashPlugin implements Plugin<Project> {
+class SourcererAndroidPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         if (!project.plugins.findPlugin("com.android.application") && !project.plugins.findPlugin("android")) {
@@ -28,20 +28,15 @@ class StashPlugin implements Plugin<Project> {
         }
         project.apply(plugin: 'com.neenbedankt.android-apt')
         project.android.applicationVariants.all { variant ->
-            String taskName = "generate${variant.name.capitalize()}StashExtensionSources"
+            String taskName = "generate${variant.name.capitalize()}SourcererExtensions"
             SourcesTask task = project.tasks.create(taskName, SourcesTask)
             task.inputFiles = new ArrayList<>(variant.getCompileLibraries())
-            task.outputDir = new File(project.buildDir, "generated/source/stash/${variant.dirName}")
+            task.outputDir = new File(project.buildDir, "generated/source/sourcerer/${variant.dirName}")
             task.init()
             variant.registerJavaGeneratingTask(task, task.outputDir)
         }
         project.android.packagingOptions {
-            for (Extensions kind : Extensions.values()) {
-                exclude kind.resourceFilePath()
-            }
-        }
-        project.dependencies {
-//            apt "com.laynemobile.stash:stash-compiler:${Version.NAME}"
+            exclude Extensions.instance().file().extFilePath()
         }
     }
 }

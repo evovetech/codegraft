@@ -17,6 +17,7 @@
 package sourcerer;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.squareup.javapoet.MethodSpec;
 
 import java.io.IOException;
@@ -37,15 +38,24 @@ public final class Extensions {
     private static final String DIR = "ext";
     private static final String FILE_NAME = "extensions";
 
+    private static final Extensions INSTANCE = new Extensions();
+
     private final MetaInf.File file;
 
-    public Extensions() {
+    private Extensions() {
         this.file = MetaInf.file(DIR, FILE_NAME);
     }
 
     public static Processor processor() {
-        return new Extensions()
-                .newProcessor();
+        return INSTANCE.newProcessor();
+    }
+
+    public static Extensions instance() {
+        return INSTANCE;
+    }
+
+    public MetaInf.File file() {
+        return file;
     }
 
     public Processor newProcessor() {
@@ -116,9 +126,8 @@ public final class Extensions {
             this.extensions = ImmutableList.copyOf(extensions);
         }
 
-        public static List<SourceWriter> sourceWriters(JarInputStream jar) throws IOException {
-            Extensions extensions = new Extensions();
-            MetaInf.File file = extensions.file;
+        public static Map<Extension, List<MethodSpec>> fromJar(JarInputStream jar) throws IOException {
+            MetaInf.File file = INSTANCE.file;
 
             Map<Extension, List<MethodSpec>> map = new HashMap<>();
             for (MetaInf.Entry<Sourcerer> entry : MetaInf.fromJar(file, jar, PARSER)) {
@@ -132,14 +141,7 @@ public final class Extensions {
                     values.addAll(ext.methods());
                 }
             }
-
-            ImmutableList.Builder<SourceWriter> list = ImmutableList.builder();
-            for (Map.Entry<Extension, List<MethodSpec>> entry : map.entrySet()) {
-                Extension.Sourcerer sourcerer = Extension.Sourcerer.create(entry.getKey(), entry.getValue());
-                list.add(sourcerer.newSourceWriter());
-            }
-
-            return list.build();
+            return ImmutableMap.copyOf(map);
         }
 
         @Override public Iterator<Extension.Sourcerer> iterator() {
