@@ -17,7 +17,6 @@
 package sourcerer
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 
@@ -26,7 +25,7 @@ import java.util.zip.ZipFile
 public class SourcesTask extends DefaultTask {
 
     @InputFiles
-    FileCollection inputFiles
+    Collection<File> inputFiles
 
     @OutputDirectory
     File outputDir
