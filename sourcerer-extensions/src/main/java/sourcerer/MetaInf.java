@@ -155,7 +155,7 @@ public class MetaInf extends Descriptor {
                 throw new UnknownHeaderException(msg);
             }
             Value64 version = Value64.read(reader);
-            if (VERSION.equals(version)) {
+            if (!VERSION.equals(version)) {
                 String msg = String.format(Locale.US, FORMAT, "Version", VERSION, version);
                 throw new IncompatibleVersionException(msg);
             }
