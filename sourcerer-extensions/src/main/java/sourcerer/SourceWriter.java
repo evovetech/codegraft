@@ -26,32 +26,24 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.zip.ZipEntry;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
 import javax.tools.JavaFileObject;
 
-import okio.BufferedSource;
-import okio.Okio;
-
 public final class SourceWriter {
-    private final Extensions ext;
-    private final Extension descriptor;
+    private final Extension ext;
     private final TypeSpec.Builder classBuilder;
 
-    SourceWriter(Extensions ext) {
-        final Extension descriptor = ext.descriptor();
-        this.ext = ext;
-        this.descriptor = descriptor;
-        this.classBuilder = TypeSpec.classBuilder(descriptor.className())
+    SourceWriter(Extension.Sourcerer sourcerer) {
+        this.ext = sourcerer.extension();
+        this.classBuilder = TypeSpec.classBuilder(ext.className())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
-        final ExtensionClass.Kind kind = descriptor.kind();
+        final ExtensionClass.Kind kind = ext.kind();
 
         // Constructor
         MethodSpec.Builder constructor = MethodSpec.constructorBuilder()
@@ -64,7 +56,7 @@ public final class SourceWriter {
 
         if (kind != ExtensionClass.Kind.StaticDelegate) {
             // Instance field
-            ClassName instanceType = descriptor.typeName();
+            ClassName instanceType = ext.typeName();
             FieldSpec instanceField
                     = FieldSpec.builder(instanceType, "INSTANCE", Modifier.PRIVATE, Modifier.STATIC,
                     Modifier.FINAL)
@@ -80,24 +72,16 @@ public final class SourceWriter {
                     .build();
             classBuilder.addMethod(instanceMethod);
         }
-    }
 
-    public void read(InputStream is) throws IOException {
-        // Read method data from buffer into java source
-        BufferedSource source = Okio.buffer(Okio.source(is));
-        read(source);
-    }
-
-    public void read(BufferedSource source) throws IOException {
-        ext.read(source, classBuilder);
+        classBuilder.addMethods(sourcerer.methods());
     }
 
     public void writeTo(Filer filer) throws IOException {
-        JavaFileObject fileObject = filer.createSourceFile(descriptor.qualifiedName());
+        JavaFileObject fileObject = filer.createSourceFile(ext.qualifiedName());
         writeTo(fileObject.openOutputStream());
     }
 
-    public void write(File outputDir) throws IOException {
+    public void writeTo(File outputDir) throws IOException {
         String packagePath = ext.javaPackagePath();
         if (!packagePath.isEmpty()) {
             outputDir = new File(outputDir, packagePath);
@@ -109,16 +93,12 @@ public final class SourceWriter {
 
     private void writeTo(OutputStream out) throws IOException {
         // Write java file
-        JavaFile javaFile = JavaFile.builder(descriptor.packageName(), classBuilder.build())
+        JavaFile javaFile = JavaFile.builder(ext.packageName(), classBuilder.build())
                 .build();
 
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(out))) {
             javaFile.writeTo(writer);
             writer.flush();
         }
-    }
-
-    public boolean matches(ZipEntry entry) {
-        return ext.resourceFilePath().equals(entry.getName());
     }
 }

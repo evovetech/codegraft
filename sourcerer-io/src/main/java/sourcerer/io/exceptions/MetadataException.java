@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-package sourcerer;
+package sourcerer.io.exceptions;
 
-import okio.ByteString;
+public class MetadataException extends SourcererException {
+    public MetadataException() {}
 
-public interface Constants {
-    ByteString HEADER = ByteString.encodeUtf8("sourcerer");
-    int VERSION = 1;
+    public MetadataException(Throwable cause) {
+        super(cause);
+    }
+
+    public MetadataException(String message) {
+        super(message);
+    }
+
+    public MetadataException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

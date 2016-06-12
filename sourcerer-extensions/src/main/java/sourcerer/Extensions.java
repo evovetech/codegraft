@@ -16,13 +16,21 @@
 
 package sourcerer;
 
+import com.google.common.collect.ImmutableList;
+import com.squareup.javapoet.MethodSpec;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.jar.JarInputStream;
 
 import javax.annotation.processing.Filer;
 
+import sourcerer.io.Reader;
 import sourcerer.io.Writer;
 
 public final class Extensions {
@@ -70,16 +78,72 @@ public final class Extensions {
         }
 
         public void writeTo(Filer filer) throws IOException {
-            Writer writer = file.newWriter(filer);
+            Writer writer = null;
+            try {
+                writer = file.newWriter(filer);
 
-            // HEADER, VERSION
+                // Write HEADER, VERSION
 
-            // Each extension
-            List<Extension.Processor> list;
-            synchronized (extensions) {
-                list = new ArrayList<>(extensions);
+                // Write ach extension
+                List<Extension.Processor> list;
+                synchronized (extensions) {
+                    list = new ArrayList<>(extensions);
+                }
+                writer.writeList(list);
+                writer.flush();
+            } finally {
+                if (writer != null) {
+                    writer.close();
+                }
             }
-            writer.writeList(list);
+        }
+    }
+
+    public static final class Sourcerer implements Iterable<Extension.Sourcerer> {
+        private static final Reader.Parser<Sourcerer> PARSER = new Reader.Parser<Sourcerer>() {
+            @Override public Sourcerer parse(Reader reader) throws IOException {
+                // Read HEADER, VERSION
+
+                // Read each extension
+                List<Extension.Sourcerer> extensions = Extension.Sourcerer.readList(reader);
+                return new Sourcerer(extensions);
+            }
+        };
+
+        private final ImmutableList<Extension.Sourcerer> extensions;
+
+        private Sourcerer(List<Extension.Sourcerer> extensions) {
+            this.extensions = ImmutableList.copyOf(extensions);
+        }
+
+        public static List<SourceWriter> sourceWriters(JarInputStream jar) throws IOException {
+            Extensions extensions = new Extensions();
+            MetaInf.File file = extensions.file;
+
+            Map<Extension, List<MethodSpec>> map = new HashMap<>();
+            for (MetaInf.Entry<Sourcerer> entry : MetaInf.fromJar(file, jar, PARSER)) {
+                for (Extension.Sourcerer ext : entry.value()) {
+                    Extension key = ext.extension();
+                    List<MethodSpec> values = map.get(key);
+                    if (values == null) {
+                        values = new ArrayList<>();
+                        map.put(key, values);
+                    }
+                    values.addAll(ext.methods());
+                }
+            }
+
+            ImmutableList.Builder<SourceWriter> list = ImmutableList.builder();
+            for (Map.Entry<Extension, List<MethodSpec>> entry : map.entrySet()) {
+                Extension.Sourcerer sourcerer = Extension.Sourcerer.create(entry.getKey(), entry.getValue());
+                list.add(sourcerer.newSourceWriter());
+            }
+
+            return list.build();
+        }
+
+        @Override public Iterator<Extension.Sourcerer> iterator() {
+            return extensions.iterator();
         }
     }
 
@@ -103,7 +167,7 @@ public final class Extensions {
         }
 
         private void process(TypeElement typeElement) {
-            ExtensionClassHelper extensionClassHelper = ExtensionClassHelper.parse(descriptor().kind(), typeElement);
+            ExtensionClassHelper extensionClassHelper = ExtensionClassHelper.process(descriptor().kind(), typeElement);
             System.out.printf("\nparsed class: %s, extClass: %s\n", typeElement, extensionClassHelper);
             synchronized (extensionClassHelpers) {
                 extensionClassHelpers.add(extensionClassHelper);

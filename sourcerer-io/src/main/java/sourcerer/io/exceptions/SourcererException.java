@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-version "${VERSION_NAME}"
+package sourcerer.io.exceptions;
 
-apply from: "${rootDir}/gradle/javaArtifacts.gradle"
+import java.io.IOException;
 
-dependencies {
-    compile project(':extensions-annotations')
-    compile project(':io')
+public class SourcererException extends IOException {
+    public SourcererException() {}
 
-    // testing
-    testCompile "junit:junit:${appJunitVersion}"
-    testCompile "org.mockito:mockito-core:${appMockitoVersion}"
+    public SourcererException(Throwable cause) {
+        super(cause);
+    }
+
+    public SourcererException(String message) {
+        super(message);
+    }
+
+    public SourcererException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

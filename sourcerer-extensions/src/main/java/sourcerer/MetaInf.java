@@ -16,21 +16,21 @@
 
 package sourcerer;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
-import java.util.zip.ZipInputStream;
 
-import javax.annotation.processing.Filer;
-import javax.tools.FileObject;
-import javax.tools.StandardLocation;
-
+import sourcerer.exceptions.IncompatibleVersionException;
+import sourcerer.exceptions.UnknownHeaderException;
 import sourcerer.io.Descriptor;
 import sourcerer.io.Reader;
+import sourcerer.io.Value64;
 import sourcerer.io.Writer;
 
 public class MetaInf extends Descriptor {
@@ -65,6 +65,32 @@ public class MetaInf extends Descriptor {
         return map.build();
     }
 
+    public static <T> List<Entry<T>> fromJar(MetaInf.File metaFile, JarInputStream jar,
+            Reader.Parser<T> parser) throws IOException {
+        MetaInf metaInf = metaFile.descriptor();
+        JarEntry jarEntry;
+        ImmutableList.Builder<Entry<T>> list = ImmutableList.builder();
+        while ((jarEntry = jar.getNextJarEntry()) != null) {
+            if (metaFile.matches(jarEntry)) {
+                list.add(metaInf.entry(jar, metaFile, parser));
+            }
+        }
+        return list.build();
+    }
+
+    public static <T> List<Entry<T>> fromJar(MetaInf metaInf, JarInputStream jar,
+            Reader.Parser<T> parser) throws IOException {
+        JarEntry jarEntry;
+        ImmutableList.Builder<Entry<T>> list = ImmutableList.builder();
+        while ((jarEntry = jar.getNextJarEntry()) != null) {
+            Entry<T> entry = metaInf.entry(jar, jarEntry, parser);
+            if (entry != null) {
+                list.add(entry);
+            }
+        }
+        return list.build();
+    }
+
     private static String dir(String dir) {
         if (dir.isEmpty()) throw new IllegalArgumentException("dir must not be empty");
         return DIR + "/" + dir;
@@ -86,16 +112,29 @@ public class MetaInf extends Descriptor {
         return new File(fileName);
     }
 
-    private <T> Entry<T> entry(ZipInputStream zis, JarEntry jarEntry, Reader.Parser<T> parser) throws IOException {
+    private <T> Entry<T> entry(JarInputStream jar, JarEntry jarEntry, Reader.Parser<T> parser) throws IOException {
         MetaInf.File metaFile = parseFile(jarEntry);
         if (metaFile != null) {
-            T value = parser.parse(Reader.newReader(zis));
-            return new Entry<>(metaFile, value);
+            return entry(jar, metaFile, parser);
         }
         return null;
     }
 
-    public class File extends Descriptor.File {
+    private <T> Entry<T> entry(JarInputStream jar, MetaInf.File metaFile, Reader.Parser<T> parser) throws IOException {
+        Reader reader = Reader.newReader(jar);
+        metaFile.assertCanRead(reader);
+        T value = parser.parse(reader);
+        return new Entry<>(metaFile, value);
+    }
+
+    private interface FileConstants {
+        Value64 HEADER = Value64.from("sourcerer");
+        Value64 VERSION = Value64.from(1);
+    }
+
+    public class File extends Descriptor.File implements FileConstants {
+        final String FORMAT = "Cannot read from the source. '%s' should be '%s', but is '%s'";
+
         protected File(File file) {
             super(file);
         }
@@ -104,9 +143,22 @@ public class MetaInf extends Descriptor {
             super(fileName);
         }
 
-        public Writer newWriter(Filer filer) throws IOException {
-            FileObject output = filer.createResource(StandardLocation.CLASS_OUTPUT, "", extFilePath());
-            return Writer.newWriter(output.openOutputStream());
+        @Override public final void writeTo(Writer writer) throws IOException {
+            writer.write(HEADER);
+            writer.write(VERSION);
+        }
+
+        public final void assertCanRead(Reader reader) throws IOException {
+            Value64 header = Value64.read(reader);
+            if (!HEADER.equals(header)) {
+                String msg = String.format(Locale.US, FORMAT, "Header", HEADER, header);
+                throw new UnknownHeaderException(msg);
+            }
+            Value64 version = Value64.read(reader);
+            if (VERSION.equals(version)) {
+                String msg = String.format(Locale.US, FORMAT, "Version", VERSION, version);
+                throw new IncompatibleVersionException(msg);
+            }
         }
 
         @Override public MetaInf descriptor() {

@@ -26,7 +26,7 @@ import com.squareup.javapoet.WildcardTypeName;
 import java.io.IOException;
 import java.util.List;
 
-public final class SrcType {
+public final class TypeNames {
     private static final Reader.Parser<TypeName> TYPE_PARSER = new Reader.Parser<TypeName>() {
         @Override public TypeName parse(Reader reader) throws IOException {
             String name = reader.readString();
@@ -42,7 +42,7 @@ public final class SrcType {
         }
     };
 
-    private SrcType() { throw new AssertionError("no instances"); }
+    private TypeNames() { throw new AssertionError("no instances"); }
 
     public static TypeName read(Reader reader) throws IOException {
         return TYPE_PARSER.parse(reader);

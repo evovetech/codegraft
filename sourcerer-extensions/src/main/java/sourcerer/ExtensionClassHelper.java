@@ -37,6 +37,7 @@ import sourcerer.io.Writeable;
 import sourcerer.io.Writer;
 
 final class ExtensionClassHelper implements Writeable {
+
     private final ExtensionClass.Kind kind;
     private final TypeElement element;
     private final ExtensionMethodHelper instanceMethod;
@@ -60,11 +61,11 @@ final class ExtensionClassHelper implements Writeable {
         this.methodInk = new MethodInk();
     }
 
-    static ExtensionClassHelper parse(ExtensionClass.Kind kind, TypeElement element) {
+    static ExtensionClassHelper process(ExtensionClass.Kind kind, TypeElement element) {
         ExtensionMethodHelper instanceMethod = null;
         List<ExtensionMethodHelper> methods = new ArrayList<>();
         for (Element memberElement : element.getEnclosedElements()) {
-            ExtensionMethodHelper method = ExtensionMethodHelper.parse(memberElement);
+            ExtensionMethodHelper method = ExtensionMethodHelper.process(memberElement);
             if (method == null) continue;
             switch (method.kind) {
                 case Instance:
@@ -81,6 +82,10 @@ final class ExtensionClassHelper implements Writeable {
             }
         }
         return new ExtensionClassHelper(kind, element, instanceMethod, methods);
+    }
+
+    public static Reader.Parser<MethodSpec> methodParser(TypeName typeName) {
+        return new MethodParser(typeName);
     }
 
     @Override public boolean equals(Object o) {
@@ -146,7 +151,7 @@ final class ExtensionClassHelper implements Writeable {
             writer.writeString(statement);
 
             // Write method kind
-            ExtensionMethodKind methodKind = extensionMethodHelper.kind;
+            ExtensionMethod.Kind methodKind = extensionMethodHelper.kind;
             writer.writeString(methodKind.name());
             switch (methodKind) {
                 case Return:
@@ -194,7 +199,8 @@ final class ExtensionClassHelper implements Writeable {
             String statement = reader.readString();
 
             // Read method kind
-            ExtensionMethodKind methodKind = ExtensionMethodKind.read(reader);
+            ExtensionMethod.Kind methodKind
+                    = Enum.valueOf(ExtensionMethod.Kind.class, reader.readString());
             switch (methodKind) {
                 case Return:
                     TypeName returnType = reader.readTypeName();

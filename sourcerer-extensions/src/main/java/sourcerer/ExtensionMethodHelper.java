@@ -16,41 +16,48 @@
 
 package sourcerer;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
 final class ExtensionMethodHelper {
-    final ExtensionMethodKind kind;
-    final ExecutableElement method;
-    final List<TypeElement> returnAnnotations;
+    static final Class<ExtensionMethod> ANNOTATION_TYPE = ExtensionMethod.class;
+    static final String ANNOTATION_NAME = ANNOTATION_TYPE.getCanonicalName();
 
-    private ExtensionMethodHelper(ExtensionMethodKind kind, ExecutableElement method,
-            List<TypeElement> returnAnnotations) {
-        if (kind == ExtensionMethodKind.Instance && method.getParameters().size() > 0) {
+    final ExtensionMethod.Kind kind;
+    final ExecutableElement method;
+    final ImmutableList<AnnotationMirror> returnAnnotations;
+
+    private ExtensionMethodHelper(ExtensionMethod.Kind kind, ExecutableElement method,
+            List<AnnotationMirror> returnAnnotations) {
+        if (kind == ExtensionMethod.Kind.Instance && method.getParameters().size() > 0) {
             throw new IllegalArgumentException("instance method cannot have parameters");
         }
         this.kind = kind;
         this.method = method;
-        this.returnAnnotations = Collections.unmodifiableList(returnAnnotations);
+        this.returnAnnotations = ImmutableList.copyOf(returnAnnotations);
     }
 
-    public static ExtensionMethodHelper parse(Element memberElement) {
-        ExtensionMethodKind methodKind = null;
-        List<TypeElement> others = new ArrayList<>();
+    public static ExtensionMethodHelper process(Element memberElement) {
+        ExtensionMethod.Kind methodKind = null;
+        List<AnnotationMirror> others = new ArrayList<>();
         for (AnnotationMirror am : memberElement.getAnnotationMirrors()) {
-            ExtensionMethodKind kind = parseAnnotation(am, others);
+            ExtensionMethod.Kind kind = parseAnnotation(memberElement, am, others);
             if (methodKind != null && kind != null) {
-                String format = "Cannot have annotation '%s' when '%s' is already present";
-                String message = String.format(format, kind.annotationType, methodKind.annotationType);
+                String format = "Cannot have annotation '%s' when it is already present";
+                String message = String.format(format, ANNOTATION_TYPE);
                 throw new IllegalStateException(message);
             } else if (kind != null) {
-                kind.validate(memberElement);
+                validate(kind, memberElement);
                 methodKind = kind;
             }
         }
@@ -59,19 +66,42 @@ final class ExtensionMethodHelper {
                 : new ExtensionMethodHelper(methodKind, (ExecutableElement) memberElement, others);
     }
 
-    private static ExtensionMethodKind parseAnnotation(AnnotationMirror am, List<TypeElement> others) {
+    String name() {
+        return method.getSimpleName().toString();
+    }
+
+    private static ExtensionMethod.Kind parseAnnotation(Element memberElement, AnnotationMirror am,
+            List<AnnotationMirror> others) {
         TypeElement te = (TypeElement) am.getAnnotationType().asElement();
         String name = te.getQualifiedName().toString();
-        for (ExtensionMethodKind annotationKind : ExtensionMethodKind.values()) {
-            if (name.equals(annotationKind.annotationType.getCanonicalName())) {
-                return annotationKind;
-            }
+        if (ANNOTATION_NAME.equals(name)) {
+            ExtensionMethod method = memberElement.getAnnotation(ANNOTATION_TYPE);
+            return method.value();
         }
-        others.add(te);
+        others.add(am);
         return null;
     }
 
-    String name() {
-        return method.getSimpleName().toString();
+    private static void validate(ExtensionMethod.Kind kind, Element element) {
+        String name = element.getSimpleName().toString();
+        String format = String.format("'%s' element with method kind '%s' %s", name, kind, "%s");
+        if (element.getKind() != ElementKind.METHOD) {
+            String message = String.format(format, "must be a method");
+            throw new IllegalArgumentException(message);
+        }
+        Set<Modifier> modifiers = element.getModifiers();
+        if (!modifiers.contains(Modifier.PUBLIC)) {
+            String message = String.format(format, "must be public");
+            throw new IllegalArgumentException(message);
+        }
+        if (kind == ExtensionMethod.Kind.Instance) {
+            if (!modifiers.contains(Modifier.STATIC)) {
+                String message = "Instance Method " + String.format(format, "must be static");
+                throw new IllegalArgumentException(message);
+            }
+        } else if (modifiers.contains(Modifier.STATIC)) {
+            String message = String.format(format, "must not be static");
+            throw new IllegalArgumentException(message);
+        }
     }
 }

@@ -19,6 +19,13 @@ package sourcerer.io;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
+import java.io.IOException;
+import java.util.jar.JarEntry;
+
+import javax.annotation.processing.Filer;
+import javax.tools.FileObject;
+import javax.tools.StandardLocation;
+
 public abstract class Descriptor {
     private final String dir;
     private final String ext;
@@ -57,7 +64,7 @@ public abstract class Descriptor {
                 .toString();
     }
 
-    public abstract class File {
+    public abstract class File implements Writeable {
         private final String fileName;
 
         protected File(File file) {
@@ -80,7 +87,20 @@ public abstract class Descriptor {
             return dir + "/" + extFileName();
         }
 
-        public abstract Descriptor descriptor();
+        public boolean matches(JarEntry jarEntry) {
+            return extFilePath().equals(jarEntry.getName());
+        }
+
+        public final Writer newWriter(Filer filer) throws IOException {
+            FileObject output = filer.createResource(StandardLocation.CLASS_OUTPUT, "", extFilePath());
+            Writer writer = Writer.newWriter(output.openOutputStream());
+            writeTo(writer);
+            return writer;
+        }
+
+        public Descriptor descriptor() {
+            return Descriptor.this;
+        }
 
         @Override public boolean equals(Object o) {
             if (this == o) return true;

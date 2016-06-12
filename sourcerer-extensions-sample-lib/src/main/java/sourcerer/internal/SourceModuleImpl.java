@@ -16,10 +16,8 @@
 
 package sourcerer.internal;
 
-import sourcerer.InstanceMethod;
+import sourcerer.ExtensionMethod;
 import sourcerer.Module;
-import sourcerer.ReturnMethod;
-import sourcerer.ReturnThisMethod;
 
 @Module
 public class SourceModuleImpl {
@@ -29,18 +27,18 @@ public class SourceModuleImpl {
 
     private SourceModuleImpl() {}
 
-    @InstanceMethod public static SourceModuleImpl instance() {
+    @ExtensionMethod(ExtensionMethod.Kind.Instance) public static SourceModuleImpl instance() {
         return INSTANCE;
     }
 
-    @ReturnThisMethod public SourceModuleImpl init(Object context) {
+    @ExtensionMethod(ExtensionMethod.Kind.ReturnThis) public SourceModuleImpl init(Object context) {
         if (this.context == null && context != null) {
             this.context = context;
         }
         return this;
     }
 
-    @ReturnMethod public Object context() {
+    @ExtensionMethod(ExtensionMethod.Kind.Return) public Object context() {
         return context;
     }
 }

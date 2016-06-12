@@ -17,10 +17,13 @@
 package sourcerer;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.MethodSpec;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -31,13 +34,6 @@ import sourcerer.io.Writeable;
 import sourcerer.io.Writer;
 
 public final class Extension {
-    public static final Reader.Parser<Extension> PARSER = new Reader.Parser<Extension>() {
-        @Override public Extension parse(Reader reader) throws IOException {
-            // TODO: read ExtensionClassHelper
-            return new Extension(reader.readString(), reader.readClassName());
-        }
-    };
-
     private final ExtensionClass.Kind kind;
     private final String packageName;
     private final String className;
@@ -124,6 +120,14 @@ public final class Extension {
         return typeName;
     }
 
+    public String javaPackagePath() {
+        return packageName().replace('.', '/');
+    }
+
+    public String javaFileName() {
+        return className() + ".java";
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Extension)) return false;
@@ -152,7 +156,7 @@ public final class Extension {
         }
 
         public boolean process(TypeElement typeElement) {
-            ExtensionClassHelper classHelper = ExtensionClassHelper.parse(kind(), typeElement);
+            ExtensionClassHelper classHelper = ExtensionClassHelper.process(kind(), typeElement);
             System.out.printf("\nparsed class: %s, extClass: %s\n", typeElement, classHelper);
             boolean result;
             synchronized (classHelpers) {
@@ -163,11 +167,60 @@ public final class Extension {
         }
 
         @Override public void writeTo(Writer writer) throws IOException {
+            // Write extension
+            writer.writeString(kind.name());
+            writer.writeClassName(typeName);
+
             List<ExtensionClassHelper> list;
             synchronized (classHelpers) {
                 list = new ArrayList<>(classHelpers);
             }
             writer.writeList(list);
+        }
+    }
+
+    public static final class Sourcerer {
+        private static final Reader.Parser<Sourcerer> PARSER = new Reader.Parser<Sourcerer>() {
+            @Override public Sourcerer parse(Reader reader) throws IOException {
+                String kind = reader.readString();
+                ClassName typeName = reader.readClassName();
+                Extension extension = new Extension(kind, typeName);
+                Reader.Parser<MethodSpec> parser = ExtensionClassHelper.methodParser(typeName);
+                List<MethodSpec> methods = reader.readList(parser);
+                return new Sourcerer(extension, methods);
+            }
+        };
+
+        private final Extension extension;
+        private final ImmutableList<MethodSpec> methods;
+
+        private Sourcerer(Extension extension, Collection<MethodSpec> methods) {
+            this.extension = extension;
+            this.methods = ImmutableList.copyOf(methods);
+        }
+
+        public static Sourcerer create(Extension extension, Collection<MethodSpec> methods) {
+            return new Sourcerer(extension, methods);
+        }
+
+        public static Sourcerer read(Reader reader) throws IOException {
+            return PARSER.parse(reader);
+        }
+
+        public static List<Sourcerer> readList(Reader reader) throws IOException {
+            return reader.readList(PARSER);
+        }
+
+        public Extension extension() {
+            return extension;
+        }
+
+        public ImmutableList<MethodSpec> methods() {
+            return methods;
+        }
+
+        public SourceWriter newSourceWriter() {
+            return new SourceWriter(this);
         }
     }
 }

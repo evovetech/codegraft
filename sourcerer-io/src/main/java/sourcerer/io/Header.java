@@ -14,22 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.exceptions;
+package sourcerer.io;
 
-import java.io.IOException;
-
-public class SourcererException extends IOException {
-    public SourcererException() {}
-
-    public SourcererException(Throwable cause) {
-        super(cause);
-    }
-
-    public SourcererException(String message) {
-        super(message);
-    }
-
-    public SourcererException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public class Header {
 }

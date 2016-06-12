@@ -19,7 +19,8 @@ version "${VERSION_NAME}"
 apply from: "${rootDir}/gradle/javaArtifacts.gradle"
 
 dependencies {
-    compile project(':extensions-definitions')
+    compile project(':extensions-annotations')
+    compile project(':io')
 
     // testing
     testCompile "junit:junit:${appJunitVersion}"

@@ -16,6 +16,8 @@
 
 package sourcerer.exceptions;
 
+import sourcerer.io.exceptions.MetadataException;
+
 public class UnknownHeaderException extends MetadataException {
     public UnknownHeaderException() {}
 

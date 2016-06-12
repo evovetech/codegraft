@@ -35,12 +35,13 @@ import java.util.Set;
 import javax.lang.model.element.Modifier;
 
 import okio.BufferedSource;
+import okio.ByteString;
 import okio.Okio;
 
-public class Reader implements Closeable {
+public final class Reader implements Closeable {
     private final BufferedSource source;
 
-    protected Reader(BufferedSource source) {
+    private Reader(BufferedSource source) {
         this.source = source;
     }
 
@@ -52,9 +53,17 @@ public class Reader implements Closeable {
         return new Reader(source);
     }
 
-    public String readString() throws IOException {
+    public ByteString read() throws IOException {
         int length = source.readInt();
-        return source.readUtf8(length);
+        return source.readByteString(length);
+    }
+
+    public String readString() throws IOException {
+        return read().utf8();
+    }
+
+    Version readVersion() throws IOException {
+        return Version.version(source.readInt());
     }
 
     public <T> List<T> readList(Parser<T> parser) throws IOException {
@@ -95,11 +104,11 @@ public class Reader implements Closeable {
     }
 
     public TypeName readTypeName() throws IOException {
-        return SrcType.read(this);
+        return TypeNames.read(this);
     }
 
     public List<TypeName> readTypeNames() throws IOException {
-        return SrcType.readList(this);
+        return TypeNames.readList(this);
     }
 
     public List<ParameterSpec> readParams() throws IOException {

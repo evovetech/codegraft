@@ -24,7 +24,6 @@ import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -61,11 +60,18 @@ public class Writer implements Closeable, Flushable {
         return this;
     }
 
-    public Writer writeString(String entry) throws IOException {
-        ByteString val = ByteString.encodeUtf8(entry);
+    void writeVersion(Version version) throws IOException {
+        sink.writeInt(version.value());
+    }
+
+    public Writer write(ByteString val) throws IOException {
         sink.writeInt(val.size());
         sink.write(val);
         return this;
+    }
+
+    public Writer writeString(String entry) throws IOException {
+        return write(ByteString.encodeUtf8(entry));
     }
 
     public <T extends Writeable> Writer writeList(List<T> list) throws IOException {
@@ -96,7 +102,7 @@ public class Writer implements Closeable, Flushable {
     }
 
     public Writer writeModifiers(Set<Modifier> modifiers) throws IOException {
-        return writeList(new ArrayList<>(modifiers), MODIFIER_INK);
+        return writeList(ImmutableList.copyOf(modifiers), MODIFIER_INK);
     }
 
     public Writer writeTypeParams(List<? extends TypeParameterElement> typeParams) throws IOException {
@@ -114,12 +120,12 @@ public class Writer implements Closeable, Flushable {
     }
 
     public Writer writeTypeName(TypeName typeName) throws IOException {
-        SrcType.write(this, typeName);
+        TypeNames.write(this, typeName);
         return this;
     }
 
     public Writer writeTypeNames(List<TypeName> typeNames) throws IOException {
-        SrcType.writeList(this, typeNames);
+        TypeNames.writeList(this, typeNames);
         return this;
     }
 
@@ -143,8 +149,8 @@ public class Writer implements Closeable, Flushable {
         return paramString.toString();
     }
 
-    public Writer writeAnnotations(List<TypeElement> annotations) throws IOException {
-        writeList(annotations, ANNOTATION_INK);
+    public Writer writeAnnotations(List<AnnotationMirror> annotations) throws IOException {
+        writeList(annotations, ANNOTATION_MIRROR_INK);
         return this;
     }
 
@@ -187,7 +193,7 @@ public class Writer implements Closeable, Flushable {
 
     private static final Inker<TypeMirror> TYPE_MIRROR_INK = new Inker<TypeMirror>() {
         @Override public boolean pen(Writer writer, TypeMirror typeMirror) throws IOException {
-            return SrcType.write(writer, TypeName.get(typeMirror));
+            return TypeNames.write(writer, TypeName.get(typeMirror));
         }
     };
 
@@ -199,17 +205,10 @@ public class Writer implements Closeable, Flushable {
         }
     };
 
-    private static final Inker<TypeElement> ANNOTATION_INK = new Inker<TypeElement>() {
-        @Override public boolean pen(Writer writer, TypeElement typeElement) throws IOException {
-            writer.writeClassName(ClassName.get(typeElement));
-            return true;
-        }
-    };
-
     private static final Inker<VariableElement> PARAM_INK = new Inker<VariableElement>() {
         @Override public boolean pen(Writer writer, VariableElement param) throws IOException {
             // Write type
-            if (SrcType.write(writer, TypeName.get(param.asType()))) {
+            if (TypeNames.write(writer, TypeName.get(param.asType()))) {
                 // Write name
                 writer.writeString(param.getSimpleName().toString());
 
@@ -217,7 +216,7 @@ public class Writer implements Closeable, Flushable {
                 writer.writeModifiers(param.getModifiers());
 
                 // Write annotations
-                writer.writeList(ImmutableList.copyOf(param.getAnnotationMirrors()), ANNOTATION_MIRROR_INK);
+                writer.writeAnnotations(ImmutableList.copyOf(param.getAnnotationMirrors()));
                 return true;
             }
             return false;
