@@ -19,6 +19,7 @@ include ':sourcerer-io',
         ':sourcerer-extensions',
         ':sourcerer-extensions-annotations',
         ':sourcerer-extensions-processor',
+        ':sourcerer-extensions-test-processor',
         ':sourcerer-extensions-plugin',
         ':sourcerer-extensions-sample-lib',
         ':sourcerer-extensions-sample-lib-annotations'
@@ -28,7 +29,7 @@ findProject(':sourcerer-abstract-processor')?.name = 'abstract-processor'
 findProject(':sourcerer-extensions')?.name = 'extensions'
 findProject(':sourcerer-extensions-annotations')?.name = 'extensions-annotations'
 findProject(':sourcerer-extensions-processor')?.name = 'extensions-processor'
+findProject(':sourcerer-extensions-test-processor')?.name = 'extensions-test-processor'
 findProject(':sourcerer-extensions-plugin')?.name = 'extensions-plugin'
 findProject(':sourcerer-extensions-sample-lib')?.name = 'extensions-sample-lib'
 findProject(':sourcerer-extensions-sample-lib-annotations')?.name = 'extensions-sample-lib-annotations'
-

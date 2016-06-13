@@ -31,6 +31,7 @@ import java.util.jar.JarInputStream;
 
 import javax.annotation.processing.Filer;
 
+import okio.BufferedSink;
 import sourcerer.io.Reader;
 import sourcerer.io.Writer;
 
@@ -87,14 +88,18 @@ public final class Extensions {
             }
         }
 
+        /* visible for testing */
+        final void writeTo(BufferedSink sink) throws IOException {
+            writeTo(file.newWriter(sink));
+        }
+
         public void writeTo(Filer filer) throws IOException {
-            Writer writer = null;
+            writeTo(file.newWriter(filer));
+        }
+
+        private void writeTo(Writer writer) throws IOException {
             try {
-                writer = file.newWriter(filer);
-
-                // Write HEADER, VERSION
-
-                // Write ach extension
+                // Write each extension
                 List<Extension.Processor> list;
                 synchronized (extensions) {
                     list = new ArrayList<>(extensions);
@@ -112,8 +117,6 @@ public final class Extensions {
     public static final class Sourcerer implements Iterable<Extension.Sourcerer> {
         private static final Reader.Parser<Sourcerer> PARSER = new Reader.Parser<Sourcerer>() {
             @Override public Sourcerer parse(Reader reader) throws IOException {
-                // Read HEADER, VERSION
-
                 // Read each extension
                 List<Extension.Sourcerer> extensions = Extension.Sourcerer.readList(reader);
                 return new Sourcerer(extensions);
@@ -140,6 +143,21 @@ public final class Extensions {
                     }
                     values.addAll(ext.methods());
                 }
+            }
+            return ImmutableMap.copyOf(map);
+        }
+
+        /* visible for testing */
+        static Map<Extension, List<MethodSpec>> read(Reader reader) throws IOException {
+            Map<Extension, List<MethodSpec>> map = new HashMap<>();
+            for (Extension.Sourcerer ext : PARSER.parse(reader)) {
+                Extension key = ext.extension();
+                List<MethodSpec> values = map.get(key);
+                if (values == null) {
+                    values = new ArrayList<>();
+                    map.put(key, values);
+                }
+                values.addAll(ext.methods());
             }
             return ImmutableMap.copyOf(map);
         }

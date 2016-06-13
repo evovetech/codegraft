@@ -29,6 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarInputStream;
 
+import javax.annotation.processing.Filer;
+
+import okio.Buffer;
+import sourcerer.io.Reader;
+
 public class SourceWriters {
     private final Map<Extension, List<MethodSpec>> extensions = new HashMap<>();
 
@@ -44,6 +49,29 @@ public class SourceWriters {
                 }
                 methods.addAll(entry.getValue());
             }
+        }
+    }
+
+    /* visible for testing */
+    synchronized void read(Buffer source) throws IOException {
+        Reader reader = Reader.newReader(source);
+        MetaInf.File metaFile = Extensions.instance().file();
+        metaFile.assertCanRead(reader);
+        Map<Extension, List<MethodSpec>> map = Extensions.Sourcerer.read(reader);
+        for (Map.Entry<Extension, List<MethodSpec>> entry : map.entrySet()) {
+            Extension ext = entry.getKey();
+            List<MethodSpec> methods = extensions.get(ext);
+            if (methods == null) {
+                methods = new ArrayList<>();
+                extensions.put(ext, methods);
+            }
+            methods.addAll(entry.getValue());
+        }
+    }
+
+    void writeTo(Filer filer) throws IOException {
+        for (SourceWriter sourceWriter : sourceWriters()) {
+            sourceWriter.writeTo(filer);
         }
     }
 

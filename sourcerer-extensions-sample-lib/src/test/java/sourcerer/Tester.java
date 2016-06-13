@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-version "${VERSION_NAME}"
+package sourcerer;
 
-apply plugin: 'java'
-apply plugin: 'provided-base'
+import org.junit.Test;
 
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
+public class Tester {
 
-dependencies {
-    compile project(':extensions-sample-lib-annotations')
-    provided project(':extensions-test-processor')
+    @Test public void testModuleCreated() {
 
-    // testing
-//    testCompile project(':extensions-test-processor')
-    testCompile "junit:junit:${appJunitVersion}"
-    testCompile "org.mockito:mockito-core:${appMockitoVersion}"
+    }
 }

@@ -26,6 +26,9 @@ import javax.annotation.processing.Filer;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
+import okio.BufferedSink;
+import okio.Okio;
+
 public abstract class Descriptor {
     private final String dir;
     private final String ext;
@@ -93,7 +96,13 @@ public abstract class Descriptor {
 
         public final Writer newWriter(Filer filer) throws IOException {
             FileObject output = filer.createResource(StandardLocation.CLASS_OUTPUT, "", extFilePath());
-            Writer writer = Writer.newWriter(output.openOutputStream());
+            BufferedSink sink = Okio.buffer(Okio.sink(output.openOutputStream()));
+            return newWriter(sink);
+        }
+
+        /* visible for testing */
+        public final Writer newWriter(BufferedSink sink) throws IOException {
+            Writer writer = Writer.newWriter(sink);
             writeTo(writer);
             return writer;
         }
