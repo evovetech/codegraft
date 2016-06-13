@@ -37,7 +37,6 @@ import sourcerer.io.Writeable;
 import sourcerer.io.Writer;
 
 final class ExtensionClassHelper implements Writeable {
-
     private final ExtensionClass.Kind kind;
     private final TypeElement element;
     private final ExtensionMethodHelper instanceMethod;
@@ -84,8 +83,13 @@ final class ExtensionClassHelper implements Writeable {
         return new ExtensionClassHelper(kind, element, instanceMethod, methods);
     }
 
-    public static Reader.Parser<MethodSpec> methodParser(TypeName typeName) {
-        return new MethodParser(typeName);
+    public static Reader.Parser<List<MethodSpec>> parser(TypeName typeName) {
+        final MethodParser methodParser = new MethodParser(typeName);
+        return new Reader.Parser<List<MethodSpec>>() {
+            @Override public List<MethodSpec> parse(Reader reader) throws IOException {
+                return reader.readList(methodParser);
+            }
+        };
     }
 
     @Override public boolean equals(Object o) {

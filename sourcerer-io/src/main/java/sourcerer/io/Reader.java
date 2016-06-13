@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.lang.model.element.Modifier;
 
@@ -71,16 +72,19 @@ public final class Reader implements Closeable {
 
     public <T> List<T> readList(Parser<T> parser) throws IOException {
         int size = source.readInt();
-        Util.log("readList(parser) size=%d", size);
+        UUID uuid = UUID.randomUUID();
+        Util.log("readList(%s) size=%d", uuid, size);
         if (size == 0) {
             return Collections.emptyList();
         }
         ImmutableList.Builder<T> list = ImmutableList.builder();
         for (int i = 0; i < size; i++) {
             T t = parser.parse(this);
+            Util.log("readList(%s) entry=%s", uuid, t);
             if (t != null) {
-                Util.log("readList i=%d is null", i);
                 list.add(t);
+            } else {
+                Util.log("readList i=%d is null", i);
             }
         }
         return list.build();

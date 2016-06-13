@@ -185,9 +185,13 @@ public final class Extension {
                 String kind = reader.readString();
                 ClassName typeName = reader.readClassName();
                 Extension extension = new Extension(kind, typeName);
-                Reader.Parser<MethodSpec> parser = ExtensionClassHelper.methodParser(typeName);
-                List<MethodSpec> methods = reader.readList(parser);
-                return new Sourcerer(extension, methods);
+
+                Reader.Parser<List<MethodSpec>> parser = ExtensionClassHelper.parser(typeName);
+                ImmutableList.Builder<MethodSpec> methods = ImmutableList.builder();
+                for (List<MethodSpec> m : reader.readList(parser)) {
+                    methods.addAll(m);
+                }
+                return new Sourcerer(extension, methods.build());
             }
         };
 

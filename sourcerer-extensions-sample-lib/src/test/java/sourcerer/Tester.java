@@ -16,11 +16,18 @@
 
 package sourcerer;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class Tester {
 
     @Test public void testModuleCreated() {
+        Object o = new Object();
+        SourceModule.getInstance()
+                .init(o);
 
+        Object context = SourceModule.getInstance()
+                .context();
+        Assert.assertEquals(o, context);
     }
 }
