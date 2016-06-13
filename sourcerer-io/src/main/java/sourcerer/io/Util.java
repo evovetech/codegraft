@@ -18,8 +18,6 @@ package sourcerer.io;
 
 import com.squareup.javapoet.TypeName;
 
-import java.util.Locale;
-
 final class Util {
     private Util() { throw new AssertionError("no instances"); }
 
@@ -28,11 +26,11 @@ final class Util {
     }
 
     static void log(String msg) {
-        System.out.println(msg);
+//        System.out.println(msg);
     }
 
     static void log(String format, Object... args) {
-        System.out.printf(Locale.US, format, args);
-        System.out.println();
+//        System.out.printf(Locale.US, format, args);
+//        System.out.println();
     }
 }
