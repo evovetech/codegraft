@@ -34,12 +34,15 @@ public class ExtensionProcessor extends BaseProcessor {
     private final Extensions.Processor processor = Extensions.processor();
 
     @Override public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        boolean processed = false;
+        Boolean processed = null;
         boolean write = false;
         for (TypeElement annotationElement : annotations) {
             ExtensionClass extensionClass = annotationElement.getAnnotation(ExtensionClass.class);
             if (extensionClass == null) {
+                processed = false;
                 continue;
+            } else if (processed == null) {
+                processed = true;
             }
 
             Extension.Processor extension = processor.add(extensionClass);
@@ -51,7 +54,9 @@ public class ExtensionProcessor extends BaseProcessor {
                 }
                 write |= extension.process((TypeElement) typeElement);
             }
-            processed = true;
+        }
+        if (processed == null) {
+            processed = false;
         }
 
         if (write) {

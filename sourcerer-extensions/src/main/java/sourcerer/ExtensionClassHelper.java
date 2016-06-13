@@ -24,6 +24,7 @@ import com.squareup.javapoet.TypeName;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -127,7 +128,13 @@ final class ExtensionClassHelper implements Writeable {
             writer.writeString(methodName);
 
             // Write modifiers
-            writer.writeModifiers(methodElement.getModifiers());
+            Set<Modifier> modifiers = methodElement.getModifiers();
+            if (kind == ExtensionClass.Kind.StaticDelegate) {
+                // add Static Modifier
+                modifiers = new HashSet<>(modifiers);
+                modifiers.add(Modifier.STATIC);
+            }
+            writer.writeModifiers(modifiers);
 
             // Write type parameters
             writer.writeTypeParams(methodElement.getTypeParameters());
