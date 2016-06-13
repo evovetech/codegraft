@@ -105,14 +105,6 @@ final class ExtensionClassHelper implements Writeable {
         writer.writeList(methods, methodInk);
     }
 
-    //    void writeMethods(Writer writer, Modifier... modifiers) throws IOException {
-//        writer.writeList(methods, new MethodInk(modifiers));
-//    }
-//
-//    static List<MethodSpec> readMethods(Reader reader, TypeName type) throws IOException {
-//        return reader.readList(new MethodParser(type));
-//    }
-
     @Override public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("element", element)

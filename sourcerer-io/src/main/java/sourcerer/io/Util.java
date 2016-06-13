@@ -18,10 +18,21 @@ package sourcerer.io;
 
 import com.squareup.javapoet.TypeName;
 
+import java.util.Locale;
+
 final class Util {
     private Util() { throw new AssertionError("no instances"); }
 
     static void log(TypeName typeName) {
-        System.out.println("typeName: " + typeName + ", class: " + typeName.getClass());
+        log("typeName: %s, class: %s", typeName, typeName.getClass());
+    }
+
+    static void log(String msg) {
+        System.out.println(msg);
+    }
+
+    static void log(String format, Object... args) {
+        System.out.printf(Locale.US, format, args);
+        System.out.println();
     }
 }

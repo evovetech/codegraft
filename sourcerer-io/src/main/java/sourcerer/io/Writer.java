@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Modifier;
@@ -60,13 +61,12 @@ public class Writer implements Closeable, Flushable {
         return this;
     }
 
-    void writeVersion(Version version) throws IOException {
-        sink.writeInt(version.value());
-    }
-
     public Writer write(ByteString val) throws IOException {
+        int length = val.size();
         sink.writeInt(val.size());
+        Util.log("writeInt: '%d'", length);
         sink.write(val);
+        Util.log("writeString: '%s'", val.utf8());
         return this;
     }
 
@@ -76,9 +76,12 @@ public class Writer implements Closeable, Flushable {
 
     public <T extends Writeable> Writer writeList(List<T> list) throws IOException {
         int size = list == null ? 0 : list.size();
+        UUID uuid = UUID.randomUUID();
+        Util.log("writeList(%s) size=%d", uuid, size);
         sink.writeInt(size);
         for (int i = 0; i < size; i++) {
             T t = list.get(i);
+            Util.log("writeList(%s) entry=%s", uuid, t);
             if (t == null) {
                 Null.writeTo(this);
             } else {
@@ -90,8 +93,12 @@ public class Writer implements Closeable, Flushable {
 
     public <T> Writer writeList(List<T> list, Inker<T> inker) throws IOException {
         int size = list == null ? 0 : list.size();
+        UUID uuid = UUID.randomUUID();
+        Util.log("writeList(%s, inker) size=%d", uuid, size);
         sink.writeInt(size);
         for (int i = 0; i < size; i++) {
+            T t = list.get(i);
+            Util.log("writeList(%s, inker) entry=%s", uuid, t);
             inker.pen(this, list.get(i));
         }
         return this;
@@ -150,7 +157,7 @@ public class Writer implements Closeable, Flushable {
     }
 
     public Writer writeAnnotations(List<AnnotationMirror> annotations) throws IOException {
-        writeList(annotations, ANNOTATION_MIRROR_INK);
+        writeList(annotations, ANNOTATION_INK);
         return this;
     }
 
@@ -197,7 +204,7 @@ public class Writer implements Closeable, Flushable {
         }
     };
 
-    private static final Inker<AnnotationMirror> ANNOTATION_MIRROR_INK = new Inker<AnnotationMirror>() {
+    private static final Inker<AnnotationMirror> ANNOTATION_INK = new Inker<AnnotationMirror>() {
         @Override public boolean pen(Writer writer, AnnotationMirror am) throws IOException {
             TypeElement te = (TypeElement) am.getAnnotationType().asElement();
             writer.writeClassName(ClassName.get(te));

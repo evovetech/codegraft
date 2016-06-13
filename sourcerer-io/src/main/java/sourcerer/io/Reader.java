@@ -55,19 +55,23 @@ public final class Reader implements Closeable {
 
     public ByteString read() throws IOException {
         int length = source.readInt();
-        return source.readByteString(length);
+        Util.log("readInt: '%d'", length);
+        ByteString bs = source.readByteString(length);
+        Util.log("readString: '%s'", bs.utf8());
+        return bs;
     }
 
     public String readString() throws IOException {
-        return read().utf8();
-    }
-
-    Version readVersion() throws IOException {
-        return Version.version(source.readInt());
+        String s = read().utf8();
+        if (s.isEmpty()) {
+            throw new IllegalStateException("string is empty");
+        }
+        return s;
     }
 
     public <T> List<T> readList(Parser<T> parser) throws IOException {
         int size = source.readInt();
+        Util.log("readList(parser) size=%d", size);
         if (size == 0) {
             return Collections.emptyList();
         }
@@ -75,6 +79,7 @@ public final class Reader implements Closeable {
         for (int i = 0; i < size; i++) {
             T t = parser.parse(this);
             if (t != null) {
+                Util.log("readList i=%d is null", i);
                 list.add(t);
             }
         }
