@@ -209,8 +209,7 @@ final class ExtensionClassHelper implements Writeable {
             String statement = reader.readString();
 
             // Read method kind
-            ExtensionMethod.Kind methodKind
-                    = Enum.valueOf(ExtensionMethod.Kind.class, reader.readString());
+            ExtensionMethod.Kind methodKind = ExtensionMethod.Kind.fromName(reader.readString());
             switch (methodKind) {
                 case Return:
                     TypeName returnType = reader.readTypeName();

@@ -29,7 +29,6 @@ public class Tester {
         Object context = InstanceModule.getInstance()
                 .context();
         Assert.assertEquals(o, context);
-        context = StaticModule.context();
-        Assert.assertEquals(o, context);
+        Assert.assertEquals(o, StaticModule.context());
     }
 }

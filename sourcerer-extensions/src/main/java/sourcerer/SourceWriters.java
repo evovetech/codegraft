@@ -37,9 +37,22 @@ import sourcerer.io.Reader;
 public class SourceWriters {
     private final Map<Extension, List<MethodSpec>> extensions = new HashMap<>();
 
-    public synchronized void read(InputStream is) throws IOException {
+    public void read(InputStream is) throws IOException {
         try (JarInputStream jar = new JarInputStream(new BufferedInputStream(is))) {
-            Map<Extension, List<MethodSpec>> map = Extensions.Sourcerer.fromJar(jar);
+            addAll(Extensions.Sourcerer.fromJar(jar));
+        }
+    }
+
+    /* visible for testing */
+    void read(Buffer source) throws IOException {
+        Reader reader = Reader.newReader(source);
+        MetaInf.File metaFile = Extensions.instance().file();
+        metaFile.assertCanRead(reader);
+        addAll(Extensions.Sourcerer.read(reader));
+    }
+
+    private void addAll(Map<Extension, List<MethodSpec>> map) {
+        synchronized (extensions) {
             for (Map.Entry<Extension, List<MethodSpec>> entry : map.entrySet()) {
                 Extension ext = entry.getKey();
                 List<MethodSpec> methods = extensions.get(ext);
@@ -49,23 +62,6 @@ public class SourceWriters {
                 }
                 methods.addAll(entry.getValue());
             }
-        }
-    }
-
-    /* visible for testing */
-    synchronized void read(Buffer source) throws IOException {
-        Reader reader = Reader.newReader(source);
-        MetaInf.File metaFile = Extensions.instance().file();
-        metaFile.assertCanRead(reader);
-        Map<Extension, List<MethodSpec>> map = Extensions.Sourcerer.read(reader);
-        for (Map.Entry<Extension, List<MethodSpec>> entry : map.entrySet()) {
-            Extension ext = entry.getKey();
-            List<MethodSpec> methods = extensions.get(ext);
-            if (methods == null) {
-                methods = new ArrayList<>();
-                extensions.put(ext, methods);
-            }
-            methods.addAll(entry.getValue());
         }
     }
 
@@ -81,11 +77,13 @@ public class SourceWriters {
         }
     }
 
-    private synchronized List<SourceWriter> sourceWriters() {
+    private List<SourceWriter> sourceWriters() {
         ImmutableList.Builder<SourceWriter> sourceWriters = ImmutableList.builder();
-        for (Map.Entry<Extension, List<MethodSpec>> entry : extensions.entrySet()) {
-            Extension.Sourcerer sourcerer = Extension.Sourcerer.create(entry.getKey(), entry.getValue());
-            sourceWriters.add(sourcerer.newSourceWriter());
+        synchronized (extensions) {
+            for (Map.Entry<Extension, List<MethodSpec>> entry : extensions.entrySet()) {
+                Extension.Sourcerer sourcerer = Extension.Sourcerer.create(entry.getKey(), entry.getValue());
+                sourceWriters.add(sourcerer.newSourceWriter());
+            }
         }
         return sourceWriters.build();
     }
