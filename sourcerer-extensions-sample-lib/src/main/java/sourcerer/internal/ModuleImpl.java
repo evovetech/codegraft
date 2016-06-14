@@ -17,28 +17,34 @@
 package sourcerer.internal;
 
 import sourcerer.ExtensionMethod;
-import sourcerer.Module;
+import sourcerer.InstanceModuleType;
+import sourcerer.StaticModuleType;
 
-@Module
-public class SourceModuleImpl {
-    private static final SourceModuleImpl INSTANCE = new SourceModuleImpl();
+import static sourcerer.ExtensionMethod.Kind.Instance;
+import static sourcerer.ExtensionMethod.Kind.Return;
+import static sourcerer.ExtensionMethod.Kind.ReturnThis;
+
+@InstanceModuleType
+@StaticModuleType
+public class ModuleImpl {
+    private static final ModuleImpl INSTANCE = new ModuleImpl();
 
     private volatile Object context;
 
-    private SourceModuleImpl() {}
+    private ModuleImpl() {}
 
-    @ExtensionMethod(ExtensionMethod.Kind.Instance) public static SourceModuleImpl instance() {
+    @ExtensionMethod(Instance) public static ModuleImpl instance() {
         return INSTANCE;
     }
 
-    @ExtensionMethod(ExtensionMethod.Kind.ReturnThis) public SourceModuleImpl init(Object context) {
+    @ExtensionMethod(ReturnThis) public ModuleImpl init(Object context) {
         if (this.context == null && context != null) {
             this.context = context;
         }
         return this;
     }
 
-    @ExtensionMethod(ExtensionMethod.Kind.Return) public Object context() {
+    @ExtensionMethod(Return) public Object context() {
         return context;
     }
 }

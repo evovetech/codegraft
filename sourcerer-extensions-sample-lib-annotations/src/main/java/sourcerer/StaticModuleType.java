@@ -22,26 +22,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import static sourcerer.ExtensionClass.Kind.StaticDelegate;
+
 @Documented
-@Retention(RetentionPolicy.CLASS)
-@Target({ElementType.METHOD})
-public @interface ExtensionMethod {
-    Kind value() default Kind.Void;
-
-    enum Kind {
-        Instance,
-        Return,
-        ReturnThis,
-        Void,
-        Unknown;
-
-        public static Kind fromName(String name) {
-            for (Kind kind : values()) {
-                if (kind.name().equals(name)) {
-                    return kind;
-                }
-            }
-            return Unknown;
-        }
-    }
-}
+@Retention(RetentionPolicy.SOURCE)
+@Target({ElementType.TYPE})
+@ExtensionClass(
+        kind = StaticDelegate,
+        packageName = "sourcerer",
+        className = "StaticModule"
+)
+public @interface StaticModuleType {}

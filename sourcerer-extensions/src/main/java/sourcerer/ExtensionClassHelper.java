@@ -37,6 +37,10 @@ import sourcerer.io.Reader;
 import sourcerer.io.Writeable;
 import sourcerer.io.Writer;
 
+import static sourcerer.ExtensionClass.Kind.StaticDelegate;
+import static sourcerer.ExtensionMethod.Kind.ReturnThis;
+import static sourcerer.ExtensionMethod.Kind.Void;
+
 final class ExtensionClassHelper implements Writeable {
     private final ExtensionClass.Kind kind;
     private final TypeElement element;
@@ -122,6 +126,7 @@ final class ExtensionClassHelper implements Writeable {
 
         @Override public boolean pen(Writer writer, ExtensionMethodHelper extensionMethodHelper) throws IOException {
             ExecutableElement methodElement = extensionMethodHelper.method;
+            ExtensionMethod.Kind methodKind = extensionMethodHelper.kind;
 
             // Write method name
             String methodName = methodElement.getSimpleName().toString();
@@ -129,10 +134,13 @@ final class ExtensionClassHelper implements Writeable {
 
             // Write modifiers
             Set<Modifier> modifiers = methodElement.getModifiers();
-            if (kind == ExtensionClass.Kind.StaticDelegate) {
+            if (kind == StaticDelegate) {
                 // add Static Modifier
                 modifiers = new HashSet<>(modifiers);
                 modifiers.add(Modifier.STATIC);
+                if (methodKind == ReturnThis) {
+                    methodKind = Void;
+                }
             }
             writer.writeModifiers(modifiers);
 
@@ -154,7 +162,6 @@ final class ExtensionClassHelper implements Writeable {
             writer.writeString(statement);
 
             // Write method kind
-            ExtensionMethod.Kind methodKind = extensionMethodHelper.kind;
             writer.writeString(methodKind.name());
             switch (methodKind) {
                 case Return:

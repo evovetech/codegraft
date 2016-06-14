@@ -18,7 +18,7 @@ package sourcerer;
 
 import sourcerer.ExtensionMethod.Kind;
 
-@Module
+@InstanceModuleType
 public class TestModule {
     private static final TestModule INSTANCE = new TestModule();
 

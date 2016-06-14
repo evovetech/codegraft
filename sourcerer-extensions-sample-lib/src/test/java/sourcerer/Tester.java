@@ -23,11 +23,13 @@ public class Tester {
 
     @Test public void testModuleCreated() {
         Object o = new Object();
-        SourceModule.getInstance()
+        InstanceModule.getInstance()
                 .init(o);
 
-        Object context = SourceModule.getInstance()
+        Object context = InstanceModule.getInstance()
                 .context();
+        Assert.assertEquals(o, context);
+        context = StaticModule.context();
         Assert.assertEquals(o, context);
     }
 }
