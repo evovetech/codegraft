@@ -55,9 +55,6 @@ public class ExtensionProcessor extends BaseProcessor {
                 write |= extension.process((TypeElement) typeElement);
             }
         }
-        if (processed == null) {
-            processed = false;
-        }
 
         if (write) {
             try {
@@ -67,7 +64,7 @@ public class ExtensionProcessor extends BaseProcessor {
                 return true; // Exit processing
             }
         }
-        return processed;
+        return processed == null ? false : processed;
     }
 
     @Override public Set<String> getSupportedAnnotationTypes() {
