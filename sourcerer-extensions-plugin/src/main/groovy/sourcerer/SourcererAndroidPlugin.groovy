@@ -26,7 +26,6 @@ class SourcererAndroidPlugin implements Plugin<Project> {
         if (!project.plugins.findPlugin("com.android.application") && !project.plugins.findPlugin("android")) {
             throw new ProjectConfigurationException("The android plugin must be applied to the project", null)
         }
-        project.apply(plugin: 'com.neenbedankt.android-apt')
         project.android.applicationVariants.all { variant ->
             String taskName = "generate${variant.name.capitalize()}SourcererExtensions"
             SourcesTask task = project.tasks.create(taskName, SourcesTask)

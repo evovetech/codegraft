@@ -26,7 +26,6 @@ apply from: "${rootDir}/gradle/groovyArtifacts.gradle"
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile "com.neenbedankt.gradle.plugins:android-apt:${appAptGradleVersion}"
     compile project(':extensions')
 }
 
