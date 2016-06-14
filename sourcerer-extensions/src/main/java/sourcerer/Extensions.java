@@ -131,18 +131,9 @@ public final class Extensions {
 
         public static Map<Extension, List<MethodSpec>> fromJar(JarInputStream jar) throws IOException {
             MetaInf.File file = INSTANCE.file;
-
             Map<Extension, List<MethodSpec>> map = new HashMap<>();
             for (MetaInf.Entry<Sourcerer> entry : MetaInf.fromJar(file, jar, PARSER)) {
-                for (Extension.Sourcerer ext : entry.value()) {
-                    Extension key = ext.extension();
-                    List<MethodSpec> values = map.get(key);
-                    if (values == null) {
-                        values = new ArrayList<>();
-                        map.put(key, values);
-                    }
-                    values.addAll(ext.methods());
-                }
+                addAll(map, entry.value());
             }
             return ImmutableMap.copyOf(map);
         }
@@ -150,7 +141,12 @@ public final class Extensions {
         /* visible for testing */
         static Map<Extension, List<MethodSpec>> read(Reader reader) throws IOException {
             Map<Extension, List<MethodSpec>> map = new HashMap<>();
-            for (Extension.Sourcerer ext : PARSER.parse(reader)) {
+            addAll(map, PARSER.parse(reader));
+            return ImmutableMap.copyOf(map);
+        }
+
+        private static void addAll(Map<Extension, List<MethodSpec>> map, Sourcerer sourcerers) {
+            for (Extension.Sourcerer ext : sourcerers) {
                 Extension key = ext.extension();
                 List<MethodSpec> values = map.get(key);
                 if (values == null) {
@@ -159,7 +155,6 @@ public final class Extensions {
                 }
                 values.addAll(ext.methods());
             }
-            return ImmutableMap.copyOf(map);
         }
 
         @Override public Iterator<Extension.Sourcerer> iterator() {
