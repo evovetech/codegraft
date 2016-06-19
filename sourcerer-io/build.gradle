@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-version "${VERSION_NAME}"
-
-apply from: "${rootDir}/gradle/javaArtifacts.gradle"
+apply from: "${rootDir}/gradle/java-library.gradle"
 
 dependencies {
     compile "com.google.guava:guava:${appGuavaVersion}"
     compile "com.squareup:javapoet:${appJavaPoetGradleVersion}"
     compile "com.squareup.okio:okio:${appOkioVersion}"
-
-    // testing
-    testCompile "junit:junit:${appJunitVersion}"
-    testCompile "org.mockito:mockito-core:${appMockitoVersion}"
 }

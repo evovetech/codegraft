@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-version "${VERSION_NAME}"
-
-apply from: "${rootDir}/gradle/javaArtifacts.gradle"
+apply from: "${rootDir}/gradle/java-library.gradle"
 
 dependencies {
     compile project(':extensions-annotations')
     compile project(':io')
-
-    // testing
-    testCompile "junit:junit:${appJunitVersion}"
-    testCompile "org.mockito:mockito-core:${appMockitoVersion}"
 }

@@ -14,33 +14,49 @@
  * limitations under the License.
  */
 
+ext {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    LICENSES = ['Apache-2.0']
+    LABELS = ['java', 'sourcerer', 'extensions']
+}
+
 buildscript {
     repositories {
         jcenter()
-        maven { url 'https://dl.bintray.com/laynemobile/maven/' }
+        mavenLocal()
     }
 
     dependencies {
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:${appGradleBintrayPluginVersion}"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:${appGradleBuildInfoExtractorVersion}"
+        classpath "com.neenbedankt.gradle.plugins:android-apt:${appGradleAptVersion}"
+        classpath "com.netflix.nebula:gradle-extra-configurations-plugin:${appGradleNebulaVersion}"
         classpath "com.squareup:javapoet:${appJavaPoetGradleVersion}"
         classpath "com.squareup.okio:okio:${appOkioVersion}"
-        classpath "com.neenbedankt.gradle.plugins:android-apt:${appAptGradleVersion}"
-        classpath "com.netflix.nebula:gradle-extra-configurations-plugin:${appNebulaGradleVersion}"
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:${appBintrayGradlePlugin}"
-        classpath "com.github.dcendents:android-maven-gradle-plugin:${appAndroidMavenGradleVersion}"
     }
 }
 
-ext {
-    LICENSES = ["Apache-2.0"]
-}
-
+// brittle but works
+def isReleaseBuild = gradle.startParameter.taskNames.contains('bintrayUpload')
 allprojects {
-    version "${VERSION_NAME}"
+    group = GROUP
+    version = isReleaseBuild ? VERSION_NAME : "$VERSION_NAME-SNAPSHOT"
+    logger.info("Project ${it.name} using version=${it.version}")
 }
 
 subprojects {
     repositories {
         jcenter()
-        maven { url 'https://dl.bintray.com/laynemobile/maven/' }
+        mavenLocal()
+    }
+
+    configurations {
+        testCompile
+    }
+
+    dependencies {
+        // testing
+        testCompile "junit:junit:${appJunitVersion}"
+        testCompile "org.mockito:mockito-core:${appMockitoVersion}"
     }
 }

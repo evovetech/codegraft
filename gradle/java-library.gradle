@@ -15,20 +15,11 @@
  */
 
 apply plugin: 'java'
-apply from: "${rootDir}/gradle/abstractArtifacts.gradle"
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource.srcDirs
-    classifier = 'sources'
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-    encoding = 'UTF-8'
-}
+apply from: "${rootDir}/gradle/abstract-library.gradle"
 
 artifacts {
     archives sourcesJar
     archives javadocJar
 }
+
+apply from: "${rootDir}/gradle/install.gradle"

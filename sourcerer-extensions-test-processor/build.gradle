@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-version "${VERSION_NAME}"
-
 apply plugin: 'java'
 apply plugin: 'provided-base'
 
@@ -25,8 +23,4 @@ targetCompatibility = JavaVersion.VERSION_1_7
 dependencies {
     compile project(':extensions')
     compile project(':abstract-processor')
-
-    // testing
-    testCompile "junit:junit:${appJunitVersion}"
-    testCompile "org.mockito:mockito-core:${appMockitoVersion}"
 }

@@ -14,34 +14,10 @@
  * limitations under the License.
  */
 
-
-import com.squareup.javapoet.*
-
-import javax.lang.model.element.Modifier
-
-version "${VERSION_NAME}"
-
-apply from: "${rootDir}/gradle/groovyArtifacts.gradle"
+apply from: "${rootDir}/gradle/groovy-library.gradle"
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
     compile project(':extensions')
 }
-
-FieldSpec versionName = FieldSpec.builder(ClassName.get(String.class), 'NAME', Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-        .initializer('$S', VERSION_NAME)
-        .build()
-FieldSpec versionCode = FieldSpec.builder(TypeName.INT, 'CODE', Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-        .initializer('$L', VERSION_CODE)
-        .build()
-TypeSpec classSpec = TypeSpec.classBuilder("Version")
-        .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-        .addField(versionName)
-        .addField(versionCode)
-        .build()
-File dir = file("${project.buildDir}/classes/main/generated/sourcerer")
-dir.mkdirs()
-JavaFile.builder("sourcerer", classSpec)
-        .build()
-        .writeTo(dir)

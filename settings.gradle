@@ -24,6 +24,8 @@ include ':sourcerer-io',
         ':sourcerer-extensions-sample-lib',
         ':sourcerer-extensions-sample-lib-annotations'
 
+rootProject.name = 'com.laynemobile.sourcerer'
+
 findProject(':sourcerer-io')?.name = 'io'
 findProject(':sourcerer-abstract-processor')?.name = 'abstract-processor'
 findProject(':sourcerer-extensions')?.name = 'extensions'

@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-apply plugin: 'groovy'
-apply from: "${rootDir}/gradle/abstractArtifacts.gradle"
+ext {
+    POM_PACKAGING = 'jar'
+}
+
+apply plugin: 'provided-base'
+apply plugin: 'maven'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.jfrog.artifactory'
+
+sourceCompatibility = rootProject.ext.sourceCompatibility
+targetCompatibility = rootProject.ext.sourceCompatibility
 
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource.srcDirs
@@ -26,16 +35,4 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
     encoding = 'UTF-8'
-}
-
-task groovydocJar(type: Jar, dependsOn: groovydoc) {
-    classifier = 'groovydoc'
-    from groovydoc.destinationDir
-    encoding = 'UTF-8'
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-    archives groovydocJar
 }

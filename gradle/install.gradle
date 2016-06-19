@@ -14,29 +14,23 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'provided-base'
-
-version = VERSION_NAME
-group = GROUP
-
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
-
 install {
     repositories.mavenInstaller {
         pom {
             project {
-                packaging 'jar'
-                name POM_DESCRIPTION
+                name POM_NAME
+                description POM_DESCRIPTION
+                packaging POM_PACKAGING
                 url POM_URL
+
                 licenses {
                     license {
                         name POM_LICENSE_NAME
                         url POM_LICENSE_URL
+                        distribution POM_LICENSE_DIST
                     }
                 }
+
                 developers {
                     developer {
                         id POM_DEVELOPER_ID
@@ -44,6 +38,7 @@ install {
                         email POM_DEVELOPER_EMAIL
                     }
                 }
+
                 scm {
                     connection POM_SCM_CONNECTION
                     developerConnection POM_SCM_DEV_CONNECTION
@@ -54,6 +49,30 @@ install {
     }
 }
 
+// Configure artifactory (for publishing snapshots)
+//
+// Based on NebulaOJOPublishingPlugin (from nebula-bintray-plugin)
+artifactory {
+    contextUrl = 'https://oss.jfrog.org'
+
+    publish {
+        repository {
+            repoKey = 'oss-snapshot-local'
+
+            if (project.hasProperty('bintrayUser')) {
+                username = project.property('bintrayUser')
+                password = project.property('bintrayKey')
+            }
+        }
+
+        defaults {
+            // Getting an error here for some reason :/
+//            publishConfigs('archives')
+        }
+    }
+}
+
+// Configure gradle-bintray-plugin (for publishing releases)
 bintray {
     configurations = ['archives']
 
@@ -63,10 +82,11 @@ bintray {
         repo = BINTRAY_REPO
         name = POM_NAME
         userOrg = BINTRAY_ORG
-        desc = POM_DESCRIPTION
-        websiteUrl = POM_URL
-        vcsUrl = POM_SCM_URL
         licenses = rootProject.ext.LICENSES
+        labels = rootProject.ext.LABELS
+        websiteUrl = POM_URL
+        issueTrackerUrl = POM_ISSUE_TRACKER_URL
+        vcsUrl = POM_SCM_URL
     }
 }
 
