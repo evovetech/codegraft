@@ -1,0 +1,19 @@
+language: java
+
+jdk:
+  - oraclejdk7
+
+# as per http://blog.travis-ci.com/2014-12-17-faster-builds-with-container-based-infrastructure/
+sudo: false
+
+# script for build and release via Travis to Bintray
+script: gradle/buildViaTravis.sh
+
+notifications:
+  email: false
+
+# cache between builds
+cache:
+  directories:
+  - $HOME/.m2
+  - $HOME/.gradle
