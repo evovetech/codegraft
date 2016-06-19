@@ -49,29 +49,6 @@ install {
     }
 }
 
-// Configure artifactory (for publishing snapshots)
-//
-// Based on NebulaOJOPublishingPlugin (from nebula-bintray-plugin)
-artifactory {
-    contextUrl = 'https://oss.jfrog.org'
-
-    publish {
-        repository {
-            repoKey = 'oss-snapshot-local'
-
-            if (project.hasProperty('bintrayUser')) {
-                username = project.property('bintrayUser')
-                password = project.property('bintrayKey')
-            }
-        }
-
-        defaults {
-            // Getting an error here for some reason :/
-//            publishConfigs('archives')
-        }
-    }
-}
-
 // Configure gradle-bintray-plugin (for publishing releases)
 bintray {
     configurations = ['archives']

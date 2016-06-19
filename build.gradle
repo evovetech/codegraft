@@ -36,6 +36,8 @@ buildscript {
     }
 }
 
+apply from: "${rootDir}/gradle/artifactory.gradle"
+
 // brittle but works
 def isReleaseBuild = gradle.startParameter.taskNames.contains('bintrayUpload')
 allprojects {
