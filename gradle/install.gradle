@@ -72,7 +72,7 @@ if (project.hasProperty('bintrayUser') && project.hasProperty('bintrayKey')) {
     bintray.key = project.bintrayKey
 }
 
-if (project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
+if (project.hasProperty('mavenSync') && project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
     def sync = bintray.pkg.version.mavenCentralSync
     sync.sync = true
     sync.user = project.sonatypeUsername
