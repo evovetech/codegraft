@@ -16,10 +16,22 @@
 
 package sourcerer.processor;
 
-import javax.annotation.processing.ProcessingEnvironment;
+import java.util.Set;
 
-public abstract class BaseProcessor extends EnvProcessor<Env> {
-    @Override protected final Env createEnv(ProcessingEnvironment processingEnv) {
-        return new Env(processingEnv);
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.TypeElement;
+
+public abstract class Template extends Env {
+    protected Template(Template template) {
+        super(template);
     }
+
+    protected Template(ProcessingEnvironment processingEnv) {
+        super(processingEnv);
+    }
+
+    public abstract Set<String> supportedAnnotationTypes();
+
+    public abstract boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv);
 }

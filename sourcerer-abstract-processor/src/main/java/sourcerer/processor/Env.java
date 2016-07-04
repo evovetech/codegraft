@@ -16,37 +16,86 @@
 
 package sourcerer.processor;
 
+import java.util.Collections;
+import java.util.Set;
+
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
+import static javax.tools.Diagnostic.Kind.NOTE;
 
 public class Env {
-    private final ProcessingEnvironment processingEnvironment;
+    public static final String ALL_ANNOTATIONS = "*";
+    public static final Set<String> ALL_ANNOTATION_TYPES = Collections.singleton(ALL_ANNOTATIONS);
+
+    private final ProcessingEnvironment processingEnv;
+    private final Messager messager;
+    private final Elements elements;
+    private final Types types;
+    private final Filer filer;
 
     public Env(Env env) {
-        this.processingEnvironment = env.processingEnvironment;
+        this(env.processingEnv);
     }
 
-    public Env(ProcessingEnvironment processingEnvironment) {
-        this.processingEnvironment = processingEnvironment;
+    public Env(ProcessingEnvironment processingEnv) {
+        this.processingEnv = processingEnv;
+        this.messager = processingEnv.getMessager();
+        this.elements = processingEnv.getElementUtils();
+        this.types = processingEnv.getTypeUtils();
+        this.filer = processingEnv.getFiler();
     }
 
-    public ProcessingEnvironment processingEnvironment() {
-        return processingEnvironment;
+    public ProcessingEnvironment processingEnv() {
+        return processingEnv;
+    }
+
+    public Messager messager() {
+        return messager;
+    }
+
+    public Elements elements() {
+        return elements;
+    }
+
+    public Types types() {
+        return types;
+    }
+
+    public Filer filer() {
+        return filer;
+    }
+
+    public final void log(Element element, String message, Object... args) {
+        if (args.length > 0) {
+            message = String.format(message, args);
+        }
+        messager().printMessage(NOTE, message, element);
+    }
+
+    public final void log(String message, Object... args) {
+        if (args.length > 0) {
+            message = String.format(message, args);
+        }
+        messager().printMessage(NOTE, message);
     }
 
     public final void error(Element element, String message, Object... args) {
         if (args.length > 0) {
             message = String.format(message, args);
         }
-        processingEnvironment.getMessager().printMessage(ERROR, message, element);
+        messager().printMessage(ERROR, message, element);
     }
 
     public final void error(String message, Object... args) {
         if (args.length > 0) {
             message = String.format(message, args);
         }
-        processingEnvironment.getMessager().printMessage(ERROR, message);
+        messager().printMessage(ERROR, message);
     }
 }

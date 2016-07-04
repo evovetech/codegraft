@@ -22,17 +22,11 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
-import javax.tools.JavaFileObject;
 
 public final class SourceWriter {
     private final Extension ext;
@@ -77,28 +71,16 @@ public final class SourceWriter {
     }
 
     public void writeTo(Filer filer) throws IOException {
-        JavaFileObject fileObject = filer.createSourceFile(ext.qualifiedName());
-        writeTo(fileObject.openOutputStream());
+        javaFile().writeTo(filer);
     }
 
     public void writeTo(File outputDir) throws IOException {
-        String packagePath = ext.javaPackagePath();
-        if (!packagePath.isEmpty()) {
-            outputDir = new File(outputDir, packagePath);
-        }
-        outputDir.mkdirs();
-        File outputFile = new File(outputDir, ext.javaFileName());
-        writeTo(new FileOutputStream(outputFile));
+        javaFile().writeTo(outputDir);
     }
 
-    private void writeTo(OutputStream out) throws IOException {
+    private JavaFile javaFile() {
         // Write java file
-        JavaFile javaFile = JavaFile.builder(ext.packageName(), classBuilder.build())
+        return JavaFile.builder(ext.packageName(), classBuilder.build())
                 .build();
-
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(out))) {
-            javaFile.writeTo(writer);
-            writer.flush();
-        }
     }
 }
