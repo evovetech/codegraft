@@ -27,6 +27,10 @@ public abstract class Template extends Env {
         super(template);
     }
 
+    protected Template(Env env) {
+        super(env);
+    }
+
     protected Template(ProcessingEnvironment processingEnv) {
         super(processingEnv);
     }

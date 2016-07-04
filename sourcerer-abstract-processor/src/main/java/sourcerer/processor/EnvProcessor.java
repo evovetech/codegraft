@@ -34,11 +34,11 @@ public abstract class EnvProcessor<E extends Env> extends AbstractProcessor {
 
     @Override public final synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
-        env.compareAndSet(null, createEnv(processingEnvironment));
+        env.compareAndSet(null, createEnv(new Env(processingEnvironment)));
         init(env.get());
     }
 
-    protected abstract E createEnv(ProcessingEnvironment processingEnv);
+    protected abstract E createEnv(Env env);
 
     protected void init(E e) {
         // subclass override

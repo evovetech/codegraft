@@ -16,10 +16,8 @@
 
 package sourcerer.processor;
 
-import javax.annotation.processing.ProcessingEnvironment;
-
 public abstract class BaseProcessor extends EnvProcessor<Env> {
-    @Override protected final Env createEnv(ProcessingEnvironment processingEnv) {
-        return new Env(processingEnv);
+    @Override protected Env createEnv(Env env) {
+        return env;
     }
 }
