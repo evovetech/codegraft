@@ -67,6 +67,13 @@ public class TestProcessor extends BaseProcessor {
                 error("error processing %s", processor.extensions());
                 return true; // Exit processing
             }
+
+            try {
+                processor.writeTo(processingEnv.getFiler());
+            } catch (IOException e) {
+                error("error processing %s", processor.extensions());
+                return true; // Exit processing
+            }
         }
         return processed;
     }
