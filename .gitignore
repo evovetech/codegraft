@@ -6,6 +6,7 @@
 !/**/.idea/copyright/
 !/**/.idea/inspectionProfiles/
 !/**/.idea/codeStyleSettings.xml
+!/**/.idea/codeStyles/
 
 # Gradle cache
 .gradle
