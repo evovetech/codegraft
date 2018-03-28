@@ -3,4 +3,4 @@
 	url = git@bitbucket.org:evovetech/codegen.git
 [submodule "sourcerer"]
 	path = sourcerer
-	url = git@github.com:evovetech/Sourcerer.git
+	url = git@bitbucket.org:evovetech/sourcerer.git
