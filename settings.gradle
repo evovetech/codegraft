@@ -21,6 +21,8 @@ pluginManagement {
 
 include(
         ':sample',
+        ':core:annotations',
+        ':core:network',
 )
 //includeBuild 'plugin'
 includeBuild 'sourcerer'

@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package tech.evove.sample
+package evovetech.sample
 
-import android.app.Application
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 
-class App : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        Realm.init(this)
-        val config = RealmConfiguration.Builder()
-                .name("app.realm")
-                .schemaVersion(1)
-                .build()
-        Realm.setDefaultConfiguration(config)
+open class User : RealmObject() {
+    @PrimaryKey
+    var email: String? = null
+    var firstName: String? = null
+    var lastName: String? = null
+
+    companion object {
+        @Throws(Throwable::class)
+        inline fun getOrCreate(email: String, init: User.() -> Unit): User {
+            return realm().getOrCreate({
+                equalTo("email", email)
+                email
+            }, init)
+        }
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.evove.sample
+package evovetech.sample
 
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView

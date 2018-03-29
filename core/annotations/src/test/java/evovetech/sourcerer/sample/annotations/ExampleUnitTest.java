@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package tech.evove.sample
+package evovetech.sourcerer.sample.annotations;
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
+import org.junit.Test;
 
-open class User : RealmObject() {
-    @PrimaryKey
-    var email: String? = null
-    var firstName: String? = null
-    var lastName: String? = null
+import static org.junit.Assert.*;
 
-    companion object {
-        @Throws(Throwable::class)
-        inline fun getOrCreate(email: String, init: User.() -> Unit): User {
-            return realm().getOrCreate({
-                equalTo("email", email)
-                email
-            }, init)
-        }
+/**
+ * Example local unit test, which will execute on the development machine (host).
+ *
+ * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ */
+public
+class ExampleUnitTest {
+    @Test
+    public
+    void addition_isCorrect() {
+        assertEquals(4, 2 + 2);
     }
 }

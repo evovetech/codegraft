@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tech.evove.sample
+package evovetech.sample
 
 
 import io.realm.Realm

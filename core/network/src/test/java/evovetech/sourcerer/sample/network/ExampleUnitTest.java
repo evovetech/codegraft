@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    id("kotlin-android-extensions")
-    id("kotlin-kapt")
-}
+package evovetech.sourcerer.sample.network;
 
-apply from: "${configDir}/android/application.gradle"
+import org.junit.Test;
 
-android {
-    defaultConfig {
-        applicationId = "evovetech.sample"
+import static org.junit.Assert.*;
+
+/**
+ * Example local unit test, which will execute on the development machine (host).
+ *
+ * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ */
+public
+class ExampleUnitTest {
+    @Test
+    public
+    void addition_isCorrect() {
+        assertEquals(4, 2 + 2);
     }
-}
-
-dependencies {
-    implementation("com.android.support:design:${app.androidSupportVersion}")
-    implementation("com.android.support.constraint:constraint-layout:1.0.2")
 }

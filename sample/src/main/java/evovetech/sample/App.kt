@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package tech.evove.sample
+package evovetech.sample
 
-import org.junit.Test
+import android.app.Application
+import io.realm.Realm
+import io.realm.RealmConfiguration
 
-import org.junit.Assert.*
-
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class ExampleUnitTest {
-    @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+class App : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        Realm.init(this)
+        val config = RealmConfiguration.Builder()
+                .name("app.realm")
+                .schemaVersion(1)
+                .build()
+        Realm.setDefaultConfiguration(config)
     }
 }
