@@ -27,22 +27,22 @@
 
 def addTask(Task task) {
     def name = task.name
-    ['annotations',
+    ['io',
+     'annotations',
      'generator',
      'model',
      'processor'].each {
         task.dependsOn(
-                gradle.includedBuild('codegen').task(":${it}:${name}")
-        )
-    }
-    ['io',
-     'extensions',
-     'extensions-processor'].each {
-        task.dependsOn(
                 gradle.includedBuild('sourcerer').task(":${it}:${name}")
         )
     }
-    task.dependsOn gradle.includedBuild('plugin').task(":${name}")
+    ['model',
+     'processor'].each {
+        task.dependsOn(
+                gradle.includedBuild('extensions').task(":${it}:${name}")
+        )
+    }
+    //task.dependsOn gradle.includedBuild('plugin').task(":${name}")
 }
 
 addTask(tasks.create('assemble'))

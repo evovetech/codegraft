@@ -22,6 +22,6 @@ pluginManagement {
 include(
         ':sample',
 )
-includeBuild 'plugin'
-includeBuild 'codegen'
+//includeBuild 'plugin'
 includeBuild 'sourcerer'
+includeBuild 'extensions'
