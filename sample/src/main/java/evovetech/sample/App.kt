@@ -17,10 +17,14 @@
 package evovetech.sample
 
 import android.app.Application
+import android.content.Context
+import dagger.Binds
+import dagger.Module
+import dagger.android.DaggerApplication
 import io.realm.Realm
 import io.realm.RealmConfiguration
 
-class App : Application() {
+class App : DaggerApplication() {
     override fun onCreate() {
         super.onCreate()
         Realm.init(this)
@@ -30,4 +34,20 @@ class App : Application() {
                 .build()
         Realm.setDefaultConfiguration(config)
     }
+
+    override
+    fun applicationInjector(): AppComponent {
+        return DaggerAppComponent.builder()
+                .app(this)
+                .build()
+    }
+}
+
+@Module
+class Activities
+
+@Module
+abstract class AppModule {
+    @Binds abstract fun bindContext(app: App): Context
+    @Binds abstract fun bindApplication(app: App): Application
 }

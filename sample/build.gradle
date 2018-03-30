@@ -23,6 +23,7 @@ plugins {
 }
 
 apply from: "${configDir}/android/application.gradle"
+apply from: "${configDir}/versions/dagger.gradle"
 
 android {
     defaultConfig {
@@ -33,4 +34,11 @@ android {
 dependencies {
     implementation("com.android.support:design:${app.androidSupportVersion}")
     implementation("com.android.support.constraint:constraint-layout:1.0.2")
+    implementation("evovetech.sourcerer:annotations:${app.sourcererVersion}")
+    implementation("evovetech.sourcerer:inject:${app.sourcererVersion}")
+    implementation(dagger.core)
+    implementation(dagger.android)
+    kapt("evovetech.sourcerer:generator:${app.sourcererVersion}")
+    kapt(dagger.coreCompiler)
+    kapt(dagger.androidCompiler)
 }
