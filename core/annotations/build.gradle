@@ -22,3 +22,7 @@ plugins {
 }
 
 apply from: "${configDir}/android/base.gradle"
+
+dependencies {
+    kapt("evovetech.sourcerer:lib-processor:${app.sourcererVersion}")
+}

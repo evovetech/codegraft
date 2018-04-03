@@ -44,9 +44,6 @@ class App : DaggerApplication() {
 }
 
 @Module
-class Activities
-
-@Module
 abstract class AppModule {
     @Binds abstract fun bindContext(app: App): Context
     @Binds abstract fun bindApplication(app: App): Application

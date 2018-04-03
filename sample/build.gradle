@@ -38,7 +38,7 @@ dependencies {
     implementation("evovetech.sourcerer:inject:${app.sourcererVersion}")
     implementation(dagger.core)
     implementation(dagger.android)
-    kapt("evovetech.sourcerer:generator:${app.sourcererVersion}")
+    kapt("evovetech.sourcerer:app-processor:${app.sourcererVersion}")
     kapt(dagger.coreCompiler)
     kapt(dagger.androidCompiler)
 }
