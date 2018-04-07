@@ -1,9 +1,6 @@
 [submodule "sourcerer"]
 	path = sourcerer
 	url = git@bitbucket.org:evovetech/sourcerer.git
-[submodule "gradle"]
-	path = gradle
-	url = git@bitbucket.org:evovetech/gradle.git
 [submodule "extensions"]
 	path = extensions
 	url = git@bitbucket.org:evovetech/extensions.git
