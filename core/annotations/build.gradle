@@ -24,5 +24,10 @@ plugins {
 apply from: "${configDir}/android/base.gradle"
 
 dependencies {
+    api("evovetech.sourcerer:annotations:${app.sourcererVersion}")
+    api("evovetech.sourcerer:inject:${app.sourcererVersion}")
     kapt("evovetech.sourcerer:lib-processor:${app.sourcererVersion}")
 }
+
+apply from: "${configDir}/versions/dagger.gradle"
+dependencies(dagger.applyAndroid('implementation'))

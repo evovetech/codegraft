@@ -16,7 +16,37 @@
 
 package evovetech.sample.network
 
+import dagger.Binds
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoMap
+import okhttp3.OkHttpClient
 import sourcerer.inject.LibModule
+import sourcerer.inject.Plugin
+import sourcerer.inject.PluginKey
+import javax.inject.Inject
+import javax.inject.Singleton
 
-@LibModule
+@LibModule(includes = [ClientPlugin::class])
 class Client
+@Inject constructor() : Plugin
+
+@Module(includes = [ClientModule::class])
+abstract
+class ClientPlugin {
+    @Binds
+    @Singleton
+    @IntoMap
+    @PluginKey(Client::class)
+    abstract fun bindClient(client: Client): Plugin
+}
+
+@Module
+class ClientModule {
+    @Provides
+    @Singleton
+    fun provideOkhttp(): OkHttpClient {
+        return OkHttpClient()
+    }
+}
+

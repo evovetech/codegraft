@@ -19,14 +19,38 @@ package evovetech.sample
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import android.widget.Toast
+import dagger.android.AndroidInjection
+import evovetech.sample.network.Client
 import kotlinx.android.synthetic.main.activity_main.message
 import kotlinx.android.synthetic.main.activity_main.navigation
 import sourcerer.inject.InjectActivity
+import sourcerer.inject.Plugins
+import sourcerer.inject.get
+import javax.inject.Inject
 
 @InjectActivity
 class MainActivity : AppCompatActivity() {
 
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+    @Inject lateinit
+    var plugins: Plugins
+
+    override
+    fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+
+        val client = plugins.get<Client>()!!
+        Log.d("tag", "client = $client")
+        Toast.makeText(this, "client = $client", Toast.LENGTH_LONG)
+                .show()
+    }
+
+    private
+    val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_home -> {
                 message.setText(R.string.title_home)
@@ -47,11 +71,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
         false
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
     }
 }

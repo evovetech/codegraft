@@ -29,16 +29,16 @@ android {
     defaultConfig {
         applicationId = "evovetech.sample"
     }
+    packagingOptions {
+        exclude "**/*.srcr"
+    }
 }
 
+dependencies(dagger.applyAndroid('implementation'))
+
 dependencies {
+    implementation project(':core:network')
     implementation("com.android.support:design:${app.androidSupportVersion}")
     implementation("com.android.support.constraint:constraint-layout:1.0.2")
-    implementation("evovetech.sourcerer:annotations:${app.sourcererVersion}")
-    implementation("evovetech.sourcerer:inject:${app.sourcererVersion}")
-    implementation(dagger.core)
-    implementation(dagger.android)
     kapt("evovetech.sourcerer:app-processor:${app.sourcererVersion}")
-    kapt(dagger.coreCompiler)
-    kapt(dagger.androidCompiler)
 }
