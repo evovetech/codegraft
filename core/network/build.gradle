@@ -22,7 +22,14 @@ plugins {
 }
 
 apply from: "${configDir}/android/base.gradle"
+apply from: "${configDir}/versions/dagger.gradle"
+apply from: "${configDir}/versions/okhttp3.gradle"
+apply from: "${configDir}/versions/retrofit2.gradle"
 
 dependencies {
+    implementation(okhttp3.core)
+    implementation(retrofit2.core)
     kapt("evovetech.sourcerer:lib-processor:${app.sourcererVersion}")
 }
+
+dependencies(dagger.applyAndroid('implementation'))
