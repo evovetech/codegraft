@@ -1,0 +1,173 @@
+/*
+ * Copyright 2018 evove.tech
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import org.gradle.plugin.management.PluginManagementSpec
+
+def configDir = setConfigDir(settings)
+loadProperties(this, "${configDir}/defaultGradle.properties", ext, '')
+
+ext.app = loadApp()
+ext.pom = loadPom()
+app.plugins = [
+        'org.gradle.kotlin.kotlin-dsl': [
+                version: app.kotlinDslVersion
+        ],
+        'kotlin'                      : [
+                module : app.kotlinModule,
+                version: app.kotlinVersion
+        ],
+        'com.android'                 : [
+                module : "com.android.tools.build:gradle",
+                version: app.androidGradleVersion
+        ],
+        'realm'                       : [
+                module : app.realmModule,
+                version: app.realmVersion
+        ]
+]
+app.configurePlugins = { PluginManagementSpec plug ->
+    Closure cl = {
+        repositories {
+            gradlePluginPortal()
+            maven { url "https://maven.google.com/" }
+            maven { url "https://jcenter.bintray.com/" }
+        }
+        resolutionStrategy {
+            eachPlugin {
+                def reqId = requested.id.id
+                app.plugins.find { String key, Map value ->
+                    if (reqId.startsWith(key)) {
+                        def module = value.get("module", null)
+                        def version = value.get("version", null)
+                        if (module && version) {
+                            useModule("${module}:${version}")
+                        } else if (module) {
+                            useModule("${module}:${requested.version}")
+                        } else if (version) {
+                            useVersion(version)
+                        }
+                        return true
+                    }
+                    return false
+                }
+            }
+        }
+    }
+    cl.delegate = plug
+    cl(plug)
+}
+app.repos = {
+    google()
+    mavenLocal()
+    jcenter()
+    maven { url 'https://maven.fabric.io/public' }
+}
+
+gradle.rootProject { p ->
+    settings.ext.properties.each { prop ->
+        p.ext."${prop.key}" = prop.value
+    }
+    group = app.group
+    version = app.version
+
+    p.buildscript.repositories(app.repos)
+    task wrapper(type: Wrapper) {
+        gradleVersion app.gradleVersion
+        distributionType 'all'
+    }
+}
+
+gradle.beforeProject { p ->
+    p.repositories(app.repos)
+    loadProject(p)
+}
+
+static def setConfigDir(settings) {
+    def gradle = settings.gradle
+    println "try parent gradle config dir"
+    def configDir = tryGetGradleConfigDir(gradle)
+    if (configDir == null) {
+        println "try normal config dir"
+        configDir = tryGetConfigDir(settings.ext)
+    }
+    if (configDir == null) {
+        println "default config dir"
+        configDir = "${settings.settingsDir}/gradle"
+    }
+    settings.gradle.ext.configDir = configDir
+    settings.ext.configDir = configDir
+    return configDir
+}
+
+static def tryGetGradleConfigDir(gradle) {
+    def gp = gradle.parent
+    if (gp != null) {
+      println "gp = ${gp}"
+      def configDir = tryGetGradleConfigDir(gp)
+      if (configDir != null) {
+        return configDir
+      }
+    }
+    return tryGetConfigDir(gradle.ext)
+}
+
+static def tryGetConfigDir(ext) {
+    if (ext.has('configDir')) {
+        println "returning configDir: ${ext.configDir}"
+        return ext.configDir
+    }
+    return null
+}
+
+def loadApp() {
+    def app = new Expando()
+    loadProperties(this, "${rootDir}/gradle.properties", app, 'app.')
+    return app
+}
+
+def loadPom() {
+    def pom = new Expando()
+    loadProperties(this, "${rootDir}/gradle.properties", pom, 'pom.')
+    return pom
+}
+
+static def loadProject(p) {
+    File propsFile = p.file('gradle.properties')
+    def app = new Expando(p.app.properties)
+    p.ext.app = app
+    loadProperties(p, propsFile, app, 'app.')
+    def pom = new Expando(p.pom.properties)
+    p.ext.pom = pom
+    loadProperties(p, propsFile, pom, 'pom.')
+}
+
+static def loadProperties(p, fileName, obj, objPrefix) {
+    def file = p.file(fileName)
+    if (!file.exists()) {
+        return
+    }
+    def props = new Properties()
+    props.load(file.newReader())
+    props.each { prop ->
+        def thing = p.ext
+        def key = prop.key as String
+        if (key.startsWith(objPrefix)) {
+            key = key.substring(objPrefix.length())
+            thing = obj
+        }
+        thing."${key}" = prop.value
+    }
+}

@@ -1,0 +1,20 @@
+# Allow git to determine automatically if binary for most files
+*                   text=auto
+
+# Explicit Text Files
+.classpath          text
+.project            text
+*.txt               text
+*.java              text    diff=java
+*.html              text    diff=html
+*.xml               text
+*.json              text
+*.gradle            text
+*.properties        text
+*.md                text
+*.sh                text    eol=lf
+
+# Explicit Binary files
+*.jpg               binary
+*.jpeg              binary
+*.png               binary

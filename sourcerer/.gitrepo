@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@bitbucket.org:evovetech/sourcerer.git
+	branch = master
+	commit = 8e13cd435c137f809f389a3d0b9be533b757a975
+	parent = 9c2e4a8d5077481c4f6f77a0b6cab20f5fbe8936
+	cmdver = 0.3.1
