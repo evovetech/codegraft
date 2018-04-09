@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@bitbucket.org:evovetech/extensions.git
+	branch = 0.x
+	commit = f108d87669e2097ab4ca9e235473a588005875cb
+	parent = 8b174d6f7ef7ec409e3963ce7ccb79069ea81d9c
+	cmdver = 0.3.1
