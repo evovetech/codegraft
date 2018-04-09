@@ -1,0 +1,50 @@
+/*
+ * Copyright 2018 evove.tech
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ext {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    LICENSES = ['Apache-2.0']
+    LABELS = ['java', 'kotlin', 'sourcerer', 'codegen', 'annotations']
+}
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenLocal()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${app.kotlinVersion}"
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:${app.gradleBintrayPluginVersion}"
+    }
+}
+
+def bintrayCreds = file('bintray.properties')
+if (bintrayCreds.exists()) {
+    def props = new Properties()
+    props.load(bintrayCreds.newReader())
+    props.each { prop ->
+        project.ext.setProperty(prop.key, prop.value)
+    }
+}
+// brittle but works
+def versionName = pom.version
+def isReleaseBuild = gradle.startParameter.taskNames.contains('bintrayUpload')
+subprojects {
+    group = pom.groupId
+    version = isReleaseBuild ? versionName : "${versionName}-SNAPSHOT"
+    logger.info("Project ${it.name} using version=${it.version}")
+}
