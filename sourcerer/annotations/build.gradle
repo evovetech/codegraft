@@ -19,8 +19,8 @@ plugins {
     id("kotlin-kapt")
 }
 
-apply from: rootProject.file('gradle/kotlin-library.gradle')
-apply from: rootProject.file('gradle/versions/dagger.gradle')
+apply from: "${configDir}/kotlin-library.gradle"
+apply from: "${configDir}/versions/dagger.gradle"
 
 dependencies {
     api dagger.core
