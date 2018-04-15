@@ -22,21 +22,13 @@ buildscript {
 
 def addTask(Task task) {
     def name = task.name
-    ['io',
-     'annotations',
-     'model',
-     'lib-processor',
-     'app-processor'].each {
-        task.dependsOn(
-                gradle.includedBuild('sourcerer').task(":${it}:${name}")
-        )
-    }
-    ['model',
-     'processor'].each {
-        task.dependsOn(
-                gradle.includedBuild('extensions').task(":${it}:${name}")
-        )
+    gradle.includedBuilds.each { incBuild ->
+        def incTask = incBuild.task(":${name}")
+        println("includedBuild=${incBuild.name} -> task=${incTask.name}")
+        task.dependsOn(incTask)
     }
 }
 
-addTask(tasks.create('clean'))
+//addTask(tasks.create('clean'))
+addTask(tasks.create('tasks'))
+addTask(tasks.create('projects'))
