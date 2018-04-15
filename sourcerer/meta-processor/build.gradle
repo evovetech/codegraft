@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-pluginManagement {
-    apply from: 'gradle/settings.gradle'
-    app.configurePlugins(it)
+plugins {
+    id("kotlin")
+    id("kotlin-kapt")
 }
 
-include(
-        ':io',
-        ':annotations',
-        ':model',
-        ':app-processor',
-        ':lib-processor',
-        ':inject',
-        ':metalava',
-        ':meta-processor',
-)
+apply from: rootProject.file('gradle/sourcerer/processor.gradle')
+
+dependencies {
+    implementation project(':metalava')
+}
