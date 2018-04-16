@@ -71,9 +71,9 @@ app.configurePlugins = { PluginManagementSpec plug ->
 }
 app.repos = {
     google()
-    mavenLocal()
     jcenter()
     maven { url 'https://maven.fabric.io/public' }
+    mavenLocal()
 }
 
 gradle.rootProject { p ->
