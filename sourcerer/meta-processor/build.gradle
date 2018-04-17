@@ -19,7 +19,7 @@ plugins {
     id("kotlin-kapt")
 }
 
-apply from: rootProject.file('gradle/sourcerer/processor.gradle')
+apply from: "${configDir}/sourcerer/processor.gradle"
 
 dependencies {
     implementation project(':metalava')
