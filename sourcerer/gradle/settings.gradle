@@ -17,16 +17,17 @@
 import org.gradle.plugin.management.PluginManagementSpec
 
 def configDir = setConfigDir(settings)
-loadProperties(this, "${configDir}/defaultGradle.properties", ext, '')
+def app = new Expando()
+loadProperties(this, "${configDir}/defaultGradle.properties", app, 'app.')
 
-ext.app = loadApp()
+ext.app = loadApp(app)
 ext.pom = loadPom()
 app.plugins = [
         'org.gradle.kotlin.kotlin-dsl': [
                 version: app.kotlinDslVersion
         ],
         'kotlin'                      : [
-                module : app.kotlinModule,
+                module : 'org.jetbrains.kotlin:kotlin-gradle-plugin',
                 version: app.kotlinVersion
         ],
         'com.android'                 : [
@@ -34,7 +35,7 @@ app.plugins = [
                 version: app.androidGradleVersion
         ],
         'realm'                       : [
-                module : app.realmModule,
+                module : 'io.realm:realm-gradle-plugin',
                 version: app.realmVersion
         ]
 ]
@@ -71,9 +72,9 @@ app.configurePlugins = { PluginManagementSpec plug ->
 }
 app.repos = {
     google()
-    mavenLocal()
     jcenter()
     maven { url 'https://maven.fabric.io/public' }
+    mavenLocal()
 }
 
 gradle.rootProject { p ->
@@ -115,11 +116,11 @@ static def setConfigDir(settings) {
 static def tryGetGradleConfigDir(gradle) {
     def gp = gradle.parent
     if (gp != null) {
-      println "gp = ${gp}"
-      def configDir = tryGetGradleConfigDir(gp)
-      if (configDir != null) {
-        return configDir
-      }
+        println "gp = ${gp}"
+        def configDir = tryGetGradleConfigDir(gp)
+        if (configDir != null) {
+            return configDir
+        }
     }
     return tryGetConfigDir(gradle.ext)
 }
@@ -132,8 +133,7 @@ static def tryGetConfigDir(ext) {
     return null
 }
 
-def loadApp() {
-    def app = new Expando()
+def loadApp(Expando app) {
     loadProperties(this, "${rootDir}/gradle.properties", app, 'app.')
     return app
 }
