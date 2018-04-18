@@ -18,9 +18,13 @@ package sourcerer.lib
 
 import com.squareup.javapoet.ClassName
 import sourcerer.BaseElement
+import sourcerer.Klass
+import sourcerer.SourceWriter
 import sourcerer.interfaceBuilder
+import sourcerer.toKlass
 import sourcerer.typeSpec
 import javax.lang.model.element.Modifier.PUBLIC
+import javax.lang.model.element.Modifier.STATIC
 
 /**
  * Created by layne on 2/25/18.
@@ -29,18 +33,41 @@ open
 class LibComponentElement(
     final override val rawType: ClassName,
     modules: Collection<ClassName> = emptySet(),
-    dependencies: Collection<ClassName> = emptySet()
+    dependencies: Collection<ClassName> = emptySet(),
+    builders: Collection<ClassName> = emptySet()
 ) : BaseElement {
-    final override val outExt = "LibComponent"
+    final override
+    val outExt = "LibComponent"
     val modules: MutableSet<ClassName> = HashSet(modules)
     val dependencies: MutableSet<ClassName> = HashSet(dependencies)
+    val builders: MutableSet<ClassName> = HashSet(builders)
 
-    override fun newBuilder() = outKlass.interfaceBuilder()
+    override
+    fun newBuilder() = outKlass.interfaceBuilder()
 
-    override fun typeSpec() = typeSpec {
+    override
+    fun typeSpec() = typeSpec {
         addModifiers(PUBLIC)
         addSuperinterfaces(dependencies.toList())
+        addType(Builder().typeSpec())
     }
 
     fun libModule() = LibModuleElement(rawType, modules)
+
+    inner
+    class Builder : SourceWriter {
+        override
+        val outKlass: Klass = "Builder".toKlass()
+
+        override
+        fun newBuilder() = outKlass.interfaceBuilder()
+
+        override
+        fun typeSpec() = typeSpec {
+            addModifiers(PUBLIC, STATIC)
+            addSuperinterfaces(builders.toList())
+        }
+    }
 }
+
+

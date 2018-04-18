@@ -37,6 +37,7 @@ class AppComponentWriter(
         readSourcererFiles()
         writeJavaFiles()
     }
+    val env: BaseEnv = components
     //    val rootModule: LibModuleElement = modules.run {
 //        readSourcererFiles()
 //        writeJavaFiles()
@@ -84,6 +85,12 @@ class AppComponentWriter(
             }
             addMethod("build", PUBLIC, ABSTRACT) {
                 returns(this@AppComponentWriter.outKlass.rawType)
+            }
+            rootComponent.builders.forEach {
+                addSuperinterface(it)
+                env.elements()
+                        .getTypeElement(it.qualifiedName)
+                        .enclosedElements
             }
         }
     }

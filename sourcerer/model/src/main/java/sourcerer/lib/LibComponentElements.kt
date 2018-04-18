@@ -22,6 +22,7 @@ import sourcerer.Codegen
 import sourcerer.entryList
 import sourcerer.getOrCreate
 import sourcerer.io.Writer
+import sourcerer.nestedBuilder
 import java.util.HashMap
 import javax.annotation.processing.Filer
 
@@ -42,6 +43,7 @@ class LibComponentElements(
     ) = getOrCreate(element.rawType).let {
         it.modules.addAll(element.modules)
         && it.dependencies.addAll(element.dependencies)
+        && it.builders.addAll(element.builders)
     }
 
     override fun writeTo(writer: Writer) {
@@ -50,6 +52,7 @@ class LibComponentElements(
             writer.writeClassName(entry.key)
             writer.writeTypeNames(element.modules.toList())
             writer.writeTypeNames(element.dependencies.toList())
+            writer.writeTypeNames(element.builders.toList())
             true
         }
     }
@@ -59,7 +62,11 @@ class LibComponentElements(
         modules.addAll(it.libModule())
         it.outKlass.rawType
     }.run {
-        LibComponentElement(Codegen.LibComponents.rawType, dependencies = this)
+        LibComponentElement(
+            rawType = Codegen.LibComponents.rawType,
+            dependencies = this,
+            builders = this.map(ClassName::nestedBuilder)
+        )
     }.apply {
         writeTo(filer)
         modules.addAll(libModule())

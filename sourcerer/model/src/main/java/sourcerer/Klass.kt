@@ -76,6 +76,9 @@ fun ClassName.append(name: String, separator: String = ""): ClassName = if (name
 operator fun ClassName.plus(name: String): ClassName =
     append(name = name)
 
+fun ClassName.nestedBuilder(): ClassName = this
+        .nestedClass("Builder")
+
 fun Klass.writeTo(filer: Filer, text: String) = filer
         .createSourceFile(canonicalName)
         .openWriter()
@@ -101,7 +104,7 @@ fun Klass.interfaceBuilder() =
 fun Klass.annotation() = annotationBuilder()
         .build()!!
 
-fun Klass.nestedBuilder() = rawType.nestedClass("Builder")
+fun Klass.nestedBuilder() = rawType.nestedBuilder()
         .toKlass()
 
 inline fun Klass.annotation(init: AnnotationSpec.Builder.() -> Unit): AnnotationSpec {
