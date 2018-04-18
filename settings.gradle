@@ -22,6 +22,7 @@ pluginManagement {
 include(
         ':sample',
         ':core:annotations',
+        ':core:db',
         ':core:crashes',
         ':core:network',
 )

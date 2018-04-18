@@ -14,48 +14,31 @@
  * limitations under the License.
  */
 
-buildscript {
-    dependencies {
-        classpath "com.google.gms:google-services:${app.googleServicesVersion}"
-    }
-}
-
 plugins {
-    id("com.android.application")
+    id("com.android.library")
     id("kotlin-android")
     id("kotlin-android-extensions")
     id("kotlin-kapt")
-    id("io.fabric")
-    id("com.google.firebase.firebase-perf")
     id("realm-android")
 }
 
-apply from: "${configDir}/android/application.gradle"
-
-android {
-    defaultConfig {
-        applicationId = "evovetech.sample"
-    }
-    packagingOptions {
-        exclude "**/*.srcr"
-    }
-}
+apply from: "${configDir}/android/base.gradle"
+apply from: "${configDir}/versions/okhttp3.gradle"
+apply from: "${configDir}/versions/retrofit2.gradle"
 
 apply from: "${configDir}/versions/dagger.gradle"
 dependencies(dagger.applyAndroid('implementation'))
+
+apply from: "${configDir}/versions/rx2.gradle"
+dependencies(rx2.android.apply('api'))
 
 apply from: "${configDir}/versions/crashlytics.gradle"
 dependencies(crashlytics.apply('implementation'))
 
 dependencies {
-    implementation project(':core:network')
-    implementation project(':core:db')
-    implementation("com.android.support:design:${app.androidSupportVersion}")
-    implementation("com.android.support.constraint:constraint-layout:1.0.2")
-    kapt("evovetech.sourcerer:app-processor:${app.sourcererVersion}")
+    api project(':core:crashes')
+    api(okhttp3.core)
+    implementation(retrofit2.core)
+    kapt("evovetech.sourcerer:lib-processor:${app.sourcererVersion}")
     implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"
-    implementation "com.google.firebase:firebase-perf:${app.firebaseVersion}"
 }
-
-// ADD THIS AT THE BOTTOM
-apply plugin: 'com.google.gms.google-services'

@@ -19,6 +19,8 @@ package sourcerer.lib
 import com.squareup.javapoet.ClassName
 import sourcerer.BaseEnv
 import sourcerer.MetaInf
+import sourcerer.annotatedWith
+import sourcerer.asTypeElement
 import sourcerer.getOrCreate
 import sourcerer.inject.LibComponent
 import sourcerer.io.Reader
@@ -26,6 +28,7 @@ import sourcerer.io.Writer
 import sourcerer.typesOf
 import java.io.IOException
 import javax.lang.model.element.Element
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 
 /**
@@ -50,32 +53,55 @@ class LibComponentEnv(env: LibModuleEnv) : BaseEnv(env) {
                     .mapTo(classes.modules, ClassName::get)
             typesOf(component::dependencies)
                     .mapTo(classes.dependencies, ClassName::get)
+            val builder = te.enclosedElements.annotatedWith<LibComponent.Builder, Element>()
+                    .mapNotNull { it.asTypeElement() }
+                    .firstOrNull()
+            builder?.let {
+                log("${it.element.qualifiedName}<${it.annotation}>: {")
+                it.element.enclosedElements
+                        .filterIsInstance<ExecutableElement>()
+                        .forEach {
+                            //                                    TypeSpec.
+                            var first = true
+                            log("  ${it.returnType} ${it.simpleName}(")
+                            it.parameters.forEach {
+                                val comma = if (first) {
+                                    first = false
+                                    ""
+                                } else {
+                                    ","
+                                }
+                                log("      ${it.asType()} ${it.simpleName}$comma")
+                            }
+                            log("  )")
+                        }
+                log("}")
+            }
+        }
+
+        override fun Writer.writeSourcererFiles() {
+            write(elements)
+        }
+
+        override fun Reader.readSourcererFile() {
+            readList(Parser).forEach {
+                elements.addAll(it)
+            }
+        }
+
+        override fun writeJavaFiles() =
+            elements.writeJavaFiles(filer())
+
+        object Parser : Reader.Parser<LibComponentElement> {
+            override fun parse(reader: Reader): LibComponentElement {
+                val className = reader.readClassName()
+                val modules = reader.readTypeNames()
+                        .map { it as ClassName }
+                        .toMutableSet()
+                val dependencies = reader.readTypeNames()
+                        .map { it as ClassName }
+                        .toMutableSet()
+                return LibComponentElement(className, modules, dependencies)
+            }
         }
     }
-
-    override fun Writer.writeSourcererFiles() {
-        write(elements)
-    }
-
-    override fun Reader.readSourcererFile() {
-        readList(Parser).forEach {
-            elements.addAll(it)
-        }
-    }
-
-    override fun writeJavaFiles() =
-        elements.writeJavaFiles(filer())
-
-    object Parser : Reader.Parser<LibComponentElement> {
-        override fun parse(reader: Reader): LibComponentElement {
-            val className = reader.readClassName()
-            val modules = reader.readTypeNames()
-                    .map { it as ClassName }
-                    .toMutableSet()
-            val dependencies = reader.readTypeNames()
-                    .map { it as ClassName }
-                    .toMutableSet()
-            return LibComponentElement(className, modules, dependencies)
-        }
-    }
-}
