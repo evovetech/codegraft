@@ -18,6 +18,7 @@ package evovetech.sample
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import dagger.Binds
 import dagger.Module
 import dagger.android.DaggerApplication
@@ -27,6 +28,9 @@ import io.realm.RealmConfiguration
 class App : DaggerApplication() {
     override fun onCreate() {
         super.onCreate()
+        applicationInjector().fabric.kits.forEach {
+            Log.d("SAMPLE", "app onCreate() kit=${it}")
+        }
         Realm.init(this)
         val config = RealmConfiguration.Builder()
                 .name("app.realm")

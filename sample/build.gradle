@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
+buildscript {
+    dependencies {
+        classpath "com.google.gms:google-services:${app.googleServicesVersion}"
+    }
+}
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-android-extensions")
     id("kotlin-kapt")
+    id("io.fabric")
+    id("com.google.firebase.firebase-perf")
     id("realm-android")
 }
 
 apply from: "${configDir}/android/application.gradle"
-apply from: "${configDir}/versions/dagger.gradle"
 
 android {
     defaultConfig {
@@ -34,11 +41,20 @@ android {
     }
 }
 
+apply from: "${configDir}/versions/dagger.gradle"
 dependencies(dagger.applyAndroid('implementation'))
+
+apply from: "${configDir}/versions/crashlytics.gradle"
+dependencies(crashlytics.apply('implementation'))
 
 dependencies {
     implementation project(':core:network')
     implementation("com.android.support:design:${app.androidSupportVersion}")
     implementation("com.android.support.constraint:constraint-layout:1.0.2")
     kapt("evovetech.sourcerer:app-processor:${app.sourcererVersion}")
+    implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"
+    implementation "com.google.firebase:firebase-perf:${app.firebaseVersion}"
 }
+
+// ADD THIS AT THE BOTTOM
+apply plugin: 'com.google.gms.google-services'

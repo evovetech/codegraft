@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-pluginManagement {
-    apply from: 'gradle/settings.gradle'
-    app.configurePlugins(it)
+apply from: "${configDir}/plugins/fabric.gradle"
+
+def crashlyticsVersion = '+'
+ext.crashlytics = loadCrashlytics(
+        crashlyticsVersion
+)
+
+static def loadCrashlytics(String crashlyticsVersion) {
+    def crashlytics = new Expando()
+    crashlytics.version = crashlyticsVersion
+    crashlytics.core = "com.crashlytics.sdk.android:crashlytics:${crashlyticsVersion}"
+    crashlytics.apply = { config ->
+        return { DependencyHandler dep ->
+            dep.add(config, crashlytics.core)
+        }
+    }
+    return crashlytics
 }
 
-include(
-        ':sample',
-        ':core:annotations',
-        ':core:crashes',
-        ':core:network',
-)
-//includeBuild 'plugin'
-includeBuild 'sourcerer'
-includeBuild 'extensions'

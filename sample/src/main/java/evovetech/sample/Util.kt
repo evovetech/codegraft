@@ -31,7 +31,7 @@ inline fun <reified T : RealmModel> Realm.getOrCreate(query: RealmQuery<out T>.(
     val w = where(T::class.java)
     val primaryKey = w.query()
     return w.findFirst()?.let { t ->
-        t.init()
+//        t.init()
         t
     } ?: create(primaryKey, init)
 }

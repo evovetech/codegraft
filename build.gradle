@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-buildscript {
-    dependencies {
-        classpath "io.fabric.tools:gradle:${app.fabricVersion}"
-    }
-}
-
 def addTask(Task task) {
     def name = task.name
     gradle.includedBuilds.each { incBuild ->
