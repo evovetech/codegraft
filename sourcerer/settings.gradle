@@ -26,6 +26,6 @@ include(
         ':app-processor',
         ':lib-processor',
         ':inject',
-        ':metalava',
-        ':meta-processor',
+//        ':metalava',
+//        ':meta-processor',
 )
