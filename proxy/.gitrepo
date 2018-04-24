@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@bitbucket.org:evovetech/proxy.git
+	branch = dev
+	commit = f3fefc9844153f63d0a234352d92c72105df6919
+	parent = fb4a39bceab90bf873001f435489bad583586246
+	cmdver = 0.3.1
