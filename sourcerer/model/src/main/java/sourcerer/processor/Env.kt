@@ -33,18 +33,22 @@ class Env(
         return this
     }
 
+    open
     fun messager(): Messager {
         return messager
     }
 
+    open
     fun elements(): Elements {
         return elementUtils
     }
 
+    open
     fun types(): Types {
         return typeUtils
     }
 
+    open
     fun filer(): Filer {
         return filer
     }

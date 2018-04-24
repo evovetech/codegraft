@@ -37,7 +37,7 @@ class EnvProcessor<E : Env> : AbstractProcessor() {
     protected abstract
     fun createEnv(env: Env): E
 
-    protected
+    protected open
     fun init(env: E) {
         // subclass override
     }
