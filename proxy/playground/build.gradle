@@ -27,7 +27,7 @@ dependencies {
     implementation "io.reactivex:rxjava:${appRxJavaVersion}"
     implementation "com.squareup.retrofit:retrofit:${appRetrofitVersion}"
 
-    annotationProcessor project(':proxy-generator-experimental')
-//    annotationProcessor "evovetech.sourcerer.extensions:processor:${appSourcererVersion}"
+    kapt project(':proxy-generator-experimental')
+//    kapt "evovetech.sourcerer.extensions:processor:${appSourcererVersion}"
     compileOnly "org.immutables:value:${appImmutablesVersion}"
 }

@@ -23,5 +23,5 @@ apply from: "${configDir}/kotlin-library.gradle"
 
 dependencies {
     api project(':annotations')
-    annotationProcessor project(':lib-processor')
+    kapt project(':lib-processor')
 }

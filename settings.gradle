@@ -29,3 +29,4 @@ include(
 //includeBuild 'plugin'
 includeBuild 'sourcerer'
 includeBuild 'extensions'
+includeBuild 'proxy'

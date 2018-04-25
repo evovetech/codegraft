@@ -86,12 +86,12 @@ class AppComponentWriter(
             addMethod("build", PUBLIC, ABSTRACT) {
                 returns(this@AppComponentWriter.outKlass.rawType)
             }
-            rootComponent.builders.forEach {
-                addSuperinterface(it)
-                env.elements()
-                        .getTypeElement(it.qualifiedName)
-                        .enclosedElements
-            }
+//            rootComponent.builders.forEach {
+//                addSuperinterface(it)
+//                env.elements()
+//                        .getTypeElement(it.qualifiedName)
+//                        .enclosedElements
+//            }
         }
     }
 }

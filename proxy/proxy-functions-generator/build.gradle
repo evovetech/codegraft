@@ -24,7 +24,7 @@ apply from: "${configDir}/kotlin-library.gradle"
 dependencies {
     api "com.google.auto:auto-common:${app.autoCommonVersion}"
     compileOnly "com.google.auto.service:auto-service:${app.autoServiceVersion}"
-    annotationProcessor "com.google.auto.service:auto-service:${app.autoServiceVersion}"
+    kapt "com.google.auto.service:auto-service:${app.autoServiceVersion}"
     api "evovetech.sourcerer.extensions:annotations:${appSourcererVersion}"
     api "evovetech.sourcerer:model:${appSourcererVersion}"
 //    compile "com.laynemobile.sourcerer:abstract-processor:${appSourcererVersion}"
