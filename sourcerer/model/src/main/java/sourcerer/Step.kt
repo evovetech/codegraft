@@ -24,18 +24,21 @@ import kotlin.reflect.KClass
  * Created by layne on 3/19/18.
  */
 
-typealias Step<Input, Output> = (env: Env, input: Input) -> Output
+typealias IoStep<Input, Output> = (env: Env, input: Input) -> Output
 
-typealias AnnotationStep<A> = Step<Input<A>, Output>
+typealias AnnotationStep<A> = IoStep<Input<A>, Output>
 
-typealias IntermediateStep = Step<Collection<Output>, Output>
+typealias IntermediateStep = IoStep<Collection<Output>, Output>
 
-typealias FullStep = Step<AnnotationElements, Collection<Output>>
+typealias FullStep = IoStep<AnnotationElements, Collection<Output>>
 
 object DefaultIntermediateStep : IntermediateStep {
     override
     fun invoke(env: Env, input: Collection<Output>) = NoOutput
 }
+
+sealed
+class Step
 
 interface Interceptor<Input, Output> {
     fun intercept(chain: Chain<Input, Output>): Output
@@ -62,9 +65,9 @@ class StoredFile(
 
 //abstract class Steps {
 //    private abstract
-//    val map: Map<KClass<out Annotation>, Collection<Step<*, Output>>>
+//    val map: Map<KClass<out Annotation>, Collection<IoStep<*, Output>>>
 //
-//    class Builder : ArrayList<Step<*, out Output>>() {
+//    class Builder : ArrayList<IoStep<*, out Output>>() {
 //        inline
 //        fun <reified A : Annotation> addAnnotionStep(
 //                step: AnnotationStep<A>
@@ -74,7 +77,7 @@ class StoredFile(
 
 //abstract
 //class FullStep :
-//    Step<AnnotationElements, Collection<Output>>()
+//    IoStep<AnnotationElements, Collection<Output>>()
 
 open
 class SingleFullStep<A : Annotation>(

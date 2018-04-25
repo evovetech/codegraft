@@ -16,9 +16,14 @@
 
 package sourcerer.activity
 
+import dagger.Module
 import sourcerer.AnnotatedElement
+import sourcerer.IntoCollectionStep
 import sourcerer.MultiStep
 import sourcerer.MultiStepProcessor
+import sourcerer.NoOutput
+import sourcerer.inject.InjectActivity
+import sourcerer.inject.LibModule
 import sourcerer.lib.LibModuleStep
 import sourcerer.processor.Env
 import javax.lang.model.element.Element
@@ -38,10 +43,18 @@ class MainProcessor(
 //        NoOutput
 //    })
     add(LibModuleStep(isModule))
-//    addStep(generatedStep<LibModule> {
-//        log(it.element, "generated LibModule")
+    addStep<LibModule> {
+        log(it.element, "LibModule")
+        NoOutput
+    }
+//    add(IntoCollectionStep(LibModule::class))
+//    add(IntoCollectionStep(Module::class))
+//    add(IntoCollectionStep(InjectActivity::class))
+//    addStep<IntoCollection> {
+//        val value = typeOf(it.annotation::value)
+//        log(it.element, "intoCollection -> $value")
 //        NoOutput
-//    })
+//    }
     init()
 })
 

@@ -17,12 +17,18 @@
 package sourcerer
 
 import com.squareup.javapoet.AnnotationSpec
+import com.squareup.javapoet.ClassName
+import sourcerer.io.log
 import sourcerer.lib.LibComponentElement
 import sourcerer.lib.LibComponentEnv
 import sourcerer.lib.LibModuleEnv
+import javax.lang.model.element.Element
 import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
+import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
+import javax.lang.model.util.ElementFilter
 
 /**
  * Created by layne on 3/8/18.
@@ -86,12 +92,63 @@ class AppComponentWriter(
             addMethod("build", PUBLIC, ABSTRACT) {
                 returns(this@AppComponentWriter.outKlass.rawType)
             }
-//            rootComponent.builders.forEach {
-//                addSuperinterface(it)
-//                env.elements()
-//                        .getTypeElement(it.qualifiedName)
-//                        .enclosedElements
-//            }
+            rootComponent.builders.mapNotNull {
+                addSuperinterface(it)
+                val el = it.typeElement()
+                env.log("element = $el")
+                el
+            }.flatMap {
+                it.withParents()
+            }.flatMap {
+                ElementFilter.methodsIn(it.enclosedElements)
+            }.forEach {
+                log("ee = $it")
+            }
         }
+
+        private
+        fun TypeElement.withParents(): List<TypeElement> {
+            val supers = listOf(superclass).typeElements()
+                    .flatMap { it.withParents() }
+            val interfaces = interfaces.typeElements()
+                    .flatMap { it.withParents() }
+            return listOf(this) +
+                   supers +
+                   interfaces
+        }
+
+        //        private
+//        fun TypeMirror.typeElements() = ElementFilter.env.types()
+//                .asElement(this) as? TypeElement
+//
+        private
+        fun ClassName.typeElement() = env.elements()
+                .getTypeElement(qualifiedName)
+
+        private
+        fun Iterable<TypeMirror>.elements() = map {
+            env.types().asElement(it)
+        }
+
+        private
+        fun Iterable<Element>.types() = ElementFilter.typesIn(this)
+
+        private
+        fun Iterable<TypeMirror>.typeElements() = elements()
+                .types()
+
+        private
+        fun Set<TypeMirror>.elements() = map {
+            env.types().asElement(it)
+        }.toSet()
+
+        private
+        fun Set<Element>.types() = ElementFilter.typesIn(this)
+
+        private
+        fun Set<TypeMirror>.typeElements() = elements()
+                .types()
     }
 }
+
+

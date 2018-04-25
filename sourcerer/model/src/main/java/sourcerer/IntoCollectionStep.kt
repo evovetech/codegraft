@@ -14,19 +14,5 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package sourcerer
 
-import kotlin.reflect.KClass
-
-@MustBeDocumented
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FILE)
-@Retention(AnnotationRetention.SOURCE)
-annotation
-class IntoCollection(
-    val value: KClass<out Annotation>,
-    val dependencies: Array<out KClass<out Annotation>> = []
-)
-
-
-annotation
-class CollectionType

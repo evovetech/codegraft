@@ -26,8 +26,8 @@ import sourcerer.inject.LibComponent
 import sourcerer.inject.LibModule
 import javax.inject.Singleton
 
-//@LibModule(includes = [RealmModule::class])
-//@LibComponent(modules = [RealmModule::class])
+@LibModule(includes = [RealmModule::class])
+@LibComponent(modules = [RealmModule::class])
 interface RealmComponent {
     val defaultRealm: Realm
 

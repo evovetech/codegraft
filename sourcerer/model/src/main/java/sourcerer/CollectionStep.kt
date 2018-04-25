@@ -19,11 +19,42 @@ package sourcerer
 import com.squareup.javapoet.TypeSpec
 import okio.Okio
 import sourcerer.inject.Generated
+import sourcerer.inject.IntoCollection
 import sourcerer.io.Reader
 import sourcerer.io.Writer
 import java.net.URL
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass
+
+abstract
+class IntoCollectionStep<A : Annotation>(
+    subType: KClass<A>
+) : FullStep,
+    SingleStep<IntoCollection> {
+
+    override
+    val inputType = IntoCollection::class
+
+    val qualifiedName: String = subType.java.canonicalName
+
+    abstract
+    fun process(
+        env: Env,
+        inputs: List<Input<IntoCollection>>
+    ): Output
+
+    final override
+    fun invoke(
+        env: Env,
+        input: AnnotationElements
+    ): Collection<Output> {
+        val inputs = input.inputs<IntoCollection>()
+                .filter { qualifiedName == env.typeOf(it.annotation::value).qualifiedName.toString() }
+                .onEach { env.log(it.element, "@IntoCollection<$qualifiedName>") }
+        val output = process(env, inputs)
+        return listOf(output)
+    }
+}
 
 abstract
 class CollectionStep<A : Annotation>(
