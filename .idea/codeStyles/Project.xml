@@ -3,6 +3,10 @@
     <AndroidXmlCodeStyleSettings>
       <option name="USE_CUSTOM_SETTINGS" value="true" />
     </AndroidXmlCodeStyleSettings>
+    <GroovyCodeStyleSettings>
+      <option name="ALIGN_MULTILINE_LIST_OR_MAP" value="false" />
+      <option name="ALIGN_NAMED_ARGS_IN_MAP" value="false" />
+    </GroovyCodeStyleSettings>
     <JavaCodeStyleSettings>
       <option name="DO_NOT_WRAP_AFTER_SINGLE_ANNOTATION" value="true" />
       <option name="BLANK_LINES_AROUND_INITIALIZER" value="0" />

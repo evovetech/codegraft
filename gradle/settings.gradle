@@ -23,27 +23,24 @@ loadProperties(this, "${configDir}/defaultGradle.properties", app, 'app.')
 ext.app = loadApp(app)
 ext.pom = loadPom()
 app.plugins = [
-        'org.gradle.kotlin.kotlin-dsl': [
-                version: app.kotlinDslVersion
-        ],
-        'kotlin'                      : [
-                module : 'org.jetbrains.kotlin:kotlin-gradle-plugin',
+        'kotlin': [
+                module: 'org.jetbrains.kotlin:kotlin-gradle-plugin',
                 version: app.kotlinVersion
         ],
-        'com.android'                 : [
-                module : "com.android.tools.build:gradle",
+        'com.android': [
+                module: "com.android.tools.build:gradle",
                 version: app.androidGradleVersion
         ],
-        'realm'                       : [
-                module : 'io.realm:realm-gradle-plugin',
+        'realm': [
+                module: 'io.realm:realm-gradle-plugin',
                 version: app.realmVersion
         ],
-        'io.fabric'                   : [
-                module : 'io.fabric.tools:gradle',
+        'io.fabric': [
+                module: 'io.fabric.tools:gradle',
                 version: app.fabricVersion
         ],
-        'com.google.firebase'         : [
-                module : 'com.google.firebase:firebase-plugins',
+        'com.google.firebase': [
+                module: 'com.google.firebase:firebase-plugins',
                 version: app.firebasePluginsVersion
         ]
 ]

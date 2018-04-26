@@ -15,6 +15,8 @@
  */
 
 pluginManagement {
-    apply from: '../gradle/settings.gradle'
+    def configDir = file('../gradle')
+    gradle.ext.configDir = configDir
+    apply from: "${configDir}/settings.gradle"
     app.configurePlugins(it)
 }

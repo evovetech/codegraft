@@ -26,7 +26,7 @@ include(
         ':core:crashes',
         ':core:network',
 )
-//includeBuild 'plugin'
+includeBuild 'plugin'
 includeBuild 'sourcerer'
 includeBuild 'extensions'
 includeBuild 'proxy'

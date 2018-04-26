@@ -19,10 +19,6 @@ plugins {
     `kotlin-dsl`
 }
 
-buildscript {
-
-}
-
 group = "evovetech"
 version = "0.1.0"
 
