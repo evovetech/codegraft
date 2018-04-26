@@ -16,19 +16,26 @@
 
 package evovetech.sample
 
+import io.realm.Realm
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
+import javax.inject.Inject
 
-open class User : RealmObject() {
+open
+class User : RealmObject() {
     @PrimaryKey
     var email: String? = null
     var firstName: String? = null
     var lastName: String? = null
 
-    companion object {
+    class Manager
+    @Inject constructor(
+        val realm: Realm
+    ) {
         @Throws(Throwable::class)
-        inline fun getOrCreate(email: String, init: User.() -> Unit): User {
-            return realm().getOrCreate({
+        inline
+        fun getOrCreate(email: String, init: User.() -> Unit): User {
+            return realm.getOrCreate({
                 equalTo("email", email)
                 email
             }, init)

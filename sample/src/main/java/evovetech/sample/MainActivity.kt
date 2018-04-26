@@ -23,6 +23,7 @@ import android.util.Log
 import android.widget.Toast
 import dagger.android.AndroidInjection
 import evovetech.sample.network.Client
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.message
 import kotlinx.android.synthetic.main.activity_main.navigation
 import sourcerer.inject.InjectActivity
@@ -32,9 +33,14 @@ import javax.inject.Inject
 
 @InjectActivity
 class MainActivity : AppCompatActivity() {
-
     @Inject lateinit
     var plugins: Plugins
+
+    @Inject lateinit
+    var realm: Realm
+
+    @Inject lateinit
+    var userManager: User.Manager
 
     override
     fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +55,13 @@ class MainActivity : AppCompatActivity() {
                 .show()
     }
 
+    override fun onDestroy() {
+        // TODO: ugly having to do this twice
+        realm.close()
+        userManager.realm.close()
+        super.onDestroy()
+    }
+
     private
     val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -57,7 +70,7 @@ class MainActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_dashboard -> {
-                val user = User.getOrCreate("laynepenney@gmail.com") {
+                val user = userManager.getOrCreate("laynepenney@gmail.com") {
                     firstName = "Layne"
                     lastName = "Penney"
                 }

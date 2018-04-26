@@ -22,6 +22,7 @@ import dagger.Module
 import dagger.Provides
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.RealmConfiguration.Builder
 import sourcerer.inject.LibComponent
 import sourcerer.inject.LibModule
 import javax.inject.Singleton
@@ -64,4 +65,18 @@ class RealmModule {
 
 interface RealmBuilder {
     fun RealmConfiguration.Builder.init()
+}
+
+typealias RealmBuilderFunc = RealmConfiguration.Builder.() -> Unit
+
+fun RealmBuilderFunc.toBuilder() = object : RealmBuilder {
+    override
+    fun Builder.init() = this@toBuilder.invoke(this)
+}
+
+fun <B : RealmComponent.Builder> B.defaultRealm(
+    init: RealmBuilderFunc
+): B {
+    defaultRealm(init.toBuilder())
+    return this
 }

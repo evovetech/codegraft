@@ -22,8 +22,7 @@ import android.util.Log
 import dagger.Binds
 import dagger.Module
 import dagger.android.DaggerApplication
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import evovetech.sample.db.realm.defaultRealm
 
 class App : DaggerApplication() {
     override fun onCreate() {
@@ -31,18 +30,16 @@ class App : DaggerApplication() {
         applicationInjector().fabric.kits.forEach {
             Log.d("SAMPLE", "app onCreate() kit=${it}")
         }
-        Realm.init(this)
-        val config = RealmConfiguration.Builder()
-                .name("app.realm")
-                .schemaVersion(1)
-                .build()
-        Realm.setDefaultConfiguration(config)
     }
 
     override
     fun applicationInjector(): AppComponent {
         return DaggerAppComponent.builder()
                 .app(this)
+                .defaultRealm {
+                    name("app.realm")
+                    schemaVersion(1)
+                }
                 .build()
     }
 }
