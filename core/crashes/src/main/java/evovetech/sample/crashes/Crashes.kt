@@ -18,6 +18,7 @@ package evovetech.sample.crashes
 
 import android.app.Application
 import com.crashlytics.android.Crashlytics
+import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
 import io.fabric.sdk.android.Fabric
@@ -28,16 +29,29 @@ import javax.inject.Singleton
 @LibModule(includes = [Crashes::class])
 @LibComponent(modules = [Crashes::class])
 interface CrashesComponent {
-    val fabric: Fabric
-    val crashlytics: Crashlytics
+    val crashes: Crashlytics
+
+    @LibComponent.Builder
+    interface Builder {
+        @BindsInstance
+        fun crashes(
+            builder: CrashBuilder
+        ): Builder
+    }
 }
 
 @Module
 class Crashes {
     @Provides
     @Singleton
-    fun provideFabric(app: Application): Fabric {
-        return Fabric.with(app)
+    fun provideFabric(app: Application, builder: CrashBuilder): Fabric {
+        val fabric = builder.run {
+            Fabric.Builder(app).run {
+                init()
+                build()
+            }
+        }
+        return Fabric.with(fabric)
     }
 
     @Provides
@@ -45,4 +59,22 @@ class Crashes {
     fun provideCrashlytics(fabric: Fabric): Crashlytics {
         return Crashlytics.getInstance()
     }
+}
+
+interface CrashBuilder {
+    fun Fabric.Builder.init()
+}
+
+typealias CrashBuilderFunc = Fabric.Builder.() -> Unit
+
+fun CrashBuilderFunc.toBuilder() = object : CrashBuilder {
+    override
+    fun Fabric.Builder.init() = this@toBuilder.invoke(this)
+}
+
+fun <B : CrashesComponent.Builder> B.crashes(
+    init: CrashBuilderFunc
+): B {
+    crashes(init.toBuilder())
+    return this
 }

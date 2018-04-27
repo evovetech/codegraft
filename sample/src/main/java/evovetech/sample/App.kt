@@ -17,30 +17,44 @@
 package evovetech.sample
 
 import android.app.Application
+import android.content.ContentProvider
 import android.content.Context
 import android.util.Log
 import dagger.Binds
 import dagger.Module
+import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
-import evovetech.sample.db.realm.defaultRealm
+import io.fabric.sdk.android.Fabric
+import javax.inject.Inject
 
+@AndroidApplication(AppBoot::class)
 class App : DaggerApplication() {
-    override fun onCreate() {
+    @Inject lateinit
+    var fabric: Fabric
+
+    override
+    fun onCreate() {
         super.onCreate()
-        applicationInjector().fabric.kits.forEach {
-            Log.d("SAMPLE", "app onCreate() kit=${it}")
+        logStartup("onCreate")
+    }
+
+    override
+    fun contentProviderInjector(): AndroidInjector<ContentProvider> {
+        return super.contentProviderInjector().also {
+            logStartup("contentProviderInjector")
         }
     }
 
     override
-    fun applicationInjector(): AppComponent {
-        return DaggerAppComponent.builder()
-                .app(this)
-                .defaultRealm {
-                    name("app.realm")
-                    schemaVersion(1)
-                }
-                .build()
+    fun applicationInjector(): AndroidInjector<out DaggerApplication> {
+        throw IllegalStateException("shouldn't be called")
+    }
+
+    fun logStartup(tag: String) {
+        Log.d(tag, "startup")
+        fabric.kits.forEach {
+            Log.d(tag, "app -- fabric kit=${it}")
+        }
     }
 }
 
