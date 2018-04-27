@@ -16,18 +16,13 @@
 
 package evovetech.sample
 
-import android.app.Application
+import kotlin.annotation.AnnotationRetention.BINARY
+import kotlin.reflect.KClass
 
-interface Bootstrap<App : Application> {
-    fun AppComponent.Builder.onBoot(app: App)
-}
-
-// App transform
-class App3 : Application() {
-
-}
-
-private
-fun inject(app: App) = AppBoot()
-        .build(app)
-        .inject(app)
+@MustBeDocumented
+@Target(AnnotationTarget.CLASS)
+@Retention(BINARY)
+annotation
+class AndroidApplication(
+    val value: KClass<out Bootstrap<*>>
+)

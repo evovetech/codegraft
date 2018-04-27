@@ -16,18 +16,15 @@
 
 package evovetech.sample
 
-import android.app.Application
-
-interface Bootstrap<App : Application> {
-    fun AppComponent.Builder.onBoot(app: App)
+// Content Provider
+class BootstrapProvider : EmptyContentProvider() {
+    override
+    fun onCreate(): Boolean {
+        val app = context as App
+        val component = AppBoot()
+                .build(app)
+        component.inject(app)
+        app.logStartup("Bootstrap")
+        return true
+    }
 }
-
-// App transform
-class App3 : Application() {
-
-}
-
-private
-fun inject(app: App) = AppBoot()
-        .build(app)
-        .inject(app)
