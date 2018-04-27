@@ -16,12 +16,9 @@
 
 import org.gradle.plugin.management.PluginManagementSpec
 
-def configDir = setConfigDir(settings)
-def app = new Expando()
-loadProperties(this, "${configDir}/defaultGradle.properties", app, 'app.')
-
-ext.app = loadApp(app)
-ext.pom = loadPom()
+def defaults = loadDefaults()
+def app = defaults.app
+def pom = defaults.pom
 app.plugins = [
         'kotlin': [
                 module: 'org.jetbrains.kotlin:kotlin-gradle-plugin',
@@ -42,6 +39,13 @@ app.plugins = [
         'com.google.firebase': [
                 module: 'com.google.firebase:firebase-plugins',
                 version: app.firebasePluginsVersion
+        ],
+        'com.jfrog.bintray': [
+                module: 'com.jfrog.bintray.gradle:gradle-bintray-plugin',
+                version: app.gradleBintrayPluginVersion
+        ],
+        'evovetech': [
+                version: pom.version
         ]
 ]
 app.repos = {
@@ -85,8 +89,6 @@ gradle.rootProject { p ->
     settings.ext.properties.each { prop ->
         p.ext."${prop.key}" = prop.value
     }
-    group = app.group
-    version = app.version
 
     p.buildscript.repositories(app.repos)
     task wrapper(type: Wrapper) {
@@ -98,6 +100,21 @@ gradle.rootProject { p ->
 gradle.beforeProject { p ->
     p.repositories(app.repos)
     loadProject(p)
+}
+
+def loadDefaults() {
+    def configDir = setConfigDir(settings)
+    return [
+            app: loadDefault(configDir, 'app'),
+            pom: loadDefault(configDir, 'pom')
+    ]
+}
+
+def loadDefault(configDir, String ext) {
+    def expando = new Expando()
+    loadProperties(this, "${configDir}/defaultGradle.properties", expando, "${ext}.")
+    this.ext.set(ext, expando)
+    return expando
 }
 
 static def setConfigDir(settings) {
@@ -135,17 +152,6 @@ static def tryGetConfigDir(ext) {
         return ext.configDir
     }
     return null
-}
-
-def loadApp(Expando app) {
-    loadProperties(this, "${rootDir}/gradle.properties", app, 'app.')
-    return app
-}
-
-def loadPom() {
-    def pom = new Expando()
-    loadProperties(this, "${rootDir}/gradle.properties", pom, 'pom.')
-    return pom
 }
 
 static def loadProject(p) {
