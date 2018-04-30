@@ -20,6 +20,7 @@ if (gp == null) {
     gp = gradle
 }
 
+println()
 if (!gp.hasProperty('buildscriptRepos')) {
     gp.ext.buildscriptRepos = {
         mavenLocal()
@@ -32,15 +33,11 @@ if (!g.hasProperty('buildscriptRepos')) {
 }
 
 if (!gp.hasProperty('buildscriptDependencies')) {
-    def configDir = "${settings.settingsDir}/gradle"
-    if (hasProperty('configDir')) {
-        configDir = ext.configDir
-    }
-    def props = new Properties()
-    props.load(new File(configDir, "defaultGradle.properties").newReader())
-    def v = props.getProperty("app.evovetechGradlePluginVersion")
+    def v = loadPluginVersion()
+    def plugin = "evovetech.gradle:gradle-plugin:${v}"
+    println("plugin=${plugin}")
     gp.ext.buildscriptDependencies = {
-        classpath "evovetech.gradle:gradle-plugin:${v}"
+        classpath plugin
     }
 }
 if (!g.hasProperty('buildscriptDependencies')) {
@@ -64,4 +61,24 @@ if (!gp.hasProperty('defaultDependencies')) {
 }
 if (!g.hasProperty('defaultDependencies')) {
     g.ext.defaultDependencies = gp.defaultDependencies
+}
+
+def loadPluginVersion() {
+    def rootDir = settings.settingsDir
+    def configDir = "${rootDir}/gradle"
+    if (hasProperty('configDir')) {
+        configDir = ext.configDir
+    }
+    def props = new Properties()
+    loadProperties(props, new File(configDir, "defaultGradle.properties"))
+    loadProperties(props, new File(rootDir, "gradle.properties"))
+    return props.getProperty("app.evovetechGradlePluginVersion") ?: "+"
+}
+
+static def loadProperties(props, file) {
+    try {
+        props.load(file.newReader())
+    } catch (ignored) {
+        // ignore
+    }
 }
