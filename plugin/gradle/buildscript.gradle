@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-def gp = gradle.parent
+def g = gradle
+def gp = g.parent
 if (gp == null) {
     gp = gradle
 }
@@ -25,6 +26,9 @@ if (!gp.hasProperty('buildscriptRepos')) {
         maven { url "https://dl.bintray.com/evove-tech/maven" }
         jcenter()
     }
+}
+if (!g.hasProperty('buildscriptRepos')) {
+    g.ext.buildscriptRepos = gp.buildscriptRepos
 }
 
 if (!gp.hasProperty('buildscriptDependencies')) {
@@ -39,6 +43,9 @@ if (!gp.hasProperty('buildscriptDependencies')) {
         classpath "evovetech.gradle:gradle-plugin:${v}"
     }
 }
+if (!g.hasProperty('buildscriptDependencies')) {
+    g.ext.buildscriptDependencies = gp.buildscriptDependencies
+}
 
 if (!gp.hasProperty('defaultRepos')) {
     gp.ext.defaultRepos = {
@@ -48,7 +55,13 @@ if (!gp.hasProperty('defaultRepos')) {
         maven { url 'https://maven.fabric.io/public' }
     }
 }
+if (!g.hasProperty('defaultRepos')) {
+    g.ext.defaultRepos = gp.defaultRepos
+}
 
 if (!gp.hasProperty('defaultDependencies')) {
-    gp.ext.defaultDependencies = gp.ext.buildscriptDependencies
+    gp.ext.defaultDependencies = gp.buildscriptDependencies
+}
+if (!g.hasProperty('defaultDependencies')) {
+    g.ext.defaultDependencies = gp.defaultDependencies
 }
