@@ -44,7 +44,6 @@ ext.pomArtifactId = {
         def n = project.name
         println("setting artifactId=${n}")
         artifactId = n
-        pom.artifactId = n
     } else {
         println("getting artifactId=${artifactId}")
     }
