@@ -58,7 +58,7 @@ class ProjectAppExtension(
 ) : AppExtension<Project>(project) {
     override
     val Project.propertiesFile: File by lazy {
-        File(configDir, "gradle.properties")
+        project.file("gradle.properties")
     }
 //
 //    override

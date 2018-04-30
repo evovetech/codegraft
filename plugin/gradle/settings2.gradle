@@ -15,6 +15,9 @@
  */
 
 def configDir = "${settings.settingsDir}/gradle"
+if (hasProperty('configDir')) {
+    configDir = ext.configDir
+}
 def gp = gradle.parent
 def hasParent = gp != null
 println("hasParent=$hasParent")
@@ -33,13 +36,18 @@ if (!useSettingsPlugin) {
 
 if (!hasParent) {
     gp = gradle
-    gradle.ext.defaultRepos = {
+}
+
+if (!gp.hasProperty('defaultRepos')) {
+    gp.ext.defaultRepos = {
         mavenLocal()
         google()
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
     }
-    gradle.ext.defaultDependencies = {
+}
+if (!gp.hasProperty('defaultDependencies')) {
+    gp.ext.defaultDependencies = {
         classpath "evovetech.gradle:gradle-plugin:0.4.0-SNAPSHOT"
     }
 }
