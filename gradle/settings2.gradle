@@ -75,5 +75,9 @@ app {
         update("com.jfrog.artifactory") {
             it.version = "4.7.1"
         }
+        update('org.jetbrains.dokka') {
+            it.module = "org.jetbrains.dokka:dokka-gradle-plugin"
+            it.version = "0.9.16"
+        }
     }
 }

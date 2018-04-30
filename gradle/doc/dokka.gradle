@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-apply plugin: 'maven-publish'
+if (!project.plugins.hasPlugin('org.jetbrains.dokka')) {
+    return
+}
 
-def pubName = ext.pubName
-def pomArtifactId = ext.pomArtifactId
-publishing.publications {
-    create(pubName, MavenPublication) {
-        from components.java
-        artifactId = pomArtifactId()
-        pom.withXml {
-            def root = asNode()
-            root.children().last() + pomConfig
-        }
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/javadoc"
+}
+
+if (!project.tasks.findByName('sourcesJar')) {
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allSource.srcDirs
+        classifier = 'sources'
+    }
+}
+
+if (!project.tasks.findByName('javadocJar')) {
+    task javadocJar(type: Jar, dependsOn: dokka) {
+        classifier = 'javadoc'
+        from dokka.outputDirectory
     }
 }

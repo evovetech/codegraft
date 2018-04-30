@@ -21,6 +21,6 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${app.kotlinVersion}"
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${app.kotlinVersion}"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${app.kotlinVersion}"
 }

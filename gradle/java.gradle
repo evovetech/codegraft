@@ -14,8 +14,5 @@
  * limitations under the License.
  */
 
-def pubDir = "${configDir}/publishing"
-apply from: "${pubDir}/pom.gradle"
-apply from: "${pubDir}/mavenPublish.gradle"
-apply from: "${pubDir}/bintray.gradle"
-apply from: "${pubDir}/artifactory.gradle"
+apply from: "${configDir}/java-library.gradle"
+apply from: "${configDir}/doc/javadoc.gradle"

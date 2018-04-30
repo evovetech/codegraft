@@ -15,21 +15,4 @@
  */
 
 apply plugin: 'java-library'
-
 pom.packaging = 'jar'
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource.srcDirs
-    classifier = 'sources'
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-//    encoding = 'UTF-8'
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}

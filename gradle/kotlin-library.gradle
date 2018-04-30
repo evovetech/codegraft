@@ -16,4 +16,5 @@
 
 apply from: "${configDir}/java-library.gradle"
 apply from: "${configDir}/kotlin.gradle"
+apply from: "${configDir}/doc/dokka.gradle"
 apply from: "${configDir}/publishing.gradle"
