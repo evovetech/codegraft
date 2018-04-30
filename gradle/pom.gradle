@@ -36,3 +36,17 @@ ext.pomConfig = {
         url pom.scmUrl
     }
 }
+def pom = ext.pom
+ext.pubName = "${project.name}Default"
+ext.pomArtifactId = {
+    def artifactId = pom.artifactId
+    if (artifactId == null) {
+        def n = project.name
+        println("setting artifactId=${n}")
+        artifactId = n
+        pom.artifactId = n
+    } else {
+        println("getting artifactId=${artifactId}")
+    }
+    return artifactId
+}

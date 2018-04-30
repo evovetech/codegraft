@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-buildscript {
-    ext.useSettingsPlugin = true
-    repositories {
-        maven { url "https://dl.bintray.com/evove-tech/maven" }
-        jcenter()
-    }
-    dependencies {
-        classpath "evovetech.gradle:gradle-plugin:0.4.0"
-    }
-}
+apply plugin: 'maven-publish'
 
-def configDir = file('../gradle').absoluteFile
-gradle.ext.configDir = configDir
-ext.configDir = configDir
-gradle.rootProject { p ->
-    p.ext.configDir = configDir
+def pubName = ext.pubName
+def pomArtifactId = ext.pomArtifactId
+publishing.publications {
+    create(pubName, MavenPublication) {
+        from components.java
+        artifactId = pomArtifactId()
+        pom.withXml {
+            def root = asNode()
+            root.children().last() + pomConfig
+        }
+    }
 }
-apply from: "${configDir}/settings2.gradle"

@@ -17,11 +17,11 @@
 buildscript {
     ext.useSettingsPlugin = true
     repositories {
-        mavenLocal()
+        maven { url "https://dl.bintray.com/evove-tech/maven" }
         jcenter()
     }
     dependencies {
-        classpath "evovetech.gradle:gradle-plugin:0.4.0-SNAPSHOT"
+        classpath "evovetech.gradle:gradle-plugin:0.4.0"
     }
 }
 

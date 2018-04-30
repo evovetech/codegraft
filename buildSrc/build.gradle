@@ -19,7 +19,6 @@ plugins {
     id("org.gradle.kotlin.kotlin-dsl")
     id("kotlin")
     id("kotlin-kapt")
-    id("com.jfrog.bintray")
 }
 
 ext {
