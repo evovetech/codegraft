@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-pluginManagement {
-    apply from: 'gradle/settings.gradle'
-    app.configurePlugins(it)
+buildscript {
+  ext.useSettingsPlugin = true
+  repositories {
+      mavenLocal()
+      jcenter()
+  }
+  dependencies {
+      classpath "evovetech.gradle:gradle-plugin:0.4.0-SNAPSHOT"
+  }
 }
+
+apply from: "gradle/settings2.gradle"
 
 include ':model',
         ':annotations',
