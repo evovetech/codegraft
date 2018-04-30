@@ -46,11 +46,6 @@ if (!gp.hasProperty('defaultRepos')) {
         maven { url 'https://maven.fabric.io/public' }
     }
 }
-if (!gp.hasProperty('defaultDependencies')) {
-    gp.ext.defaultDependencies = {
-        classpath "evovetech.gradle:gradle-plugin:0.4.0-SNAPSHOT"
-    }
-}
 
 apply from: "${configDir}/init.gradle"
 apply plugin: 'evovetech.settings'
