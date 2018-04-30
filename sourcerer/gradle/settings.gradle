@@ -13,56 +13,78 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import org.gradle.plugin.management.PluginManagementSpec
-
-def configDir = setConfigDir(settings)
-def app = new Expando()
-loadProperties(this, "${configDir}/defaultGradle.properties", app, 'app.')
-
-ext.app = loadApp(app)
-ext.pom = loadPom()
+def defaults = loadDefaults()
+def app = defaults.app
+def pom = defaults.pom
 app.plugins = [
         'org.gradle.kotlin.kotlin-dsl': [
                 version: app.kotlinDslVersion
         ],
-        'kotlin'                      : [
-                module : 'org.jetbrains.kotlin:kotlin-gradle-plugin',
+        'kotlin': [
+                module: 'org.jetbrains.kotlin:kotlin-gradle-plugin',
                 version: app.kotlinVersion
         ],
-        'com.android'                 : [
-                module : "com.android.tools.build:gradle",
+        'com.android': [
+                module: "com.android.tools.build:gradle",
                 version: app.androidGradleVersion
         ],
-        'realm'                       : [
-                module : 'io.realm:realm-gradle-plugin',
+        'realm': [
+                module: 'io.realm:realm-gradle-plugin',
                 version: app.realmVersion
+        ],
+        'io.fabric': [
+                module: 'io.fabric.tools:gradle',
+                version: app.fabricVersion
+        ],
+        'com.google.firebase': [
+                module: 'com.google.firebase:firebase-plugins',
+                version: app.firebasePluginsVersion
+        ],
+        'com.jfrog.bintray': [
+                module: 'com.jfrog.bintray.gradle:gradle-bintray-plugin',
+                version: app.gradleBintrayPluginVersion
+        ],
+        'evovetech': [
+                version: pom.version
         ]
 ]
+app.repos = {
+    mavenLocal()
+    google()
+    jcenter()
+    maven { url 'https://maven.fabric.io/public' }
+}
 app.configurePlugins = { PluginManagementSpec plug ->
     Closure cl = {
         repositories {
             gradlePluginPortal()
-            maven { url "https://maven.google.com/" }
-            maven { url "https://jcenter.bintray.com/" }
         }
+        repositories(app.repos)
         resolutionStrategy {
             eachPlugin {
+                def found = false
                 def reqId = requested.id.id
                 app.plugins.find { String key, Map value ->
                     if (reqId.startsWith(key)) {
                         def module = value.get("module", null)
                         def version = value.get("version", null)
                         if (module && version) {
+                            println("${reqId}: module=${module}, version=${version}")
                             useModule("${module}:${version}")
                         } else if (module) {
+                            println("${reqId}: module=${module}, version=${requested.version}")
                             useModule("${module}:${requested.version}")
                         } else if (version) {
+                            println("${reqId}: version=${version}")
                             useVersion(version)
                         }
+                        found = true
                         return true
                     }
                     return false
+                }
+                if (!found) {
+                    println("${reqId}: module=${module}, version=${requested.version}")
                 }
             }
         }
@@ -70,30 +92,38 @@ app.configurePlugins = { PluginManagementSpec plug ->
     cl.delegate = plug
     cl(plug)
 }
-app.repos = {
-    google()
-    jcenter()
-    maven { url 'https://maven.fabric.io/public' }
-    mavenLocal()
-}
 
 gradle.rootProject { p ->
     settings.ext.properties.each { prop ->
         p.ext."${prop.key}" = prop.value
     }
-    group = app.group
-    version = app.version
+    loadProject(p)
 
-    p.buildscript.repositories(app.repos)
+    p.buildscript.repositories(p.app.repos)
     task wrapper(type: Wrapper) {
-        gradleVersion app.gradleVersion
+        gradleVersion p.app.gradleVersion
         distributionType 'all'
     }
 }
 
 gradle.beforeProject { p ->
-    p.repositories(app.repos)
     loadProject(p)
+    p.repositories(p.app.repos)
+}
+
+def loadDefaults() {
+    def configDir = setConfigDir(settings)
+    return [
+            app: loadDefault(configDir, 'app'),
+            pom: loadDefault(configDir, 'pom')
+    ]
+}
+
+def loadDefault(configDir, String ext) {
+    def expando = new Expando()
+    loadProperties(this, "${configDir}/defaultGradle.properties", expando, "${ext}.")
+    this.ext.set(ext, expando)
+    return expando
 }
 
 static def setConfigDir(settings) {
@@ -133,17 +163,6 @@ static def tryGetConfigDir(ext) {
     return null
 }
 
-def loadApp(Expando app) {
-    loadProperties(this, "${rootDir}/gradle.properties", app, 'app.')
-    return app
-}
-
-def loadPom() {
-    def pom = new Expando()
-    loadProperties(this, "${rootDir}/gradle.properties", pom, 'pom.')
-    return pom
-}
-
 static def loadProject(p) {
     File propsFile = p.file('gradle.properties')
     def app = new Expando(p.app.properties)
@@ -162,12 +181,10 @@ static def loadProperties(p, fileName, obj, objPrefix) {
     def props = new Properties()
     props.load(file.newReader())
     props.each { prop ->
-        def thing = p.ext
         def key = prop.key as String
         if (key.startsWith(objPrefix)) {
             key = key.substring(objPrefix.length())
-            thing = obj
+            obj."${key}" = prop.value
         }
-        thing."${key}" = prop.value
     }
 }

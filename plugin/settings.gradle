@@ -14,9 +14,5 @@
  * limitations under the License.
  */
 
-pluginManagement {
-    def configDir = file('../gradle')
-    gradle.ext.configDir = configDir
-    apply from: "${configDir}/settings.gradle"
-    app.configurePlugins(it)
-}
+ext.useSettingsPlugin = false
+apply from: "gradle/settings2.gradle"

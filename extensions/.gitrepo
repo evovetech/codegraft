@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@bitbucket.org:evovetech/extensions.git
 	branch = 0.x
-	commit = 99edbe9ffa58ceacf95c892424b5a68768589eda
-	parent = b8a436082dc96f4591e8d12a8e4e4bf96663f424
+	commit = 9049561491366108e5dcbaa7c52e0317402a89f2
+	parent = 9b162796e681173c401f3b80be88922d51eb3766
 	cmdver = 0.3.1

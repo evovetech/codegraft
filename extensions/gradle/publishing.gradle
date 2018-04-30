@@ -19,9 +19,22 @@ apply plugin: 'maven-publish'
 
 def pubName = "${project.name}Default"
 
+def getPomArtifactId() {
+    def artifactId = project.pom?.artifactId
+    if (artifactId == null) {
+        def n = project.name
+        println("setting artifactId=${n}")
+        artifactId = n
+    } else {
+        println("getting artifactId=${artifactId}")
+    }
+    return artifactId
+}
+
 publishing.publications {
     create(pubName, MavenPublication) {
         from components.java
+        artifactId = getPomArtifactId()
         pom.withXml {
             def root = asNode()
             root.children().last() + pomConfig
@@ -32,7 +45,7 @@ publishing.publications {
 apply plugin: 'com.jfrog.bintray'
 
 bintray {
-    publications = [pubName]
+    publications = [getPomArtifactId()]
     pkg {
         repo = app.bintrayRepo
         name = project.name

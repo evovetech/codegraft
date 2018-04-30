@@ -14,23 +14,10 @@
  * limitations under the License.
  */
 
-plugins {
-    `java-gradle-plugin`
-    `kotlin-dsl`
-}
+apply from: "${configDir}/sourcerer/base.gradle"
 
-group = "evovetech"
-version = "0.1.0"
-
-gradlePlugin {
-    (plugins) {
-        "settings" {
-            id = "settings-plugin"
-            implementationClass = "evovetech.plugin.SettingsPlugin"
-        }
-        "rootProject" {
-            id = "root-project-plugin"
-            implementationClass = "evovetech.plugin.RootProjectPlugin"
-        }
-    }
+dependencies {
+    implementation project(':model')
+    compileOnly "com.google.auto.service:auto-service:${app.autoServiceVersion}"
+    kapt "com.google.auto.service:auto-service:${app.autoServiceVersion}"
 }

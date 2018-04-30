@@ -16,11 +16,23 @@
 
 package evovetech.plugin
 
-import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.repositories
 
-class RootProjectPlugin : Plugin<Project> {
-    override fun apply(project: Project) {
-
+class RootProjectPlugin : BaseProjectPlugin() {
+    override
+    fun Project.initialize() {
+        val root = this
+        gradle.beforeProject {
+            if (this != root) {
+                val plugin = plugins.apply(ProjectPlugin::class.java)
+                plugin.app.apply {
+                    parent = root.app
+                }
+            }
+        }
+        afterEvaluate {
+            repositories(app.repos::closure)
+        }
     }
 }
