@@ -14,18 +14,7 @@
  * limitations under the License.
  */
 
-plugins {
-//    id('evovetech.rootProject')
-}
-
-//addTask(tasks.create('tasks'))
 addTask(tasks.create('projects'))
-addTask(tasks.create('clean'),
-        'plugin'
-)
-addTask(tasks.create('publishToMavenLocal'),
-        'plugin'
-)
 
 static def addTask(Task task, Collection<IncludedBuild> includedBuilds) {
     def name = task.name

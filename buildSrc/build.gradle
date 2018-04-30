@@ -25,7 +25,7 @@ ext {
     LABELS = ["java", "kotlin", "gradle", "plugins", "gradlePlugin"]
     LICENSES = ["Apache-2.0"]
     byteBuddyVersion = '1.8.10'
-    evovetechVersion = '0.4.0'
+    evovetechVersion = '0.4.1'
 }
 
 apply from: "${configDir}/kotlin-library.gradle"
