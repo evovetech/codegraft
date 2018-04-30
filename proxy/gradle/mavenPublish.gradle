@@ -14,7 +14,17 @@
  * limitations under the License.
  */
 
-apply from: "${configDir}/pom.gradle"
-apply from: "${configDir}/mavenPublish.gradle"
-apply from: "${configDir}/bintray.gradle"
-apply from: "${configDir}/artifactory.gradle"
+apply plugin: 'maven-publish'
+
+def pubName = ext.pubName
+def pomArtifactId = ext.pomArtifactId
+publishing.publications {
+    create(pubName, MavenPublication) {
+        from components.java
+        artifactId = pomArtifactId()
+        pom.withXml {
+            def root = asNode()
+            root.children().last() + pomConfig
+        }
+    }
+}

@@ -15,6 +15,9 @@
  */
 
 def configDir = "${settings.settingsDir}/gradle"
+if (hasProperty('configDir')) {
+    configDir = ext.configDir
+}
 def gp = gradle.parent
 def hasParent = gp != null
 println("hasParent=$hasParent")
@@ -33,14 +36,14 @@ if (!useSettingsPlugin) {
 
 if (!hasParent) {
     gp = gradle
-    gradle.ext.defaultRepos = {
+}
+
+if (!gp.hasProperty('defaultRepos')) {
+    gp.ext.defaultRepos = {
         mavenLocal()
         google()
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
-    }
-    gradle.ext.defaultDependencies = {
-        classpath "evovetech.gradle:gradle-plugin:0.4.0-SNAPSHOT"
     }
 }
 
@@ -81,6 +84,9 @@ app {
         update("com.jfrog.bintray") {
             it.module = "com.jfrog.bintray.gradle:gradle-bintray-plugin"
             it.version = "1.8.0"
+        }
+        update("com.jfrog.artifactory") {
+            it.version = "4.7.1"
         }
     }
 }

@@ -15,14 +15,10 @@
  */
 
 buildscript {
-  ext.useSettingsPlugin = true
-  repositories {
-      mavenLocal()
-      jcenter()
-  }
-  dependencies {
-      classpath "evovetech.gradle:gradle-plugin:0.4.0-SNAPSHOT"
-  }
+   ext.useSettingsPlugin = true
+   apply from: "gradle/buildscript.gradle"
+   repositories(gradle.buildscriptRepos)
+   dependencies(gradle.buildscriptDependencies)
 }
 
 apply from: "gradle/settings2.gradle"
