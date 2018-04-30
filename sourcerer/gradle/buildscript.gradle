@@ -1,0 +1,54 @@
+/*
+ * Copyright 2018 evove.tech
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+def gp = gradle.parent
+if (gp == null) {
+    gp = gradle
+}
+
+if (!gp.hasProperty('buildscriptRepos')) {
+    gp.ext.buildscriptRepos = {
+        mavenLocal()
+        maven { url "https://dl.bintray.com/evove-tech/maven" }
+        jcenter()
+    }
+}
+
+if (!gp.hasProperty('buildscriptDependencies')) {
+    def configDir = "${settings.settingsDir}/gradle"
+    if (hasProperty('configDir')) {
+        configDir = ext.configDir
+    }
+    def props = new Properties()
+    props.load(new File(configDir, "defaultGradle.properties").newReader())
+    def v = props.getProperty("app.evovetechGradlePluginVersion")
+    gp.ext.buildscriptDependencies = {
+        classpath "evovetech.gradle:gradle-plugin:${v}"
+    }
+}
+
+if (!gp.hasProperty('defaultRepos')) {
+    gp.ext.defaultRepos = {
+        mavenLocal()
+        google()
+        jcenter()
+        maven { url 'https://maven.fabric.io/public' }
+    }
+}
+
+if (!gp.hasProperty('defaultDependencies')) {
+    gp.ext.defaultDependencies = gp.ext.buildscriptDependencies
+}

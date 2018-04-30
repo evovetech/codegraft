@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-buildscript {
-   ext.useSettingsPlugin = true
-   apply from: "gradle/buildscript.gradle"
-   repositories(gradle.buildscriptRepos)
-   dependencies(gradle.buildscriptDependencies)
+apply plugin: 'maven-publish'
+
+def pubName = ext.pubName
+def pomArtifactId = ext.pomArtifactId
+publishing.publications {
+    create(pubName, MavenPublication) {
+        from components.java
+        artifactId = pomArtifactId()
+        pom.withXml {
+            def root = asNode()
+            root.children().last() + pomConfig
+        }
+    }
 }
-
-apply from: "gradle/settings2.gradle"
-
-include(
-        ':io',
-        ':annotations',
-        ':model',
-        ':app-processor',
-        ':lib-processor',
-        ':inject',
-//        ':metalava',
-//        ':meta-processor',
-)
