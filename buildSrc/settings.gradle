@@ -16,19 +16,15 @@
 
 buildscript {
     ext.useSettingsPlugin = true
-    repositories {
-        maven { url "https://dl.bintray.com/evove-tech/maven" }
-        jcenter()
+    def configDir = file('../gradle').absoluteFile
+    gradle.ext.configDir = configDir
+    ext.configDir = configDir
+    gradle.rootProject { p ->
+        p.ext.configDir = configDir
     }
-    dependencies {
-        classpath "evovetech.gradle:gradle-plugin:0.4.0"
-    }
+    apply from: "${configDir}/buildscript.gradle"
+    repositories(gradle.buildscriptRepos)
+    dependencies(gradle.buildscriptDependencies)
 }
 
-def configDir = file('../gradle').absoluteFile
-gradle.ext.configDir = configDir
-ext.configDir = configDir
-gradle.rootProject { p ->
-    p.ext.configDir = configDir
-}
 apply from: "${configDir}/settings2.gradle"
