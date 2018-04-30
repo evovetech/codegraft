@@ -24,10 +24,14 @@ plugins {
 ext {
     LABELS = ["java", "kotlin", "gradle", "plugins", "gradlePlugin"]
     LICENSES = ["Apache-2.0"]
+    byteBuddyVersion = '1.8.10'
+    evovetechVersion = '0.4.0'
 }
 
 apply from: "${configDir}/kotlin-library.gradle"
 
 dependencies {
     compileOnly(localGroovy())
+    compile "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
+    compile "evovetech.gradle:gradle-plugin:${evovetechVersion}"
 }
