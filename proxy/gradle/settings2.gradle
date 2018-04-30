@@ -23,7 +23,7 @@ if (hasProperty('useSettingsPlugin')) {
     useSettingsPlugin = ext.useSettingsPlugin
 }
 println("useSettingsPlugin=$useSettingsPlugin")
-if (!useSettingsPlugin && !hasParent) {
+if (!useSettingsPlugin) {
     pluginManagement {
         apply from: "${configDir}/settings.gradle"
         app.configurePlugins(it)

@@ -26,7 +26,7 @@ dependencies {
     api "com.google.guava:guava:${appGuavaVersion}"
     compileOnly "org.immutables:value:${appImmutablesVersion}"
     compileOnly project(':proxy-functions-generator')
-    kapt project(':proxy-functions-generator')
+    annotationProcessor project(':proxy-functions-generator')
 
     testCompile "io.reactivex:rxjava:${appRxJavaVersion}"
 }

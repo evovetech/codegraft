@@ -24,7 +24,7 @@ apply from: "${configDir}/kotlin-library.gradle"
 dependencies {
     implementation "com.google.auto:auto-common:${app.autoCommonVersion}"
     compileOnly "com.google.auto.service:auto-service:${app.autoServiceVersion}"
-    kapt "com.google.auto.service:auto-service:${app.autoServiceVersion}"
+    annotationProcessor "com.google.auto.service:auto-service:${app.autoServiceVersion}"
     implementation "evovetech.sourcerer.extensions:annotations:${appSourcererVersion}"
     implementation "evovetech.sourcerer:model:${appSourcererVersion}"
     implementation "com.squareup:javapoet:${appJavaPoetVersion}"
