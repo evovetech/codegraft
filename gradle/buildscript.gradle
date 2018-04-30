@@ -23,8 +23,8 @@ if (gp == null) {
 if (!gp.hasProperty('buildscriptRepos')) {
     gp.ext.buildscriptRepos = {
         mavenLocal()
-        maven { url "https://dl.bintray.com/evove-tech/maven" }
         jcenter()
+        maven { url "https://oss.jfrog.org/oss-snapshot-local" }
     }
 }
 if (!g.hasProperty('buildscriptRepos')) {

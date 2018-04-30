@@ -20,20 +20,6 @@ if (hasProperty('configDir')) {
 }
 def gp = gradle.parent
 def hasParent = gp != null
-println("hasParent=$hasParent")
-def useSettingsPlugin = true
-if (hasProperty('useSettingsPlugin')) {
-    useSettingsPlugin = ext.useSettingsPlugin
-}
-println("useSettingsPlugin=$useSettingsPlugin")
-if (!useSettingsPlugin) {
-    pluginManagement {
-        apply from: "${configDir}/settings.gradle"
-        app.configurePlugins(it)
-    }
-    return
-}
-
 if (!hasParent) {
     gp = gradle
 }
@@ -43,6 +29,7 @@ if (!gp.hasProperty('defaultRepos')) {
         mavenLocal()
         google()
         jcenter()
+        maven { url "https://oss.jfrog.org/oss-snapshot-local" }
         maven { url 'https://maven.fabric.io/public' }
     }
 }
