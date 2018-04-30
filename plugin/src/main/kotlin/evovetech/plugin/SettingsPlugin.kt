@@ -16,6 +16,7 @@
 
 package evovetech.plugin
 
+import evovetech.plugin.extensions.AppExtension
 import evovetech.plugin.extensions.SettingsAppExtension
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -28,8 +29,13 @@ class SettingsPlugin : BasePlugin<Settings>(SettingsAppExtension::class) {
     override
     fun Settings.initialize() {
         app.parent = null
-        setConfigDir()
+        val settings = this
         configureEvaluated(gradle::settingsEvaluated)
+        gradle.projectsLoaded {
+            println("configure root project")
+            settings.configureRootProject(rootProject)
+        }
+//        configureRootProject(gradle::rootProject)
         configureProject(gradle::beforeProject)
     }
 
@@ -38,58 +44,61 @@ class SettingsPlugin : BasePlugin<Settings>(SettingsAppExtension::class) {
         afterEvaluated: (action: Action<in Settings>) -> Unit
     ) = afterEvaluated(Action {
         pluginManagement(app.plugins::configure)
-//        pluginAware!!.run {
-//            val dir: Any = gradle.extras?.properties?.get("configDir") ?: "gradle"
-//            apply {
-//                from("$dir/settings.gradle")
-//            }
-//        }
     })
+}
+
+fun AppExtension<Project>.initialize() {
+    val p = parent
+    p?.configDir?.let {
+        configDir = it
+    }
+    println("$project setting configDir=$configDir")
+    project.extras?.set("configDir", configDir)
+
+    project.afterEvaluate {
+        p?.let {
+            repos = it.repos
+        }
+    }
 }
 
 fun <T> Action<T>.closure(value: T) {
     execute(value)
 }
 
+fun Settings.configureRootProject(
+    rootProject: Project
+): Unit = rootProject.run {
+    gradle.extras?.properties?.forEach {
+        extras?.set(it.key, it.value)
+    }
+    settings.extras?.properties?.forEach {
+        extras?.set(it.key, it.value)
+    }
+    val app = plugins.apply(RootProjectPlugin::class.java).app
+    app.apply {
+        parent = settings.app
+        buildscript.repositories(repos::closure)
+    }
+    settings.setConfigDir().let {
+        app.configDir = it.toFile()
+    }
+    app.initialize()
+}
+
 fun Settings.configureProject(
     project: (action: Action<in Project>) -> Unit
 ) = project(Action {
-    gradle.extras?.properties?.forEach {
-        project.extras?.set(it.key, it.value)
-    }
-    val settings = this@configureProject
-    settings.extras?.properties?.forEach {
-        project.extras?.set(it.key, it.value)
-    }
-    val app = if (this === rootProject) {
-        val plugin = plugins.apply(RootProjectPlugin::class.java)
-        plugin.app.apply {
-            parent = settings.app
-            buildscript.repositories(repos::closure)
-        }
-    } else {
+    if (this !== rootProject) {
         val plugin = plugins.apply(ProjectPlugin::class.java)
         plugin.app.apply {
             parent = rootProject.app
         }
-    }
-    app.apply {
-        val p = parent
-        p?.configDir?.let {
-            configDir = it
-        }
-        println("$project setting configDir=$configDir")
-        project.extras?.set("configDir", configDir)
-
-        afterEvaluate {
-            p?.let {
-                repos = it.repos
-            }
-        }
+        app.initialize()
     }
 })
 
-fun Settings.setConfigDir() {
+fun Settings.setConfigDir(): File {
     println("$this try parent gradle config dir")
     var configDir = gradle.tryGetConfigDir()?.toFile()
     if (configDir == null) {
@@ -104,6 +113,7 @@ fun Settings.setConfigDir() {
     }
     gradle.extras?.properties?.set("configDir", configDir)
     extras?.properties?.set("configDir", configDir)
+    return configDir
 }
 
 fun Gradle.tryGetConfigDir(): Any? {

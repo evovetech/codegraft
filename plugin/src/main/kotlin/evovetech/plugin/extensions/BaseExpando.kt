@@ -16,6 +16,7 @@
 
 package evovetech.plugin.extensions
 
+import groovy.lang.MissingPropertyException
 import groovy.util.Expando
 import org.gradle.api.internal.DynamicObjectAware
 import org.gradle.internal.metaobject.AbstractDynamicObject
@@ -86,6 +87,22 @@ class BaseExpando : Expando(), DynamicObjectAware {
     inner
     class Dynamo : AbstractDynamicObject() {
         val parent = this@BaseExpando
+
+        override
+        fun getProperty(name: String): Any {
+            return super.getProperty(name)
+        }
+
+        override
+        fun invokeMethod(name: String, vararg arguments: Any?): Any {
+            return super.invokeMethod(name, *arguments)
+        }
+
+        override
+        fun getMissingProperty(name: String): MissingPropertyException {
+            println("properties=$properties")
+            return super.getMissingProperty(name)
+        }
 
         override
         fun getDisplayName(): String {

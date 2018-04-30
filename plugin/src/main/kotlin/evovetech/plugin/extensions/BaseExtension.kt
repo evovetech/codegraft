@@ -17,6 +17,7 @@
 package evovetech.plugin.extensions
 
 import evovetech.plugin.extras
+import evovetech.plugin.toFile
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
@@ -32,7 +33,15 @@ class BaseExtension<P : Any>(
     abstract
     val P.propertiesFile: File
 
+//    var sourcererVersion: String by property {
+//        pom.getProperty("version")
+//    }
+
     var configDir: File by property {
+        val dir = project.extras?.get("configDir")?.toFile()
+        if (dir != null) {
+            return@property dir
+        }
         val p = project
         val root = when (p) {
             is Project -> p.rootDir
@@ -78,16 +87,39 @@ class BaseExtension<P : Any>(
                 app.pom.loadProperties(it.pom)
                 repos = it.repos
                 configDir = it.configDir
+                it.dynamo.tryGetProperty("sourcererVersion")
+                        .let {
+                            if (it.isFound) {
+                                it.value
+                            } else {
+                                null
+                            }
+                        }
+                        ?.let { v ->
+                            println("setting sourcererVersion to $v")
+                            app.setProperty("sourcererVersion", v)
+                        }
             }
             p.loadProperties()
+            dynamo.tryGetProperty("sourcererVersion")
+                    .let { if (it.isFound) null else true }
+                    ?.let {
+                        val v = pom.properties["version"]
+                        println("setting sourcererVersion to $v")
+                        app.setProperty("sourcererVersion", v)
+                    }
+
         }
 
     private
     fun P.loadProperties() = try {
         val props = Properties()
-        props.load(propertiesFile.reader())
+        val file = propertiesFile
+        println("loading properties: $file")
+        props.load(file.reader())
         loadProperties(props)
     } catch (e: Throwable) {
+        println("error loading properties")
 //        e.printStackTrace(System.err)
     }
 
