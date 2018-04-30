@@ -14,26 +14,42 @@
  * limitations under the License.
  */
 
-apply plugin: "com.jfrog.artifactory"
+if (!project.plugins.hasPlugin('com.jfrog.artifactory')) {
+    return
+}
 
+def pubName = ext.pubName
+def pomVersion = pom.version
+def bintrayOrgRepo = "${app.bintrayOrg}/${app.bintrayRepo}"
 artifactory {
     contextUrl = 'https://oss.jfrog.org'
-
-    publish {
+    resolve {
         repository {
-            repoKey = 'oss-snapshot-local'
-
-            if (project.hasProperty('bintrayUser')) {
-                username = project.property('bintrayUser')
-                password = project.property('bintrayKey')
-            }
-        }
-
-        defaults {
-            publishConfigs('archives')
+            repoKey = 'libs-release'
         }
     }
-    resolve {
-        repoKey = 'jcenter'
+    publish {
+        repository {
+            if (pomVersion.endsWith("-SNAPSHOT")) {
+                repoKey = 'oss-snapshot-local'
+            } else {
+                repoKey = 'oss-release-local'
+            }
+
+            if (project.hasProperty('bintrayUser')
+                    && project.hasProperty('bintrayKey')
+            ) {
+                username = project.bintrayUser
+                password = project.bintrayKey
+            }
+        }
+        defaults {
+            publications(pubName)
+            properties = [
+                    'bintray.repo': bintrayOrgRepo,
+                    'bintray.package': pom.groupId,
+                    'bintray.version': pom.version
+            ]
+        }
     }
 }

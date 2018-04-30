@@ -90,5 +90,8 @@ app {
             it.module = "com.jfrog.bintray.gradle:gradle-bintray-plugin"
             it.version = "1.8.0"
         }
+        update("com.jfrog.artifactory") {
+            it.version = "4.7.1"
+        }
     }
 }
