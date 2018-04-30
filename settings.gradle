@@ -31,7 +31,6 @@ include(
         ':core:network',
 )
 
-includeBuild 'plugin'
 includeBuild 'sourcerer'
 includeBuild 'extensions'
 includeBuild 'proxy'
