@@ -46,6 +46,9 @@ app.plugins = [
         ],
         'evovetech': [
                 version: pom.version
+        ],
+        'com.jfrog.artifactory': [
+                version: '4.7.1'
         ]
 ]
 app.repos = {
