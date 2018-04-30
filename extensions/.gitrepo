@@ -7,5 +7,5 @@
 	remote = git@bitbucket.org:evovetech/extensions.git
 	branch = 0.x
 	commit = 9049561491366108e5dcbaa7c52e0317402a89f2
-	parent = 9b162796e681173c401f3b80be88922d51eb3766
+	parent = 65932be909fcc2f7e6f85109577ad9c04cb67a9c
 	cmdver = 0.3.1
