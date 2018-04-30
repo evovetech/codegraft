@@ -16,21 +16,10 @@
 
 apply from: "${configDir}/pom.gradle"
 apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.jfrog.artifactory'
 
 def pubName = "${project.name}Default"
-
-def getPomArtifactId() {
-    def artifactId = project.pom?.artifactId
-    if (artifactId == null) {
-        def n = project.name
-        println("setting artifactId=${n}")
-        artifactId = n
-    } else {
-        println("getting artifactId=${artifactId}")
-    }
-    return artifactId
-}
-
 publishing.publications {
     create(pubName, MavenPublication) {
         from components.java
@@ -42,21 +31,61 @@ publishing.publications {
     }
 }
 
-apply plugin: 'com.jfrog.bintray'
+def bintrayOrgRepo = "${app.bintrayOrg}/${app.bintrayRepo}"
+def pomGroupId = pom.groupId
+def pomVersion = pom.version
+artifactory {
+    contextUrl = 'https://oss.jfrog.org'
+    resolve {
+        repository {
+            repoKey = 'libs-release'
+        }
+    }
+    publish {
+        repository {
+            if (pomVersion.endsWith("-SNAPSHOT")) {
+                repoKey = 'oss-snapshot-local'
+            } else {
+                repoKey = 'oss-release-local'
+            }
+
+            if (project.hasProperty('bintrayUser')
+                    && project.hasProperty('bintrayKey')
+            ) {
+                username = project.bintrayUser
+                password = project.bintrayKey
+            }
+        }
+        defaults {
+            publications(pubName)
+            properties = [
+                    'bintray.repo': bintrayOrgRepo,
+                    'bintray.package': pomGroupId,
+                    'bintray.version': pomVersion
+            ]
+        }
+    }
+}
 
 bintray {
-    publications = [getPomArtifactId()]
+    publications = [pubName]
     pkg {
         repo = app.bintrayRepo
-        name = project.name
+        name = getPomArtifactId()
         userOrg = app.bintrayOrg
         licenses = rootProject.ext.LICENSES
         labels = rootProject.ext.LABELS
         websiteUrl = pom.url
         issueTrackerUrl = pom.issueTrackerUrl
         vcsUrl = pom.scmUrl
+        publicDownloadNumbers = true
+        version {
+            released = new Date()
+            name = pomVersion
+        }
     }
 }
+
 
 if (project.hasProperty('bintrayUser')
         && project.hasProperty('bintrayKey')
@@ -83,4 +112,16 @@ if (project.hasProperty('mavenSync')
     sync.sync = true
     sync.user = project.sonatypeUsername
     sync.password = project.sonatypePassword
+}
+
+def getPomArtifactId() {
+    def artifactId = project.pom?.artifactId
+    if (artifactId == null) {
+        def n = project.name
+        println("setting artifactId=${n}")
+        artifactId = n
+    } else {
+        println("getting artifactId=${artifactId}")
+    }
+    return artifactId
 }
