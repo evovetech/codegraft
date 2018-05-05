@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@bitbucket.org:evovetech/gradle-config.git
+	branch = dev
+	commit = 838679a24dcfb5be46e2878baaa6001ca28b11cc
+	parent = 356ec731dfdf057c55484e230cd5eb3a74b6fb7c
+	cmdver = 0.3.1
