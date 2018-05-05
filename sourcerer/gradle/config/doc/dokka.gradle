@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-apply plugin: 'java-library'
-
-pom.packaging = 'jar'
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource.srcDirs
-    classifier = 'sources'
+if (!project.plugins.hasPlugin('org.jetbrains.dokka')) {
+    return
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-//    encoding = 'UTF-8'
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/javadoc"
 }
 
-artifacts {
-    archives sourcesJar
-    archives javadocJar
+if (!project.tasks.findByName('sourcesJar')) {
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allSource.srcDirs
+        classifier = 'sources'
+    }
+}
+
+if (!project.tasks.findByName('javadocJar')) {
+    task javadocJar(type: Jar, dependsOn: dokka) {
+        classifier = 'javadoc'
+        from dokka.outputDirectory
+    }
 }

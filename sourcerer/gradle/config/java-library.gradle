@@ -14,7 +14,5 @@
  * limitations under the License.
  */
 
-apply from: "${configDir}/pom.gradle"
-apply from: "${configDir}/mavenPublish.gradle"
-apply from: "${configDir}/bintray.gradle"
-apply from: "${configDir}/artifactory.gradle"
+apply plugin: 'java-library'
+pom.packaging = 'jar'

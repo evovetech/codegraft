@@ -4,8 +4,8 @@
 ; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
 ;
 [subrepo]
-	remote = git@bitbucket.org:evovetech/gradle.git
+	remote = git@bitbucket.org:evovetech/gradle-config.git
 	branch = dev
-	commit = d116fdf82ce657abc759cacf40069b1af3bbe28f
-	parent = 059a319bf8e7e9e78df5d671e030cdd20c47b019
+	commit = 838679a24dcfb5be46e2878baaa6001ca28b11cc
+	parent = 5eeeeb30e78d7135e4360d57fda68bf9c17db462
 	cmdver = 0.3.1

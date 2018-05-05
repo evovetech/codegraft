@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-apply from: "${configDir}/kotlin-library.gradle"
+apply plugin: 'kotlin'
+apply from: "${configDir}/kapt.gradle"
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
-    implementation "com.google.guava:guava:${app.guavaVersion}"
-    api "com.squareup:javapoet:${app.javaPoetVersion}"
-    api "com.squareup.okio:okio:${app.okioVersion}"
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${app.kotlinVersion}"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${app.kotlinVersion}"
 }
