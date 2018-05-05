@@ -26,17 +26,7 @@ class ByteBuddyPlugin : Plugin<Project> {
 //        project.extensions.
         project.plugins.withId("com.android.application") {
             println("plugin=$this")
-            project.extensions
-                    .findByName("android")
-//                ?.apply { println("android extension = ${this::class.java}") }
-//                ?.let {
-//                    //                    val type = AppExtension::class.java
-//                    if (type.isInstance(it)) {
-//                        type.cast(it)
-//                    } else {
-//                        null
-//                    }
-//                }
+            project.extensions.findByName("android")
                     ?.run(this@ByteBuddyPlugin::setup)
         }
     }
