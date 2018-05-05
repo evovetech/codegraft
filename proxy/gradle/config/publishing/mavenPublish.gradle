@@ -22,6 +22,19 @@ publishing.publications {
     create(pubName, MavenPublication) {
         from components.java
         artifactId = pomArtifactId()
+
+        if (project.tasks.findByName('sourcesJar')) {
+            artifact sourcesJar {
+                classifier "sources"
+            }
+        }
+
+        if (project.tasks.findByName('javadocJar')) {
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+        }
+
         pom.withXml {
             def root = asNode()
             root.children().last() + pomConfig
