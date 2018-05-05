@@ -7,5 +7,5 @@
 	remote = git@bitbucket.org:evovetech/gradle.git
 	branch = dev
 	commit = 82b3938e1f2af23ac6488295943ad8742addf10c
-	parent = 0ce55c36ca050d83edeb6a05b9ba7fa31d049544
+	parent = 9781b57a56d549652570297d351724642d2cde56
 	cmdver = 0.3.1
