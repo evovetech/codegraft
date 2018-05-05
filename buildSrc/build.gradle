@@ -26,12 +26,31 @@ ext {
     LICENSES = ["Apache-2.0"]
     byteBuddyVersion = '1.8.10'
     evovetechVersion = '0.4.1'
+    androidVersion = '3.2.0-alpha13'
 }
 
 apply from: "${configDir}/kotlin-library.gradle"
 
 dependencies {
-    compileOnly(localGroovy())
-    compile "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
-    compile "evovetech.gradle:gradle-plugin:${evovetechVersion}"
+    api "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
+    compileOnly "evovetech.gradle:gradle-plugin:${evovetechVersion}"
+    compileOnly "com.android.tools.build:gradle:${androidVersion}"
+    compileOnly "com.android.tools.build:gradle:${androidVersion}"
+    api "com.android.tools.build:gradle-api:${androidVersion}"
+//    compileOnly(localGroovy())
+//    runtime "com.android.tools.build:gradle:${androidVersion}"
+}
+
+gradlePlugin {
+    automatedPublishing = true
+    plugins {
+        "bytes" {
+            id = "evovetech.bytes"
+            implementationClass = "evovetech.gradle.plugin.ByteBuddyPlugin"
+        }
+//        "rootProject" {
+//            id = "evovetech.rootProject"
+//            implementationClass = "evovetech.plugin.RootProjectPlugin"
+//        }
+    }
 }
