@@ -15,16 +15,50 @@
  */
 
 buildscript {
-    ext.useSettingsPlugin = true
-    def configDir = file('../gradle').absoluteFile
-    gradle.ext.configDir = configDir
-    ext.configDir = configDir
-    gradle.rootProject { p ->
-        p.ext.configDir = configDir
-    }
-    apply from: "${configDir}/buildscript.gradle"
-    repositories(gradle.buildscriptRepos)
-    dependencies(gradle.buildscriptDependencies)
+   ext.configDir = file('../gradle/config').absoluteFile
+   apply from: "${configDir}/buildscript.gradle"
+   repositories(gradle.buildscriptRepos)
+   dependencies(gradle.buildscriptDependencies)
 }
 
-apply from: "${configDir}/settings2.gradle"
+apply plugin: 'evovetech.settings'
+
+evove {
+    repos(gradle.defaultRepos)
+    plugins {
+        update("org.gradle.kotlin.kotlin-dsl") {
+            it.version = "0.16.3"
+        }
+        update("kotlin") {
+            it.module = "org.jetbrains.kotlin:kotlin-gradle-plugin"
+            it.version = "1.2.41"
+        }
+        update("com.android") {
+            it.module = "com.android.tools.build:gradle"
+            it.version = "3.2.0-alpha12"
+        }
+        update("realm") {
+            it.module = "io.realm:realm-gradle-plugin"
+            it.version = "4.2.0"
+        }
+        update("io.fabric") {
+            it.module = "io.fabric.tools:gradle"
+            it.version = "1.25.3"
+        }
+        update("com.google.firebase") {
+            it.module = "com.google.firebase:firebase-plugins"
+            it.version = "1.1.5"
+        }
+        update("com.jfrog.bintray") {
+            it.module = "com.jfrog.bintray.gradle:gradle-bintray-plugin"
+            it.version = "1.8.0"
+        }
+        update("com.jfrog.artifactory") {
+            it.version = "4.7.1"
+        }
+        update('org.jetbrains.dokka') {
+            it.module = "org.jetbrains.dokka:dokka-gradle-plugin"
+            it.version = "0.9.16"
+        }
+    }
+}
