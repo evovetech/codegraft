@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-apply from: "${rootDir}/gradle/kotlin-library.gradle"
+apply from: "${configDir}/kotlin-library.gradle"

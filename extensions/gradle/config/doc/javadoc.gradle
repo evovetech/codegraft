@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-apply from: "${configDir}/kotlin-library.gradle"
+if (!project.plugins.hasPlugin('java')) {
+    return
+}
 
-dependencies {
-    api project(':sample-lib-annotations')
-    kapt project(':test-processor')
+if (!project.tasks.findByName('sourcesJar')) {
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allSource.srcDirs
+        classifier = 'sources'
+    }
+}
+
+if (!project.tasks.findByName('javadocJar')) {
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
 }
