@@ -16,10 +16,17 @@
 
 package evovetech.gradle.plugin
 
+import com.android.build.api.transform.DirectoryInput
+import com.android.build.api.transform.Format
 import com.android.build.api.transform.Format.DIRECTORY
 import com.android.build.api.transform.QualifiedContent
 import com.android.build.api.transform.QualifiedContent.ContentType
+import com.android.build.api.transform.QualifiedContent.DefaultContentType.CLASSES
+import com.android.build.api.transform.QualifiedContent.DefaultContentType.RESOURCES
 import com.android.build.api.transform.QualifiedContent.Scope
+import com.android.build.api.transform.QualifiedContent.Scope.EXTERNAL_LIBRARIES
+import com.android.build.api.transform.QualifiedContent.Scope.PROJECT
+import com.android.build.api.transform.QualifiedContent.Scope.SUB_PROJECTS
 import com.android.build.api.transform.Transform
 import com.android.build.api.transform.TransformInvocation
 import com.android.utils.FileUtils
@@ -31,13 +38,17 @@ class ByteBuddyTransform : Transform() {
         return "ByteBuddyTransform"
     }
 
-    override fun getOutputTypes(): MutableSet<ContentType> {
+    override
+    fun getOutputTypes(): MutableSet<ContentType> {
         return super.getOutputTypes()
     }
 
     override
     fun getInputTypes(): MutableSet<ContentType> {
-        return mutableSetOf(QualifiedContent.DefaultContentType.CLASSES)
+        return mutableSetOf(
+            CLASSES,
+            RESOURCES
+        )
     }
 
     override
@@ -47,7 +58,11 @@ class ByteBuddyTransform : Transform() {
 
     override
     fun getScopes(): MutableSet<in Scope> {
-        return mutableSetOf(QualifiedContent.Scope.PROJECT)
+        return mutableSetOf(
+            PROJECT,
+            SUB_PROJECTS,
+            EXTERNAL_LIBRARIES
+        )
     }
 
     override
@@ -55,38 +70,68 @@ class ByteBuddyTransform : Transform() {
         transformInvocation.run()
     }
 
+    private
+    fun TransformInvocation.runner(format: Format): (content: QualifiedContent) -> Unit = {
+        val outFile = outputProvider.getContentLocation(it.name, it.contentTypes, it.scopes, format)
+        FileTransform(it, outFile, format).run()
+    }
+
     fun TransformInvocation.run() {
-        val outDir = outputProvider.getContentLocation("evove", outputTypes, scopes, DIRECTORY)
-        FileTransform(outDir).apply {
-            inputs.flatMap { it.directoryInputs }
-                    .flatMap { it.file.listFiles().toList() }
-                    .forEach {
-                        it.write()
-                    }
-        }
+        directoryInputs.forEach(runner(Format.DIRECTORY))
+        jarInputs.forEach(runner(Format.JAR))
     }
 }
 
+val TransformInvocation.directoryInputs
+    get() = inputs.flatMap { it.directoryInputs }
+
+fun DirectoryInput.files() = file.listFiles()
+        .toList()
+
+val TransformInvocation.jarInputs
+    get() = inputs.flatMap { it.jarInputs }
+
 class FileTransform(
-    val outDir: File
+    val content: QualifiedContent,
+    val out: File,
+    val format: Format = DIRECTORY
 ) {
     init {
-        if (outDir.exists()) {
-            FileUtils.deleteDirectoryContents(outDir)
+        if (format == DIRECTORY) {
+            out.apply {
+                if (exists()) {
+                    FileUtils.deleteDirectoryContents(this)
+                }
+                mkdirs()
+            }
+        } else {
+            FileUtils.deleteIfExists(out)
         }
-        outDir.mkdirs()
+        println("src=${content.file}, dest=$out")
     }
 
+    fun run() {
+        if (format == DIRECTORY) {
+            content.file.listFiles()
+                    .forEach(this::write)
+        } else {
+            FileUtils.copyFile(content.file, out)
+        }
+    }
+
+    private
     fun dest(src: File, dir: File? = null): File {
-        val dest = File(dir ?: outDir, src.name)
-        println("src=$src, dest=$dest")
+        val dest = File(dir ?: out, src.name)
+//        println("src=$src, dest=$dest")
         return dest
     }
 
+    private
     fun File.writeFile(dest: File) {
         FileUtils.copyFile(this, dest)
     }
 
+    private
     fun File.writeDir(dest: File) {
         dest.mkdirs()
         listFiles().forEach {
@@ -94,6 +139,7 @@ class FileTransform(
         }
     }
 
+    private
     fun File.write(dir: File? = null) {
         val dest = dest(this, dir)
         if (isDirectory) {
@@ -101,5 +147,10 @@ class FileTransform(
         } else {
             writeFile(dest)
         }
+    }
+
+    private
+    fun write(file: File) {
+        file.write()
     }
 }
