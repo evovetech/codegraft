@@ -33,10 +33,14 @@ import com.android.build.api.transform.Transform
 import com.android.build.api.transform.TransformInput
 import com.android.build.api.transform.TransformInvocation
 import com.android.utils.FileUtils
+import net.bytebuddy.ByteBuddy
 import net.bytebuddy.ClassFileVersion
+import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.dynamic.ClassFileLocator
+import net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer
 import net.bytebuddy.pool.TypePool
 import java.io.File
+import java.io.IOException
 import java.util.jar.JarFile
 
 class ByteBuddyTransform : Transform() {
@@ -146,7 +150,7 @@ class RootDirTransform(
         val src = child.src
         val dest = File(this.dest, child.dest.path)
         dest.parentFile.mkdirs()
-        println("$src -> $dest")
+//        println("$src -> $dest")
         FileUtils.copyFile(src, dest)
     }
 }
@@ -167,7 +171,7 @@ class RootJarTransform(
     fun write(child: BaseTransform) {
         val src = child.src
         val dest = child.dest
-        println("$src -> $dest")
+//        println("$src -> $dest")
         FileUtils.copyFile(src, dest)
     }
 
@@ -252,6 +256,8 @@ class RootTransform {
     fun write(child: BaseTransform)
 }
 
+private const val CLASS_FILE_EXTENSION = ".class"
+
 class Runner(
     delegate: TransformInvocation
 ) : TransformInvocation by delegate {
@@ -279,11 +285,53 @@ class Runner(
         TypePool.ClassLoading.ofBootPath()
     )
     val classFileVersion = ClassFileVersion.JAVA_V7
+    val entryPoint: EntryPoint = EntryPoint.Default.REDEFINE
+    fun newByteBuddy(): ByteBuddy =
+        entryPoint.byteBuddy(classFileVersion)
+
+    val androidApplication = typePool.describe("evovetech.sample.AndroidApplication")
+            .resolve()
 
     fun run() {
         primary.forEach {
             val root = it
-            it.all.forEach { root.write(it) }
+            it.all.forEach {
+                when (root) {
+                    is RootDirTransform -> it.writeTo(root)
+                    else -> root.write(it)
+                }
+            }
+        }
+    }
+
+    fun FileTransform.writeTo(root: RootDirTransform) {
+        val file = dest.path
+        val complete: () -> Unit = {
+            root.write(this)
+        }
+        if (!file.endsWith(CLASS_FILE_EXTENSION)) {
+            return complete()
+        }
+        val typeName = file.replace('/', '.').substring(0, file.length - CLASS_FILE_EXTENSION.length)
+        val typeDescription = typePool.describe(typeName).resolve()
+        val anno = typeDescription.declaredAnnotations.ofType(androidApplication)
+                   ?: return complete()
+        println("anno=$anno")
+        val byteBuddy = newByteBuddy()
+        val methodTransformer = MethodNameTransformer.Suffixing("original")
+        val builder = try {
+            entryPoint.transform(typeDescription, byteBuddy, classFileLocator, methodTransformer)
+        } catch (_: Exception) {
+            return complete()
+        }
+
+        val dynamicType = builder.defineField("defined", String::class.java)
+                .value("one")
+                .make()
+        try {
+            dynamicType.saveIn(root.dest)
+        } catch (exception: IOException) {
+            throw  RuntimeException("Cannot save $typeName in $root", exception)
         }
     }
 }
