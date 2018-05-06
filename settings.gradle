@@ -71,7 +71,7 @@ evove {
             it.module = "org.jetbrains.dokka:dokka-gradle-plugin"
             it.version = "0.9.16"
         }
-        update('evovetech.bytes') {
+        update('evovetech') {
             it.module = "evovetech.gradle:gradle-plugin"
             it.version = "0.4.4"
         }
