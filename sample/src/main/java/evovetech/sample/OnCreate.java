@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package evovetech.sample
+package evovetech.sample;
 
-import android.app.Application
+import android.util.Log;
+import net.bytebuddy.implementation.bind.annotation.SuperCall;
 
-interface Bootstrap<App : Application> {
-    fun AppComponent.Builder.onBoot(app: App)
-}
-
-// App transform
-class App3 : Application() {
-
-}
-
-fun inject(app: App) = AppBoot()
-        .build(app)
-        .apply {
-            inject(app)
+public
+class OnCreate {
+    public static
+    void log(@SuperCall Runnable zuper) {
+        final String TAG = "onCreate";
+        Log.d(TAG, "before onCreate()!");
+        try {
+            zuper.run();
+        } finally {
+            Log.d(TAG, "before onCreate()!");
         }
+    }
+}

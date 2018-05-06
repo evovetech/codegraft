@@ -16,19 +16,15 @@
 
 package evovetech.sample
 
-import android.app.Application
 import android.content.ContentProvider
-import android.content.Context
 import android.util.Log
-import dagger.Binds
-import dagger.Module
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
 import io.fabric.sdk.android.Fabric
 import javax.inject.Inject
 
-@AndroidApplication(AppBoot::class)
-class App : DaggerApplication() {
+open
+class App2 : DaggerApplication() {
     @Inject lateinit
     var fabric: Fabric
 
@@ -36,6 +32,13 @@ class App : DaggerApplication() {
     fun onCreate() {
         super.onCreate()
         logStartup("onCreate")
+        this::class.java.methods.forEach {
+            Log.d("onCreate", "method=$it")
+            if (it.name == "getDefined") {
+                val value = it.invoke(this) as? String
+                Log.d("onCreate", "defined=$value")
+            }
+        }
     }
 
     override
@@ -58,8 +61,3 @@ class App : DaggerApplication() {
     }
 }
 
-@Module
-abstract class AppModule {
-    @Binds abstract fun bindContext(app: App): Context
-    @Binds abstract fun bindApplication(app: App): Application
-}

@@ -15,9 +15,9 @@
  */
 
 buildscript {
-   apply from: "gradle/config/buildscript.gradle"
-   repositories(gradle.buildscriptRepos)
-   dependencies(gradle.buildscriptDependencies)
+    apply from: "gradle/config/buildscript.gradle"
+    repositories(gradle.buildscriptRepos)
+    dependencies(gradle.buildscriptDependencies)
 }
 
 apply plugin: 'evovetech.settings'
@@ -73,7 +73,7 @@ evove {
         }
         update('evovetech.bytes') {
             it.module = "evovetech.gradle:gradle-plugin"
-            it.version = "0.4.3"
+            it.version = "0.4.4"
         }
     }
 }

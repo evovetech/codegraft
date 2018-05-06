@@ -21,9 +21,7 @@ class BootstrapProvider : EmptyContentProvider() {
     override
     fun onCreate(): Boolean {
         val app = context as App
-        val component = AppBoot()
-                .build(app)
-        component.inject(app)
+        inject(app)
         app.logStartup("Bootstrap")
         return true
     }

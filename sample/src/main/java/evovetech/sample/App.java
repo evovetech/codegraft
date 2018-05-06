@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package evovetech.sample
+package evovetech.sample;
 
-import android.app.Application
-
-interface Bootstrap<App : Application> {
-    fun AppComponent.Builder.onBoot(app: App)
-}
-
-// App transform
-class App3 : Application() {
+@AndroidApplication(AppBoot.class)
+public
+class App
+        extends App2
+{
 
 }
-
-fun inject(app: App) = AppBoot()
-        .build(app)
-        .apply {
-            inject(app)
-        }

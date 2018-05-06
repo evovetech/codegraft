@@ -17,18 +17,12 @@
 package evovetech.sample
 
 import android.app.Application
+import android.content.Context
+import dagger.Binds
+import dagger.Module
 
-interface Bootstrap<App : Application> {
-    fun AppComponent.Builder.onBoot(app: App)
+@Module
+abstract class AppModule {
+    @Binds abstract fun bindContext(app: App): Context
+    @Binds abstract fun bindApplication(app: App): Application
 }
-
-// App transform
-class App3 : Application() {
-
-}
-
-fun inject(app: App) = AppBoot()
-        .build(app)
-        .apply {
-            inject(app)
-        }

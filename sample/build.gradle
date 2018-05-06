@@ -48,6 +48,9 @@ dependencies(dagger.applyAndroid('implementation'))
 apply from: "${configDir}/versions/crashlytics.gradle"
 dependencies(crashlytics.apply('implementation'))
 
+ext {
+    byteBuddyVersion = '1.8.10'
+}
 dependencies {
     implementation project(':core:network')
     implementation project(':core:db')
@@ -56,6 +59,7 @@ dependencies {
     kapt("evovetech.sourcerer:app-processor:${app.sourcererVersion}")
     implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"
     implementation "com.google.firebase:firebase-perf:${app.firebaseVersion}"
+    compileOnly "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
 }
 
 // ADD THIS AT THE BOTTOM
