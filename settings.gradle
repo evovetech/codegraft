@@ -46,7 +46,7 @@ evove {
         }
         update("com.android") {
             it.module = "com.android.tools.build:gradle"
-            it.version = "3.2.0-alpha12"
+            it.version = "3.2.0-alpha13"
         }
         update("realm") {
             it.module = "io.realm:realm-gradle-plugin"
@@ -70,6 +70,10 @@ evove {
         update('org.jetbrains.dokka') {
             it.module = "org.jetbrains.dokka:dokka-gradle-plugin"
             it.version = "0.9.16"
+        }
+        update('evovetech.bytes') {
+            it.module = "evovetech.gradle:gradle-plugin"
+            it.version = "0.4.3"
         }
     }
 }
