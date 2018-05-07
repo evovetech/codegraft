@@ -17,31 +17,3 @@
 plugins {
     id('base')
 }
-
-addTask(tasks.create('projects'))
-
-static def addTask(Task task, Collection<IncludedBuild> includedBuilds) {
-    def name = task.name
-    includedBuilds.each { incBuild ->
-        if (incBuild != null) {
-            def incTask = incBuild.task(":${name}")
-            println("includedBuild=${incBuild.name} -> task=${incTask.name}")
-            task.dependsOn(incTask)
-        }
-    }
-}
-
-def addTask(Task task, String... includes) {
-    def includedBuilds = includes.collect {
-        try {
-            gradle.includedBuild(it)
-        } catch (ignored) {
-            // ignore
-        }
-    }
-    return addTask(task, includedBuilds)
-}
-
-def addTask(Task task) {
-    return addTask(task, gradle.includedBuilds)
-}
