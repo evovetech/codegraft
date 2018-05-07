@@ -7,5 +7,5 @@
 	remote = git@bitbucket.org:evovetech/proxy.git
 	branch = dev
 	commit = 9f82db274db42dab0136736c61e013c90117a223
-	parent = b63d8fafe87799745441482608ed53b0b4694659
+	parent = a774bc043f34bab12d08e253d9f6d8dda244a572
 	cmdver = 0.3.1
