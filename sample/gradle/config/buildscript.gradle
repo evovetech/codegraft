@@ -35,7 +35,7 @@ if (!g.hasProperty('buildscriptRepos')) {
 }
 
 if (!gp.hasProperty('buildscriptDependencies')) {
-    def v = loadPluginVersion()
+    def v = loadPluginVersion(gp)
     def plugin = "evovetech.gradle:gradle-plugin:${v}"
     println("plugin=${plugin}")
     gp.ext.buildscriptDependencies = {
@@ -66,10 +66,10 @@ if (!g.hasProperty('defaultDependencies')) {
     g.ext.defaultDependencies = gp.defaultDependencies
 }
 
-def loadPluginVersion() {
+def loadPluginVersion(gp) {
     def rootDir = settings.settingsDir
     def configDir = "${rootDir}/gradle/config"
-    if (hasProperty('configDir')) {
+    if (gp.hasProperty('configDir')) {
         configDir = ext.configDir
     }
     def props = new Properties()

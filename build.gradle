@@ -20,11 +20,11 @@ plugins {
 
 addTask(tasks.getByName('clean'), 'sample')
 task(assembleDebug) {
+    addTask(it, 'sample')
     doLast {
         println('assembleDebug = DONE')
     }
 }
-addTask(assembleDebug, 'sample')
 
 static def addTask(Task task, Collection<IncludedBuild> includedBuilds) {
     def taskName = ":${task.name}"

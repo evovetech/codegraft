@@ -66,11 +66,11 @@ if (!g.hasProperty('defaultDependencies')) {
     g.ext.defaultDependencies = gp.defaultDependencies
 }
 
-def loadPluginVersion() {
+def loadPluginVersion(gp) {
     def rootDir = settings.settingsDir
     def configDir = "${rootDir}/gradle/config"
-    if (hasProperty('configDir')) {
-        configDir = ext.configDir
+    if (gp.hasProperty('configDir')) {
+        configDir = gp.ext.configDir
     }
     def props = new Properties()
     loadProperties(props, new File(configDir, "defaultGradle.properties"))

@@ -63,8 +63,13 @@ class ByteBuddyRunRun(
 
     override
     fun run() {
-        transforms.flatMap { it.output.allFiles() }
-                .forEach(this::write)
+        println("bytebuddy runrun! start")
+        try {
+            transforms.flatMap { it.output.allFiles() }
+                    .forEach(this::write)
+        } finally {
+            println("bytebuddy runrun! complete")
+        }
     }
 
     private

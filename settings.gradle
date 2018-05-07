@@ -15,7 +15,9 @@
  */
 
 buildscript {
-    apply from: "gradle/config/buildscript.gradle"
+    def configDir = file('gradle/config').absoluteFile
+    gradle.ext.configDir = configDir
+    apply from: "${configDir}/buildscript.gradle"
     repositories(gradle.buildscriptRepos)
     dependencies(gradle.buildscriptDependencies)
 }
@@ -23,6 +25,11 @@ buildscript {
 apply plugin: 'evovetech.settings'
 apply from: "${configDir}/evovetech/settings.gradle"
 
+includeBuild('plugin') {
+    dependencySubstitution {
+        substitute module('evovetech.gradle:gradle-plugin') with project(':')
+    }
+}
 includeBuild 'sample'
 includeBuild 'sourcerer'
 includeBuild 'extensions'
