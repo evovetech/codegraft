@@ -73,7 +73,7 @@ evove {
         }
         update('evovetech') {
             it.module = "evovetech.gradle:gradle-plugin"
-            it.version = "0.4.4"
+            it.version = "0.4.4.1"
         }
     }
 }

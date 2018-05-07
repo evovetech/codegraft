@@ -29,6 +29,7 @@ plugins {
     id("com.google.firebase.firebase-perf")
     id("realm-android")
     id("evovetech.transform.copy")
+    id("evovetech.transform.bytes")
 }
 
 apply from: "${configDir}/android/application.gradle"
