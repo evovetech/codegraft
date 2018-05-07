@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@bitbucket.org:evovetech/sourcerer.git
 	branch = dev
-	commit = ba0976c2c46f3dedde41c0cb2b18e32d63219f24
-	parent = c2630d67e069fdcae7b59cbdbe58f223d00f74f9
+	commit = 6f556ca2c5f8b39622bcbf4e49df58a4b066ccca
+	parent = 380f96ebd6a9dda294ebb2f16780b8e8dd51c274
 	cmdver = 0.3.1
