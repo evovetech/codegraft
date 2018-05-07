@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "321903297009",
+    "firebase_url": "https://sample-67dea.firebaseio.com",
+    "project_id": "sample-67dea",
+    "storage_bucket": "sample-67dea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:321903297009:android:108cf939bb7fa849",
+        "android_client_info": {
+          "package_name": "evovetech.sample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "321903297009-7coir4qf0u2ehdp2l001cnv6qncsgt11.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoPa_JLAZ8vRsKCa3itDy6iB_-IZvSOH8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

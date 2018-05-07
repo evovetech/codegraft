@@ -1,0 +1,19 @@
+# eol conversation for text files
+* text=auto
+
+# Explicit Text Files
+*.txt               text
+*.java              text    diff=java
+*.html              text    diff=html
+*.xml               text
+*.json              text
+*.gradle            text
+*.properties        text
+*.md                text
+*.sh                text    eol=lf
+*.bat               text    eol=crlf
+
+# Explicit Binary files
+*.jpg               binary
+*.jpeg              binary
+*.png               binary

@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@bitbucket.org:evovetech/android-inject-sample.git
+	branch = dev
+	commit = ba4d4966da57304e864f635255c0ec0c2f674a21
+	parent = 5af69f587fb626277ec43f480c531838a3067959
+	cmdver = 0.3.1
