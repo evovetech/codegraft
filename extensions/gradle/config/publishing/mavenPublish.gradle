@@ -17,27 +17,30 @@
 apply plugin: 'maven-publish'
 
 def pubName = ext.pubName
-def pomArtifactId = ext.pomArtifactId
-publishing.publications {
-    create(pubName, MavenPublication) {
-        from components.java
-        artifactId = pomArtifactId()
+def pub = publishing.publications.create(pubName, MavenPublication)
 
+afterEvaluate {
+    configure(pub) {
+        from components.java
         if (project.tasks.findByName('sourcesJar')) {
             artifact sourcesJar {
                 classifier "sources"
             }
         }
-
         if (project.tasks.findByName('javadocJar')) {
             artifact javadocJar {
                 classifier "javadoc"
             }
         }
-
-        pom.withXml {
-            def root = asNode()
-            root.children().last() + pomConfig
+    }
+    def pomArtifactId = ext.pomArtifactId()
+    publishing.publications.all {
+        project.configure(it) {
+            artifactId = pomArtifactId
+            pom.withXml {
+                def root = asNode()
+                root.children().last() + pomConfig
+            }
         }
     }
 }

@@ -29,27 +29,5 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${app.kotlinVersion}"
         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:${app.gradleBintrayPluginVersion}"
-//        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:${appGradleBuildInfoExtractorVersion}"
-//        classpath "com.squareup:javapoet:${appJavaPoetGradleVersion}"
-//        classpath "com.squareup.okio:okio:${appOkioVersion}"
     }
-}
-
-//apply from: "${rootDir}/gradle/artifactory.gradle"
-
-// brittle but works
-def versionName = pom.version
-def isReleaseBuild = gradle.startParameter.taskNames.contains('bintrayUpload')
-def bintrayCreds = file('bintray.properties')
-if (bintrayCreds.exists()) {
-    def props = new Properties()
-    props.load(bintrayCreds.newReader())
-    props.each { prop ->
-        project.ext.setProperty(prop.key, prop.value)
-    }
-}
-subprojects {
-    group = pom.groupId
-    version = isReleaseBuild ? versionName : "${versionName}-SNAPSHOT"
-    logger.info("Project ${it.name} using version=${it.version}")
 }
