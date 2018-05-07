@@ -16,12 +16,8 @@
 
 package evovetech.sample
 
-import android.app.Application
 import android.content.ContentProvider
-import android.content.Context
 import android.util.Log
-import dagger.Binds
-import dagger.Module
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
 import io.fabric.sdk.android.Fabric

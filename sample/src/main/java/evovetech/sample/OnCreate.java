@@ -19,16 +19,16 @@ package evovetech.sample;
 import android.util.Log;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 
-public
+final
 class OnCreate {
     public static
-    void log(@SuperCall Runnable zuper) {
+    void log(@SuperCall Runnable super$onCreate) {
         final String TAG = "onCreate";
         Log.d(TAG, "before onCreate()!");
         try {
-            zuper.run();
+            super$onCreate.run();
         } finally {
-            Log.d(TAG, "before onCreate()!");
+            Log.d(TAG, "after onCreate()!");
         }
     }
 }
