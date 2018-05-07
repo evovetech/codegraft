@@ -17,3 +17,39 @@
 plugins {
     id('base')
 }
+
+addTask(tasks.getByName('clean'), 'sample')
+task(assembleDebug) {
+    doLast {
+        println('assembleDebug = DONE')
+    }
+}
+addTask(assembleDebug, 'sample')
+
+static def addTask(Task task, Collection<IncludedBuild> includedBuilds) {
+    def taskName = ":${task.name}"
+    println("taskName = ${taskName}")
+    includedBuilds.each { incBuild ->
+        if (incBuild != null) {
+            def incTask = incBuild.task(taskName)
+            println("includedBuild=${incBuild.name} -> task=${incTask.name}")
+            task.dependsOn(incTask)
+        }
+    }
+    return task
+}
+
+def addTask(Task task, String... includes) {
+    def includedBuilds = includes.collect {
+        try {
+            gradle.includedBuild(it)
+        } catch (ignored) {
+            // ignore
+        }
+    }
+    return addTask(task, includedBuilds)
+}
+
+def addTask(Task task) {
+    return addTask(task, gradle.includedBuilds)
+}

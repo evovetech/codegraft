@@ -23,6 +23,7 @@ buildscript {
 apply plugin: 'evovetech.settings'
 apply from: "${configDir}/evovetech/settings.gradle"
 
+includeBuild 'sample'
 includeBuild 'sourcerer'
 includeBuild 'extensions'
 includeBuild 'proxy'

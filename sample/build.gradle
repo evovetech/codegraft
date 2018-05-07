@@ -17,3 +17,18 @@
 plugins {
     id('base')
 }
+
+configure(tasks.findByName('clean')) {
+    dependsOn(':app:clean')
+    dependsOn(':core:db:clean')
+    doLast {
+        println("clean = DONE")
+    }
+}
+
+task(assembleDebug) {
+    dependsOn(':app:assembleDebug')
+    doLast {
+        println("assembleDebug = DONE")
+    }
+}
