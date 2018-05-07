@@ -1,0 +1,87 @@
+/*
+ * Copyright 2018 evove.tech
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+def g = gradle
+def gp = g.parent
+if (gp == null) {
+    gp = gradle
+}
+
+println()
+if (!gp.hasProperty('buildscriptRepos')) {
+    gp.ext.buildscriptRepos = {
+        mavenLocal()
+        google()
+        jcenter()
+        maven { url "https://oss.jfrog.org/oss-snapshot-local" }
+        maven { url 'https://maven.fabric.io/public' }
+    }
+}
+if (!g.hasProperty('buildscriptRepos')) {
+    g.ext.buildscriptRepos = gp.buildscriptRepos
+}
+
+if (!gp.hasProperty('buildscriptDependencies')) {
+    def v = loadPluginVersion()
+    def plugin = "evovetech.gradle:gradle-plugin:${v}"
+    println("plugin=${plugin}")
+    gp.ext.buildscriptDependencies = {
+        classpath plugin
+    }
+}
+if (!g.hasProperty('buildscriptDependencies')) {
+    g.ext.buildscriptDependencies = gp.buildscriptDependencies
+}
+
+if (!gp.hasProperty('defaultRepos')) {
+    gp.ext.defaultRepos = {
+        mavenLocal()
+        google()
+        jcenter()
+        maven { url "https://oss.jfrog.org/oss-snapshot-local" }
+        maven { url 'https://maven.fabric.io/public' }
+    }
+}
+if (!g.hasProperty('defaultRepos')) {
+    g.ext.defaultRepos = gp.defaultRepos
+}
+
+if (!gp.hasProperty('defaultDependencies')) {
+    gp.ext.defaultDependencies = gp.buildscriptDependencies
+}
+if (!g.hasProperty('defaultDependencies')) {
+    g.ext.defaultDependencies = gp.defaultDependencies
+}
+
+def loadPluginVersion() {
+    def rootDir = settings.settingsDir
+    def configDir = "${rootDir}/gradle/config"
+    if (hasProperty('configDir')) {
+        configDir = ext.configDir
+    }
+    def props = new Properties()
+    loadProperties(props, new File(configDir, "defaultGradle.properties"))
+    loadProperties(props, new File(rootDir, "gradle.properties"))
+    return props.getProperty("app.evovetechGradlePluginVersion") ?: "+"
+}
+
+static def loadProperties(props, file) {
+    try {
+        props.load(file.newReader())
+    } catch (ignored) {
+        // ignore
+    }
+}
