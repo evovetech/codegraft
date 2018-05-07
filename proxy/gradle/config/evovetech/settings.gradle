@@ -1,0 +1,61 @@
+/*
+ * Copyright 2018 evove.tech
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'evovetech.settings'
+
+evove {
+    repos(gradle.defaultRepos)
+    plugins {
+        update("org.gradle.kotlin.kotlin-dsl") {
+            it.version = "0.16.3"
+        }
+        update("kotlin") {
+            it.module = "org.jetbrains.kotlin:kotlin-gradle-plugin"
+            it.version = "1.2.41"
+        }
+        update("com.android") {
+            it.module = "com.android.tools.build:gradle"
+            it.version = "3.2.0-alpha13"
+        }
+        update("realm") {
+            it.module = "io.realm:realm-gradle-plugin"
+            it.version = "4.2.0"
+        }
+        update("io.fabric") {
+            it.module = "io.fabric.tools:gradle"
+            it.version = "1.25.3"
+        }
+        update("com.google.firebase") {
+            it.module = "com.google.firebase:firebase-plugins"
+            it.version = "1.1.5"
+        }
+        update("com.jfrog.bintray") {
+            it.module = "com.jfrog.bintray.gradle:gradle-bintray-plugin"
+            it.version = "1.8.0"
+        }
+        update("com.jfrog.artifactory") {
+            it.version = "4.7.1"
+        }
+        update('org.jetbrains.dokka') {
+            it.module = "org.jetbrains.dokka:dokka-gradle-plugin"
+            it.version = "0.9.16"
+        }
+        update('evovetech') {
+            it.module = "evovetech.gradle:gradle-plugin"
+            it.version = "0.4.4.2"
+        }
+    }
+}

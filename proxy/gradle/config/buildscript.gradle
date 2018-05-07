@@ -24,8 +24,10 @@ println()
 if (!gp.hasProperty('buildscriptRepos')) {
     gp.ext.buildscriptRepos = {
         mavenLocal()
+        google()
         jcenter()
         maven { url "https://oss.jfrog.org/oss-snapshot-local" }
+        maven { url 'https://maven.fabric.io/public' }
     }
 }
 if (!g.hasProperty('buildscriptRepos')) {
@@ -49,6 +51,7 @@ if (!gp.hasProperty('defaultRepos')) {
         mavenLocal()
         google()
         jcenter()
+        maven { url "https://oss.jfrog.org/oss-snapshot-local" }
         maven { url 'https://maven.fabric.io/public' }
     }
 }

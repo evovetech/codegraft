@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@bitbucket.org:evovetech/proxy.git
 	branch = dev
-	commit = b919ec3a971b219a13dd594a8972cae83a1821b7
-	parent = 5997554020192d7360f8a021f17babf35189cba5
+	commit = 9f82db274db42dab0136736c61e013c90117a223
+	parent = 711e814a9945b7ff45624ddbf44738a0f473fcf4
 	cmdver = 0.3.1
