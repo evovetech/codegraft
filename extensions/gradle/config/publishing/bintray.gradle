@@ -27,8 +27,8 @@ bintray {
         repo = app.bintrayRepo
         name = pomArtifactId()
         userOrg = app.bintrayOrg
-        licenses = rootProject.ext.LICENSES
-        labels = rootProject.ext.LABELS
+        licenses = project.LICENSES
+        labels =  project.LABELS
         websiteUrl = pom.url
         issueTrackerUrl = pom.issueTrackerUrl
         vcsUrl = pom.scmUrl
