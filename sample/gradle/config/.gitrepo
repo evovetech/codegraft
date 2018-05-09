@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@bitbucket.org:evovetech/gradle-config.git
 	branch = dev
-	commit = 7f0a913924fdf39abfbfa225277293c3f127ebba
-	parent = 2dccd46a817ddf1f95096a2ffabc0f9c0eacf235
+	commit = a6b53959befa2790fdeff32637919828c7d7a462
+	parent = fa32344fbd737784fa939c6ee57a0e9871a84d1f
 	cmdver = 0.3.1
