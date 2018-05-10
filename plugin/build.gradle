@@ -27,15 +27,14 @@ plugins {
 ext {
     LABELS = ["java", "kotlin", "gradle", "plugins", "gradlePlugin"]
     LICENSES = ["Apache-2.0"]
-    byteBuddyVersion = '1.8.10'
-    androidVersion = '3.2.0-alpha13'
+    androidVersion = '3.2.0-alpha14'
+    injectVersion = '0.4.0-SNAPSHOT'
 }
 
 apply from: "${configDir}/kotlin-library.gradle"
 
 dependencies {
-    implementation "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
-    implementation "com.android.tools.build:gradle-api:${androidVersion}"
+    implementation "evovetech.android.inject:bytes:${injectVersion}"
 
     compileOnly localGroovy()
     implementation "com.android.tools.build:gradle:${androidVersion}"

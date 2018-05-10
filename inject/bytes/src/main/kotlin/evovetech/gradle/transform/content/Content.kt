@@ -21,7 +21,7 @@ import com.android.build.api.transform.Format.DIRECTORY
 import com.android.build.api.transform.QualifiedContent
 import com.android.build.api.transform.TransformInvocation
 import com.android.utils.FileUtils
-import evovetech.plugin.util.Counter
+import evovetech.util.Counter
 import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator.ForFolder
 import net.bytebuddy.dynamic.ClassFileLocator.ForJarFile

@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-plugins {
-    id('base')
-}
+package evovetech.util
 
-ext {
-    LICENSES = ['Apache-2.0']
-    LABELS = ['androdi', 'java', 'kotlin', 'inject', 'annotations', 'bytebuddy']
+import java.util.concurrent.atomic.AtomicInteger
+
+internal
+object Counter {
+    private
+    val count = AtomicInteger()
+
+    val next: String
+        get() {
+            val value = count.getAndIncrement()
+            return "evove_$value"
+        }
 }

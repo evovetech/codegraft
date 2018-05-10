@@ -20,9 +20,9 @@ import evovetech.plugin.extensions.AppExtension
 import evovetech.plugin.extensions.BaseExtension
 import evovetech.plugin.extensions.ProjectAppExtension
 import evovetech.plugin.extensions.SettingsAppExtension
-import evovetech.plugin.util.getValue
-import evovetech.plugin.util.once
-import evovetech.plugin.util.setValue
+import evovetech.util.getValue
+import evovetech.util.once
+import evovetech.util.setValue
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings

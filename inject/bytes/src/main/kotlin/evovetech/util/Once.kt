@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package evovetech.plugin.util
+package evovetech.util
 
-import org.gradle.api.Action
 import kotlin.LazyThreadSafetyMode.PUBLICATION
 import kotlin.reflect.KProperty
 
@@ -43,15 +42,6 @@ class Once<T>(
 fun <T> once(
     initializer: (thisRef: Any) -> T
 ): Once<T> = Once(initializer)
-
-fun <T> onceAction(
-    initialize: T.(thisRef: Any) -> Unit
-): Once<Action<in T>> {
-    fun initializer(thisRef: Any) = Action<T> {
-        this.initialize(thisRef)
-    }
-    return Once(::initializer)
-}
 
 operator
 fun <T> Once<T>.getValue(thisRef: Any?, property: KProperty<*>): T {

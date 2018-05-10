@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package evovetech.plugin.util
+plugins {
+    id("kotlin")
+    id("kotlin-kapt")
+    id("com.jfrog.bintray")
+    id("com.jfrog.artifactory")
+    id("org.jetbrains.dokka")
+}
 
-import java.util.concurrent.atomic.AtomicInteger
+apply from: "${configDir}/kotlin-library.gradle"
 
-internal
-object Counter {
-    private
-    val count = AtomicInteger()
+ext {
+    byteBuddyVersion = '1.8.10'
+    androidVersion = '3.2.0-alpha14'
+}
 
-    val next: String
-        get() {
-            val value = count.getAndIncrement()
-            return "evove_$value"
-        }
+dependencies {
+    api "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
+    api "com.android.tools.build:gradle-api:${androidVersion}"
 }
