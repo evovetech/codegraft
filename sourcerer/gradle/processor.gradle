@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-apply from: "${configDir}/sourcerer/base.gradle"
+apply from: "${rootDir}/gradle/base.gradle"
 
 dependencies {
     implementation project(':model')
