@@ -31,7 +31,12 @@ includeBuild('plugin') {
     }
 }
 includeBuild 'sourcerer'
-includeBuild 'extensions'
-includeBuild 'proxy'
 includeBuild 'inject'
-includeBuild 'sample'
+
+include(
+        ':app',
+        ':core:annotations',
+        ':core:db',
+        ':core:crashes',
+        ':core:network',
+)
