@@ -14,5 +14,16 @@
  * limitations under the License.
  */
 
+def androids = [
+        'com.android.library'
+]
+for (def id : androids) {
+    if (project.plugins.hasPlugin(id)) {
+        pom.packaging = 'aar'
+        return
+    }
+}
+
+
 apply plugin: 'java-library'
 pom.packaging = 'jar'

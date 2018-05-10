@@ -14,23 +14,10 @@
  * limitations under the License.
  */
 
-package sourcerer.inject;
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
-import dagger.Module;
-import dagger.multibindings.Multibinds;
-
-import javax.inject.Singleton;
-import java.util.Map;
-
-/**
- * Created by layne on 2/26/18.
- */
-
-@Module
-public abstract
-class LibraryModule2 {
-    @Multibinds
-    @Singleton
-    public abstract
-    Map<Class<? extends Library>, Library> bindLibraryMap();
+dependencies {
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${app.kotlinVersion}"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${app.kotlinVersion}"
 }

@@ -14,7 +14,21 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package evovetech.codegen;
 
-@Suppress("UNCHECKED_CAST")
-fun <T : Any> Any?.cast(): T? = this as? T
+import android.util.Log;
+import net.bytebuddy.implementation.bind.annotation.SuperCall;
+
+final
+class OnCreate {
+    public static
+    void log(@SuperCall Runnable super$onCreate) {
+        final String TAG = "onCreate";
+        Log.d(TAG, "before onCreate()!");
+        try {
+            super$onCreate.run();
+        } finally {
+            Log.d(TAG, "after onCreate()!");
+        }
+    }
+}

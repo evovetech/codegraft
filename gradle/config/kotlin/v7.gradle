@@ -14,26 +14,10 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
 
-import javax.inject.Provider
-
-interface ClassKeyProviderMap<T : Any> : ProviderMap<Class<out T>, T> {
-    operator
-    fun <R : T> get(key: Class<R>): R? {
-        return providers[key]?.get().cast()
-    }
+dependencies {
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${app.kotlinVersion}"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${app.kotlinVersion}"
 }
-
-inline
-fun <reified T : Any> ClassKeyProviderMap<in T>.get(): T? =
-    provider()?.get()
-
-inline
-fun <reified T : Any> ClassKeyProviderMap<in T>.with(
-    block: T.() -> Unit
-) = provider()?.with(block)
-
-inline
-fun <reified T : Any> ClassKeyProviderMap<in T>.provider(): Provider<T>? =
-    providers[T::class.java].cast()

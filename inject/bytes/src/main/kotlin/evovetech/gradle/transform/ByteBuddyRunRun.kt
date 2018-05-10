@@ -35,6 +35,24 @@ import net.bytebuddy.pool.TypePool.Default.ReaderMode.FAST
 import net.bytebuddy.pool.TypePool.Default.WithLazyResolution
 import java.io.File
 
+abstract
+class BBRunRun2(
+    val typePool: TypePool,
+    val classFileVersion: ClassFileVersion = ClassFileVersion.JAVA_V7
+) {
+    val entryPoint: EntryPoint = REBASE
+    val androidApplication = typePool.describe("evovetech.sample.AndroidApplication")
+            .resolve()
+
+    fun newByteBuddy(): ByteBuddy =
+        entryPoint.byteBuddy(classFileVersion)
+
+}
+
+interface ByteBuddyProcessor {
+    fun process(): Boolean
+}
+
 class ByteBuddyRunRun(
     val bootClasspath: () -> List<File>,
     delegate: TransformInvocation

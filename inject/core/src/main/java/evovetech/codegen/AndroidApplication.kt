@@ -14,31 +14,15 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package evovetech.codegen
 
-import javax.inject.Provider
+import kotlin.annotation.AnnotationRetention.BINARY
+import kotlin.reflect.KClass
 
-@Deprecated("moved")
-typealias KeyProvider<K, V> = KeyProviderMap<K, V>
-
-@Deprecated("moved")
-typealias ClassKeyProvider<T> = ClassKeyProviderMap<T>
-
-inline
-fun <T, R> Provider<T>.map(
-    block: (T) -> R
-) = get().let(block)
-
-inline
-fun <T, P : Provider<T>> P.with(
-    block: T.() -> Unit
-): P {
-    get().apply(block)
-    return this
-}
-
-inline
-fun <T : Any, R> Provider<T>?.fold(
-    success: (T) -> R,
-    failure: () -> R
-) = this?.map(success) ?: failure()
+@MustBeDocumented
+@Target(AnnotationTarget.CLASS)
+@Retention(BINARY)
+annotation
+class AndroidApplication(
+    val value: KClass<out Bootstrap<*>>
+)

@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
-import javax.inject.Singleton
-
-interface Library
-
-@MustBeDocumented
-@Retention(AnnotationRetention.SOURCE)
-@PluginType(
-    value = Library::class,
-    scope = Singleton::class
-)
-annotation class ProvidesLibrary
+dependencies {
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${app.kotlinVersion}"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${app.kotlinVersion}"
+}

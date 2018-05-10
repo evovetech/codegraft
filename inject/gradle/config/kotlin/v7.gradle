@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 
-package sourcerer.inject;
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
 
-import dagger.MapKey;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-/**
- * Created by layne on 2/26/18.
- */
-
-@MapKey
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-public
-@interface LibraryKey {
-    Class<? extends Library> value();
+dependencies {
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${app.kotlinVersion}"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${app.kotlinVersion}"
 }

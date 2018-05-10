@@ -27,4 +27,10 @@ apply from: "${configDir}/kotlin-library.gradle"
 dependencies {
     api "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
     api "com.android.tools.build:gradle-api:${androidVersion}"
+//    compileOnly(project(':core')) {
+//        artifact {
+//            name = ''
+//            classifier='release'
+//        }
+//    }
 }
