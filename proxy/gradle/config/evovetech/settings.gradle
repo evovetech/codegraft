@@ -28,7 +28,7 @@ evove {
         }
         update("com.android") {
             it.module = "com.android.tools.build:gradle"
-            it.version = "3.2.0-alpha13"
+            it.version = "3.2.0-alpha14"
         }
         update("realm") {
             it.module = "io.realm:realm-gradle-plugin"
@@ -53,9 +53,13 @@ evove {
             it.module = "org.jetbrains.dokka:dokka-gradle-plugin"
             it.version = "0.9.16"
         }
-        update('evovetech') {
+        update('evovetech.settings') {
             it.module = "evovetech.gradle:gradle-plugin"
-            it.version = "0.4.4.2"
+            it.version = "0.4.2"
+        }
+        update('evovetech.android') {
+            it.module = "evovetech.android.inject:plugin"
+            it.version = "0.5.0"
         }
     }
 }
