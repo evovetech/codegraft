@@ -17,6 +17,9 @@
 plugins {
     id("kotlin")
     id("kotlin-kapt")
+    id("com.jfrog.bintray")
+    id("com.jfrog.artifactory")
+    id("org.jetbrains.dokka")
 }
 
 apply from: "${configDir}/kotlin-library.gradle"

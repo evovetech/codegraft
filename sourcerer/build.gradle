@@ -19,15 +19,3 @@ ext {
     LICENSES = ['Apache-2.0']
     LABELS = ['java', 'kotlin', 'sourcerer', 'codegen', 'annotations']
 }
-
-buildscript {
-    repositories {
-        jcenter()
-        mavenLocal()
-    }
-
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${app.kotlinVersion}"
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:${app.gradleBintrayPluginVersion}"
-    }
-}
