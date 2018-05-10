@@ -27,20 +27,15 @@ plugins {
 ext {
     LABELS = ["java", "kotlin", "gradle", "plugins", "gradlePlugin"]
     LICENSES = ["Apache-2.0"]
-    androidVersion = '3.2.0-alpha14'
-    injectVersion = '0.4.0-SNAPSHOT'
 }
 
 apply from: "${configDir}/kotlin-library.gradle"
 
 dependencies {
-    implementation "evovetech.android.inject:bytes:${injectVersion}"
-
     compileOnly localGroovy()
-    implementation "com.android.tools.build:gradle:${androidVersion}"
 }
 
-def prefix = "evovetech.gradle"
+def prefix = "evovetech"
 gradlePlugin {
     automatedPublishing = true
     plugins {
@@ -52,13 +47,5 @@ gradlePlugin {
 //            id = "${prefix}.rootProject"
 //            implementationClass = "evovetech.plugin.RootProjectPlugin"
 //        }
-        "transform.copy" {
-            id = "${prefix}.transform.copy"
-            implementationClass = "evovetech.gradle.transform.plugin.CopyPlugin"
-        }
-        "transform.bytes" {
-            id = "${prefix}.transform.bytes"
-            implementationClass = "evovetech.gradle.transform.plugin.ByteBuddyPlugin"
-        }
     }
 }

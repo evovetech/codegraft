@@ -30,3 +30,12 @@ include(
         ':core:crashes',
         ':core:network',
 )
+
+evove {
+    plugins {
+        update('evovetech.android') {
+            it.module = "evovetech.android.inject:plugin"
+            it.version = "0.5.0"
+        }
+    }
+}

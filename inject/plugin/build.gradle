@@ -15,16 +15,33 @@
  */
 
 plugins {
+    id("java-gradle-plugin")
+    id("org.gradle.kotlin.kotlin-dsl")
     id("kotlin")
     id("kotlin-kapt")
     id("com.jfrog.bintray")
-    id("com.jfrog.artifactory")
+//    id("com.jfrog.artifactory")
     id("org.jetbrains.dokka")
 }
 
 apply from: "${configDir}/kotlin-library.gradle"
 
 dependencies {
-    api "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
-    api "com.android.tools.build:gradle-api:${androidVersion}"
+    implementation project(':bytes')
+    compileOnly "com.android.tools.build:gradle:${androidVersion}"
+}
+
+def prefix = "evovetech.android"
+gradlePlugin {
+    automatedPublishing = true
+    plugins {
+        "transform.copy" {
+            id = "${prefix}.transform.copy"
+            implementationClass = "evovetech.gradle.transform.plugin.CopyPlugin"
+        }
+        "transform.bytes" {
+            id = "${prefix}.transform.bytes"
+            implementationClass = "evovetech.gradle.transform.plugin.ByteBuddyPlugin"
+        }
+    }
 }
