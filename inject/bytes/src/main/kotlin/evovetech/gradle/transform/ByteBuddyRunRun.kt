@@ -46,7 +46,6 @@ class BBRunRun2(
 
     fun newByteBuddy(): ByteBuddy =
         entryPoint.byteBuddy(classFileVersion)
-
 }
 
 interface ByteBuddyProcessor {
