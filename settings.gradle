@@ -25,11 +25,6 @@ buildscript {
 apply plugin: 'evovetech.settings'
 apply from: "${configDir}/evovetech/settings.gradle"
 
-includeBuild('plugin') {
-    dependencySubstitution {
-        substitute module('evovetech.gradle:gradle-plugin') with project(':')
-    }
-}
 includeBuild 'sourcerer'
 includeBuild 'inject'
 
