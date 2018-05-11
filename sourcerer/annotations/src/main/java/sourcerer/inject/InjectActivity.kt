@@ -16,15 +16,24 @@
 
 package sourcerer.inject
 
+import kotlin.annotation.AnnotationRetention.SOURCE
+import kotlin.annotation.AnnotationTarget.CLASS
+import kotlin.annotation.AnnotationTarget.FILE
 import kotlin.reflect.KClass
 
 /**
  * Created by layne on 2/26/18.
  */
 
+@IntoCollection(InjectActivity::class)
 @MustBeDocumented
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FILE)
-@Retention(AnnotationRetention.SOURCE)
+@Target(
+    CLASS,
+    FILE
+)
+@Retention(
+    SOURCE
+)
 annotation
 class InjectActivity(
     /**
@@ -35,5 +44,5 @@ class InjectActivity(
      * Additional `@Module`-annotated classes from which this activity is
      * composed.
      */
-    val includes: Array<KClass<*>> = arrayOf()
+    val includes: Array<KClass<*>> = []
 )

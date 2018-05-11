@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+plugins {
+    id("base")
+}
+
 ext {
     sourceCompatibility = JavaVersion.VERSION_1_8
     LICENSES = ['Apache-2.0']

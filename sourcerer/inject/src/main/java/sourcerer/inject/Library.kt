@@ -20,10 +20,12 @@ import javax.inject.Singleton
 
 interface Library
 
+@Singleton
 @MustBeDocumented
 @Retention(AnnotationRetention.SOURCE)
 @PluginType(
     value = Library::class,
     scope = Singleton::class
 )
-annotation class ProvidesLibrary
+annotation
+class ProvidesLibrary

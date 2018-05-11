@@ -16,17 +16,21 @@
 
 package sourcerer.inject;
 
+import dagger.Component;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+@IntoCollection(Component.class)
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public
 @interface LibComponent {
+    @IntoCollection(LibModule.class)
     Class<?>[] modules() default {};
 
     Class<?>[] dependencies() default {};

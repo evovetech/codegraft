@@ -16,6 +16,8 @@
 
 package sourcerer.inject
 
+import kotlin.annotation.AnnotationRetention.BINARY
+import kotlin.annotation.AnnotationTarget.ANNOTATION_CLASS
 import kotlin.reflect.KClass
 
 /**
@@ -23,8 +25,12 @@ import kotlin.reflect.KClass
  */
 
 @MustBeDocumented
-@Target(AnnotationTarget.ANNOTATION_CLASS)
-@Retention(AnnotationRetention.BINARY)
+@Target(
+    ANNOTATION_CLASS
+)
+@Retention(
+    BINARY
+)
 annotation
 class PluginType(
     val value: KClass<*>,

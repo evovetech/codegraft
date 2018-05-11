@@ -16,15 +16,25 @@
 
 package sourcerer.inject
 
+import dagger.Module
+import kotlin.annotation.AnnotationRetention.SOURCE
+import kotlin.annotation.AnnotationTarget.CLASS
+import kotlin.annotation.AnnotationTarget.FILE
 import kotlin.reflect.KClass
 
 /**
  * Created by layne on 2/20/18.
  */
 
+@IntoCollection(Module::class)
 @MustBeDocumented
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FILE)
-@Retention(AnnotationRetention.SOURCE)
+@Target(
+    CLASS,
+    FILE
+)
+@Retention(
+    SOURCE
+)
 annotation
 class LibModule(
     val includes: Array<KClass<*>> = []

@@ -16,17 +16,26 @@
 
 package sourcerer.inject
 
+import kotlin.annotation.AnnotationRetention.SOURCE
+import kotlin.annotation.AnnotationTarget.ANNOTATION_CLASS
+import kotlin.annotation.AnnotationTarget.CLASS
+import kotlin.annotation.AnnotationTarget.PROPERTY_GETTER
 import kotlin.reflect.KClass
 
 @MustBeDocumented
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FILE)
-@Retention(AnnotationRetention.SOURCE)
+@Target(
+    // TODO: take out class
+    CLASS,
+    ANNOTATION_CLASS,
+    PROPERTY_GETTER
+)
+@Retention(
+    SOURCE
+)
 annotation
 class IntoCollection(
-    val value: KClass<out Annotation>,
-    val dependencies: Array<out KClass<out Annotation>> = []
+    val value: KClass<out Annotation>
 )
-
 
 annotation
 class CollectionType
