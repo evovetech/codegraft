@@ -16,6 +16,8 @@
 
 package sourcerer
 
+import sourcerer.inject.PluginType
+import sourcerer.processor.Env
 import javax.lang.model.element.TypeElement
 
 /**
@@ -27,3 +29,8 @@ data class PluginElement(
     val type: TypeElement,
     val scope: TypeElement
 )
+
+fun Env.newPluginElement(p: AnnotatedElement<PluginType, TypeElement>): PluginElement {
+    val (a, e) = p
+    return PluginElement(e, typeOf(a::value), typeOf(a::scope))
+}

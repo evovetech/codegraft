@@ -16,13 +16,10 @@
 
 package sourcerer.activity
 
-import dagger.Module
 import sourcerer.AnnotatedElement
-import sourcerer.IntoCollectionStep
 import sourcerer.MultiStep
 import sourcerer.MultiStepProcessor
 import sourcerer.NoOutput
-import sourcerer.inject.InjectActivity
 import sourcerer.inject.LibModule
 import sourcerer.lib.LibModuleStep
 import sourcerer.processor.Env
@@ -47,6 +44,7 @@ class MainProcessor(
         log(it.element, "LibModule")
         NoOutput
     }
+    add(ActivityCollectionStep())
 //    add(IntoCollectionStep(LibModule::class))
 //    add(IntoCollectionStep(Module::class))
 //    add(IntoCollectionStep(InjectActivity::class))

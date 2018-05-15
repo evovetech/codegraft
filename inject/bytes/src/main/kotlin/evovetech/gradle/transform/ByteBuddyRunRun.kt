@@ -24,7 +24,10 @@ import net.bytebuddy.ByteBuddy
 import net.bytebuddy.ClassFileVersion
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.build.EntryPoint.Default.REBASE
+import net.bytebuddy.build.Plugin
+import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.ClassFileLocator.Compound
+import net.bytebuddy.dynamic.DynamicType.Builder
 import net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer.Suffixing
 import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.matcher.ElementMatchers.named
@@ -46,6 +49,19 @@ class BBRunRun2(
 
     fun newByteBuddy(): ByteBuddy =
         entryPoint.byteBuddy(classFileVersion)
+}
+
+abstract
+class BBRunRunPlugin : Plugin {
+    override
+    fun apply(builder: Builder<*>, typeDescription: TypeDescription): Builder<*> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override
+    fun matches(target: TypeDescription): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
 
 interface ByteBuddyProcessor {

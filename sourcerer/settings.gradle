@@ -24,12 +24,13 @@ apply plugin: 'evovetech.settings'
 apply from: "${configDir}/evovetech/settings.gradle"
 
 include(
+        ':meta:annotations',
+        ':meta:processor',
+        ':meta:utils',
         ':io',
         ':annotations',
         ':model',
         ':app-processor',
         ':lib-processor',
         ':inject',
-//        ':metalava',
-//        ':meta-processor',
 )

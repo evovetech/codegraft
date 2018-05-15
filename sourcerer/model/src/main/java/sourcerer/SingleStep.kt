@@ -60,6 +60,18 @@ fun <reified A : Annotation> singleStep(
     noinline handler: SingleStepHandler<A>
 ) = DefaultSingleStep(A::class, handler)
 
+fun Env.addGeneratedAnnotation(
+    builder: TypeSpec.Builder,
+    comments: String = ""
+) = builder.apply {
+    addAnnotation(Codegen.Inject.Generated) {
+        addMember("value", "\$S", processorType.java.canonicalName)
+        comments.ifNotEmpty {
+            addMember("comments", "\$S", it)
+        }
+    }
+}
+
 fun Env.javaClassOutput(
     rawType: ClassName,
     outExt: String,
@@ -72,7 +84,7 @@ fun Env.javaClassOutput(
     override
     fun typeSpec() = typeSpec {
         init(baseElement)
-        addGeneratedAnnotation(comments)
+        addGeneratedAnnotation(this, comments)
     }
 }
 

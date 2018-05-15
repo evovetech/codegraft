@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id("kotlin")
-    id("kotlin-kapt")
-    id("com.jfrog.bintray")
-    id("com.jfrog.artifactory")
-    id("org.jetbrains.dokka")
-}
+package sourcerer.inject
 
-apply from: "${configDir}/kotlin-library.gradle"
-apply from: "${configDir}/versions/dagger.gradle"
+import kotlin.annotation.AnnotationRetention.RUNTIME
+import kotlin.annotation.AnnotationTarget.ANNOTATION_CLASS
+import kotlin.reflect.KClass
 
-dependencies {
-    api dagger.core
-    implementation project(':meta:annotations')
-    kapt project(':meta:processor')
-}
+@MustBeDocumented
+@Retention(RUNTIME)
+@Target(ANNOTATION_CLASS)
+annotation
+class Wrapper(
+    val value: KClass<out Annotation>
+)

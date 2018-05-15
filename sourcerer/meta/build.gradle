@@ -15,18 +15,10 @@
  */
 
 plugins {
-    id("kotlin")
-    id("kotlin-kapt")
-    id("com.jfrog.bintray")
-    id("com.jfrog.artifactory")
-    id("org.jetbrains.dokka")
+    id("base")
 }
+//
+//subprojects {
+//    it.pom.artifactId = "meta-${it.name}"
+//}
 
-apply from: "${configDir}/kotlin-library.gradle"
-apply from: "${configDir}/versions/dagger.gradle"
-
-dependencies {
-    api dagger.core
-    implementation project(':meta:annotations')
-    kapt project(':meta:processor')
-}

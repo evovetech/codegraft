@@ -14,26 +14,22 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package evovetech.sample.github
 
+import android.app.Fragment
+import android.support.v7.app.AppCompatActivity
+import dagger.android.AndroidInjector
+import dagger.android.HasFragmentInjector
+import sourcerer.inject.InjectActivity
+import javax.inject.Inject
 import javax.inject.Provider
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
-interface ClassKeyProviderMap<T : Any> : ProviderMap<Class<out T>, T> {
-    operator
-    fun <R : T> get(key: Class<R>): R? {
-        return providers[key]?.get().castOrNull()
+@InjectActivity
+class MainActivity : AppCompatActivity(), HasFragmentInjector {
+    override
+    fun fragmentInjector(): AndroidInjector<Fragment> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
-
-inline
-fun <reified T : Any> ClassKeyProviderMap<in T>.get(): T? =
-    provider()?.get()
-
-inline
-fun <reified T : Any> ClassKeyProviderMap<in T>.with(
-    block: T.() -> Unit
-) = provider()?.with(block)
-
-inline
-fun <reified T : Any> ClassKeyProviderMap<in T>.provider(): Provider<T>? =
-    providers[T::class.java].castOrNull()

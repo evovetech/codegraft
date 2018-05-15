@@ -17,4 +17,7 @@
 package sourcerer.inject
 
 @Suppress("UNCHECKED_CAST")
-fun <T : Any> Any?.cast(): T? = this as? T
+fun <T : Any> Any?.castOrNull(): T? = this as? T
+
+@Suppress("UNCHECKED_CAST")
+fun <T : Any> Any?.castNotNull(): T = this as T

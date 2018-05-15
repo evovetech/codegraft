@@ -14,19 +14,5 @@
  * limitations under the License.
  */
 
-plugins {
-    id("kotlin")
-    id("kotlin-kapt")
-    id("com.jfrog.bintray")
-    id("com.jfrog.artifactory")
-    id("org.jetbrains.dokka")
-}
+package evovetech.sample.helpers
 
-apply from: "${configDir}/kotlin-library.gradle"
-apply from: "${configDir}/versions/dagger.gradle"
-
-dependencies {
-    api dagger.core
-    implementation project(':meta:annotations')
-    kapt project(':meta:processor')
-}

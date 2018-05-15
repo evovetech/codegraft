@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-plugins {
-    id("kotlin")
-    id("kotlin-kapt")
-    id("com.jfrog.bintray")
-    id("com.jfrog.artifactory")
-    id("org.jetbrains.dokka")
-}
+package sourcerer
 
-apply from: "${configDir}/kotlin-library.gradle"
-apply from: "${configDir}/versions/dagger.gradle"
+import javax.annotation.processing.ProcessingEnvironment
+import javax.annotation.processing.Processor
+import kotlin.reflect.KClass
 
-dependencies {
-    api dagger.core
-    implementation project(':meta:annotations')
-    kapt project(':meta:processor')
+/**
+ * Created by layne on 3/19/18.
+ */
+abstract
+class Env : sourcerer.processor.Env {
+    abstract
+    val processorType: KClass<out Processor>
+
+    constructor(env: Env) : super(env)
+    constructor(processingEnv: ProcessingEnvironment) : super(processingEnv)
 }

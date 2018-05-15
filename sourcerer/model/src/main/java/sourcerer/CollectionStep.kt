@@ -16,6 +16,9 @@
 
 package sourcerer
 
+import com.google.auto.common.AnnotationMirrors
+import com.google.auto.common.MoreTypes
+import com.google.common.base.Equivalence
 import com.squareup.javapoet.TypeSpec
 import okio.Okio
 import sourcerer.inject.Generated
@@ -24,11 +27,33 @@ import sourcerer.io.Reader
 import sourcerer.io.Writer
 import java.net.URL
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.type.TypeMirror
 import kotlin.reflect.KClass
 
+data
+class Key(
+    private val wrappedType: Equivalence.Wrapper<TypeMirror>,
+    private val wrappedQualifier: Equivalence.Wrapper<AnnotationMirror>? = null
+) {
+    constructor(
+        type: TypeMirror,
+        qualifier: AnnotationMirror? = null
+    ) : this(
+        wrappedType = MoreTypes.equivalence().wrap(type),
+        wrappedQualifier = qualifier?.run(AnnotationMirrors.equivalence()::wrap)
+    )
+
+    val type: TypeMirror
+        get() = wrappedType.get()!!
+
+    val qualifier: AnnotationMirror?
+        get() = wrappedQualifier?.get()
+}
+
 abstract
-class IntoCollectionStep<A : Annotation>(
-    subType: KClass<A>
+class IntoCollectionStep(
+    subType: KClass<out Annotation>
 ) : FullStep,
     SingleStep<IntoCollection> {
 
@@ -55,6 +80,8 @@ class IntoCollectionStep<A : Annotation>(
         return listOf(output)
     }
 }
+
+//cla
 
 abstract
 class CollectionStep<A : Annotation>(

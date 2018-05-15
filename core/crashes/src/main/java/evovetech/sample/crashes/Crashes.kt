@@ -22,9 +22,17 @@ import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
 import io.fabric.sdk.android.Fabric
+import io.fabric.sdk.android.Kit
 import sourcerer.inject.LibComponent
 import sourcerer.inject.LibModule
+import sourcerer.inject.castNotNull
+import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.reflect.KClass
+
+interface BootstrapComponent {
+    val fabric: Fabric
+}
 
 @LibModule(includes = [Crashes::class])
 @LibComponent(modules = [Crashes::class])
@@ -56,8 +64,24 @@ class Crashes {
 
     @Provides
     @Singleton
-    fun provideCrashlytics(fabric: Fabric): Crashlytics {
-        return Crashlytics.getInstance()
+    fun provideCrashlytics(kits: Kits): Crashlytics {
+        return kits[Crashlytics::class]
+    }
+}
+
+@Singleton
+class Kits
+@Inject constructor(
+    fabric: Fabric
+) {
+    private val map = fabric.kits
+            .groupBy { it::class }
+            .mapValues { it.value.first()!! }
+
+    operator
+    fun <T : Kit<*>> get(clazz: KClass<T>): T {
+        val kit = map[clazz]
+        return kit.castNotNull()
     }
 }
 

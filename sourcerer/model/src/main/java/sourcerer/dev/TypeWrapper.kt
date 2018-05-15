@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-plugins {
-    id("kotlin")
-    id("kotlin-kapt")
-    id("com.jfrog.bintray")
-    id("com.jfrog.artifactory")
-    id("org.jetbrains.dokka")
+package sourcerer.dev
+
+import com.google.auto.common.MoreTypes
+import com.google.common.base.Equivalence
+import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
+
+interface Wrapper<T : Any> {
+    val wrappedType: Equivalence.Wrapper<T>
 }
 
-apply from: "${configDir}/kotlin-library.gradle"
-apply from: "${configDir}/versions/dagger.gradle"
-
-dependencies {
-    api dagger.core
-    implementation project(':meta:annotations')
-    kapt project(':meta:processor')
+interface TypeMirrorWrapper<T : TypeMirror> : Wrapper<T> {
+    val type: T
+        get() = wrappedType.get()!!
+    val typeElement: TypeElement
+        get() = MoreTypes.asTypeElement(type)
 }

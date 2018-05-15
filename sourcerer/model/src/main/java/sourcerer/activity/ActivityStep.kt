@@ -26,13 +26,17 @@ import sourcerer.Dagger
 import sourcerer.Env
 import sourcerer.Input
 import sourcerer.Intermediate
+import sourcerer.IntoCollectionStep
 import sourcerer.JavaOutput
 import sourcerer.Klass
+import sourcerer.NoOutput
+import sourcerer.Output
 import sourcerer.StoredFile
 import sourcerer.addAnnotation
 import sourcerer.addMethod
 import sourcerer.addTo
 import sourcerer.inject.InjectActivity
+import sourcerer.inject.IntoCollection
 import sourcerer.intoCollection
 import sourcerer.io.Writer
 import sourcerer.javaClassOutput
@@ -54,6 +58,16 @@ object ActivityAnnotationStep : AnnotationStep<InjectActivity> {
             addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
             returns(it.rawType)
         }
+    }
+}
+
+class ActivityCollectionStep : IntoCollectionStep(InjectActivity::class) {
+    override
+    fun process(env: Env, inputs: List<Input<IntoCollection>>): Output {
+        inputs.forEach {
+            env.log(it.element, "IntoCollection<InjectActivity>")
+        }
+        return NoOutput
     }
 }
 
