@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id("kotlin")
-    id("kotlin-kapt")
-    id("com.jfrog.bintray")
-//    id("com.jfrog.artifactory")
-    id("org.jetbrains.dokka")
-}
+package sourcerer.inject
 
-apply from: "${configDir}/kotlin-library.gradle"
+import kotlin.annotation.AnnotationRetention.SOURCE
+import kotlin.annotation.AnnotationTarget.EXPRESSION
+import kotlin.reflect.KClass
 
-dependencies {
-    api "com.google.auto:auto-common:${app.autoCommonVersion}"
-}
+@MustBeDocumented
+@Target(EXPRESSION)
+@Retention(SOURCE)
+annotation
+class AnnotatedWith(
+    val value: Array<KClass<out Annotation>>
+)

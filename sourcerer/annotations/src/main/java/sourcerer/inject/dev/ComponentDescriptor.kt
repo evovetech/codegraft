@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-plugins {
-    id("kotlin")
-    id("kotlin-kapt")
-    id("com.jfrog.bintray")
-//    id("com.jfrog.artifactory")
-    id("org.jetbrains.dokka")
-}
+package sourcerer.inject.dev
 
-apply from: "${configDir}/kotlin-library.gradle"
-
-dependencies {
-    api "com.google.auto:auto-common:${app.autoCommonVersion}"
+abstract
+class ComponentDescriptor(
+    val component: ComponentWrapper
+) {
 }

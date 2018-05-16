@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-plugins {
-    id("kotlin")
-    id("kotlin-kapt")
-    id("com.jfrog.bintray")
-//    id("com.jfrog.artifactory")
-    id("org.jetbrains.dokka")
+package sourcerer.inject.dev
+
+import javax.lang.model.element.Element
+
+interface AnnotationDescriptor {
+    val element: Element
 }
 
-apply from: "${configDir}/kotlin-library.gradle"
-
-dependencies {
-    api "com.google.auto:auto-common:${app.autoCommonVersion}"
+interface TypedAnnotationDescriptor<E : Element> : AnnotationDescriptor {
+    override val element: E
 }

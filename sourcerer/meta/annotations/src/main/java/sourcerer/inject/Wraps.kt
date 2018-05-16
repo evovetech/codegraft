@@ -24,6 +24,6 @@ import kotlin.reflect.KClass
 @Retention(RUNTIME)
 @Target(ANNOTATION_CLASS)
 annotation
-class Wrapper(
+class Wraps(
     val value: KClass<out Annotation>
 )
