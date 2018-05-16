@@ -22,8 +22,10 @@ plugins {
     id("org.jetbrains.dokka")
 }
 
+apply from: "${configDir}/kotlin-library.gradle"
+
 dependencies {
-    compileOnly project(':meta:annotations')
+    implementation project(':meta:annotations')
     implementation project(':meta:utils')
     implementation "com.google.auto:auto-common:${app.autoCommonVersion}"
     compileOnly "com.google.auto.service:auto-service:${app.autoServiceVersion}"
