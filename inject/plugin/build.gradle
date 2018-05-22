@@ -43,5 +43,9 @@ gradlePlugin {
             id = "${prefix}.transform.bytes"
             implementationClass = "evovetech.gradle.transform.plugin.ByteBuddyPlugin"
         }
+        "transform.graph" {
+            id = "${prefix}.transform.graph"
+            implementationClass = "evovetech.gradle.transform.plugin.GraphPlugin"
+        }
     }
 }
