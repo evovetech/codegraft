@@ -76,16 +76,37 @@ class Dependency(
     fun toString(): String {
         return "Dep<$key>"
     }
-
 }
 
 fun network(): MutableNetwork<Key, Binding> = NetworkBuilder
         .directed()
         .build<Key, Binding>()
 
+fun compare1(o1: Binding, o2: Binding): Int {
+    if (o2.dependencies
+                .map(Dependency::key)
+                .contains(o1.key)) {
+        return 1
+    }
+    return 0
+}
+
+fun compare(o1: Binding, o2: Binding): Int {
+    if (compare1(o1, o2) != 0) {
+        return -1
+    }
+    if (compare1(o2, o1) != 0) {
+        return 1
+    }
+    return 0
+}
+
 fun graph(): MutableGraph<Binding> = GraphBuilder.directed()
         .nodeOrder<Binding>(ElementOrder.sorted { o1, o2 ->
-            var result = o2.dependencies.size - o1.dependencies.size
+            var result = compare(o1, o2)
+            if (result == 0) {
+                result = o2.dependencies.size - o1.dependencies.size
+            }
             if (result == 0) {
                 result = o1.key.compareTo(o2.key)
             }
