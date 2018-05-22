@@ -16,6 +16,7 @@
 
 package evovetech.gradle.transform.graph
 
+import com.google.common.graph.ElementOrder
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
 import com.google.common.graph.MutableNetwork
@@ -27,9 +28,14 @@ import net.bytebuddy.description.type.TypeDefinition
 data
 class Key(
     val type: TypeDefinition
-) {
+) : Comparable<Key> {
     override
     fun toString() = type.toString()
+
+    override
+    fun compareTo(other: Key): Int {
+        return type.typeName.compareTo(other.type.typeName)
+    }
 }
 
 data
@@ -49,7 +55,7 @@ class Binding(
         if (dependencies.isNotEmpty()) {
             _str += "{ dependencies=$dependencies) }"
         }
-        str = _str
+        str = "$_str\n"
     }
 
     override
@@ -78,6 +84,13 @@ fun network(): MutableNetwork<Key, Binding> = NetworkBuilder
         .build<Key, Binding>()
 
 fun graph(): MutableGraph<Binding> = GraphBuilder.directed()
+        .nodeOrder<Binding>(ElementOrder.sorted { o1, o2 ->
+            var result = o2.dependencies.size - o1.dependencies.size
+            if (result == 0) {
+                result = o1.key.compareTo(o2.key)
+            }
+            result
+        })
         .build<Binding>()
 
 fun MutableGraph<Binding>.add(type: TypeDefinition): Binding? {
