@@ -20,6 +20,7 @@ import com.android.build.api.transform.TransformInvocation
 import evovetech.gradle.transform.content.Output
 import evovetech.gradle.transform.content.allFiles
 import evovetech.gradle.transform.content.classFileLocator
+import evovetech.gradle.transform.graph.add
 import net.bytebuddy.dynamic.ClassFileLocator.Compound
 import net.bytebuddy.pool.TypePool
 import net.bytebuddy.pool.TypePool.CacheProvider.Simple
@@ -46,6 +47,7 @@ class GraphRunRun(
         FAST,
         ClassLoading.ofBootPath()
     )
+    val graph = evovetech.gradle.transform.graph.graph()
 
     override
     fun run() {
@@ -53,6 +55,7 @@ class GraphRunRun(
         try {
             transforms.flatMap { it.output.allFiles() }
                     .forEach(this::write)
+            println("graph=$graph")
         } finally {
             println("bytebuddy runrun! complete")
         }
@@ -71,7 +74,7 @@ class GraphRunRun(
         val typeName = src.replace('/', '.')
                 .substring(0, src.length - CLASS_FILE_EXTENSION.length)
         val typeDescription = typePool.describe(typeName).resolve()
-        println("type=$typeDescription")
+        graph.add(typeDescription)
         return copy()
     }
 }
