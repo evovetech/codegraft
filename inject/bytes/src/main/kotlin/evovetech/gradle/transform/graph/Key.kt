@@ -51,11 +51,11 @@ class Binding(
     val str: String
 
     init {
-        var _str = "Binding<$key>"
+        var _str = "\nBinding<$key>"
         if (dependencies.isNotEmpty()) {
             _str += "{ dependencies=$dependencies) }"
         }
-        str = "$_str\n"
+        str = _str
     }
 
     override
