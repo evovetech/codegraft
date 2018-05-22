@@ -55,7 +55,12 @@ class GraphRunRun(
         try {
             transforms.flatMap { it.output.allFiles() }
                     .forEach(this::write)
-            println("graph=$graph")
+            println("graph {")
+            graph.edges().forEach {
+                println("  $it")
+            }
+            println("}")
+//            println("graph=$graph")
         } finally {
             println("bytebuddy runrun! complete")
         }

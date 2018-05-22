@@ -51,10 +51,10 @@ class Binding(
     val str: String
 
     init {
-        var _str = "\nBinding<$key>"
-        if (dependencies.isNotEmpty()) {
-            _str += "{ dependencies=$dependencies) }"
-        }
+        var _str = "Binding<$key>"
+//        if (dependencies.isNotEmpty()) {
+//            _str += "{ dependencies=$dependencies) }"
+//        }
         str = _str
     }
 
@@ -118,18 +118,25 @@ fun MutableGraph<Binding>.add(type: TypeDefinition): Binding? {
     if (type.represents(Object::class.java)) {
         return null
     }
+    val bindings = ArrayList<Binding>()
     val deps = ArrayList<Dependency>()
     type.superClass
             ?.let { add(it) }
+            ?.also { bindings.add(it) }
             ?.let { Dependency(it.key, SuperClass) }
             ?.run(deps::add)
     type.interfaces
             .mapNotNull { add(it) }
+            .onEach { bindings.add(it) }
             .map { Dependency(it.key, Interface) }
             .map(deps::add)
 
     val key = Key(type)
     val node = Binding(key, deps.toList())
+    fun addEdge(target: Binding): Boolean =
+        putEdge(node, target)
+
     addNode(node)
+    bindings.map(::addEdge)
     return node
 }
