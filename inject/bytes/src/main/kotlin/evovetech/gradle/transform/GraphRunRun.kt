@@ -20,7 +20,7 @@ import com.android.build.api.transform.TransformInvocation
 import evovetech.gradle.transform.content.Output
 import evovetech.gradle.transform.content.allFiles
 import evovetech.gradle.transform.content.classFileLocator
-import evovetech.gradle.transform.graph.add
+import evovetech.gradle.transform.graph.Resolver
 import net.bytebuddy.dynamic.ClassFileLocator.Compound
 import net.bytebuddy.pool.TypePool
 import net.bytebuddy.pool.TypePool.CacheProvider.Simple
@@ -47,7 +47,7 @@ class GraphRunRun(
         FAST,
         ClassLoading.ofBootPath()
     )
-    val graph = evovetech.gradle.transform.graph.graph()
+    val network = Resolver()
 
     override
     fun run() {
@@ -56,9 +56,17 @@ class GraphRunRun(
             transforms.flatMap { it.output.allFiles() }
                     .forEach(this::write)
             println("graph {")
-            graph.edges().forEach {
-                println("  $it")
+            val graph = network.resolve()
+            graph.nodes().forEach {
+                println("  $it {")
+                graph.inEdges(it).forEach {
+                    println("    $it")
+                }
+                println("  }")
             }
+//            graph.edges().forEach {
+//                println("  edge=$it")
+//            }
             println("}")
 //            println("graph=$graph")
         } finally {
@@ -79,7 +87,8 @@ class GraphRunRun(
         val typeName = src.replace('/', '.')
                 .substring(0, src.length - CLASS_FILE_EXTENSION.length)
         val typeDescription = typePool.describe(typeName).resolve()
-        graph.add(typeDescription)
+        network.add(typeDescription)
+//        graph.add(typeDescription)
         return copy()
     }
 }
