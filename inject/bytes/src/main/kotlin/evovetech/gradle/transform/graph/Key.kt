@@ -68,11 +68,7 @@ class Binding(
 
     private
     fun hasEdgeInternal(other: Binding): Boolean {
-//        return this == other.binding ||
         val ours = allEdges().map(BoundEdge::binding)
-//        if (ours.contains(other)) {
-//            return true
-//        }
         val theirs = other.dependencies.map(BoundEdge::binding)
         return ours.any(theirs::contains)
     }
@@ -196,72 +192,23 @@ class Resolver {
                 .map { it.boundEdge(type, Interface) }
                 .toSet()
         val all = supers + interfaces
-//        val topLevel = all.flatMap { it.binding. }
-
         val key = Key(type)
         val kind = if (internals.contains(type)) Internal else External
         val node1 = Binding(key, kind, all)
         addNode(node1)
-
-        node1.dependencies.filter {
-            //            val node2 = it.binding
-//            val edge = it.edge
-//            println("")
-//            val keep = !node1.hasEdge(node2)
-//            if (!keep) {
-//                println("    skipping $it")
-//            }
-//            println("    node1=${node1.key}${node1.dependencies}")
-//            println("    node2=${node2.key}${node2.dependencies}")
-//            println("    edge=$edge")
-//            keep
-            true
-        }.forEach {
+        node1.dependencies.forEach {
             val node2 = it.binding
             val edge = it.edge
             try {
+//                println("")
                 addEdge(node1, node2, edge)
+//                println("    node1=${node1.key}${node1.dependencies}")
+//                println("    node2=${node2.key}${node2.dependencies}")
+//                println("    edge=$edge")
             } catch (e: NullPointerException) {
                 println("null pointers: $node1 -> $edge -> $node2")
             }
         }
-//        all.forEach {
-//            val node2 = it.key
-//            val edge = it.value
-//            if (!edgesConnecting(node1, node2).contains(edge)) {
-//                println("    node1=${node1.key}${node1.dependencies}")
-//                println("    node2=${node2.key}${node2.dependencies}")
-//                println("    edge=$edge")
-//                addEdge(node1, node2, edge)
-//            }
-//        }
         return node1
     }
 }
-//
-//fun MutableGraph<Binding>.add(type: TypeDefinition): Binding? {
-//    if (type.represents(Object::class.java)) {
-//        return null
-//    }
-//    val bindings = ArrayList<Binding>()
-//    val deps = ArrayList<Dependency>()
-//    type.superClass
-//            ?.let { add(it) }
-//            ?.also { bindings.add(it) }
-//            ?.let { Dependency(it.key, SuperClass) }
-//            ?.run(deps::add)
-//    type.interfaces
-//            .mapNotNull { add(it) }
-//            .onEach { bindings.add(it) }
-//            .map { Dependency(it.key, Interface) }
-//            .map(deps::add)
-//
-//    val key = Key(type)
-//    val node = Binding(key, deps.toList())
-//    fun addEdge(target: Binding): Boolean =
-//        putEdge(node, target)
-//
-//    addNode(node)
-//    bindings.map(::addEdge)
-//    return node
-//}
