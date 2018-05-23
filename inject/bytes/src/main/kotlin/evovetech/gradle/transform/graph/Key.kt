@@ -31,7 +31,7 @@ class Key(
     val type: TypeDefinition
 ) : Comparable<Key> {
     override
-    fun toString() = type.toString()
+    fun toString() = type.typeName.toString()
 
     override
     fun compareTo(other: Key): Int {
@@ -69,11 +69,11 @@ class Binding(
     private
     fun hasEdgeInternal(other: Binding): Boolean {
 //        return this == other.binding ||
-        val ours = dependencies.map(BoundEdge::binding)
-        if (ours.contains(other)) {
-            return true
-        }
-        val theirs = other.allEdges().map(BoundEdge::binding)
+        val ours = allEdges().map(BoundEdge::binding)
+//        if (ours.contains(other)) {
+//            return true
+//        }
+        val theirs = other.dependencies.map(BoundEdge::binding)
         return ours.any(theirs::contains)
     }
 
@@ -86,8 +86,8 @@ class Binding(
     }
 }
 
-fun Binding.boundEdge(kind: DependencyEdge.Kind): BoundEdge {
-    val dep = DependencyEdge(key, kind)
+fun Binding.boundEdge(parent: TypeDefinition, kind: DependencyEdge.Kind): BoundEdge {
+    val dep = DependencyEdge(key, parent, kind)
     return BoundEdge(this, dep)
 }
 
@@ -109,11 +109,12 @@ class BoundEdge(
 data
 class DependencyEdge(
     val key: Key,
+    val parent: TypeDefinition,
     val kind: Kind
 ) {
     override
     fun toString(): String {
-        return "Dep<$key>"
+        return "from=${parent.typeName}"
     }
 
     enum
@@ -187,11 +188,11 @@ class Resolver {
         }
         val supers = type.superClass?.toList().orEmpty()
                 .mapNotNull { resolve(it) }
-                .map { it.boundEdge(SuperClass) }
+                .map { it.boundEdge(type, SuperClass) }
                 .toSet()
         val interfaces = type.interfaces
                 .mapNotNull { resolve(it) }
-                .map { it.boundEdge(Interface) }
+                .map { it.boundEdge(type, Interface) }
                 .toSet()
         val all = supers + interfaces
 //        val topLevel = all.flatMap { it.binding. }
