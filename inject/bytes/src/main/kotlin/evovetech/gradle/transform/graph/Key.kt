@@ -114,7 +114,7 @@ class DependencyEdge(
 ) {
     override
     fun toString(): String {
-        return "from=${parent.typeName}"
+        return "Dep{ $key }"
     }
 
     enum
@@ -125,9 +125,10 @@ class DependencyEdge(
 }
 
 fun compare1(o1: Binding, o2: Binding): Int {
-    if (o2.dependencies
+    if (o1.dependencies
                 .map(BoundEdge::binding)
-                .contains(o1)) {
+                .map(Binding::key)
+                .contains(o2.key)) {
         return 1
     }
     return 0
@@ -203,24 +204,25 @@ class Resolver {
         addNode(node1)
 
         node1.dependencies.filter {
-            val node2 = it.binding
-            val edge = it.edge
-            println("")
-            val keep = !node1.hasEdge(node2)
-            if (!keep) {
-                println("    skipping $it")
-            }
-            println("    node1=${node1.key}${node1.dependencies}")
-            println("    node2=${node2.key}${node2.dependencies}")
-            println("    edge=$edge")
-            keep
+            //            val node2 = it.binding
+//            val edge = it.edge
+//            println("")
+//            val keep = !node1.hasEdge(node2)
+//            if (!keep) {
+//                println("    skipping $it")
+//            }
+//            println("    node1=${node1.key}${node1.dependencies}")
+//            println("    node2=${node2.key}${node2.dependencies}")
+//            println("    edge=$edge")
+//            keep
+            true
         }.forEach {
             val node2 = it.binding
             val edge = it.edge
             try {
                 addEdge(node1, node2, edge)
             } catch (e: NullPointerException) {
-                println("null pointers")
+                println("null pointers: $node1 -> $edge -> $node2")
             }
         }
 //        all.forEach {

@@ -59,7 +59,7 @@ class GraphRunRun(
             val graph = network.resolve()
             graph.nodes().forEach {
                 println("  $it {")
-                graph.inEdges(it).forEach {
+                graph.outEdges(it).forEach {
                     println("    $it")
                 }
                 println("  }")
