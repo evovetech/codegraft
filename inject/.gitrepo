@@ -7,5 +7,5 @@
 	remote = git@bitbucket.org:evovetech/android-inject.git
 	branch = dev
 	commit = 6ccb2b1a6f522b943edf63f098a650fd5354ac67
-	parent = 68bd479e4d965637bf12bf98dccb8e32c5d01b01
+	parent = fbd053f5e30eea1e4150a522f7554044955741c4
 	cmdver = 0.3.1
