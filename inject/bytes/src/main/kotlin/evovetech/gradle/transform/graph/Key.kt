@@ -17,8 +17,6 @@
 package evovetech.gradle.transform.graph
 
 import com.google.common.graph.ElementOrder
-import com.google.common.graph.GraphBuilder
-import com.google.common.graph.MutableGraph
 import com.google.common.graph.MutableNetwork
 import com.google.common.graph.Network
 import com.google.common.graph.NetworkBuilder
@@ -45,24 +43,29 @@ data
 class Binding(
     val key: Key,
     val kind: Kind,
-    val dependencies: List<DependencyEdge>
+    val dependencies: Set<BoundEdge>
 ) {
-    constructor(
-        key: Key,
-        kind: Kind,
-        vararg dependencies: DependencyEdge
-    ) : this(key, kind, dependencies.toList())
-
     val str: String = "${kind.name}Binding<$key>"
 
-//    init {
-//        val prefix = if (kind == Internal) "Internal" else "External"
-//        var _str = "Binding<$key>"
-////        if (dependencies.isNotEmpty()) {
-////            _str += "{ dependencies=$dependencies) }"
-////        }
-//        str = _str
-//    }
+    fun children(): Set<BoundEdge> = dependencies
+            .flatMap { it.binding.allEdges() }
+            .toSet()
+
+    fun allEdges(): Set<BoundEdge> =
+        dependencies + children()
+
+    fun topLevel(): Set<BoundEdge> {
+        val top = HashSet(dependencies)
+        top.removeAll(children())
+        return top
+    }
+
+    fun hasEdge(other: BoundEdge): Boolean {
+        if (other.binding.dependencies.map(BoundEdge::binding).contains(this)) {
+            return true
+        }
+        return dependencies.any { hasEdge(other) }
+    }
 
     override
     fun toString() = str
@@ -70,6 +73,26 @@ class Binding(
     enum class Kind {
         Internal,
         External
+    }
+}
+
+fun Binding.boundEdge(kind: DependencyEdge.Kind): BoundEdge {
+    val dep = DependencyEdge(key, kind)
+    return BoundEdge(this, dep)
+}
+
+data
+class BoundEdge(
+    val binding: Binding,
+    val edge: DependencyEdge
+) {
+    override
+    fun toString(): String {
+        return "BoundEdge<${edge.key}>"
+    }
+
+    fun hasEdge(other: BoundEdge): Boolean {
+        return binding.hasEdge(other)
     }
 }
 
@@ -92,8 +115,8 @@ class DependencyEdge(
 
 fun compare1(o1: Binding, o2: Binding): Int {
     if (o2.dependencies
-                .map(DependencyEdge::key)
-                .contains(o1.key)) {
+                .map(BoundEdge::binding)
+                .contains(o1)) {
         return 1
     }
     return 0
@@ -109,10 +132,6 @@ fun compare(o1: Binding, o2: Binding): Int {
     return 0
 }
 
-fun newGraph(): MutableGraph<Binding> = GraphBuilder.directed()
-        .nodeOrder<Binding>(elementOrder)
-        .build<Binding>()
-
 
 typealias Net = MutableNetwork<Binding, DependencyEdge>
 
@@ -122,6 +141,9 @@ fun newNetwork(): Net = NetworkBuilder
         .build<Binding, DependencyEdge>()
 
 private val elementOrder: ElementOrder<Binding> = ElementOrder.sorted { o1, o2 ->
+    if (o1.key == o2.key) {
+        return@sorted 0
+    }
     var result = compare(o1, o2)
     if (result == 0) {
         result = o2.dependencies.size - o1.dependencies.size
@@ -155,26 +177,49 @@ class Resolver {
         }
         val supers = type.superClass?.toList().orEmpty()
                 .mapNotNull { resolve(it) }
-                .groupBy { it }
-                .mapValues { DependencyEdge(it.key.key, SuperClass) }
+                .map { it.boundEdge(SuperClass) }
+                .toSet()
         val interfaces = type.interfaces
                 .mapNotNull { resolve(it) }
-                .groupBy { it }
-                .mapValues { DependencyEdge(it.key.key, Interface) }
+                .map { it.boundEdge(Interface) }
+                .toSet()
         val all = supers + interfaces
-        val deps = all.values.flatMap { listOf(it) }
+//        val topLevel = all.flatMap { it.binding. }
 
         val key = Key(type)
         val kind = if (internals.contains(type)) Internal else External
-        val node1 = Binding(key, kind, deps)
+        val node1 = Binding(key, kind, all)
         addNode(node1)
-        all.forEach {
-            val node2 = it.key
-            val edge = it.value
-            if (!edgesConnecting(node1, node2).contains(edge)) {
+
+        node1.dependencies.filter {
+            val node2 = it.binding
+            val keep = !node1.hasEdge(it)
+            if (!keep) {
+                println("skipping $it")
+            }
+            keep
+        }.forEach {
+            val node2 = it.binding
+            val edge = it.edge
+            println("    node1=${node1.key}${node1.dependencies}")
+            println("    node2=${node2.key}${node2.dependencies}")
+            println("    edge=$edge")
+            try {
                 addEdge(node1, node2, edge)
+            } catch (e: NullPointerException) {
+                println("null pointers")
             }
         }
+//        all.forEach {
+//            val node2 = it.key
+//            val edge = it.value
+//            if (!edgesConnecting(node1, node2).contains(edge)) {
+//                println("    node1=${node1.key}${node1.dependencies}")
+//                println("    node2=${node2.key}${node2.dependencies}")
+//                println("    edge=$edge")
+//                addEdge(node1, node2, edge)
+//            }
+//        }
         return node1
     }
 }
