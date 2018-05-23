@@ -60,11 +60,21 @@ class Binding(
         return top
     }
 
-    fun hasEdge(other: BoundEdge): Boolean {
-        if (other.binding.dependencies.map(BoundEdge::binding).contains(this)) {
+    fun hasEdge(other: Binding): Boolean {
+        val hasEdge = hasEdgeInternal(other)
+        println("$key.hasEdge(${other.key})=$hasEdge")
+        return hasEdge
+    }
+
+    private
+    fun hasEdgeInternal(other: Binding): Boolean {
+//        return this == other.binding ||
+        val ours = dependencies.map(BoundEdge::binding)
+        if (ours.contains(other)) {
             return true
         }
-        return dependencies.any { hasEdge(other) }
+        val theirs = other.allEdges().map(BoundEdge::binding)
+        return ours.any(theirs::contains)
     }
 
     override
@@ -92,7 +102,7 @@ class BoundEdge(
     }
 
     fun hasEdge(other: BoundEdge): Boolean {
-        return binding.hasEdge(other)
+        return binding.hasEdge(other.binding)
     }
 }
 
@@ -193,17 +203,19 @@ class Resolver {
 
         node1.dependencies.filter {
             val node2 = it.binding
-            val keep = !node1.hasEdge(it)
+            val edge = it.edge
+            println("")
+            val keep = !node1.hasEdge(node2)
             if (!keep) {
-                println("skipping $it")
+                println("    skipping $it")
             }
+            println("    node1=${node1.key}${node1.dependencies}")
+            println("    node2=${node2.key}${node2.dependencies}")
+            println("    edge=$edge")
             keep
         }.forEach {
             val node2 = it.binding
             val edge = it.edge
-            println("    node1=${node1.key}${node1.dependencies}")
-            println("    node2=${node2.key}${node2.dependencies}")
-            println("    edge=$edge")
             try {
                 addEdge(node1, node2, edge)
             } catch (e: NullPointerException) {
