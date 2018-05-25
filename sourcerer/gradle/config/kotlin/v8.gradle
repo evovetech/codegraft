@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-def fileName = "v8"
-def v7s = [
-        'com.android.application',
-        'com.android.library'
-]
-for (def id : v7s) {
-    if (project.plugins.hasPlugin(id)) {
-        fileName = "v7"
-        break
-    }
-}
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
-apply from: "${configDir}/kotlin/${fileName}.gradle"
+dependencies {
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${app.kotlinVersion}"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${app.kotlinVersion}"
+}

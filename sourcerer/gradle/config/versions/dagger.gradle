@@ -21,6 +21,7 @@ static def loadDagger(String version) {
     def dagger = new Expando()
     dagger.version = version
     dagger.core = "com.google.dagger:dagger:${version}"
+    dagger.coreSpi = "com.google.dagger:dagger-spi:${version}"
     dagger.coreCompiler = "com.google.dagger:dagger-compiler:${version}"
     dagger.android = "com.google.dagger:dagger-android-support:${version}"
     dagger.androidCompiler = "com.google.dagger:dagger-android-processor:${version}"
