@@ -20,6 +20,7 @@ plugins {
     id("kotlin-android-extensions")
     id("kotlin-kapt")
     id("realm-android")
+    id("evovetech.android.transform.graph")
 }
 
 apply from: "${configDir}/android/base.gradle"

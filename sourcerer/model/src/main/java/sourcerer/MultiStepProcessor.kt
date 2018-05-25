@@ -23,5 +23,6 @@ class MultiStepProcessor(
     private
     val multiStep = MultiStep(init)
 
-    override fun processSteps() = listOf(multiStep)
+    override
+    fun processSteps(options: Options) = listOf(multiStep)
 }

@@ -18,9 +18,6 @@ package sourcerer.dev
 
 interface Node
 
-
-
-
 /*
 
 App: ->
@@ -34,4 +31,4 @@ App ->
   Lib ->
   Lib ->
 
- */
+*/

@@ -19,11 +19,21 @@ package evovetech.gradle.transform.plugin
 import com.android.build.api.transform.Transform
 import com.android.build.gradle.BaseExtension
 import evovetech.gradle.transform.GraphRunRunTransform
+import org.gradle.api.Project
 
 class GraphPlugin : TransformPlugin() {
     override
-    val BaseExtension.transformer: Transform
-        get() = GraphRunRunTransform {
+    fun BaseExtension.transformer(
+        project: Project
+    ): Transform {
+        val options = defaultConfig.javaCompileOptions.annotationProcessorOptions
+        project.afterEvaluate {
+            val id = defaultConfig.applicationId
+            options.argument("evovetech.processor.package", id)
+            println("\nprocessor arguments: ${options.arguments}\n")
+        }
+        return GraphRunRunTransform {
             bootClasspath
         }
+    }
 }

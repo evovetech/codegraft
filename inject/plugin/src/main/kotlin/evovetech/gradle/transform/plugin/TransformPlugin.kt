@@ -17,27 +17,29 @@
 package evovetech.gradle.transform.plugin
 
 import com.android.build.api.transform.Transform
-import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.BasePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 abstract
 class TransformPlugin : Plugin<Project> {
     abstract
-    val BaseExtension.transformer: Transform
+    fun BaseExtension.transformer(
+        project: Project
+    ): Transform
 
     final override
     fun apply(project: Project) {
-        project.plugins.withType(AppPlugin::class.java) {
+        project.plugins.withType(BasePlugin::class.java) {
             println("plugin=$this")
-            extension.setup()
+            extension.setup(project)
         }
     }
 
     private
-    fun BaseExtension.setup() {
+    fun BaseExtension.setup(project: Project) {
         println("android ext = $this")
-        registerTransform(transformer)
+        registerTransform(transformer(project))
     }
 }

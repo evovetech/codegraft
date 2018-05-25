@@ -19,11 +19,13 @@ package evovetech.gradle.transform.plugin
 import com.android.build.api.transform.Transform
 import com.android.build.gradle.BaseExtension
 import evovetech.gradle.transform.ByteBuddyRunRunTransform
+import org.gradle.api.Project
 
 class ByteBuddyPlugin : TransformPlugin() {
     override
-    val BaseExtension.transformer: Transform
-        get() = ByteBuddyRunRunTransform {
-            bootClasspath
-        }
+    fun BaseExtension.transformer(
+        project: Project
+    ): Transform = ByteBuddyRunRunTransform {
+        bootClasspath
+    }
 }

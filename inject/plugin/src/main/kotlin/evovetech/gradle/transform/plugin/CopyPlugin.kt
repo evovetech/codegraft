@@ -19,9 +19,11 @@ package evovetech.gradle.transform.plugin
 import com.android.build.api.transform.Transform
 import com.android.build.gradle.BaseExtension
 import evovetech.gradle.transform.CopyRunRunTransform
+import org.gradle.api.Project
 
 class CopyPlugin : TransformPlugin() {
     override
-    val BaseExtension.transformer: Transform
-        get() = CopyRunRunTransform()
+    fun BaseExtension.transformer(
+        project: Project
+    ): Transform = CopyRunRunTransform()
 }

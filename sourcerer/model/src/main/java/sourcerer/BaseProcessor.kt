@@ -27,19 +27,53 @@ import javax.lang.model.element.Element
 abstract
 class BaseProcessor : BasicAnnotationProcessor() {
     private
-    val env: Env by lazy { Env(this) }
+    val env: Env by lazy {
+        Env(this)
+    }
+    private
+    val options: Options by lazy {
+        Options(env.options)
+    }
 
     abstract
-    fun processSteps(): List<ProcessStep>
+    fun processSteps(
+        options: Options
+    ): List<ProcessStep>
+
+    protected open
+    fun supportedOptions(): Iterable<Option> =
+        emptySet()
 
     final override
-    fun initSteps(): MutableIterable<ProcessingStep> = processSteps()
+    fun initSteps(): MutableIterable<ProcessingStep> = processSteps(options)
             .map { Step(env, it) }
             .toMutableList()
 
     override
     fun getSupportedSourceVersion() =
         SourceVersion.latestSupported()!!
+
+    final override
+    fun getSupportedOptions(): Set<String> = supportedOptions()
+            .map(Option::key)
+            .toSet()
+
+    interface Option {
+        val key: String
+        val defaultValue: String
+
+        fun get(options: Map<String, String>): String {
+            return options[key] ?: defaultValue
+        }
+    }
+
+    class Options(
+        private val provided: Map<String, String>
+    ) {
+        operator
+        fun get(option: Option): String =
+            option.get(provided)
+    }
 
     private
     class Step(
