@@ -7,5 +7,5 @@
 	remote = git@bitbucket.org:evovetech/sourcerer.git
 	branch = dev2
 	commit = 5227c5e25de270534b56241521ecc2033bde74ab
-	parent = 91496fc4bfa26c7ec316d6a3e0219119ec751f6b
+	parent = 0d655e3568596783f72567e08ca6c810718d2faa
 	cmdver = 0.3.1
