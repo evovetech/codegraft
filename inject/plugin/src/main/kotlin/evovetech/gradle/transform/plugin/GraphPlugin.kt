@@ -37,18 +37,12 @@ class GraphPlugin : TransformPlugin() {
             is FeatureExtension -> featureVariants
             else -> return null
         }
-
-        fun run(variant: BaseVariant) {
-            val options = variant.javaCompileOptions.annotationProcessorOptions
-            val packageName = variant.generateBuildConfig.appPackageName
+        variants.all {
+            val options = javaCompileOptions.annotationProcessorOptions
+            val packageName = generateBuildConfig.appPackageName
             options.arguments["evovetech.processor.package"] = packageName
             println("\nprocessor arguments: ${options.arguments}\n")
         }
-
-        project.afterEvaluate {
-            variants.all(::run)
-        }
-
         return GraphRunRunTransform {
             bootClasspath
         }

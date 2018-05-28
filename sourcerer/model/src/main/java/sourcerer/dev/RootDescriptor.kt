@@ -48,7 +48,10 @@ class RootProcessor : BaseProcessor() {
         fun sourcerer.Env.process(
             annotationElements: AnnotationElements
         ): Map<AnnotationType, List<Output>> {
+            log("")
+            log("options=$opt")
             log("package=${opt[Option.Package]}")
+            log("")
             return emptyMap()
         }
     }

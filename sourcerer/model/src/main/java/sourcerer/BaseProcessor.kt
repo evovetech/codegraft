@@ -73,6 +73,12 @@ class BaseProcessor : BasicAnnotationProcessor() {
         operator
         fun get(option: Option): String =
             option.get(provided)
+
+        override
+        fun toString(): String {
+            return "Options(provided=$provided)"
+        }
+
     }
 
     private

@@ -28,6 +28,7 @@ apply from: "${configDir}/kotlin-library.gradle"
 
 dependencies {
     implementation project(':bytes')
+    compileOnly 'org.jetbrains.kotlin:kotlin-gradle-plugin'
     compileOnly "com.android.tools.build:gradle:${androidVersion}"
 }
 
