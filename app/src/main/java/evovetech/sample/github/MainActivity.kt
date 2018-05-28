@@ -17,7 +17,7 @@
 package evovetech.sample.github
 
 import android.app.Fragment
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import dagger.android.AndroidInjector
 import dagger.android.HasFragmentInjector
 import sourcerer.inject.InjectActivity
