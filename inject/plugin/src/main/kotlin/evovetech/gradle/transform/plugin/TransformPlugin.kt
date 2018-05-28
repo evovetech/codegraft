@@ -27,7 +27,7 @@ class TransformPlugin : Plugin<Project> {
     abstract
     fun BaseExtension.transformer(
         project: Project
-    ): Transform
+    ): Transform?
 
     final override
     fun apply(project: Project) {
@@ -40,6 +40,8 @@ class TransformPlugin : Plugin<Project> {
     private
     fun BaseExtension.setup(project: Project) {
         println("android ext = $this")
-        registerTransform(transformer(project))
+        transformer(project)?.let {
+            registerTransform(it)
+        }
     }
 }

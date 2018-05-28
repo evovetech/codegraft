@@ -17,21 +17,38 @@
 package evovetech.gradle.transform.plugin
 
 import com.android.build.api.transform.Transform
+import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.FeatureExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.api.BaseVariant
 import evovetech.gradle.transform.GraphRunRunTransform
+import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 
 class GraphPlugin : TransformPlugin() {
     override
     fun BaseExtension.transformer(
         project: Project
-    ): Transform {
-        val options = defaultConfig.javaCompileOptions.annotationProcessorOptions
-        project.afterEvaluate {
-            val id = defaultConfig.applicationId
-            options.argument("evovetech.processor.package", id)
+    ): Transform? {
+        val variants: DomainObjectSet<out BaseVariant> = when (this) {
+            is AppExtension -> applicationVariants
+            is LibraryExtension -> libraryVariants
+            is FeatureExtension -> featureVariants
+            else -> return null
+        }
+
+        fun run(variant: BaseVariant) {
+            val options = variant.javaCompileOptions.annotationProcessorOptions
+            val packageName = variant.generateBuildConfig.appPackageName
+            options.arguments["evovetech.processor.package"] = packageName
             println("\nprocessor arguments: ${options.arguments}\n")
         }
+
+        project.afterEvaluate {
+            variants.all(::run)
+        }
+
         return GraphRunRunTransform {
             bootClasspath
         }
