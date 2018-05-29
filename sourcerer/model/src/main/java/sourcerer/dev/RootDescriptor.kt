@@ -17,12 +17,15 @@
 package sourcerer.dev
 
 import com.google.auto.service.AutoService
+import dagger.Component
+import dagger.Module
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
 import sourcerer.BaseProcessor
 import sourcerer.Output
 import sourcerer.ProcessStep
 import sourcerer.inject.LibComponent
+import sourcerer.inject.LibModule
 import javax.annotation.processing.Processor
 
 @AutoService(Processor::class)
@@ -41,7 +44,12 @@ class RootProcessor : BaseProcessor() {
     ) : ProcessStep {
         override
         fun sourcerer.Env.annotations(): Set<AnnotationType> {
-            return setOf(LibComponent::class)
+            return setOf(
+                LibComponent::class,
+                LibModule::class,
+                Component::class,
+                Module::class
+            )
         }
 
         override
