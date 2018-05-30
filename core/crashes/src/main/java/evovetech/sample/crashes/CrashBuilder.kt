@@ -14,32 +14,26 @@
  * limitations under the License.
  */
 
-@file:Module
-@file:JvmName("Crashes")
-
 package evovetech.sample.crashes
 
-import android.app.Application
-import com.crashlytics.android.Crashlytics
-import dagger.Module
-import dagger.Provides
 import io.fabric.sdk.android.Fabric
-import javax.inject.Singleton
+import io.fabric.sdk.android.Fabric.Builder
 
-@Provides
-@Singleton
-fun provideFabric(app: Application, builder: CrashBuilder): Fabric {
-    val fabric = builder.run {
-        Fabric.Builder(app).run {
-            init()
-            build()
-        }
-    }
-    return Fabric.with(fabric)
+interface CrashBuilder {
+    fun Builder.init()
 }
 
-@Provides
-@Singleton
-fun provideCrashlytics(kits: Kits): Crashlytics {
-    return kits[Crashlytics::class]
+
+typealias CrashBuilderFunc = Fabric.Builder.() -> Unit
+
+fun CrashBuilderFunc.toBuilder() = object : CrashBuilder {
+    override
+    fun Fabric.Builder.init() = this@toBuilder.invoke(this)
+}
+
+fun <B : CrashesComponent.Builder> B.crashes(
+    init: CrashBuilderFunc
+): B {
+    crashes(init.toBuilder())
+    return this
 }

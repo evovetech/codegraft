@@ -14,32 +14,27 @@
  * limitations under the License.
  */
 
-@file:Module
-@file:JvmName("Crashes")
-
 package evovetech.sample.crashes
 
-import android.app.Application
-import com.crashlytics.android.Crashlytics
-import dagger.Module
-import dagger.Provides
 import io.fabric.sdk.android.Fabric
+import io.fabric.sdk.android.Kit
+import sourcerer.inject.castNotNull
+import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.reflect.KClass
 
-@Provides
 @Singleton
-fun provideFabric(app: Application, builder: CrashBuilder): Fabric {
-    val fabric = builder.run {
-        Fabric.Builder(app).run {
-            init()
-            build()
-        }
+class Kits
+@Inject constructor(
+    fabric: Fabric
+) {
+    private val map = fabric.kits
+            .groupBy { it::class }
+            .mapValues { it.value.first()!! }
+
+    operator
+    fun <T : Kit<*>> get(clazz: KClass<T>): T {
+        val kit = map[clazz]
+        return kit.castNotNull()
     }
-    return Fabric.with(fabric)
-}
-
-@Provides
-@Singleton
-fun provideCrashlytics(kits: Kits): Crashlytics {
-    return kits[Crashlytics::class]
 }
