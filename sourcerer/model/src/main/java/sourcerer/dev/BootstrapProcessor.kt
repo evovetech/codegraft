@@ -22,7 +22,7 @@ import sourcerer.ProcessStep
 import javax.annotation.processing.Processor
 
 @AutoService(Processor::class)
-class RootProcessor : BaseProcessor() {
+class BootstrapProcessor : BaseProcessor() {
     override
     fun processSteps(): List<ProcessStep> {
         return listOf(
