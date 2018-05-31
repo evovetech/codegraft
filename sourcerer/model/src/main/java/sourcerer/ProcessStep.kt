@@ -16,6 +16,8 @@
 
 package sourcerer
 
+import sourcerer.processor.Env.Option
+
 interface ProcessStep {
     fun Env.annotations():
             Set<AnnotationType>
@@ -23,4 +25,7 @@ interface ProcessStep {
     fun Env.process(
         annotationElements: AnnotationElements
     ): Map<AnnotationType, List<Output>>
+
+    fun supportedOptions(): Iterable<Option> =
+        emptySet()
 }

@@ -14,9 +14,27 @@
  * limitations under the License.
  */
 
-package evovetech.sample.crashes
+package sourcerer.dev
 
-import sourcerer.inject.BootstrapModule
+import sourcerer.AnnotationElements
+import sourcerer.AnnotationType
+import sourcerer.Env
+import sourcerer.Output
+import sourcerer.ProcessStep
+import sourcerer.inject.Builds
 
-@BootstrapModule()
-class BootstrapMod {}
+class BuildsStep : ProcessStep {
+    override
+    fun Env.annotations(): Set<AnnotationType> = setOf(
+        Builds::class
+    )
+
+    override
+    fun Env.process(
+        annotationElements: AnnotationElements
+    ): Map<AnnotationType, List<Output>> {
+        return emptyMap()
+    }
+}
+
+

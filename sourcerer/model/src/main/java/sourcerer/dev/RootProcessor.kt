@@ -14,9 +14,22 @@
  * limitations under the License.
  */
 
-package evovetech.sample.crashes
+package sourcerer.dev
 
-import sourcerer.inject.BootstrapModule
+import com.google.auto.service.AutoService
+import sourcerer.BaseProcessor
+import sourcerer.ProcessStep
+import javax.annotation.processing.Processor
 
-@BootstrapModule()
-class BootstrapMod {}
+@AutoService(Processor::class)
+class RootProcessor : BaseProcessor() {
+    override
+    fun processSteps(): List<ProcessStep> {
+        return listOf(
+            BuildsStep(),
+            BootstrapStep()
+        )
+    }
+}
+
+

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package evovetech.sample.crashes
+package sourcerer.inject
 
-import sourcerer.inject.BootstrapModule
-
-@BootstrapModule()
-class BootstrapMod {}
+interface Transform<in Input, out Output> {
+    fun transform(input: Input): Output
+}

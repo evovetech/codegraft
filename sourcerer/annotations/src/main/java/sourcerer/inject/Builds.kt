@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package evovetech.sample.crashes
+package sourcerer.inject
 
-import com.crashlytics.android.Crashlytics
-import io.fabric.sdk.android.Fabric
-import sourcerer.inject.BootstrapComponent
-import sourcerer.inject.BootstrapComponent.Builder
+import kotlin.reflect.KClass
 
-@BootstrapComponent()
-interface Bootstrap {
-    val fabric: Fabric
-    val crashes: Crashlytics
-
-    @sourcerer.inject.BootstrapComponent.Builder
-    interface Builder {
-//        @BindsInstance fun provideCrashBuilder
-    }
-}
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.BINARY)
+@MustBeDocumented
+annotation
+class Builds(
+    val value: KClass<*>
+)

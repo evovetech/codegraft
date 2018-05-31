@@ -29,6 +29,10 @@ open
 class Env(
     processingEnv: ProcessingEnvironment
 ) : ProcessingEnvironment by processingEnv {
+    val options: Options by lazy {
+        Options(processingEnv.options)
+    }
+
     fun processingEnv(): ProcessingEnvironment {
         return this
     }
@@ -83,5 +87,27 @@ class Env(
     companion object {
         const val ALL_ANNOTATIONS = "*"
         val ALL_ANNOTATION_TYPES = setOf(ALL_ANNOTATIONS)
+    }
+
+    interface Option {
+        val key: String
+        val defaultValue: String
+
+        fun get(options: Map<String, String>): String {
+            return options[key] ?: defaultValue
+        }
+    }
+
+    class Options(
+        private val provided: Map<String, String>
+    ) {
+        operator
+        fun get(option: Option): String =
+            option.get(provided)
+
+        override
+        fun toString(): String {
+            return "Options(provided=$provided)"
+        }
     }
 }

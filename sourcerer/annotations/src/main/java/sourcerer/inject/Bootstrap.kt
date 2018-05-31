@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package evovetech.sample.crashes
+package sourcerer.inject
 
-import sourcerer.inject.BootstrapModule
-
-@BootstrapModule()
-class BootstrapMod {}
+@Target(AnnotationTarget.FILE)
+@Retention(AnnotationRetention.BINARY)
+@MustBeDocumented
+annotation
+class Bootstrap

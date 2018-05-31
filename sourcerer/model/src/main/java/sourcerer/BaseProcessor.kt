@@ -17,6 +17,7 @@
 package sourcerer
 
 import com.google.auto.common.BasicAnnotationProcessor
+import sourcerer.processor.Env.Option
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 
@@ -31,21 +32,19 @@ class BaseProcessor : BasicAnnotationProcessor() {
         Env(this)
     }
     private
-    val options: Options by lazy {
-        Options(env.options)
+    val steps by lazy {
+        processSteps()
     }
 
     abstract
-    fun processSteps(
-        options: Options
-    ): List<ProcessStep>
+    fun processSteps(): List<ProcessStep>
 
-    protected open
-    fun supportedOptions(): Iterable<Option> =
-        emptySet()
+    private
+    fun supportedOptions(): Iterable<Option> = steps
+            .flatMap { it.supportedOptions() }
 
     final override
-    fun initSteps(): MutableIterable<ProcessingStep> = processSteps(options)
+    fun initSteps(): MutableIterable<ProcessingStep> = steps
             .map { Step(env, it) }
             .toMutableList()
 
@@ -57,29 +56,6 @@ class BaseProcessor : BasicAnnotationProcessor() {
     fun getSupportedOptions(): Set<String> = supportedOptions()
             .map(Option::key)
             .toSet()
-
-    interface Option {
-        val key: String
-        val defaultValue: String
-
-        fun get(options: Map<String, String>): String {
-            return options[key] ?: defaultValue
-        }
-    }
-
-    class Options(
-        private val provided: Map<String, String>
-    ) {
-        operator
-        fun get(option: Option): String =
-            option.get(provided)
-
-        override
-        fun toString(): String {
-            return "Options(provided=$provided)"
-        }
-
-    }
 
     private
     class Step(

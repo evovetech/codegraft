@@ -14,9 +14,23 @@
  * limitations under the License.
  */
 
+@file:Bootstrap
+@file:JvmName("BootstrapCrashes")
+
 package evovetech.sample.crashes
 
-import sourcerer.inject.BootstrapModule
+import android.app.Application
+import io.fabric.sdk.android.Fabric
+import sourcerer.inject.Bootstrap
+import sourcerer.inject.Builds
+import sourcerer.inject.Initializes
 
-@BootstrapModule()
-class BootstrapMod {}
+@Builds(Fabric::class)
+fun provideFabricBuilder(app: Application): Fabric.Builder {
+    return Fabric.Builder(app)
+}
+
+@Initializes
+fun initializeFabric(fabric: Fabric): Fabric {
+    return Fabric.with(fabric)
+}
