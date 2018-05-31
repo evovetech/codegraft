@@ -17,7 +17,6 @@
 package sourcerer
 
 import com.google.auto.service.AutoService
-import sourcerer.BaseProcessor.Options
 import sourcerer.activity.MainProcessor
 import sourcerer.lib.LibEnvProcessor
 import javax.annotation.processing.Processor
@@ -30,14 +29,6 @@ import javax.lang.model.element.TypeElement
 @AutoService(Processor::class)
 class AppGenerator : LibEnvProcessor() {
     private var done: Boolean = false
-    private
-    val options: Options by lazy {
-        Options(env().options)
-    }
-    private
-    val pkg: Package by lazy {
-        DefaultPackage(options[Option.Package])
-    }
 
     override
     fun getSupportedOptions(): Set<String> {
@@ -48,6 +39,7 @@ class AppGenerator : LibEnvProcessor() {
     fun process(set: MutableSet<out TypeElement>, roundEnv: RoundEnvironment) = withEnv {
         if (!done) {
             done = true
+            val pkg = DefaultPackage(options[Option.Package])
             AppComponentWriter(pkg, modules, components).apply {
                 writeTo(filer())
             }
@@ -64,7 +56,7 @@ class AppGenerator : LibEnvProcessor() {
     class Option(
         override val key: String,
         override val defaultValue: String
-    ) : BaseProcessor.Option {
+    ) : sourcerer.processor.Env.Option {
         Package(
             "evovetech.processor.package",
             "evovetech.processor"
