@@ -32,15 +32,9 @@ import javax.inject.Singleton
 @Component(modules = [Crashes::class])
 interface CrashesComponentImpl : CrashesComponent {
     @Component.Builder
-    abstract
-    class Builder {
-        @BindsInstance abstract
-        fun app(app: Application): Builder
-
-        @BindsInstance abstract
-        fun fabric(fabric: Fabric): Builder
-
-        abstract
+    interface Builder {
+        @BindsInstance fun app(app: Application): Builder
+        @BindsInstance fun fabric(fabric: Fabric): Builder
         fun build(): CrashesComponentImpl
     }
 }
