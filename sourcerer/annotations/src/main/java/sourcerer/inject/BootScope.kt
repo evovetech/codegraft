@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package evovetech.sample.crashes
+package sourcerer.inject
 
 import javax.inject.Scope
 

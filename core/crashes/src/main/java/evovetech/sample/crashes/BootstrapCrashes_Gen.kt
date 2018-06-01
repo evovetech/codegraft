@@ -22,6 +22,7 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import io.fabric.sdk.android.Fabric
+import sourcerer.inject.BootScope
 import javax.inject.Singleton
 
 //
