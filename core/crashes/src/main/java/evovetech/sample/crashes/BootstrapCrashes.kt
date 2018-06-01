@@ -20,10 +20,15 @@
 package evovetech.sample.crashes
 
 import android.app.Application
+import dagger.BindsInstance
+import dagger.Component
+import dagger.Module
+import dagger.Provides
 import io.fabric.sdk.android.Fabric
 import sourcerer.inject.Bootstrap
 import sourcerer.inject.Builds
 import sourcerer.inject.Initializes
+import javax.inject.Singleton
 
 @Builds(Fabric::class)
 fun provideFabricBuilder(app: Application): Fabric.Builder {
@@ -33,4 +38,33 @@ fun provideFabricBuilder(app: Application): Fabric.Builder {
 @Initializes
 fun initializeFabric(fabric: Fabric): Fabric {
     return Fabric.with(fabric)
+}
+
+//
+// Generated
+//
+
+@Module
+class Mod {
+    @Provides
+    @Singleton
+    fun provideFabric(app: Application, init: (Fabric.Builder) -> Fabric): Fabric {
+        val builder = provideFabricBuilder(app)
+        val fabric = init(builder)
+        return initializeFabric(fabric)
+    }
+}
+
+@Singleton
+@Component(modules = [Mod::class])
+interface Comp {
+    val app: Application
+    val fabric: Fabric
+
+    @Component.Builder
+    interface Builder {
+        @BindsInstance fun app(app: Application): Builder
+        @BindsInstance fun buildFabric(init: (Fabric.Builder) -> Fabric): Builder
+        fun build(): Comp
+    }
 }
