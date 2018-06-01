@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@file:Bootstrap
+@file:Bootstrap(modules = [Crashes::class])
 @file:JvmName("BootstrapCrashes")
 
 package evovetech.sample.crashes
@@ -44,27 +44,65 @@ fun initializeFabric(fabric: Fabric): Fabric {
 // Generated
 //
 
+@Singleton
+@Component(modules = [Crashes::class])
+interface FabricComponent : CrashesComponent {
+    val fabric: Fabric
+
+    @Component.Builder
+    abstract
+    class Builder {
+        @BindsInstance abstract
+        fun app(app: Application): Builder
+
+        @BindsInstance abstract
+        fun fabric(fabric: Fabric): Builder
+
+        abstract
+        fun build(): FabricComponent
+    }
+}
+
 @Module
-class Mod {
+class BootMod {
     @Provides
-    @Singleton
-    fun provideFabric(app: Application, init: (Fabric.Builder) -> Fabric): Fabric {
+    @BootScope
+    fun provideFabric(
+        app: Application,
+        @FunctionQualifier(
+            params = [Fabric.Builder::class],
+            returnType = [Fabric::class]
+        ) init: (Fabric.Builder) -> Fabric
+    ): Fabric {
         val builder = provideFabricBuilder(app)
         val fabric = init(builder)
         return initializeFabric(fabric)
     }
+
+    @Provides
+    @BootScope
+    fun provideFabricComponent(fabric: Fabric): FabricComponent {
+        return DaggerFabricComponent.builder()
+                .fabric(fabric)
+                .build()
+    }
 }
 
-@Singleton
-@Component(modules = [Mod::class])
-interface Comp {
-    val app: Application
-    val fabric: Fabric
+@BootScope
+@Component(modules = [BootMod::class])
+interface BootComp {
+    val fabric: FabricComponent
 
     @Component.Builder
     interface Builder {
         @BindsInstance fun app(app: Application): Builder
-        @BindsInstance fun buildFabric(init: (Fabric.Builder) -> Fabric): Builder
-        fun build(): Comp
+        @BindsInstance fun buildFabric(
+            @FunctionQualifier(
+                params = [Fabric.Builder::class],
+                returnType = [Fabric::class]
+            ) init: (Fabric.Builder) -> Fabric
+        ): Builder
+
+        fun build(): BootComp
     }
 }

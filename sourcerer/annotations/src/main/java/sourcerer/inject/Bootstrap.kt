@@ -16,8 +16,12 @@
 
 package sourcerer.inject
 
+import kotlin.reflect.KClass
+
 @Target(AnnotationTarget.FILE)
 @Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
 annotation
-class Bootstrap
+class Bootstrap(
+    val modules: Array<KClass<*>> = []
+)

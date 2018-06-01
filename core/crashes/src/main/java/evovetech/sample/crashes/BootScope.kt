@@ -16,17 +16,11 @@
 
 package evovetech.sample.crashes
 
-import io.fabric.sdk.android.Fabric
-import io.fabric.sdk.android.Fabric.Builder
+import javax.inject.Scope
 
-interface CrashBuilder {
-    fun Builder.init()
-}
-
-
-typealias CrashBuilderFunc = Fabric.Builder.() -> Unit
-
-fun CrashBuilderFunc.toBuilder() = object : CrashBuilder {
-    override
-    fun Fabric.Builder.init() = this@toBuilder.invoke(this)
-}
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.BINARY)
+@MustBeDocumented
+@Scope
+annotation
+class BootScope
