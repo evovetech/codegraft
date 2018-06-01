@@ -17,16 +17,10 @@
 
 package evovetech.sample.crashes
 
-import android.app.Application
 import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
-
-interface CrashesComponent {
-    val app: Application
-    val crashlytics: Crashlytics
-}
 
 @Module
 class Crashes {

@@ -23,5 +23,5 @@ import kotlin.reflect.KClass
 @MustBeDocumented
 annotation
 class Bootstrap(
-    val modules: Array<KClass<*>> = []
+    val components: Array<KClass<*>> = []
 )

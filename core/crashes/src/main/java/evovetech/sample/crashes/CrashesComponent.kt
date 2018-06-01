@@ -16,7 +16,12 @@
 
 package evovetech.sample.crashes
 
-import sourcerer.inject.BootstrapModule
+import android.app.Application
+import com.crashlytics.android.Crashlytics
+import sourcerer.inject.BootstrapComponent
 
-@BootstrapModule()
-class BootstrapMod {}
+@BootstrapComponent(modules = [Crashes::class])
+interface CrashesComponent {
+    val app: Application
+    val crashlytics: Crashlytics
+}
