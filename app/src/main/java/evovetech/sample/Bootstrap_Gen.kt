@@ -91,3 +91,26 @@ interface BootComponent {
         fun build(): BootComponent
     }
 }
+
+interface BootApplication {
+    val component: AppComponent
+    fun BootComponent.Builder.bootstrap(
+        app: Application
+    ): BootComponent
+}
+
+fun BootApplication.buildAppComponent(
+    app: Application
+): AppComponent = DaggerBootComponent.builder().run {
+    application(app)
+    bootstrap(app)
+            .component
+}
+
+abstract
+class AbstractBootApplication : Application(), BootApplication {
+    final override val component: AppComponent by lazy {
+        val app = this@AbstractBootApplication
+        buildAppComponent(app)
+    }
+}
