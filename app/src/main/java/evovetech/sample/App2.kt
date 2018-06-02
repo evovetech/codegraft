@@ -26,9 +26,9 @@ interface Bootstrap<App : Application> {
 class App3 : Application() {
 
 }
-
-fun inject(app: App) = AppBoot()
-        .build(app)
-        .apply {
-            inject(app)
-        }
+//
+//fun inject(app: App) = AppBoot()
+//        .build(app)
+//        .apply {
+//            inject(app)
+//        }

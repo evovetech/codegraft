@@ -21,11 +21,18 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import okhttp3.OkHttpClient
+import sourcerer.inject.Bootstrap
 import sourcerer.inject.LibModule
 import sourcerer.inject.Plugin
 import sourcerer.inject.PluginKey
+import sourcerer.inject.Plugins
 import javax.inject.Inject
 import javax.inject.Singleton
+
+@Bootstrap.Component(modules = [ClientPlugin::class])
+interface ClientComponent {
+    val plugins: Plugins
+}
 
 @LibModule(includes = [ClientPlugin::class])
 class Client

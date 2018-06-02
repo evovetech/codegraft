@@ -23,7 +23,7 @@ import dagger.android.DaggerApplication
 import io.fabric.sdk.android.Fabric
 import javax.inject.Inject
 
-@AndroidApplication(AppBoot::class)
+//@AndroidApplication(AppBoot::class)
 class App : DaggerApplication() {
     @Inject lateinit
     var fabric: Fabric

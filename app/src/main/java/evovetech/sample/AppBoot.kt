@@ -16,27 +16,22 @@
 
 package evovetech.sample
 
-import com.crashlytics.android.Crashlytics
-import evovetech.sample.AppComponent.Builder
-import evovetech.sample.crashes.crashes
-import evovetech.sample.db.realm.defaultRealm
-
-class AppBoot : Bootstrap<App> {
-    override
-    fun Builder.onBoot(app: App) {
-        app(app)
-        crashes {
-            kits(Crashlytics())
-        }
-        defaultRealm {
-            name("app.realm")
-            schemaVersion(1)
-        }
-    }
-
-    fun build(app: App): AppComponent {
-        val builder = DaggerAppComponent.builder()
-        builder.onBoot(app)
-        return builder.build()
-    }
-}
+//class AppBoot : Bootstrap<App> {
+//    override
+//    fun Builder.onBoot(app: App) {
+//        app(app)
+//        crashes {
+//            kits(Crashlytics())
+//        }
+//        defaultRealm {
+//            name("app.realm")
+//            schemaVersion(1)
+//        }
+//    }
+//
+//    fun build(app: App): AppComponent {
+//        val builder = DaggerAppComponent.builder()
+//        builder.onBoot(app)
+//        return builder.build()
+//    }
+//}
