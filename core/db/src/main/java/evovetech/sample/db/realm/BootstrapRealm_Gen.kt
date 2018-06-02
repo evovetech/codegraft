@@ -21,37 +21,40 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import evovetech.sample.crashes.CrashesComponent_BootstrapComponent
+import evovetech.sample.crashes.Crashes
 import io.fabric.sdk.android.Fabric
+import io.fabric.sdk.android.services.settings.IconRequest.build
 import io.realm.RealmConfiguration
 import sourcerer.inject.BootScope
 import sourcerer.inject.FunctionQualifier
-import javax.inject.Inject
 import javax.inject.Singleton
 
 //
 // Generated
 //
 
-@Singleton
-@Component(modules = [RealmModule::class])
 interface RealmComponent_BootstrapComponent : RealmComponent {
-    @Component.Builder
     interface Builder {
         @BindsInstance fun application(app: Application)
         @BindsInstance fun realmConfiguration(realmConfiguration: RealmConfiguration)
-        fun build(): RealmComponent_BootstrapComponent
     }
 }
 
 // group component
-@BootScope
-class LibraryComponent
-@Inject constructor(
-    val crashesComponent: CrashesComponent_BootstrapComponent,
-    val realmComponent: RealmComponent_BootstrapComponent
-) : CrashesComponent_BootstrapComponent by crashesComponent,
-    RealmComponent_BootstrapComponent by realmComponent
+interface LibraryComponent : RealmComponent_BootstrapComponent, evovetech.sample.crashes.LibraryComponent {
+    interface Builder :
+        RealmComponent_BootstrapComponent.Builder,
+        evovetech.sample.crashes.LibraryComponent.Builder
+}
+
+@Singleton
+@Component(modules = [RealmModule::class, Crashes::class])
+interface LibraryComponentImpl : LibraryComponent {
+    @Component.Builder
+    interface Builder : LibraryComponent.Builder {
+        fun build(): LibraryComponent
+    }
+}
 
 @Module(includes = [evovetech.sample.crashes.BootMod::class])
 class BootMod {
@@ -73,37 +76,36 @@ class BootMod {
     @BootScope
     fun provideRealmComponent(
         app: Application,
+        fabric: Fabric,
         realmConfiguration: RealmConfiguration
-    ): RealmComponent_BootstrapComponent = DaggerRealmComponent_BootstrapComponent.builder().run {
+    ): LibraryComponent = DaggerLibraryComponentImpl.builder().run {
         application(app)
+        fabric(fabric)
         realmConfiguration(realmConfiguration)
         build()
     }
 }
 
-@BootScope
-@Component(modules = [BootMod::class])
-interface BootComp {
-    val component: LibraryComponent
+interface BootComp : evovetech.sample.crashes.BootComp {
+    override val component: LibraryComponent
 
-    @Component.Builder
-    interface Builder {
-        @BindsInstance fun app(app: Application): Builder
-
+    interface Builder : evovetech.sample.crashes.BootComp.Builder {
         @BindsInstance fun realm(
             @FunctionQualifier(
                 params = [RealmConfiguration.Builder::class],
                 returnType = [RealmConfiguration::class]
             ) init: (RealmConfiguration.Builder) -> RealmConfiguration
-        ): Builder
+        )
+    }
+}
 
-        @BindsInstance fun fabric(
-            @FunctionQualifier(
-                params = [Fabric.Builder::class],
-                returnType = [Fabric::class]
-            ) init: (Fabric.Builder) -> Fabric
-        ): Builder
+@BootScope
+@Component(modules = [BootMod::class])
+interface BootCompImpl : BootComp {
+    override val component: LibraryComponent
 
+    @Component.Builder
+    interface Builder : BootComp.Builder {
         fun build(): BootComp
     }
 }

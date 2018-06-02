@@ -24,7 +24,6 @@ import dagger.Provides
 import io.fabric.sdk.android.Fabric
 import sourcerer.inject.BootScope
 import sourcerer.inject.FunctionQualifier
-import javax.inject.Inject
 import javax.inject.Singleton
 
 //
@@ -32,23 +31,26 @@ import javax.inject.Singleton
 //
 
 // individual component
-@Singleton
-@Component(modules = [Crashes::class])
 interface CrashesComponent_BootstrapComponent : CrashesComponent {
-    @Component.Builder
     interface Builder {
         @BindsInstance fun application(app: Application)
         @BindsInstance fun fabric(fabric: Fabric)
-        fun build(): CrashesComponent_BootstrapComponent
     }
 }
 
 // group component
-@BootScope
-class LibraryComponent
-@Inject constructor(
-    val crashesComponent: CrashesComponent_BootstrapComponent
-) : CrashesComponent_BootstrapComponent by crashesComponent
+interface LibraryComponent : CrashesComponent_BootstrapComponent {
+    interface Builder : CrashesComponent_BootstrapComponent.Builder
+}
+
+@Singleton
+@Component(modules = [Crashes::class])
+interface LibraryComponentImpl : LibraryComponent {
+    @Component.Builder
+    interface Builder : LibraryComponent.Builder {
+        fun build(): LibraryComponent
+    }
+}
 
 @Module
 class BootMod {
@@ -71,8 +73,8 @@ class BootMod {
     fun provideCrashesComponent(
         app: Application,
         fabric: Fabric
-    ): CrashesComponent_BootstrapComponent {
-        return DaggerCrashesComponent_BootstrapComponent.builder().run {
+    ): LibraryComponent {
+        return DaggerLibraryComponentImpl.builder().run {
             application(app)
             fabric(fabric)
             build()
@@ -80,21 +82,25 @@ class BootMod {
     }
 }
 
-@BootScope
-@Component(modules = [BootMod::class])
 interface BootComp {
     val component: LibraryComponent
 
-    @Component.Builder
     interface Builder {
-        @BindsInstance fun application(app: Application): Builder
+        @BindsInstance fun application(app: Application)
         @BindsInstance fun fabric(
             @FunctionQualifier(
                 params = [Fabric.Builder::class],
                 returnType = [Fabric::class]
             ) init: (Fabric.Builder) -> Fabric
-        ): Builder
+        )
+    }
+}
 
-        fun build(): BootComp
+@BootScope
+@Component(modules = [BootMod::class])
+interface BootCompImpl : BootComp {
+    @Component.Builder
+    interface Builder : BootComp.Builder {
+        fun build(): BootCompImpl
     }
 }

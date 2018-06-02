@@ -16,6 +16,7 @@
 
 package evovetech.sample.db.realm
 
+import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
 import io.realm.Realm
@@ -25,6 +26,7 @@ import sourcerer.inject.BootstrapComponent
 @BootstrapComponent(modules = [RealmModule::class])
 interface RealmComponent {
     val realm: Realm
+    val crashlytics: Crashlytics
 }
 
 @Module
