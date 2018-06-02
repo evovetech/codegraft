@@ -21,12 +21,11 @@ import sourcerer.AnnotationType
 import sourcerer.Env
 import sourcerer.Output
 import sourcerer.ProcessStep
-import sourcerer.inject.Bootstrap
 
 class BootstrapStep : ProcessStep {
     override
     fun Env.annotations(): Set<AnnotationType> = setOf(
-        Bootstrap::class
+//        Bootstrap::class
     )
 
     override

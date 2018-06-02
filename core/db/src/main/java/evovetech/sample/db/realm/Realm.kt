@@ -16,17 +16,41 @@
 
 package evovetech.sample.db.realm
 
+import android.app.Application
 import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
+import evovetech.sample.crashes.CrashesComponent
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import sourcerer.inject.BootstrapComponent
+import sourcerer.inject.Bootstrap
+import sourcerer.inject.Builds
+import sourcerer.inject.Initializes
 
-@BootstrapComponent(modules = [RealmModule::class])
+@Bootstrap.Component(
+    dependencies = [CrashesComponent::class],
+    modules = [RealmModule::class]
+)
 interface RealmComponent {
     val realm: Realm
     val crashlytics: Crashlytics
+
+    @Bootstrap.BuilderModule
+    object Builder {
+        @JvmStatic
+        @Builds(RealmConfiguration::class)
+        fun realmConfigurationBuilder(app: Application): RealmConfiguration.Builder {
+            Realm.init(app)
+            return RealmConfiguration.Builder()
+        }
+
+        @JvmStatic
+        @Initializes
+        fun initializeRealmConfiguration(config: RealmConfiguration): RealmConfiguration {
+            Realm.setDefaultConfiguration(config)
+            return config
+        }
+    }
 }
 
 @Module

@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-@file:Bootstrap(components = [CrashesComponent::class])
-@file:JvmName("BootstrapCrashes")
+package sourcerer.inject;
 
-package evovetech.sample.crashes
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import android.app.Application
-import io.fabric.sdk.android.Fabric
-import sourcerer.inject.Bootstrap
-import sourcerer.inject.Builds
-import sourcerer.inject.Initializes
+@Documented
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public
+@interface ApplicationComponent {
+    Class<?>[] dependencies() default {};
 
-@Builds(Fabric::class)
-fun fabricBuilder(app: Application): Fabric.Builder {
-    return Fabric.Builder(app)
-}
+    Class<?>[] modules() default {};
 
-@Initializes
-fun initializeFabric(fabric: Fabric): Fabric {
-    return Fabric.with(fabric)
+    @Documented
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Builder {}
 }

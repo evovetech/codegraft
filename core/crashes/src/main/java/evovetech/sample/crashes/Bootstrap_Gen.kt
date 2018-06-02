@@ -21,7 +21,10 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import evovetech.sample.crashes.CrashesComponent.Builder.fabricBuilder
+import evovetech.sample.crashes.CrashesComponent.Builder.initializeFabric
 import io.fabric.sdk.android.Fabric
+import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootScope
 import sourcerer.inject.FunctionQualifier
 import javax.inject.Singleton
@@ -31,29 +34,29 @@ import javax.inject.Singleton
 //
 
 // individual component
-interface CrashesComponent_BootstrapComponent : CrashesComponent {
+// module generated
+@ApplicationComponent(modules = [Crashes::class])
+interface CrashesComponent_ApplicationComponent : CrashesComponent {
+    @ApplicationComponent.Builder
     interface Builder {
         @BindsInstance fun application(app: Application)
         @BindsInstance fun fabric(fabric: Fabric)
     }
 }
 
-// group component
-interface LibraryComponent : CrashesComponent_BootstrapComponent {
-    interface Builder : CrashesComponent_BootstrapComponent.Builder
-}
-
+// package component
+// application generated
 @Singleton
 @Component(modules = [Crashes::class])
-interface LibraryComponentImpl : LibraryComponent {
+interface AppComponent : CrashesComponent_ApplicationComponent {
     @Component.Builder
-    interface Builder : LibraryComponent.Builder {
-        fun build(): LibraryComponent
+    interface Builder : CrashesComponent_ApplicationComponent.Builder {
+        fun build(): AppComponent
     }
 }
 
 @Module
-class BootMod {
+class BootModule {
     @Provides
     @BootScope
     fun provideFabric(
@@ -73,8 +76,8 @@ class BootMod {
     fun provideCrashesComponent(
         app: Application,
         fabric: Fabric
-    ): LibraryComponent {
-        return DaggerLibraryComponentImpl.builder().run {
+    ): AppComponent {
+        return DaggerAppComponent.builder().run {
             application(app)
             fabric(fabric)
             build()
@@ -82,9 +85,12 @@ class BootMod {
     }
 }
 
-interface BootComp {
-    val component: LibraryComponent
+@BootScope
+@Component(modules = [BootModule::class])
+interface BootComponent {
+    val component: AppComponent
 
+    @Component.Builder
     interface Builder {
         @BindsInstance fun application(app: Application)
         @BindsInstance fun fabric(
@@ -93,14 +99,7 @@ interface BootComp {
                 returnType = [Fabric::class]
             ) init: (Fabric.Builder) -> Fabric
         )
-    }
-}
 
-@BootScope
-@Component(modules = [BootMod::class])
-interface BootCompImpl : BootComp {
-    @Component.Builder
-    interface Builder : BootComp.Builder {
-        fun build(): BootCompImpl
+        fun build(): BootComponent
     }
 }

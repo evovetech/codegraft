@@ -17,10 +17,37 @@
 
 package evovetech.sample.crashes
 
+import android.app.Application
 import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
+import io.fabric.sdk.android.Fabric
+import sourcerer.inject.Bootstrap
+import sourcerer.inject.Builds
+import sourcerer.inject.Initializes
 import javax.inject.Singleton
+
+@Bootstrap.Component(modules = [Crashes::class])
+interface CrashesComponent {
+    val app: Application
+    val crashlytics: Crashlytics
+    // fun inject(activity: Activity)
+
+    @Bootstrap.BuilderModule
+    object Builder {
+        @JvmStatic
+        @Builds(Fabric::class)
+        fun fabricBuilder(app: Application): Fabric.Builder {
+            return Fabric.Builder(app)
+        }
+
+        @JvmStatic
+        @Initializes
+        fun initializeFabric(fabric: Fabric): Fabric {
+            return Fabric.with(fabric)
+        }
+    }
+}
 
 @Module
 class Crashes {
