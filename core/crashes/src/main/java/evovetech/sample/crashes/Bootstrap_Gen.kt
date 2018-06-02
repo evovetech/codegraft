@@ -44,19 +44,8 @@ interface CrashesComponent_ApplicationComponent : CrashesComponent {
     }
 }
 
-// package component
-// application generated
-@Singleton
-@Component(modules = [Crashes::class])
-interface AppComponent : CrashesComponent_ApplicationComponent {
-    @Component.Builder
-    interface Builder : CrashesComponent_ApplicationComponent.Builder {
-        fun build(): AppComponent
-    }
-}
-
 @Module
-class BootModule {
+class CrashesComponent_BootModule {
     @Provides
     @BootScope
     fun provideFabric(
@@ -70,10 +59,35 @@ class BootModule {
         val fabric = init(builder)
         return initializeFabric(fabric)
     }
+}
 
+// TODO: annotate
+interface CrashesComponent_BootBuilder {
+    @BindsInstance fun application(app: Application)
+    @BindsInstance fun fabric(
+        @FunctionQualifier(
+            params = [Fabric.Builder::class],
+            returnType = [Fabric::class]
+        ) init: (Fabric.Builder) -> Fabric
+    )
+}
+
+// package component
+// application generated
+@Singleton
+@Component(modules = [Crashes::class])
+interface AppComponent : CrashesComponent_ApplicationComponent {
+    @Component.Builder
+    interface Builder : CrashesComponent_ApplicationComponent.Builder {
+        fun build(): AppComponent
+    }
+}
+
+@Module(includes = [CrashesComponent_BootModule::class])
+class BootModule {
     @Provides
     @BootScope
-    fun provideCrashesComponent(
+    fun provideComponent(
         app: Application,
         fabric: Fabric
     ): AppComponent {
@@ -91,15 +105,7 @@ interface BootComponent {
     val component: AppComponent
 
     @Component.Builder
-    interface Builder {
-        @BindsInstance fun application(app: Application)
-        @BindsInstance fun fabric(
-            @FunctionQualifier(
-                params = [Fabric.Builder::class],
-                returnType = [Fabric::class]
-            ) init: (Fabric.Builder) -> Fabric
-        )
-
+    interface Builder : CrashesComponent_BootBuilder {
         fun build(): BootComponent
     }
 }
