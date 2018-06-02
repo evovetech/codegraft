@@ -45,7 +45,7 @@ interface CrashesComponent_ApplicationComponent : CrashesComponent {
 }
 
 @Module
-class CrashesComponent_BootModule {
+class CrashesComponent_BootstrapModule {
     @Provides
     @BootScope
     fun provideFabric(
@@ -62,7 +62,7 @@ class CrashesComponent_BootModule {
 }
 
 // TODO: annotate
-interface CrashesComponent_BootBuilder {
+interface CrashesComponent_BootstrapBuilder {
     @BindsInstance fun application(app: Application)
     @BindsInstance fun fabric(
         @FunctionQualifier(
@@ -83,7 +83,7 @@ interface AppComponent : CrashesComponent_ApplicationComponent {
     }
 }
 
-@Module(includes = [CrashesComponent_BootModule::class])
+@Module(includes = [CrashesComponent_BootstrapModule::class])
 class BootModule {
     @Provides
     @BootScope
@@ -105,7 +105,7 @@ interface BootComponent {
     val component: AppComponent
 
     @Component.Builder
-    interface Builder : CrashesComponent_BootBuilder {
+    interface Builder : CrashesComponent_BootstrapBuilder {
         fun build(): BootComponent
     }
 }

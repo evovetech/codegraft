@@ -23,8 +23,8 @@ import dagger.Module
 import dagger.Provides
 import evovetech.sample.crashes.Crashes
 import evovetech.sample.crashes.CrashesComponent_ApplicationComponent
-import evovetech.sample.crashes.CrashesComponent_BootBuilder
-import evovetech.sample.crashes.CrashesComponent_BootModule
+import evovetech.sample.crashes.CrashesComponent_BootstrapBuilder
+import evovetech.sample.crashes.CrashesComponent_BootstrapModule
 import evovetech.sample.db.realm.RealmComponent.Builder.initializeRealmConfiguration
 import evovetech.sample.db.realm.RealmComponent.Builder.realmConfigurationBuilder
 import io.fabric.sdk.android.Fabric
@@ -54,7 +54,7 @@ interface RealmComponent_ApplicationComponent : RealmComponent {
 }
 
 @Module
-class RealmComponent_BootModule {
+class RealmComponent_BootstrapModule {
     @Provides
     @BootScope
     fun provideRealmConfiguration(
@@ -71,7 +71,7 @@ class RealmComponent_BootModule {
 }
 
 // TODO: annotate
-interface RealmComponent_BootBuilder {
+interface RealmComponent_BootstrapBuilder {
     @BindsInstance fun application(app: Application)
     @BindsInstance fun realm(
         @FunctionQualifier(
@@ -100,8 +100,8 @@ interface AppComponent :
 
 @Module(
     includes = [
-        RealmComponent_BootModule::class,
-        CrashesComponent_BootModule::class
+        RealmComponent_BootstrapModule::class,
+        CrashesComponent_BootstrapModule::class
     ]
 )
 class BootModule {
@@ -126,8 +126,8 @@ interface BootComponent {
 
     @Component.Builder
     interface Builder :
-        RealmComponent_BootBuilder,
-        CrashesComponent_BootBuilder {
+        RealmComponent_BootstrapBuilder,
+        CrashesComponent_BootstrapBuilder {
         fun build(): BootComponent
     }
 }
