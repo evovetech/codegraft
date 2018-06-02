@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package evovetech.sample.crashes
+package evovetech.sample.db.realm
 
 import android.app.Application
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import evovetech.sample.crashes.CrashesComponent_BootstrapComponent
 import io.fabric.sdk.android.Fabric
+import io.realm.RealmConfiguration
 import sourcerer.inject.BootScope
 import sourcerer.inject.FunctionQualifier
 import javax.inject.Inject
@@ -31,15 +33,14 @@ import javax.inject.Singleton
 // Generated
 //
 
-// individual component
 @Singleton
-@Component(modules = [Crashes::class])
-interface CrashesComponent_BootstrapComponent : CrashesComponent {
+@Component(modules = [RealmModule::class])
+interface RealmComponent_BootstrapComponent : RealmComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance fun application(app: Application)
-        @BindsInstance fun fabric(fabric: Fabric)
-        fun build(): CrashesComponent_BootstrapComponent
+        @BindsInstance fun realmConfiguration(realmConfiguration: RealmConfiguration)
+        fun build(): RealmComponent_BootstrapComponent
     }
 }
 
@@ -47,36 +48,36 @@ interface CrashesComponent_BootstrapComponent : CrashesComponent {
 @BootScope
 class LibraryComponent
 @Inject constructor(
-    val crashesComponent: CrashesComponent_BootstrapComponent
-) : CrashesComponent_BootstrapComponent by crashesComponent
+    val crashesComponent: CrashesComponent_BootstrapComponent,
+    val realmComponent: RealmComponent_BootstrapComponent
+) : CrashesComponent_BootstrapComponent by crashesComponent,
+    RealmComponent_BootstrapComponent by realmComponent
 
-@Module
+@Module(includes = [evovetech.sample.crashes.BootMod::class])
 class BootMod {
     @Provides
     @BootScope
-    fun provideFabric(
+    fun provideRealmConfiguration(
         app: Application,
         @FunctionQualifier(
-            params = [Fabric.Builder::class],
-            returnType = [Fabric::class]
-        ) init: (Fabric.Builder) -> Fabric
-    ): Fabric {
-        val builder = fabricBuilder(app)
-        val fabric = init(builder)
-        return initializeFabric(fabric)
+            params = [RealmConfiguration.Builder::class],
+            returnType = [RealmConfiguration::class]
+        ) init: (RealmConfiguration.Builder) -> RealmConfiguration
+    ): RealmConfiguration {
+        val builder = realmConfigurationBuilder(app)
+        val config = init(builder)
+        return initializeRealmConfiguration(config)
     }
 
     @Provides
     @BootScope
-    fun provideCrashesComponent(
+    fun provideRealmComponent(
         app: Application,
-        fabric: Fabric
-    ): CrashesComponent_BootstrapComponent {
-        return DaggerCrashesComponent_BootstrapComponent.builder().run {
-            application(app)
-            fabric(fabric)
-            build()
-        }
+        realmConfiguration: RealmConfiguration
+    ): RealmComponent_BootstrapComponent = DaggerRealmComponent_BootstrapComponent.builder().run {
+        application(app)
+        realmConfiguration(realmConfiguration)
+        build()
     }
 }
 
@@ -87,7 +88,15 @@ interface BootComp {
 
     @Component.Builder
     interface Builder {
-        @BindsInstance fun application(app: Application): Builder
+        @BindsInstance fun app(app: Application): Builder
+
+        @BindsInstance fun realm(
+            @FunctionQualifier(
+                params = [RealmConfiguration.Builder::class],
+                returnType = [RealmConfiguration::class]
+            ) init: (RealmConfiguration.Builder) -> RealmConfiguration
+        ): Builder
+
         @BindsInstance fun fabric(
             @FunctionQualifier(
                 params = [Fabric.Builder::class],

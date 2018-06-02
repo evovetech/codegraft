@@ -24,4 +24,5 @@ import sourcerer.inject.BootstrapComponent
 interface CrashesComponent {
     val app: Application
     val crashlytics: Crashlytics
+    // fun inject(activity: Activity)
 }

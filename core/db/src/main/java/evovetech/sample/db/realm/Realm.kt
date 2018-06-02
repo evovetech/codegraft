@@ -16,67 +16,21 @@
 
 package evovetech.sample.db.realm
 
-import android.content.Context
-import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import io.realm.RealmConfiguration.Builder
-import sourcerer.inject.LibComponent
-import sourcerer.inject.LibModule
-import javax.inject.Singleton
+import sourcerer.inject.BootstrapComponent
 
-@LibModule(includes = [RealmModule::class])
-@LibComponent(modules = [RealmModule::class])
+@BootstrapComponent(modules = [RealmModule::class])
 interface RealmComponent {
-    val defaultRealm: Realm
-
-    @LibComponent.Builder
-    interface Builder {
-        @BindsInstance
-        fun defaultRealm(
-            builder: RealmBuilder
-        ): Builder
-    }
+    val realm: Realm
 }
 
 @Module
 class RealmModule {
     @Provides
-    @Singleton
-    fun defaultRealmConfiguration(context: Context, builder: RealmBuilder): RealmConfiguration {
-        Realm.init(context)
-        val config = builder.run {
-            RealmConfiguration.Builder().run {
-                init()
-                build()
-            }
-        }
-        Realm.setDefaultConfiguration(config)
-        return config
-    }
-
-    @Provides
-    fun defaultRealm(config: RealmConfiguration): Realm {
+    fun provideRealm(config: RealmConfiguration): Realm {
         return Realm.getInstance(config)
     }
-}
-
-interface RealmBuilder {
-    fun RealmConfiguration.Builder.init()
-}
-
-typealias RealmBuilderFunc = RealmConfiguration.Builder.() -> Unit
-
-fun RealmBuilderFunc.toBuilder() = object : RealmBuilder {
-    override
-    fun Builder.init() = this@toBuilder.invoke(this)
-}
-
-fun <B : RealmComponent.Builder> B.defaultRealm(
-    init: RealmBuilderFunc
-): B {
-    defaultRealm(init.toBuilder())
-    return this
 }

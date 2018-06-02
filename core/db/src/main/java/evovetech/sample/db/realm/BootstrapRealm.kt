@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-@file:Bootstrap(components = [CrashesComponent::class])
-@file:JvmName("BootstrapCrashes")
+@file:Bootstrap(components = [RealmComponent::class])
+@file:JvmName("BootstrapRealm")
 
-package evovetech.sample.crashes
+package evovetech.sample.db.realm
 
 import android.app.Application
-import io.fabric.sdk.android.Fabric
+import io.realm.Realm
+import io.realm.RealmConfiguration
 import sourcerer.inject.Bootstrap
 import sourcerer.inject.Builds
 import sourcerer.inject.Initializes
 
-@Builds(Fabric::class)
-fun fabricBuilder(app: Application): Fabric.Builder {
-    return Fabric.Builder(app)
+@Builds(RealmConfiguration::class)
+fun realmConfigurationBuilder(app: Application): RealmConfiguration.Builder {
+    Realm.init(app)
+    return RealmConfiguration.Builder()
 }
 
 @Initializes
-fun initializeFabric(fabric: Fabric): Fabric {
-    return Fabric.with(fabric)
+fun initializeRealmConfiguration(config: RealmConfiguration): RealmConfiguration {
+    Realm.setDefaultConfiguration(config)
+    return config
 }
