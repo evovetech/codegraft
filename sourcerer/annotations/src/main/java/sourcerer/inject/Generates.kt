@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package evovetech.sample
+package sourcerer.inject
 
-import kotlin.annotation.AnnotationRetention.BINARY
-import kotlin.reflect.KClass
-
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
-@Target(AnnotationTarget.CLASS)
-@Retention(BINARY)
 annotation
-class AndroidApplication(
-    val value: KClass<out Bootstrap2<*>>
-)
+class Generates

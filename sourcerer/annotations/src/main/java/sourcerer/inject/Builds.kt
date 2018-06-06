@@ -16,12 +16,8 @@
 
 package sourcerer.inject
 
-import kotlin.reflect.KClass
-
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
 annotation
-class Builds(
-    val value: KClass<*>
-)
+class Builds

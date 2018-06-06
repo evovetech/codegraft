@@ -18,7 +18,7 @@ package evovetech.sample
 
 import android.app.Application
 
-interface Bootstrap<App : Application> {
+interface Bootstrap2<App : Application> {
     fun AppComponent.Builder.onBoot(app: App)
 }
 

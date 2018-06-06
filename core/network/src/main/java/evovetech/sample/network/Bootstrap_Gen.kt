@@ -21,6 +21,7 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import evovetech.sample.crashes.Crashes
+import evovetech.sample.crashes.CrashesBootstrapModule
 import evovetech.sample.crashes.CrashesComponent_ApplicationComponent
 import evovetech.sample.crashes.CrashesComponent_BootstrapBuilder
 import evovetech.sample.crashes.CrashesComponent_BootstrapModule
@@ -40,10 +41,7 @@ import javax.inject.Singleton
     dependencies = [CrashesComponent_ApplicationComponent::class],
     modules = [ClientPlugin::class]
 )
-interface ClientComponent_ApplicationComponent : ClientComponent {
-    @ApplicationComponent.Builder
-    interface Builder
-}
+interface ClientComponent_ApplicationComponent : ClientComponent
 
 // package component
 // application generated
@@ -55,7 +53,6 @@ interface AppComponent :
 
     @Component.Builder
     interface Builder :
-        ClientComponent_ApplicationComponent.Builder,
         CrashesComponent_ApplicationComponent.Builder {
 
         fun build(): AppComponent
@@ -89,5 +86,44 @@ interface BootComponent {
     interface Builder :
         CrashesComponent_BootstrapBuilder {
         fun build(): BootComponent
+    }
+}
+
+class Bootstrap(
+    private val delegate: BootComponent.Builder = DaggerBootComponent.builder()
+) : BootComponent.Builder by delegate {
+    init {
+        // defaults
+        delegate.fabric(CrashesBootstrapModule::buildFabric)
+    }
+
+    override
+    fun application(app: Application) {
+        delegate.application(app)
+    }
+
+    override
+    fun fabric(init: (Fabric.Builder) -> Fabric) {
+        delegate.fabric(init)
+    }
+
+    override
+    fun build(): BootComponent {
+        return delegate.build()
+    }
+
+    inline
+    fun build(init: BootComponent.Builder.() -> Unit): BootComponent {
+        this.init()
+        return build()
+    }
+
+    companion object {
+        @JvmStatic
+        inline
+        fun create(
+            init: BootComponent.Builder.() -> Unit
+        ): BootComponent = Bootstrap()
+                .build(init)
     }
 }

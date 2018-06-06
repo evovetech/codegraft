@@ -22,11 +22,10 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import evovetech.sample.crashes.Crashes
+import evovetech.sample.crashes.CrashesBootstrapModule
 import evovetech.sample.crashes.CrashesComponent_ApplicationComponent
 import evovetech.sample.crashes.CrashesComponent_BootstrapBuilder
 import evovetech.sample.crashes.CrashesComponent_BootstrapModule
-import evovetech.sample.db.realm.RealmComponent.Builder.initializeRealmConfiguration
-import evovetech.sample.db.realm.RealmComponent.Builder.realmConfigurationBuilder
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
 import sourcerer.inject.ApplicationComponent
@@ -65,9 +64,9 @@ class RealmComponent_BootstrapModule {
             returnType = [RealmConfiguration::class]
         ) init: (RealmConfiguration.Builder) -> RealmConfiguration
     ): RealmConfiguration {
-        val builder = realmConfigurationBuilder(app)
+        val builder = RealmBootstrapModule.generateRealmConfigurationBuilder(app)
         val config = init(builder)
-        return initializeRealmConfiguration(config)
+        return RealmBootstrapModule.initializeRealmConfiguration(config)
     }
 }
 
@@ -130,5 +129,50 @@ interface BootComponent {
         RealmComponent_BootstrapBuilder,
         CrashesComponent_BootstrapBuilder {
         fun build(): BootComponent
+    }
+}
+
+class Bootstrap(
+    private val delegate: BootComponent.Builder = DaggerBootComponent.builder()
+) : BootComponent.Builder by delegate {
+    init {
+        // defaults
+        delegate.fabric(CrashesBootstrapModule::buildFabric)
+        delegate.realm(RealmBootstrapModule::buildRealmConfiguration)
+    }
+
+    override
+    fun application(app: Application) {
+        delegate.application(app)
+    }
+
+    override
+    fun fabric(init: (Fabric.Builder) -> Fabric) {
+        delegate.fabric(init)
+    }
+
+    override
+    fun realm(init: (RealmConfiguration.Builder) -> RealmConfiguration) {
+        delegate.realm(init)
+    }
+
+    override
+    fun build(): BootComponent {
+        return delegate.build()
+    }
+
+    inline
+    fun build(init: BootComponent.Builder.() -> Unit): BootComponent {
+        this.init()
+        return build()
+    }
+
+    companion object {
+        @JvmStatic
+        inline
+        fun create(
+            init: BootComponent.Builder.() -> Unit
+        ): BootComponent = Bootstrap()
+                .build(init)
     }
 }

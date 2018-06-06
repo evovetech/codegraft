@@ -21,9 +21,11 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import evovetech.sample.crashes.Crashes
+import evovetech.sample.crashes.CrashesBootstrapModule
 import evovetech.sample.crashes.CrashesComponent_ApplicationComponent
 import evovetech.sample.crashes.CrashesComponent_BootstrapBuilder
 import evovetech.sample.crashes.CrashesComponent_BootstrapModule
+import evovetech.sample.db.realm.RealmBootstrapModule
 import evovetech.sample.db.realm.RealmComponent_ApplicationComponent
 import evovetech.sample.db.realm.RealmComponent_BootstrapBuilder
 import evovetech.sample.db.realm.RealmComponent_BootstrapModule
@@ -51,8 +53,7 @@ interface AppComponent :
     @Component.Builder
     interface Builder :
         RealmComponent_ApplicationComponent.Builder,
-        CrashesComponent_ApplicationComponent.Builder,
-        ClientComponent_ApplicationComponent.Builder {
+        CrashesComponent_ApplicationComponent.Builder {
 
         fun build(): AppComponent
     }
@@ -92,6 +93,51 @@ interface BootComponent {
     }
 }
 
+class Bootstrap(
+    private val delegate: BootComponent.Builder = DaggerBootComponent.builder()
+) : BootComponent.Builder by delegate {
+    init {
+        // defaults
+        delegate.fabric(CrashesBootstrapModule::buildFabric)
+        delegate.realm(RealmBootstrapModule::buildRealmConfiguration)
+    }
+
+    override
+    fun application(app: Application) {
+        delegate.application(app)
+    }
+
+    override
+    fun fabric(init: (Fabric.Builder) -> Fabric) {
+        delegate.fabric(init)
+    }
+
+    override
+    fun realm(init: (RealmConfiguration.Builder) -> RealmConfiguration) {
+        delegate.realm(init)
+    }
+
+    override
+    fun build(): BootComponent {
+        return delegate.build()
+    }
+
+    inline
+    fun build(init: BootComponent.Builder.() -> Unit): BootComponent {
+        this.init()
+        return build()
+    }
+
+    companion object {
+        @JvmStatic
+        inline
+        fun create(
+            init: BootComponent.Builder.() -> Unit
+        ): BootComponent = Bootstrap()
+                .build(init)
+    }
+}
+
 interface BootApplication {
     val component: AppComponent
     fun BootComponent.Builder.bootstrap(
@@ -101,11 +147,10 @@ interface BootApplication {
 
 fun BootApplication.buildAppComponent(
     app: Application
-): AppComponent = DaggerBootComponent.builder().run {
+): AppComponent = Bootstrap.create {
     application(app)
     bootstrap(app)
-            .component
-}
+}.component
 
 abstract
 class AbstractBootApplication : Application(), BootApplication {

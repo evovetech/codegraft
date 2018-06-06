@@ -24,32 +24,41 @@ import evovetech.sample.crashes.CrashesComponent
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import sourcerer.inject.BootstrapComponent
+import sourcerer.inject.BootstrapModule
 import sourcerer.inject.Builds
+import sourcerer.inject.Generates
 import sourcerer.inject.Initializes
 
 @BootstrapComponent(
     dependencies = [CrashesComponent::class],
-    modules = [RealmModule::class]
+    daggerModules = [RealmModule::class],
+    bootstrapModules = [RealmBootstrapModule::class]
 )
 interface RealmComponent {
     val realm: Realm
     val crashlytics: Crashlytics
+}
 
-    @BootstrapComponent.Builder
-    object Builder {
-        @JvmStatic
-        @Builds(RealmConfiguration::class)
-        fun realmConfigurationBuilder(app: Application): RealmConfiguration.Builder {
-            Realm.init(app)
-            return RealmConfiguration.Builder()
-        }
+@BootstrapModule
+object RealmBootstrapModule {
+    @JvmStatic
+    @Generates
+    fun generateRealmConfigurationBuilder(app: Application): RealmConfiguration.Builder {
+        Realm.init(app)
+        return RealmConfiguration.Builder()
+    }
 
-        @JvmStatic
-        @Initializes
-        fun initializeRealmConfiguration(config: RealmConfiguration): RealmConfiguration {
-            Realm.setDefaultConfiguration(config)
-            return config
-        }
+    @JvmStatic
+    @Builds
+    fun buildRealmConfiguration(builder: RealmConfiguration.Builder): RealmConfiguration {
+        return builder.build()
+    }
+
+    @JvmStatic
+    @Initializes
+    fun initializeRealmConfiguration(config: RealmConfiguration): RealmConfiguration {
+        Realm.setDefaultConfiguration(config)
+        return config
     }
 }
 

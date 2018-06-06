@@ -29,7 +29,9 @@ public
 @interface BootstrapComponent {
     Class<?>[] dependencies() default {};
 
-    Class<?>[] modules() default {};
+    Class<?>[] daggerModules() default {};
+
+    Class<?>[] bootstrapModules() default {};
 
     @Documented
     @Target(ElementType.TYPE)

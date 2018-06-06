@@ -21,8 +21,6 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import evovetech.sample.crashes.CrashesComponent.Builder.fabricBuilder
-import evovetech.sample.crashes.CrashesComponent.Builder.initializeFabric
 import io.fabric.sdk.android.Fabric
 import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootScope
@@ -56,9 +54,9 @@ class CrashesComponent_BootstrapModule {
             returnType = [Fabric::class]
         ) init: (Fabric.Builder) -> Fabric
     ): Fabric {
-        val builder = fabricBuilder(app)
+        val builder = CrashesBootstrapModule.generateFabricBuilder(app)
         val fabric = init(builder)
-        return initializeFabric(fabric)
+        return CrashesBootstrapModule.initializeFabric(fabric)
     }
 }
 
@@ -108,5 +106,44 @@ interface BootComponent {
     @Component.Builder
     interface Builder : CrashesComponent_BootstrapBuilder {
         fun build(): BootComponent
+    }
+}
+
+class Bootstrap(
+    private val delegate: BootComponent.Builder = DaggerBootComponent.builder()
+) : BootComponent.Builder by delegate {
+    init {
+        // defaults
+        delegate.fabric(CrashesBootstrapModule::buildFabric)
+    }
+
+    override
+    fun application(app: Application) {
+        delegate.application(app)
+    }
+
+    override
+    fun fabric(init: (Fabric.Builder) -> Fabric) {
+        delegate.fabric(init)
+    }
+
+    override
+    fun build(): BootComponent {
+        return delegate.build()
+    }
+
+    inline
+    fun build(init: BootComponent.Builder.() -> Unit): BootComponent {
+        this.init()
+        return build()
+    }
+
+    companion object {
+        @JvmStatic
+        inline
+        fun create(
+            init: BootComponent.Builder.() -> Unit
+        ): BootComponent = Bootstrap()
+                .build(init)
     }
 }
