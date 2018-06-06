@@ -15,13 +15,17 @@
  */
 
 plugins {
-    id("kotlin")
+    id("com.android.library")
+    id("kotlin-android")
+    id("kotlin-android-extensions")
     id("kotlin-kapt")
 }
 
-apply from: "${configDir}/kotlin-library.gradle"
+apply from: "${configDir}/android/base.gradle"
+apply from: "${configDir}/android-library.gradle"
 
 dependencies {
     api project(':annotations')
+    api project(':inject')
     kapt project(':lib-processor')
 }

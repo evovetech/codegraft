@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
+pom.packaging = 'aar'
 
-dependencies {
-    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${app.kotlinVersion}"
-//    implementation 'androidx.core:core-ktx:1.0.0-alpha1'
-    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${app.kotlinVersion}"
-}
+apply from: "${configDir}/kotlin.gradle"
+apply from: "${configDir}/doc/dokka.gradle"
+apply from: "${configDir}/publishing.gradle"

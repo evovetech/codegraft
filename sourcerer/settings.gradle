@@ -15,7 +15,8 @@
  */
 
 buildscript {
-    apply from: "gradle/config/buildscript.gradle"
+    gradle.ext.configDir = file("../gradle/config").absoluteFile
+    apply from: "${gradle.ext.configDir}/buildscript.gradle"
     repositories(gradle.buildscriptRepos)
     dependencies(gradle.buildscriptDependencies)
 }
@@ -33,4 +34,5 @@ include(
         ':app-processor',
         ':lib-processor',
         ':inject',
+        ':inject-android',
 )

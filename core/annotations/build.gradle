@@ -27,6 +27,7 @@ apply from: "${configDir}/android/base.gradle"
 dependencies {
     api("evovetech.sourcerer:annotations:${app.sourcererVersion}")
     api("evovetech.sourcerer:inject:${app.sourcererVersion}")
+    api("evovetech.sourcerer:inject-android:${app.sourcererVersion}")
     kapt("evovetech.sourcerer:lib-processor:${app.sourcererVersion}")
 }
 
