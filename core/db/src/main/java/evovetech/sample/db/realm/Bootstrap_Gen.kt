@@ -49,36 +49,22 @@ interface RealmComponent_ApplicationComponent : RealmComponent {
     interface Builder {
         @BindsInstance fun application(app: Application)
         @BindsInstance fun realmConfiguration(realmConfiguration: RealmConfiguration)
-        fun realmModule(realmModule: RealmModule)
+        fun realmModule(realmModule: RealmModule?)
     }
 }
-
-//@Module
-//class RealmComponent_BootstrapModule {
-//    @Provides
-//    @BootScope
-//    fun provideRealmConfiguration(
-//        app: Application,
-//        @FunctionQualifier(
-//            params = [RealmConfiguration.Builder::class],
-//            returnType = [RealmConfiguration::class]
-//        ) init: (RealmConfiguration.Builder) -> RealmConfiguration
-//    ): RealmConfiguration {
-//        val builder = RealmBootstrapModule.generateRealmConfigurationBuilder(app)
-//        val config = init(builder)
-//        return RealmBootstrapModule.initializeRealmConfiguration(config)
-//    }
-//}
 
 @BootstrapBuilder(modules = [RealmBootstrapModule::class])
 interface RealmComponent_BootstrapBuilder {
     @BindsInstance fun application(app: Application)
+
     @BindsInstance fun realm(
         @FunctionQualifier(
             params = [RealmConfiguration.Builder::class],
             returnType = [RealmConfiguration::class]
         ) init: ((RealmConfiguration.Builder) -> RealmConfiguration)?
     )
+
+    @BindsInstance fun realmModule(realmModule: RealmModule?)
 }
 
 // package component
@@ -110,11 +96,15 @@ class BootModule {
     fun provideComponent(
         app: Application,
         fabric: Fabric,
-        realmConfiguration: RealmConfiguration
+        realmConfiguration: RealmConfiguration,
+        crashes: Crashes?,
+        realmModule: RealmModule?
     ): AppComponent = DaggerAppComponent.builder().run {
         application(app)
         fabric(fabric)
         realmConfiguration(realmConfiguration)
+        crashes(crashes)
+        realmModule(realmModule)
         build()
     }
 }

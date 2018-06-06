@@ -70,11 +70,15 @@ class BootModule {
     fun provideComponent(
         app: Application,
         fabric: Fabric,
-        realmConfiguration: RealmConfiguration
+        realmConfiguration: RealmConfiguration,
+        crashes: Crashes?,
+        realmModule: RealmModule?
     ): AppComponent = DaggerAppComponent.builder().run {
         application(app)
         fabric(fabric)
         realmConfiguration(realmConfiguration)
+        crashes(crashes)
+        realmModule(realmModule)
         build()
     }
 }
@@ -101,24 +105,16 @@ object Bootstrap {
     }
 }
 
-interface BootApplication {
-    val component: AppComponent
-    fun BootComponent.Builder.bootstrap(
-        app: Application
-    ): BootComponent
-}
-
-fun BootApplication.buildAppComponent(
-    app: Application
-): AppComponent = Bootstrap.build {
-    application(app)
-    bootstrap(app)
-}.component
-
 abstract
-class AbstractBootApplication : Application(), BootApplication {
-    final override val component: AppComponent by lazy {
-        val app = this@AbstractBootApplication
-        buildAppComponent(app)
+class BootApplication(
+    private val initialize: BootComponent.Builder.() -> Unit
+) : Application() {
+    val bootComponent: BootComponent by lazy {
+        Bootstrap.build {
+            application(this@BootApplication)
+            initialize()
+        }
     }
+    val appComponent: AppComponent
+        get() = bootComponent.component
 }

@@ -40,30 +40,14 @@ interface CrashesComponent_ApplicationComponent : CrashesComponent {
     interface Builder {
         @BindsInstance fun application(app: Application)
         @BindsInstance fun fabric(fabric: Fabric)
-        fun crashes(crashes: Crashes)
+        fun crashes(crashes: Crashes?)
     }
 }
-
-//@Module
-//class CrashesComponent_BootstrapModule {
-//    @Provides
-//    @BootScope
-//    fun provideFabric(
-//        app: Application,
-//        @FunctionQualifier(
-//            params = [Fabric.Builder::class],
-//            returnType = [Fabric::class]
-//        ) init: (Fabric.Builder) -> Fabric
-//    ): Fabric {
-//        val builder = CrashesBootstrapModule.generateFabricBuilder(app)
-//        val fabric = init(builder)
-//        return CrashesBootstrapModule.initializeFabric(fabric)
-//    }
-//}
 
 @BootstrapBuilder(modules = [CrashesBootstrapModule::class])
 interface CrashesComponent_BootstrapBuilder {
     @BindsInstance fun application(app: Application)
+
     @BindsInstance fun fabric(
         @FunctionQualifier(
             params = [Fabric.Builder::class],
@@ -71,7 +55,7 @@ interface CrashesComponent_BootstrapBuilder {
         ) init: ((Fabric.Builder) -> Fabric)?
     )
 
-//    @BindsInstance fun crashes(crashes: Crashes)
+    @BindsInstance fun crashes(crashes: Crashes?)
 }
 
 // package component
@@ -91,11 +75,13 @@ class BootModule {
     @BootScope
     fun provideComponent(
         app: Application,
-        fabric: Fabric
+        fabric: Fabric,
+        crashes: Crashes?
     ): AppComponent {
         return DaggerAppComponent.builder().run {
             application(app)
             fabric(fabric)
+            crashes(crashes)
             build()
         }
     }

@@ -74,10 +74,12 @@ class BootModule {
     @BootScope
     fun provideComponent(
         app: Application,
-        fabric: Fabric
+        fabric: Fabric,
+        crashes: Crashes?
     ): AppComponent = DaggerAppComponent.builder().run {
         application(app)
         fabric(fabric)
+        crashes(crashes)
         build()
     }
 }
