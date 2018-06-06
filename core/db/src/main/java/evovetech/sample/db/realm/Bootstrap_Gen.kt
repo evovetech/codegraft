@@ -50,6 +50,7 @@ interface RealmComponent_ApplicationComponent : RealmComponent {
     interface Builder {
         @BindsInstance fun application(app: Application)
         @BindsInstance fun realmConfiguration(realmConfiguration: RealmConfiguration)
+        fun realmModule(realmModule: RealmModule)
     }
 }
 

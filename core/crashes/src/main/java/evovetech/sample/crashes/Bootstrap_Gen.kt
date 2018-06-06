@@ -40,6 +40,7 @@ interface CrashesComponent_ApplicationComponent : CrashesComponent {
     interface Builder {
         @BindsInstance fun application(app: Application)
         @BindsInstance fun fabric(fabric: Fabric)
+        fun crashes(crashes: Crashes)
     }
 }
 
@@ -69,6 +70,8 @@ interface CrashesComponent_BootstrapBuilder {
             returnType = [Fabric::class]
         ) init: (Fabric.Builder) -> Fabric
     )
+
+//    @BindsInstance fun crashes(crashes: Crashes)
 }
 
 // package component
@@ -126,6 +129,11 @@ class Bootstrap(
     fun fabric(init: (Fabric.Builder) -> Fabric) {
         delegate.fabric(init)
     }
+
+//    override
+//    fun crashes(crashes: Crashes) {
+//        delegate.crashes(crashes)
+//    }
 
     override
     fun build(): BootComponent {

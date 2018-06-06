@@ -53,7 +53,8 @@ interface AppComponent :
     @Component.Builder
     interface Builder :
         RealmComponent_ApplicationComponent.Builder,
-        CrashesComponent_ApplicationComponent.Builder {
+        CrashesComponent_ApplicationComponent.Builder,
+        ClientComponent_ApplicationComponent.Builder {
 
         fun build(): AppComponent
     }

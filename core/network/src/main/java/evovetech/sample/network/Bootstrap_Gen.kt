@@ -41,7 +41,12 @@ import javax.inject.Singleton
     dependencies = [CrashesComponent_ApplicationComponent::class],
     modules = [ClientPlugin::class]
 )
-interface ClientComponent_ApplicationComponent : ClientComponent
+interface ClientComponent_ApplicationComponent : ClientComponent {
+    @ApplicationComponent.Builder
+    interface Builder {
+        fun clientModule(clientModule: ClientModule)
+    }
+}
 
 // package component
 // application generated
@@ -53,7 +58,8 @@ interface AppComponent :
 
     @Component.Builder
     interface Builder :
-        CrashesComponent_ApplicationComponent.Builder {
+        CrashesComponent_ApplicationComponent.Builder,
+        ClientComponent_ApplicationComponent.Builder {
 
         fun build(): AppComponent
     }
