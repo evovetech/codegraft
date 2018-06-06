@@ -23,6 +23,9 @@ import dagger.Module
 import dagger.Provides
 import sourcerer.BaseProcessor
 import sourcerer.ProcessStep
+import sourcerer.processor.Env
+import sourcerer.processor.Env.Options
+import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
 import javax.inject.Inject
 import javax.lang.model.util.Elements
@@ -30,13 +33,13 @@ import javax.lang.model.util.Types
 
 @AutoService(Processor::class)
 class BootstrapProcessor : BaseProcessor() {
-    @Inject lateinit var typ: Types
+    @Inject lateinit var types: Types
+    @Inject lateinit var options: Options
 
     override
     fun processSteps(): List<ProcessStep> {
         val component = DaggerBootstrapProcessorComponent.builder().run {
-            types(processingEnv.typeUtils)
-            elements(processingEnv.elementUtils)
+            processingEnv(processingEnv)
             build()
         }
         component.inject(this)
@@ -54,6 +57,26 @@ class BootstrapProcessStepsModule {
         buildsStep,
         bootstrapComponentStep
     )
+
+    @Provides
+    fun providesTypes(processingEnv: ProcessingEnvironment): Types {
+        return processingEnv.typeUtils
+    }
+
+    @Provides
+    fun providesElements(processingEnv: ProcessingEnvironment): Elements {
+        return processingEnv.elementUtils
+    }
+
+    @Provides
+    fun providesEnv(processingEnv: ProcessingEnvironment): Env {
+        return Env(processingEnv)
+    }
+
+    @Provides
+    fun providesOptions(processingEnv: ProcessingEnvironment): Options {
+        return Options(processingEnv.options)
+    }
 }
 
 @Component(modules = [BootstrapProcessStepsModule::class])
@@ -63,8 +86,7 @@ interface BootstrapProcessorComponent {
 
     @Component.Builder
     interface Builder {
-        @BindsInstance fun types(types: Types)
-        @BindsInstance fun elements(elements: Elements)
+        @BindsInstance fun processingEnv(processingEnv: ProcessingEnvironment)
         fun build(): BootstrapProcessorComponent
     }
 }
