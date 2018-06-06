@@ -19,27 +19,23 @@ package sourcerer.inject
 interface BootComponent<out T> {
     val component: T
 
-    interface Builder<out App, out Boot : BootComponent<App>> {
-        fun build(): Boot
+    interface Builder<out T> {
+        fun build(): BootComponent<T>
     }
 }
 
 open
-class AbstractBootstrap<
-        App,
-        Boot : BootComponent<App>,
-        BootBuilder : BootComponent.Builder<App, Boot>
-        >(
-    boot: BootBuilder.() -> Unit,
-    appInit: App.() -> Unit,
-    bootBuilder: () -> BootBuilder
-) {
-    private val boot: Boot by lazy {
+class AbstractBootstrap<out T, out B : BootComponent.Builder<T>>(
+    boot: B.() -> Unit,
+    appInit: T.() -> Unit,
+    bootBuilder: () -> B
+) : BootComponent<T> {
+    private val boot: BootComponent<T> by lazy {
         val builder = bootBuilder()
         builder.boot()
         builder.build()
     }
-    val component: App by lazy {
+    final override val component: T by lazy {
         val comp = this.boot.component
         comp.appInit()
         comp
@@ -50,6 +46,6 @@ class AbstractBootstrap<
     }
 }
 
-interface BootstrapApplication<T> {
-    val bootstrap: AbstractBootstrap<T, *, *>
+interface BootstrapApplication<out T> {
+    val bootstrap: BootComponent<T>
 }

@@ -123,7 +123,7 @@ interface AndroidBootComponent : BootComponent<AppComponent> {
 
     @Component.Builder
     interface Builder :
-        BootComponent.Builder<AppComponent, AndroidBootComponent>,
+        BootComponent.Builder<AppComponent>,
         RealmComponent_BootstrapBuilder,
         CrashesComponent_BootstrapBuilder {
         override fun build(): AndroidBootComponent
@@ -134,7 +134,7 @@ open
 class Bootstrap(
     boot: AndroidBootComponent.Builder.() -> Unit,
     appInit: AppComponent.() -> Unit
-) : AbstractBootstrap<AppComponent, AndroidBootComponent, AndroidBootComponent.Builder>(
+) : AbstractBootstrap<AppComponent, AndroidBootComponent.Builder>(
     boot = boot,
     appInit = appInit,
     bootBuilder = { DaggerAndroidBootComponent.builder() }
