@@ -37,6 +37,7 @@ configurations.kapt.extendsFrom(configurations.anno)
 
 dependencies {
     api(dagger.coreCompiler)
+    kapt(dagger.coreCompiler)
     api(dagger.androidCompiler)
     api project(':meta:utils')
     kapt "com.google.auto.value:auto-value:${app.autoValueVersion}"

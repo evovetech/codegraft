@@ -22,18 +22,18 @@ import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
 import io.fabric.sdk.android.Fabric
-import sourcerer.inject.Bootstrap
+import sourcerer.inject.BootstrapComponent
 import sourcerer.inject.Builds
 import sourcerer.inject.Initializes
 import javax.inject.Singleton
 
-@Bootstrap.Component(modules = [Crashes::class])
+@BootstrapComponent(modules = [Crashes::class])
 interface CrashesComponent {
     val app: Application
     val crashlytics: Crashlytics
     // fun inject(activity: Activity)
 
-    @Bootstrap.BuilderModule
+    @BootstrapComponent.Builder
     object Builder {
         @JvmStatic
         @Builds(Fabric::class)

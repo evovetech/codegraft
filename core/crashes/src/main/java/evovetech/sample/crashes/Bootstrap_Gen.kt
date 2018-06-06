@@ -26,6 +26,7 @@ import evovetech.sample.crashes.CrashesComponent.Builder.initializeFabric
 import io.fabric.sdk.android.Fabric
 import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootScope
+import sourcerer.inject.BootstrapBuilder
 import sourcerer.inject.FunctionQualifier
 import javax.inject.Singleton
 
@@ -61,7 +62,7 @@ class CrashesComponent_BootstrapModule {
     }
 }
 
-// TODO: annotate
+@BootstrapBuilder(modules = [CrashesComponent_BootstrapModule::class])
 interface CrashesComponent_BootstrapBuilder {
     @BindsInstance fun application(app: Application)
     @BindsInstance fun fabric(

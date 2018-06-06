@@ -23,11 +23,11 @@ import dagger.Provides
 import evovetech.sample.crashes.CrashesComponent
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import sourcerer.inject.Bootstrap
+import sourcerer.inject.BootstrapComponent
 import sourcerer.inject.Builds
 import sourcerer.inject.Initializes
 
-@Bootstrap.Component(
+@BootstrapComponent(
     dependencies = [CrashesComponent::class],
     modules = [RealmModule::class]
 )
@@ -35,7 +35,7 @@ interface RealmComponent {
     val realm: Realm
     val crashlytics: Crashlytics
 
-    @Bootstrap.BuilderModule
+    @BootstrapComponent.Builder
     object Builder {
         @JvmStatic
         @Builds(RealmConfiguration::class)

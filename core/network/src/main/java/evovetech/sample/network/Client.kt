@@ -16,19 +16,20 @@
 
 package evovetech.sample.network
 
+import android.app.Application
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import okhttp3.OkHttpClient
-import sourcerer.inject.Bootstrap
+import sourcerer.inject.BootstrapComponent
 import sourcerer.inject.Plugin
 import sourcerer.inject.PluginKey
 import sourcerer.inject.Plugins
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Bootstrap.Component(modules = [ClientPlugin::class])
+@BootstrapComponent(modules = [ClientPlugin::class])
 interface ClientComponent {
     val plugins: Plugins
 }
@@ -52,7 +53,7 @@ class ClientPlugin {
 class ClientModule {
     @Provides
     @Singleton
-    fun provideOkhttp(): OkHttpClient {
+    fun provideOkhttp(app: Application): OkHttpClient {
         return OkHttpClient()
     }
 }

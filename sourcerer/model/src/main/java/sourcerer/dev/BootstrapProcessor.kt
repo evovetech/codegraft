@@ -17,19 +17,54 @@
 package sourcerer.dev
 
 import com.google.auto.service.AutoService
+import dagger.BindsInstance
+import dagger.Component
+import dagger.Module
+import dagger.Provides
 import sourcerer.BaseProcessor
 import sourcerer.ProcessStep
 import javax.annotation.processing.Processor
+import javax.inject.Inject
+import javax.lang.model.util.Elements
+import javax.lang.model.util.Types
 
 @AutoService(Processor::class)
 class BootstrapProcessor : BaseProcessor() {
+    @Inject lateinit var typ: Types
+
     override
     fun processSteps(): List<ProcessStep> {
-        return listOf(
-            BuildsStep(),
-            BootstrapStep()
-        )
+        val component = DaggerBootstrapProcessorComponent.builder().run {
+            types(processingEnv.typeUtils)
+            elements(processingEnv.elementUtils)
+            build()
+        }
+        component.inject(this)
+        return component.processSteps
     }
 }
 
+@Module
+class BootstrapProcessStepsModule {
+    @Provides
+    fun provideProcessSteps(
+        buildsStep: BuildsStep,
+        bootstrapComponentStep: BootstrapComponentStep
+    ): List<ProcessStep> = listOf(
+        buildsStep,
+        bootstrapComponentStep
+    )
+}
 
+@Component(modules = [BootstrapProcessStepsModule::class])
+interface BootstrapProcessorComponent {
+    fun inject(processor: BootstrapProcessor)
+    val processSteps: List<ProcessStep>
+
+    @Component.Builder
+    interface Builder {
+        @BindsInstance fun types(types: Types)
+        @BindsInstance fun elements(elements: Elements)
+        fun build(): BootstrapProcessorComponent
+    }
+}

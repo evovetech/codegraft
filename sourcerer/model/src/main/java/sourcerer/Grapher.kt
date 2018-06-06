@@ -27,7 +27,7 @@ import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind.NOTE
 
-@AutoService(BindingGraphPlugin::class)
+//@AutoService(BindingGraphPlugin::class)
 class Grapher : BindingGraphPlugin {
     private lateinit var filer: Filer
     private lateinit var elements: Elements

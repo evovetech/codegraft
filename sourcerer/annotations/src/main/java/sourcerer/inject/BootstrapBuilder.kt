@@ -18,28 +18,10 @@ package sourcerer.inject
 
 import kotlin.reflect.KClass
 
-//
-//@Target(AnnotationTarget.FILE)
-//@Retention(AnnotationRetention.BINARY)
-//@MustBeDocumented
-//annotation
-//class Bootstrap(
-//    val components: Array<KClass<*>> = []
-//)
-
-interface Bootstrap {
-    @Target(AnnotationTarget.CLASS)
-    @Retention(AnnotationRetention.RUNTIME)
-    @MustBeDocumented
-    annotation
-    class Component(
-        val dependencies: Array<KClass<*>> = [],
-        val modules: Array<KClass<*>> = []
-    )
-
-    @Target(AnnotationTarget.CLASS)
-    @Retention(AnnotationRetention.RUNTIME)
-    @MustBeDocumented
-    annotation
-    class BuilderModule
-}
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.BINARY)
+@MustBeDocumented
+annotation
+class BootstrapBuilder(
+    val modules: Array<KClass<*>> = []
+)

@@ -14,31 +14,25 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package sourcerer.inject;
 
-import sourcerer.AnnotationElements
-import sourcerer.AnnotationType
-import sourcerer.Env
-import sourcerer.Output
-import sourcerer.ProcessStep
-import sourcerer.inject.Builds
-import javax.inject.Inject
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-class BuildsStep
-@Inject constructor(
+@Documented
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public
+@interface BootstrapComponent {
+    Class<?>[] dependencies() default {};
 
-) : ProcessStep {
-    override
-    fun Env.annotations(): Set<AnnotationType> = setOf(
-        Builds::class
-    )
+    Class<?>[] modules() default {};
 
-    override
-    fun Env.process(
-        annotationElements: AnnotationElements
-    ): Map<AnnotationType, List<Output>> {
-        return emptyMap()
-    }
+    @Documented
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Builder {}
 }
-
-

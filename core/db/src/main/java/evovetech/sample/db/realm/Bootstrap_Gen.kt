@@ -31,6 +31,7 @@ import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
 import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootScope
+import sourcerer.inject.BootstrapBuilder
 import sourcerer.inject.FunctionQualifier
 import javax.inject.Singleton
 
@@ -70,7 +71,7 @@ class RealmComponent_BootstrapModule {
     }
 }
 
-// TODO: annotate
+@BootstrapBuilder(modules = [RealmComponent_BootstrapModule::class])
 interface RealmComponent_BootstrapBuilder {
     @BindsInstance fun application(app: Application)
     @BindsInstance fun realm(

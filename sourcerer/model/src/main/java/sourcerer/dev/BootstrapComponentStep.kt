@@ -16,16 +16,43 @@
 
 package sourcerer.dev
 
+import sourcerer.AnnotatedTypeElement
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
 import sourcerer.Env
 import sourcerer.Output
 import sourcerer.ProcessStep
+import sourcerer.inject.BootstrapComponent
+import sourcerer.typeInputs
+import javax.inject.Inject
+import javax.lang.model.element.TypeElement
+import javax.lang.model.util.Elements
+import javax.lang.model.util.Types
 
-class BootstrapStep : ProcessStep {
+data
+class ComponentDescriptor(
+    val componentDefinitionType: TypeElement
+) {
+    class Factory
+    @Inject constructor(
+        val elements: Elements,
+        val types: Types
+    ) {
+        fun forComponent(
+            componentTypeElement: AnnotatedTypeElement<*>
+        ): ComponentDescriptor {
+            return ComponentDescriptor(componentTypeElement.element)
+        }
+    }
+}
+
+class BootstrapComponentStep
+@Inject constructor(
+    val componentFactory: ComponentDescriptor.Factory
+) : ProcessStep {
     override
     fun Env.annotations(): Set<AnnotationType> = setOf(
-//        Bootstrap::class
+        BootstrapComponent::class
     )
 
     override
@@ -41,6 +68,9 @@ class BootstrapStep : ProcessStep {
         log("options=$opt")
         log("package=${opt[Option.Package]}")
         log("")
+        val components = annotationElements.typeInputs<BootstrapComponent>()
+                .map(componentFactory::forComponent)
+        log("bootstrapComponents=$components")
         return emptyMap()
     }
 
