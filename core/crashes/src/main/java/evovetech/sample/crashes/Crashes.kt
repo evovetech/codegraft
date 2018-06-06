@@ -32,6 +32,7 @@ import javax.inject.Singleton
 )
 interface CrashesComponent {
     val app: Application
+    val fabric: Fabric
     val crashlytics: Crashlytics
 }
 

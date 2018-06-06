@@ -16,13 +16,24 @@
 
 package evovetech.sample
 
+import android.app.Application
+import android.util.Log
+
 // Content Provider
 class BootstrapProvider : EmptyContentProvider() {
     override
     fun onCreate(): Boolean {
-        val app = context as App
-//        inject(app)
-        app.logStartup("Bootstrap")
+        val TAG = "BootstrapProvider"
+        val app = context as Application
+        when (app) {
+            is BootstrapApplication -> {
+                Log.d(TAG, "IS Bootstrap!!")
+                app.bootstrap.initialize()
+            }
+            else -> {
+                Log.d(TAG, "IS NOT Bootstrap!!")
+            }
+        }
         return true
     }
 }

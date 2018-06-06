@@ -20,6 +20,9 @@ import android.app.Application
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import dagger.android.AndroidInjectionModule
+import dagger.android.AndroidInjector
+import dagger.android.ContributesAndroidInjector
 import evovetech.sample.crashes.Crashes
 import evovetech.sample.crashes.CrashesBootstrapModule
 import evovetech.sample.crashes.CrashesComponent_ApplicationComponent
@@ -32,6 +35,7 @@ import evovetech.sample.network.ClientComponent_ApplicationComponent
 import evovetech.sample.network.ClientPlugin
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
+import sourcerer.inject.ActivityScope
 import sourcerer.inject.BootScope
 import javax.inject.Singleton
 
@@ -41,19 +45,42 @@ import javax.inject.Singleton
 
 // package component
 // application generated
+
+// TODO:
+@Module(
+    includes = [
+        AndroidInjectionModule::class
+    ]
+)
+interface MainActivityModule {
+    @ActivityScope
+    @ContributesAndroidInjector
+    fun contributeMainActivity(): MainActivity
+}
+
 @Singleton
-@Component(modules = [ClientPlugin::class, RealmModule::class, Crashes::class])
+@Component(
+    modules = [
+        ClientPlugin::class,
+        RealmModule::class,
+        Crashes::class,
+        MainActivityModule::class
+    ]
+)
 interface AppComponent :
     RealmComponent_ApplicationComponent,
     CrashesComponent_ApplicationComponent,
-    ClientComponent_ApplicationComponent {
+    ClientComponent_ApplicationComponent,
+    AndroidInjector<App> {
+
+    // TODO:
+    fun inject(mainActivity: MainActivity)
 
     @Component.Builder
     interface Builder :
         RealmComponent_ApplicationComponent.Builder,
         CrashesComponent_ApplicationComponent.Builder,
         ClientComponent_ApplicationComponent.Builder {
-
         fun build(): AppComponent
     }
 }
@@ -77,8 +104,12 @@ class BootModule {
         application(app)
         fabric(fabric)
         realmConfiguration(realmConfiguration)
-        crashes(crashes)
-        realmModule(realmModule)
+        crashes?.let {
+            crashes(it)
+        }
+        realmModule?.let {
+            realmModule(it)
+        }
         build()
     }
 }
@@ -96,25 +127,34 @@ interface BootComponent {
     }
 }
 
-object Bootstrap {
-    @JvmStatic inline
-    fun build(init: BootComponent.Builder.() -> Unit): BootComponent {
+open
+class Bootstrap(
+    boot: BootComponent.Builder.() -> Unit,
+    appInit: AppComponent.() -> Unit
+) {
+    constructor(
+        boot: BootComponent.Builder.() -> Unit
+    ) : this(boot, {})
+
+    private val boot: BootComponent by lazy {
         val builder = DaggerBootComponent.builder()
-        builder.init()
-        return builder.build()
+        builder.boot()
+        builder.build()
+    }
+    val component: AppComponent by lazy {
+        val comp = this.boot.component
+        comp.appInit()
+        comp
+    }
+
+    fun initialize() {
+        println("component=$component")
     }
 }
 
-abstract
-class BootApplication(
-    private val initialize: BootComponent.Builder.() -> Unit
-) : Application() {
-    val bootComponent: BootComponent by lazy {
-        Bootstrap.build {
-            application(this@BootApplication)
-            initialize()
-        }
-    }
-    val appComponent: AppComponent
-        get() = bootComponent.component
+interface BootstrapApplication {
+    val bootstrap: Bootstrap
 }
+
+val BootstrapApplication.component: AppComponent
+    get() = bootstrap.component

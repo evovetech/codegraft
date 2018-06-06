@@ -79,7 +79,9 @@ class BootModule {
     ): AppComponent = DaggerAppComponent.builder().run {
         application(app)
         fabric(fabric)
-        crashes(crashes)
+        crashes?.let {
+            crashes(it)
+        }
         build()
     }
 }

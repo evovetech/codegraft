@@ -40,7 +40,7 @@ interface CrashesComponent_ApplicationComponent : CrashesComponent {
     interface Builder {
         @BindsInstance fun application(app: Application)
         @BindsInstance fun fabric(fabric: Fabric)
-        fun crashes(crashes: Crashes?)
+        fun crashes(crashes: Crashes)
     }
 }
 
@@ -52,7 +52,7 @@ interface CrashesComponent_BootstrapBuilder {
         @FunctionQualifier(
             params = [Fabric.Builder::class],
             returnType = [Fabric::class]
-        ) init: ((Fabric.Builder) -> Fabric)?
+        ) init: (Fabric.Builder.() -> Fabric)?
     )
 
     @BindsInstance fun crashes(crashes: Crashes?)
@@ -81,7 +81,9 @@ class BootModule {
         return DaggerAppComponent.builder().run {
             application(app)
             fabric(fabric)
-            crashes(crashes)
+            crashes?.let {
+                crashes(it)
+            }
             build()
         }
     }

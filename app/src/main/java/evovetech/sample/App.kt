@@ -18,15 +18,29 @@ package evovetech.sample
 
 import android.content.ContentProvider
 import android.util.Log
+import com.crashlytics.android.Crashlytics
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
-import io.fabric.sdk.android.Fabric
-import javax.inject.Inject
 
 //@AndroidApplication(AppBoot::class)
-class App : DaggerApplication() {
-    @Inject lateinit
-    var fabric: Fabric
+class App : DaggerApplication(),
+    BootstrapApplication {
+
+    override
+    val bootstrap: Bootstrap = Bootstrap(boot = {
+        application(this@App)
+        fabric {
+            kits(Crashlytics())
+            build()
+        }
+        realm {
+            name("app.realm")
+            schemaVersion(1)
+            build()
+        }
+    }, appInit = {
+        inject(this@App)
+    })
 
     override
     fun onCreate() {
@@ -54,8 +68,8 @@ class App : DaggerApplication() {
 
     fun logStartup(tag: String) {
         Log.d(tag, "startup")
-        fabric.kits.forEach {
-            Log.d(tag, "app -- fabric kit=${it}")
+        component.fabric.kits.forEach {
+            Log.d(tag, "app -- fabric kit=$it")
         }
     }
 }

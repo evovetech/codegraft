@@ -49,7 +49,7 @@ interface RealmComponent_ApplicationComponent : RealmComponent {
     interface Builder {
         @BindsInstance fun application(app: Application)
         @BindsInstance fun realmConfiguration(realmConfiguration: RealmConfiguration)
-        fun realmModule(realmModule: RealmModule?)
+        fun realmModule(realmModule: RealmModule)
     }
 }
 
@@ -61,7 +61,7 @@ interface RealmComponent_BootstrapBuilder {
         @FunctionQualifier(
             params = [RealmConfiguration.Builder::class],
             returnType = [RealmConfiguration::class]
-        ) init: ((RealmConfiguration.Builder) -> RealmConfiguration)?
+        ) init: (RealmConfiguration.Builder.() -> RealmConfiguration)?
     )
 
     @BindsInstance fun realmModule(realmModule: RealmModule?)
@@ -103,8 +103,12 @@ class BootModule {
         application(app)
         fabric(fabric)
         realmConfiguration(realmConfiguration)
-        crashes(crashes)
-        realmModule(realmModule)
+        crashes?.let {
+            crashes(it)
+        }
+        realmModule?.let {
+            realmModule(it)
+        }
         build()
     }
 }
