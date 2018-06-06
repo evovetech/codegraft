@@ -52,9 +52,11 @@ class BootstrapProcessStepsModule {
     @Provides
     fun provideProcessSteps(
         buildsStep: BuildsStep,
+        bootstrapModuleStep: BootstrapModuleStep,
         bootstrapComponentStep: BootstrapComponentStep
     ): List<ProcessStep> = listOf(
         buildsStep,
+        bootstrapModuleStep,
         bootstrapComponentStep
     )
 
