@@ -35,7 +35,9 @@ import evovetech.sample.network.ClientComponent_ApplicationComponent
 import evovetech.sample.network.ClientPlugin
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
+import sourcerer.inject.AbstractBootstrap
 import sourcerer.inject.ActivityScope
+import sourcerer.inject.BootComponent
 import sourcerer.inject.BootScope
 import javax.inject.Singleton
 
@@ -116,45 +118,36 @@ class BootModule {
 
 @BootScope
 @Component(modules = [BootModule::class])
-interface BootComponent {
-    val component: AppComponent
+interface AndroidBootComponent : BootComponent<AppComponent> {
+    override val component: AppComponent
 
     @Component.Builder
     interface Builder :
+        BootComponent.Builder<AppComponent, AndroidBootComponent>,
         RealmComponent_BootstrapBuilder,
         CrashesComponent_BootstrapBuilder {
-        fun build(): BootComponent
+        override fun build(): AndroidBootComponent
     }
 }
 
 open
 class Bootstrap(
-    boot: BootComponent.Builder.() -> Unit,
+    boot: AndroidBootComponent.Builder.() -> Unit,
     appInit: AppComponent.() -> Unit
+) : AbstractBootstrap<AppComponent, AndroidBootComponent, AndroidBootComponent.Builder>(
+    boot = boot,
+    appInit = appInit,
+    bootBuilder = { DaggerAndroidBootComponent.builder() }
 ) {
     constructor(
-        boot: BootComponent.Builder.() -> Unit
+        boot: AndroidBootComponent.Builder.() -> Unit
     ) : this(boot, {})
-
-    private val boot: BootComponent by lazy {
-        val builder = DaggerBootComponent.builder()
-        builder.boot()
-        builder.build()
-    }
-    val component: AppComponent by lazy {
-        val comp = this.boot.component
-        comp.appInit()
-        comp
-    }
-
-    fun initialize() {
-        println("component=$component")
-    }
 }
 
-interface BootstrapApplication {
-    val bootstrap: Bootstrap
+interface BootstrapApplication : sourcerer.inject.BootstrapApplication<AppComponent> {
+    override val bootstrap: Bootstrap
 }
 
 val BootstrapApplication.component: AppComponent
     get() = bootstrap.component
+
