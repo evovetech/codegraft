@@ -24,6 +24,10 @@ interface BootComponent<out T> {
     }
 }
 
+interface BootstrapApplication<out T> {
+    val bootstrap: BootComponent<T>
+}
+
 open
 class AbstractBootstrap<out T, out B : BootComponent.Builder<T>>(
     boot: B.() -> Unit,
@@ -44,8 +48,4 @@ class AbstractBootstrap<out T, out B : BootComponent.Builder<T>>(
     fun initialize() {
         println("component=$component")
     }
-}
-
-interface BootstrapApplication<out T> {
-    val bootstrap: BootComponent<T>
 }
