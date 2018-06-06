@@ -21,39 +21,33 @@ import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
 import io.fabric.sdk.android.Fabric
+import sourcerer.inject.BootScope
 import sourcerer.inject.BootstrapComponent
-import sourcerer.inject.BootstrapModule
-import sourcerer.inject.Builds
-import sourcerer.inject.Generates
-import sourcerer.inject.Initializes
+import sourcerer.inject.FunctionQualifier
 import javax.inject.Singleton
 
 @BootstrapComponent(
     bootstrapModules = [CrashesBootstrapModule::class],
-    daggerModules = [Crashes::class]
+    applicationModules = [Crashes::class]
 )
 interface CrashesComponent {
     val app: Application
     val crashlytics: Crashlytics
 }
 
-@BootstrapModule
-object CrashesBootstrapModule {
-    @JvmStatic
-    @Generates
-    fun generateFabricBuilder(app: Application): Fabric.Builder {
-        return Fabric.Builder(app)
-    }
-
-    @JvmStatic
-    @Builds
-    fun buildFabric(builder: Fabric.Builder): Fabric {
-        return builder.build()
-    }
-
-    @JvmStatic
-    @Initializes
-    fun initializeFabric(fabric: Fabric): Fabric {
+@Module
+class CrashesBootstrapModule {
+    @Provides
+    @BootScope
+    fun provideFabric(
+        app: Application,
+        @FunctionQualifier(
+            params = [Fabric.Builder::class],
+            returnType = [Fabric::class]
+        ) init: (Fabric.Builder.() -> Fabric)?
+    ): Fabric {
+        val builder = Fabric.Builder(app)
+        val fabric = init?.let { it(builder) } ?: builder.build()
         return Fabric.with(fabric)
     }
 }

@@ -25,7 +25,6 @@ import evovetech.sample.crashes.Crashes
 import evovetech.sample.crashes.CrashesBootstrapModule
 import evovetech.sample.crashes.CrashesComponent_ApplicationComponent
 import evovetech.sample.crashes.CrashesComponent_BootstrapBuilder
-import evovetech.sample.crashes.CrashesComponent_BootstrapModule
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
 import sourcerer.inject.ApplicationComponent
@@ -54,31 +53,31 @@ interface RealmComponent_ApplicationComponent : RealmComponent {
     }
 }
 
-@Module
-class RealmComponent_BootstrapModule {
-    @Provides
-    @BootScope
-    fun provideRealmConfiguration(
-        app: Application,
-        @FunctionQualifier(
-            params = [RealmConfiguration.Builder::class],
-            returnType = [RealmConfiguration::class]
-        ) init: (RealmConfiguration.Builder) -> RealmConfiguration
-    ): RealmConfiguration {
-        val builder = RealmBootstrapModule.generateRealmConfigurationBuilder(app)
-        val config = init(builder)
-        return RealmBootstrapModule.initializeRealmConfiguration(config)
-    }
-}
+//@Module
+//class RealmComponent_BootstrapModule {
+//    @Provides
+//    @BootScope
+//    fun provideRealmConfiguration(
+//        app: Application,
+//        @FunctionQualifier(
+//            params = [RealmConfiguration.Builder::class],
+//            returnType = [RealmConfiguration::class]
+//        ) init: (RealmConfiguration.Builder) -> RealmConfiguration
+//    ): RealmConfiguration {
+//        val builder = RealmBootstrapModule.generateRealmConfigurationBuilder(app)
+//        val config = init(builder)
+//        return RealmBootstrapModule.initializeRealmConfiguration(config)
+//    }
+//}
 
-@BootstrapBuilder(modules = [RealmComponent_BootstrapModule::class])
+@BootstrapBuilder(modules = [RealmBootstrapModule::class])
 interface RealmComponent_BootstrapBuilder {
     @BindsInstance fun application(app: Application)
     @BindsInstance fun realm(
         @FunctionQualifier(
             params = [RealmConfiguration.Builder::class],
             returnType = [RealmConfiguration::class]
-        ) init: (RealmConfiguration.Builder) -> RealmConfiguration
+        ) init: ((RealmConfiguration.Builder) -> RealmConfiguration)?
     )
 }
 
@@ -101,8 +100,8 @@ interface AppComponent :
 
 @Module(
     includes = [
-        RealmComponent_BootstrapModule::class,
-        CrashesComponent_BootstrapModule::class
+        RealmBootstrapModule::class,
+        CrashesBootstrapModule::class
     ]
 )
 class BootModule {
@@ -133,47 +132,11 @@ interface BootComponent {
     }
 }
 
-class Bootstrap(
-    private val delegate: BootComponent.Builder = DaggerBootComponent.builder()
-) : BootComponent.Builder by delegate {
-    init {
-        // defaults
-        delegate.fabric(CrashesBootstrapModule::buildFabric)
-        delegate.realm(RealmBootstrapModule::buildRealmConfiguration)
-    }
-
-    override
-    fun application(app: Application) {
-        delegate.application(app)
-    }
-
-    override
-    fun fabric(init: (Fabric.Builder) -> Fabric) {
-        delegate.fabric(init)
-    }
-
-    override
-    fun realm(init: (RealmConfiguration.Builder) -> RealmConfiguration) {
-        delegate.realm(init)
-    }
-
-    override
-    fun build(): BootComponent {
-        return delegate.build()
-    }
-
-    inline
+object Bootstrap {
+    @JvmStatic inline
     fun build(init: BootComponent.Builder.() -> Unit): BootComponent {
-        this.init()
-        return build()
-    }
-
-    companion object {
-        @JvmStatic
-        inline
-        fun create(
-            init: BootComponent.Builder.() -> Unit
-        ): BootComponent = Bootstrap()
-                .build(init)
+        val builder = DaggerBootComponent.builder()
+        builder.init()
+        return builder.build()
     }
 }

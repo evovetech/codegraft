@@ -23,42 +23,36 @@ import dagger.Provides
 import evovetech.sample.crashes.CrashesComponent
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import sourcerer.inject.BootScope
 import sourcerer.inject.BootstrapComponent
-import sourcerer.inject.BootstrapModule
-import sourcerer.inject.Builds
-import sourcerer.inject.Generates
-import sourcerer.inject.Initializes
+import sourcerer.inject.FunctionQualifier
 
 @BootstrapComponent(
-    dependencies = [CrashesComponent::class],
-    daggerModules = [RealmModule::class],
-    bootstrapModules = [RealmBootstrapModule::class]
+    bootstrapDependencies = [CrashesComponent::class],
+    bootstrapModules = [RealmBootstrapModule::class],
+    applicationModules = [RealmModule::class]
 )
 interface RealmComponent {
     val realm: Realm
     val crashlytics: Crashlytics
 }
 
-@BootstrapModule
-object RealmBootstrapModule {
-    @JvmStatic
-    @Generates
-    fun generateRealmConfigurationBuilder(app: Application): RealmConfiguration.Builder {
+@Module
+class RealmBootstrapModule {
+    @Provides
+    @BootScope
+    fun provideRealmConfiguration(
+        app: Application,
+        @FunctionQualifier(
+            params = [RealmConfiguration.Builder::class],
+            returnType = [RealmConfiguration::class]
+        ) init: (RealmConfiguration.Builder.() -> RealmConfiguration)?
+    ): RealmConfiguration {
         Realm.init(app)
-        return RealmConfiguration.Builder()
-    }
-
-    @JvmStatic
-    @Builds
-    fun buildRealmConfiguration(builder: RealmConfiguration.Builder): RealmConfiguration {
-        return builder.build()
-    }
-
-    @JvmStatic
-    @Initializes
-    fun initializeRealmConfiguration(config: RealmConfiguration): RealmConfiguration {
-        Realm.setDefaultConfiguration(config)
-        return config
+        val builder = RealmConfiguration.Builder()
+        val realmConfiguration = init?.let { it(builder) } ?: builder.build()
+        Realm.setDefaultConfiguration(realmConfiguration)
+        return realmConfiguration
     }
 }
 

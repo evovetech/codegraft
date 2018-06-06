@@ -24,11 +24,9 @@ import evovetech.sample.crashes.Crashes
 import evovetech.sample.crashes.CrashesBootstrapModule
 import evovetech.sample.crashes.CrashesComponent_ApplicationComponent
 import evovetech.sample.crashes.CrashesComponent_BootstrapBuilder
-import evovetech.sample.crashes.CrashesComponent_BootstrapModule
 import evovetech.sample.db.realm.RealmBootstrapModule
 import evovetech.sample.db.realm.RealmComponent_ApplicationComponent
 import evovetech.sample.db.realm.RealmComponent_BootstrapBuilder
-import evovetech.sample.db.realm.RealmComponent_BootstrapModule
 import evovetech.sample.db.realm.RealmModule
 import evovetech.sample.network.ClientComponent_ApplicationComponent
 import evovetech.sample.network.ClientPlugin
@@ -62,8 +60,8 @@ interface AppComponent :
 
 @Module(
     includes = [
-        RealmComponent_BootstrapModule::class,
-        CrashesComponent_BootstrapModule::class
+        RealmBootstrapModule::class,
+        CrashesBootstrapModule::class
     ]
 )
 class BootModule {
@@ -94,48 +92,12 @@ interface BootComponent {
     }
 }
 
-class Bootstrap(
-    private val delegate: BootComponent.Builder = DaggerBootComponent.builder()
-) : BootComponent.Builder by delegate {
-    init {
-        // defaults
-        delegate.fabric(CrashesBootstrapModule::buildFabric)
-        delegate.realm(RealmBootstrapModule::buildRealmConfiguration)
-    }
-
-    override
-    fun application(app: Application) {
-        delegate.application(app)
-    }
-
-    override
-    fun fabric(init: (Fabric.Builder) -> Fabric) {
-        delegate.fabric(init)
-    }
-
-    override
-    fun realm(init: (RealmConfiguration.Builder) -> RealmConfiguration) {
-        delegate.realm(init)
-    }
-
-    override
-    fun build(): BootComponent {
-        return delegate.build()
-    }
-
-    inline
+object Bootstrap {
+    @JvmStatic inline
     fun build(init: BootComponent.Builder.() -> Unit): BootComponent {
-        this.init()
-        return build()
-    }
-
-    companion object {
-        @JvmStatic
-        inline
-        fun create(
-            init: BootComponent.Builder.() -> Unit
-        ): BootComponent = Bootstrap()
-                .build(init)
+        val builder = DaggerBootComponent.builder()
+        builder.init()
+        return builder.build()
     }
 }
 
@@ -148,7 +110,7 @@ interface BootApplication {
 
 fun BootApplication.buildAppComponent(
     app: Application
-): AppComponent = Bootstrap.create {
+): AppComponent = Bootstrap.build {
     application(app)
     bootstrap(app)
 }.component

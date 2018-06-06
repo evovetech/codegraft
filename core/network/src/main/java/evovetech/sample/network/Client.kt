@@ -29,7 +29,7 @@ import sourcerer.inject.Plugins
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@BootstrapComponent(daggerModules = [ClientPlugin::class])
+@BootstrapComponent(applicationModules = [ClientPlugin::class])
 interface ClientComponent {
     val plugins: Plugins
 }

@@ -27,11 +27,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public
 @interface BootstrapComponent {
-    Class<?>[] dependencies() default {};
-
-    Class<?>[] daggerModules() default {};
-
     Class<?>[] bootstrapModules() default {};
+
+    Class<?>[] bootstrapDependencies() default {};
+
+    Class<?>[] applicationModules() default {};
 
     @Documented
     @Target(ElementType.TYPE)

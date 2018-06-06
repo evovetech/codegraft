@@ -44,31 +44,31 @@ interface CrashesComponent_ApplicationComponent : CrashesComponent {
     }
 }
 
-@Module
-class CrashesComponent_BootstrapModule {
-    @Provides
-    @BootScope
-    fun provideFabric(
-        app: Application,
-        @FunctionQualifier(
-            params = [Fabric.Builder::class],
-            returnType = [Fabric::class]
-        ) init: (Fabric.Builder) -> Fabric
-    ): Fabric {
-        val builder = CrashesBootstrapModule.generateFabricBuilder(app)
-        val fabric = init(builder)
-        return CrashesBootstrapModule.initializeFabric(fabric)
-    }
-}
+//@Module
+//class CrashesComponent_BootstrapModule {
+//    @Provides
+//    @BootScope
+//    fun provideFabric(
+//        app: Application,
+//        @FunctionQualifier(
+//            params = [Fabric.Builder::class],
+//            returnType = [Fabric::class]
+//        ) init: (Fabric.Builder) -> Fabric
+//    ): Fabric {
+//        val builder = CrashesBootstrapModule.generateFabricBuilder(app)
+//        val fabric = init(builder)
+//        return CrashesBootstrapModule.initializeFabric(fabric)
+//    }
+//}
 
-@BootstrapBuilder(modules = [CrashesComponent_BootstrapModule::class])
+@BootstrapBuilder(modules = [CrashesBootstrapModule::class])
 interface CrashesComponent_BootstrapBuilder {
     @BindsInstance fun application(app: Application)
     @BindsInstance fun fabric(
         @FunctionQualifier(
             params = [Fabric.Builder::class],
             returnType = [Fabric::class]
-        ) init: (Fabric.Builder) -> Fabric
+        ) init: ((Fabric.Builder) -> Fabric)?
     )
 
 //    @BindsInstance fun crashes(crashes: Crashes)
@@ -85,7 +85,7 @@ interface AppComponent : CrashesComponent_ApplicationComponent {
     }
 }
 
-@Module(includes = [CrashesComponent_BootstrapModule::class])
+@Module(includes = [CrashesBootstrapModule::class])
 class BootModule {
     @Provides
     @BootScope
@@ -112,46 +112,11 @@ interface BootComponent {
     }
 }
 
-class Bootstrap(
-    private val delegate: BootComponent.Builder = DaggerBootComponent.builder()
-) : BootComponent.Builder by delegate {
-    init {
-        // defaults
-        delegate.fabric(CrashesBootstrapModule::buildFabric)
-    }
-
-    override
-    fun application(app: Application) {
-        delegate.application(app)
-    }
-
-    override
-    fun fabric(init: (Fabric.Builder) -> Fabric) {
-        delegate.fabric(init)
-    }
-
-//    override
-//    fun crashes(crashes: Crashes) {
-//        delegate.crashes(crashes)
-//    }
-
-    override
-    fun build(): BootComponent {
-        return delegate.build()
-    }
-
-    inline
+object Bootstrap {
+    @JvmStatic inline
     fun build(init: BootComponent.Builder.() -> Unit): BootComponent {
-        this.init()
-        return build()
-    }
-
-    companion object {
-        @JvmStatic
-        inline
-        fun create(
-            init: BootComponent.Builder.() -> Unit
-        ): BootComponent = Bootstrap()
-                .build(init)
+        val builder = DaggerBootComponent.builder()
+        builder.init()
+        return builder.build()
     }
 }
