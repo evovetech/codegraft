@@ -27,11 +27,11 @@ class BootstrapProvider : EmptyContentProvider() {
         val app = context as Application
         when (app) {
             is BootApplication<*> -> {
-                Log.d(TAG, "IS Bootstrap!!")
+                Log.d(TAG, "Bootstrapping!!")
                 app.bootstrap.initialize()
             }
             else -> {
-                Log.d(TAG, "IS NOT Bootstrap!!")
+                Log.d(TAG, "NO Bootstraps :(")
             }
         }
         return true
