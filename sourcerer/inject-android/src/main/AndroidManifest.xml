@@ -1,1 +1,11 @@
-<manifest package="sourcerer.inject" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="sourcerer.inject">
+
+    <application>
+        <provider
+            android:authorities="sourcerer.inject.bootstrapProvider"
+            android:name="sourcerer.inject.BootstrapProvider"
+            android:exported="false"
+            android:initOrder="0x7fffffff" />
+    </application>
+</manifest>

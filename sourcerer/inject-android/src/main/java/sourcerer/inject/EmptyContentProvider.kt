@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package evovetech.sample
+package sourcerer.inject
 
 import android.content.ContentProvider
 import android.content.ContentValues

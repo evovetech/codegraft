@@ -25,26 +25,33 @@ interface BootComponent<out T> {
 }
 
 interface BootstrapApplication<out T> {
-    val bootstrap: BootComponent<T>
+    val bootstrap: Bootstrap<T>
+}
+
+interface Bootstrap<out T> : BootComponent<T> {
+    fun initialize()
 }
 
 open
 class AbstractBootstrap<out T, out B : BootComponent.Builder<T>>(
-    boot: B.() -> Unit,
-    appInit: T.() -> Unit,
-    bootBuilder: () -> B
-) : BootComponent<T> {
-    private val boot: BootComponent<T> by lazy {
-        val builder = bootBuilder()
-        builder.boot()
-        builder.build()
-    }
-    final override val component: T by lazy {
-        val comp = this.boot.component
-        comp.appInit()
-        comp
-    }
+    creator: () -> T
+) : Bootstrap<T> {
+    constructor(
+        boot: B.() -> Unit,
+        appInit: T.() -> Unit,
+        bootBuilder: () -> B
+    ) : this({
+        bootBuilder()
+                .apply(boot)
+                .build()
+                .component
+                .apply(appInit)
+    })
 
+    final override
+    val component: T by lazy(creator)
+
+    override
     fun initialize() {
         println("component=$component")
     }

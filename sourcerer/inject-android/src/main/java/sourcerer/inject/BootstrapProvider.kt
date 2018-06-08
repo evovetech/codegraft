@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package evovetech.sample
+package sourcerer.inject
 
 import android.app.Application
 import android.util.Log
@@ -26,7 +26,7 @@ class BootstrapProvider : EmptyContentProvider() {
         val TAG = "BootstrapProvider"
         val app = context as Application
         when (app) {
-            is BootstrapApplication -> {
+            is BootstrapApplication<*> -> {
                 Log.d(TAG, "IS Bootstrap!!")
                 app.bootstrap.initialize()
             }

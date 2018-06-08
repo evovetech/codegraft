@@ -19,11 +19,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <provider
-            android:authorities="evovetech.sample.bootstrapProvider"
-            android:name=".BootstrapProvider"
-            android:exported="false"
-            android:initOrder="200" />
     </application>
 
 </manifest>
