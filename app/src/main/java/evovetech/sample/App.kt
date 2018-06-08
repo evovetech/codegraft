@@ -27,7 +27,7 @@ import sourcerer.inject.component
 //@AndroidApplication(AppBoot::class)
 class App : DaggerApplication(), BootApplication<AppComponent> {
     override
-    val bootstrap = Bootstrap({
+    val bootstrap = bootstrap {
         fabric {
             kits(Crashlytics())
             build()
@@ -38,7 +38,7 @@ class App : DaggerApplication(), BootApplication<AppComponent> {
             build()
         }
         this@App
-    })
+    }
 
     override
     fun onCreate() {

@@ -26,7 +26,7 @@ interface BootComponent<out Component : AppComponent<*>> {
 }
 
 interface BootApplication<out Component : AppComponent<*>> {
-    val bootstrap: Boot<Component>
+    val bootstrap: Bootstrap<Component>
 }
 
 val <Component : AppComponent<*>> BootApplication<Component>.component: Component
@@ -37,8 +37,8 @@ interface AppComponent<Application> {
 }
 
 open
-class Boot<out Component : AppComponent<*>>(
-    builder: () -> Boot.Builder<*, Component>
+class Bootstrap<out Component : AppComponent<*>>(
+    builder: () -> Bootstrap.Builder<*, Component>
 ) : BootComponent<Component> {
     final override
     val component by lazy(builder::build)
@@ -61,7 +61,7 @@ class Boot<out Component : AppComponent<*>>(
     }
 }
 
-typealias BootBuilder<Component> = () -> Boot.Builder<*, Component>
+typealias BootBuilder<Component> = () -> Bootstrap.Builder<*, Component>
 
 fun <Component : AppComponent<*>> BootBuilder<Component>.build(): Component = invoke()
         .build()
