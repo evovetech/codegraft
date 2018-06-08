@@ -21,13 +21,15 @@ import android.util.Log
 import com.crashlytics.android.Crashlytics
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
+import sourcerer.inject.BootApplication
+import sourcerer.inject.component
 
 //@AndroidApplication(AppBoot::class)
-class App : DaggerApplication(),
-    BootstrapApplication {
+class App : DaggerApplication(), BootApplication<AppComponent> {
 
     override
-    val bootstrap: Bootstrap = Bootstrap(boot = {
+    val bootstrap: Bootstrap = Bootstrap({
+        val application = this@App
         application(this@App)
         fabric {
             kits(Crashlytics())
@@ -38,8 +40,7 @@ class App : DaggerApplication(),
             schemaVersion(1)
             build()
         }
-    }, appInit = {
-        inject(this@App)
+        application
     })
 
     override

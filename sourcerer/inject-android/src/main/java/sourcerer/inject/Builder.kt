@@ -16,24 +16,10 @@
 
 package sourcerer.inject
 
-import android.app.Application
-import android.util.Log
-
-// Content Provider
-class BootstrapProvider : EmptyContentProvider() {
-    override
-    fun onCreate(): Boolean {
-        val TAG = "BootstrapProvider"
-        val app = context as Application
-        when (app) {
-            is BootApplication<*> -> {
-                Log.d(TAG, "IS Bootstrap!!")
-                app.bootstrap.initialize()
-            }
-            else -> {
-                Log.d(TAG, "IS NOT Bootstrap!!")
-            }
-        }
-        return true
-    }
+interface Builder<out T> {
+    fun build(): T
 }
+
+fun <T> Builder<T>.build(
+    init: T.() -> Unit
+): T = build().apply(init)

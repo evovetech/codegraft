@@ -35,8 +35,9 @@ import evovetech.sample.network.ClientComponent_ApplicationComponent
 import evovetech.sample.network.ClientPlugin
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
-import sourcerer.inject.AbstractBootstrap
+import sourcerer.inject.AbstractBoot
 import sourcerer.inject.ActivityScope
+import sourcerer.inject.Boot
 import sourcerer.inject.BootComponent
 import sourcerer.inject.BootScope
 import javax.inject.Singleton
@@ -73,7 +74,8 @@ interface AppComponent :
     RealmComponent_ApplicationComponent,
     CrashesComponent_ApplicationComponent,
     ClientComponent_ApplicationComponent,
-    AndroidInjector<App> {
+    AndroidInjector<App>,
+    sourcerer.inject.AppComponent<App> {
 
     // TODO:
     fun inject(mainActivity: MainActivity)
@@ -123,31 +125,17 @@ interface AndroidBootComponent : BootComponent<AppComponent> {
 
     @Component.Builder
     interface Builder :
-        BootComponent.Builder<AppComponent>,
+        BootComponent.Builder<AndroidBootComponent>,
         RealmComponent_BootstrapBuilder,
         CrashesComponent_BootstrapBuilder {
         override fun build(): AndroidBootComponent
     }
 }
 
-open
 class Bootstrap(
-    boot: AndroidBootComponent.Builder.() -> Unit,
-    appInit: AppComponent.() -> Unit
-) : AbstractBootstrap<AppComponent, AndroidBootComponent.Builder>(
-    boot = boot,
-    appInit = appInit,
-    bootBuilder = { DaggerAndroidBootComponent.builder() }
-) {
-    constructor(
-        boot: AndroidBootComponent.Builder.() -> Unit
-    ) : this(boot, {})
-}
-
-interface BootstrapApplication : sourcerer.inject.BootstrapApplication<AppComponent> {
-    override val bootstrap: Bootstrap
-}
-
-val BootstrapApplication.component: AppComponent
-    get() = bootstrap.component
-
+    boot: AndroidBootComponent.Builder.() -> App
+) : AbstractBoot<App, AppComponent>({
+    val builder = DaggerAndroidBootComponent.builder()
+    val app = builder.boot()
+    Boot.Params(app, builder)
+})

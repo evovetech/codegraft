@@ -16,43 +16,56 @@
 
 package sourcerer.inject
 
-interface BootComponent<out T> {
-    val component: T
+import sourcerer.inject.Boot.Params
 
-    interface Builder<out T> {
-        fun build(): BootComponent<T>
+interface BootComponent<out Component> {
+    val component: Component
+
+    interface Builder<out Boot : BootComponent<*>> : sourcerer.inject.Builder<Boot> {
+        override
+        fun build(): Boot
     }
 }
 
-interface BootstrapApplication<out T> {
-    val bootstrap: Bootstrap<T>
+interface BootApplication<out Component> {
+    val bootstrap: Boot<Component>
 }
 
-interface Bootstrap<out T> : BootComponent<T> {
+val <Component> BootApplication<Component>.component: Component
+    get() = bootstrap.component
+
+interface AppComponent<Application> {
+    fun inject(application: Application)
+}
+
+interface Boot<out Component> : BootComponent<Component> {
     fun initialize()
+
+    data
+    class Params<Application, out Component : AppComponent<Application>>(
+        val application: Application,
+        val builder: BootComponent.Builder<BootComponent<Component>>
+    ) : Builder<Component> {
+        override
+        fun build(): Component = builder.build().component.apply {
+            inject(application)
+        }
+    }
 }
 
 open
-class AbstractBootstrap<out T, out B : BootComponent.Builder<T>>(
-    creator: () -> T
-) : Bootstrap<T> {
-    constructor(
-        boot: B.() -> Unit,
-        appInit: T.() -> Unit,
-        bootBuilder: () -> B
-    ) : this({
-        bootBuilder()
-                .apply(boot)
-                .build()
-                .component
-                .apply(appInit)
-    })
+class AbstractBoot<Application, out Component : AppComponent<Application>>(
+    builder: () -> Params<Application, Component>
+) : Boot<Component> {
+    final override
+    val component by lazy(builder::build)
 
     final override
-    val component: T by lazy(creator)
-
-    override
     fun initialize() {
-        println("component=$component")
+        val comp = component
+        println("component=$comp")
     }
 }
+
+fun <Component : AppComponent<*>> (() -> Boot.Params<*, Component>).build(): Component =
+    invoke().build()
