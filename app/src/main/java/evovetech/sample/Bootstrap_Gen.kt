@@ -35,7 +35,6 @@ import evovetech.sample.network.ClientComponent_ApplicationComponent
 import evovetech.sample.network.ClientPlugin
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
-import sourcerer.inject.AbstractBoot
 import sourcerer.inject.ActivityScope
 import sourcerer.inject.Boot
 import sourcerer.inject.BootComponent
@@ -132,19 +131,18 @@ interface AndroidBootComponent : BootComponent<AppComponent> {
     }
 }
 
-typealias AbstractBootstrap = AbstractBoot<App, AppComponent>
 typealias BootstrapInit = AndroidBootComponent.Builder.() -> App
-typealias BootstrapParams = Boot.Params<App, AppComponent>
+typealias BootstrapBuilder = Boot.Builder<App, AppComponent>
 
 class Bootstrap(
     boot: BootstrapInit
-) : AbstractBootstrap(boot::bootstrap)
+) : Boot<AppComponent>(boot::bootstrap)
 
 private
-fun BootstrapInit.bootstrap(): BootstrapParams {
+fun BootstrapInit.bootstrap(): BootstrapBuilder {
     val builder = DaggerAndroidBootComponent.builder()
     return invoke(builder).let { app ->
         builder.application(app)
-        BootstrapParams(app, builder)
+        BootstrapBuilder(app, builder)
     }
 }

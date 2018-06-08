@@ -26,9 +26,8 @@ import sourcerer.inject.component
 
 //@AndroidApplication(AppBoot::class)
 class App : DaggerApplication(), BootApplication<AppComponent> {
-
     override
-    val bootstrap: Bootstrap = Bootstrap({
+    val bootstrap = Bootstrap({
         fabric {
             kits(Crashlytics())
             build()

@@ -16,9 +16,7 @@
 
 package sourcerer.inject
 
-import sourcerer.inject.Boot.Params
-
-interface BootComponent<out Component> {
+interface BootComponent<out Component : AppComponent<*>> {
     val component: Component
 
     interface Builder<out Boot : BootComponent<*>> : sourcerer.inject.Builder<Boot> {
@@ -27,22 +25,32 @@ interface BootComponent<out Component> {
     }
 }
 
-interface BootApplication<out Component> {
+interface BootApplication<out Component : AppComponent<*>> {
     val bootstrap: Boot<Component>
 }
 
-val <Component> BootApplication<Component>.component: Component
+val <Component : AppComponent<*>> BootApplication<Component>.component: Component
     get() = bootstrap.component
 
 interface AppComponent<Application> {
     fun inject(application: Application)
 }
 
-interface Boot<out Component> : BootComponent<Component> {
-    fun initialize()
+open
+class Boot<out Component : AppComponent<*>>(
+    builder: () -> Boot.Builder<*, Component>
+) : BootComponent<Component> {
+    final override
+    val component by lazy(builder::build)
+
+    internal
+    fun initialize() {
+        val comp = component
+        println("component=$comp")
+    }
 
     data
-    class Params<Application, out Component : AppComponent<Application>>(
+    class Builder<Application, out Component : AppComponent<Application>>(
         val application: Application,
         val builder: BootComponent.Builder<BootComponent<Component>>
     ) {
@@ -53,19 +61,7 @@ interface Boot<out Component> : BootComponent<Component> {
     }
 }
 
-open
-class AbstractBoot<Application, out Component : AppComponent<Application>>(
-    params: () -> Params<Application, Component>
-) : Boot<Component> {
-    final override
-    val component by lazy(params::build)
+typealias BootBuilder<Component> = () -> Boot.Builder<*, Component>
 
-    final override
-    fun initialize() {
-        val comp = component
-        println("component=$comp")
-    }
-}
-
-fun <Component : AppComponent<*>> (() -> Boot.Params<*, Component>).build(): Component =
-    invoke().build()
+fun <Component : AppComponent<*>> BootBuilder<Component>.build(): Component = invoke()
+        .build()
