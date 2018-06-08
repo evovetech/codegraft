@@ -29,8 +29,6 @@ class App : DaggerApplication(), BootApplication<AppComponent> {
 
     override
     val bootstrap: Bootstrap = Bootstrap({
-        val application = this@App
-        application(this@App)
         fabric {
             kits(Crashlytics())
             build()
@@ -40,7 +38,7 @@ class App : DaggerApplication(), BootApplication<AppComponent> {
             schemaVersion(1)
             build()
         }
-        application
+        this@App
     })
 
     override

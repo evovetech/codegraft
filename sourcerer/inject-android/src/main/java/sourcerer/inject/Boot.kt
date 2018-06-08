@@ -45,8 +45,8 @@ interface Boot<out Component> : BootComponent<Component> {
     class Params<Application, out Component : AppComponent<Application>>(
         val application: Application,
         val builder: BootComponent.Builder<BootComponent<Component>>
-    ) : Builder<Component> {
-        override
+    ) {
+        internal
         fun build(): Component = builder.build().component.apply {
             inject(application)
         }
@@ -55,10 +55,10 @@ interface Boot<out Component> : BootComponent<Component> {
 
 open
 class AbstractBoot<Application, out Component : AppComponent<Application>>(
-    builder: () -> Params<Application, Component>
+    params: () -> Params<Application, Component>
 ) : Boot<Component> {
     final override
-    val component by lazy(builder::build)
+    val component by lazy(params::build)
 
     final override
     fun initialize() {

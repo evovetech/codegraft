@@ -132,10 +132,19 @@ interface AndroidBootComponent : BootComponent<AppComponent> {
     }
 }
 
+typealias AbstractBootstrap = AbstractBoot<App, AppComponent>
+typealias BootstrapInit = AndroidBootComponent.Builder.() -> App
+typealias BootstrapParams = Boot.Params<App, AppComponent>
+
 class Bootstrap(
-    boot: AndroidBootComponent.Builder.() -> App
-) : AbstractBoot<App, AppComponent>({
+    boot: BootstrapInit
+) : AbstractBootstrap(boot::bootstrap)
+
+private
+fun BootstrapInit.bootstrap(): BootstrapParams {
     val builder = DaggerAndroidBootComponent.builder()
-    val app = builder.boot()
-    Boot.Params(app, builder)
-})
+    return invoke(builder).let { app ->
+        builder.application(app)
+        BootstrapParams(app, builder)
+    }
+}
