@@ -16,6 +16,10 @@
 
 package sourcerer.inject
 
+interface AppComponent<Application> {
+    fun inject(application: Application)
+}
+
 interface BootComponent<out Component : AppComponent<*>> {
     val component: Component
 
@@ -31,10 +35,6 @@ interface BootApplication<out Component : AppComponent<*>> {
 
 val <Component : AppComponent<*>> BootApplication<Component>.component: Component
     get() = bootstrap.component
-
-interface AppComponent<Application> {
-    fun inject(application: Application)
-}
 
 open
 class Bootstrap<out Component : AppComponent<*>>(

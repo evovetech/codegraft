@@ -21,11 +21,15 @@ import android.util.Log
 import com.crashlytics.android.Crashlytics
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
+import io.fabric.sdk.android.Fabric
 import sourcerer.inject.BootApplication
-import sourcerer.inject.component
+import javax.inject.Inject
 
 //@AndroidApplication(AppBoot::class)
 class App : DaggerApplication(), BootApplication<AppComponent> {
+    @Inject lateinit
+    var fabric: Fabric
+
     override
     val bootstrap = bootstrap {
         fabric {
@@ -66,7 +70,7 @@ class App : DaggerApplication(), BootApplication<AppComponent> {
 
     fun logStartup(tag: String) {
         Log.d(tag, "startup")
-        component.fabric.kits.forEach {
+        fabric.kits.forEach {
             Log.d(tag, "app -- fabric kit=$it")
         }
     }

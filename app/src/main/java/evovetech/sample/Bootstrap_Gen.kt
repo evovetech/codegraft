@@ -21,7 +21,6 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import dagger.android.AndroidInjectionModule
-import dagger.android.AndroidInjector
 import dagger.android.ContributesAndroidInjector
 import evovetech.sample.crashes.Crashes
 import evovetech.sample.crashes.CrashesBootstrapModule
@@ -73,7 +72,6 @@ interface AppComponent :
     RealmComponent_ApplicationComponent,
     CrashesComponent_ApplicationComponent,
     ClientComponent_ApplicationComponent,
-    AndroidInjector<App>,
     sourcerer.inject.AppComponent<App> {
 
     // TODO:

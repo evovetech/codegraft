@@ -28,7 +28,7 @@ evove {
         }
         update("com.android") {
             it.module = "com.android.tools.build:gradle"
-            it.version = "3.2.0-alpha16"
+            it.version = "3.2.0-alpha17"
         }
         update("realm") {
             it.module = "io.realm:realm-gradle-plugin"
