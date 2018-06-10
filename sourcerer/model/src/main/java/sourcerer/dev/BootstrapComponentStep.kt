@@ -16,7 +16,6 @@
 
 package sourcerer.dev
 
-import sourcerer.AnnotatedTypeElement
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
 import sourcerer.Env
@@ -25,26 +24,6 @@ import sourcerer.ProcessStep
 import sourcerer.inject.BootstrapComponent
 import sourcerer.typeInputs
 import javax.inject.Inject
-import javax.lang.model.element.TypeElement
-import javax.lang.model.util.Elements
-import javax.lang.model.util.Types
-
-data
-class ComponentDescriptor(
-    val componentDefinitionType: TypeElement
-) {
-    class Factory
-    @Inject constructor(
-        val elements: Elements,
-        val types: Types
-    ) {
-        fun forComponent(
-            componentTypeElement: AnnotatedTypeElement<*>
-        ): ComponentDescriptor {
-            return ComponentDescriptor(componentTypeElement.element)
-        }
-    }
-}
 
 class BootstrapComponentStep
 @Inject constructor(
