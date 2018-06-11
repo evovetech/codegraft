@@ -16,7 +16,6 @@
 
 package evovetech.sample.db.realm
 
-import android.app.Application
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -30,7 +29,8 @@ import io.realm.RealmConfiguration
 import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootScope
 import sourcerer.inject.BootstrapBuilder
-import sourcerer.inject.FunctionQualifier
+import sourcerer.inject.android.AndroidApplication
+import javax.inject.Named
 import javax.inject.Singleton
 
 //
@@ -47,7 +47,7 @@ import javax.inject.Singleton
 interface RealmComponent_ApplicationComponent : RealmComponent {
     @ApplicationComponent.Builder
     interface Builder {
-        @BindsInstance fun application(app: Application)
+        @BindsInstance fun application(app: AndroidApplication)
         @BindsInstance fun realmConfiguration(realmConfiguration: RealmConfiguration)
         fun realmModule(realmModule: RealmModule)
     }
@@ -55,15 +55,8 @@ interface RealmComponent_ApplicationComponent : RealmComponent {
 
 @BootstrapBuilder(modules = [RealmBootstrapModule::class])
 interface RealmComponent_BootstrapBuilder {
-    @BindsInstance fun application(app: Application)
-
-    @BindsInstance fun realm(
-        @FunctionQualifier(
-            params = [RealmConfiguration.Builder::class],
-            returnType = [RealmConfiguration::class]
-        ) init: (RealmConfiguration.Builder.() -> RealmConfiguration)?
-    )
-
+    @BindsInstance fun application(app: AndroidApplication)
+    @BindsInstance fun realm(@Named("realmInit") realmInit: RealmInit?)
     @BindsInstance fun realmModule(realmModule: RealmModule?)
 }
 
@@ -94,7 +87,7 @@ class BootModule {
     @Provides
     @BootScope
     fun provideComponent(
-        app: Application,
+        app: AndroidApplication,
         fabric: Fabric,
         realmConfiguration: RealmConfiguration,
         crashes: Crashes?,
@@ -123,14 +116,5 @@ interface BootComponent {
         RealmComponent_BootstrapBuilder,
         CrashesComponent_BootstrapBuilder {
         fun build(): BootComponent
-    }
-}
-
-object Bootstrap {
-    @JvmStatic inline
-    fun build(init: BootComponent.Builder.() -> Unit): BootComponent {
-        val builder = DaggerBootComponent.builder()
-        builder.init()
-        return builder.build()
     }
 }

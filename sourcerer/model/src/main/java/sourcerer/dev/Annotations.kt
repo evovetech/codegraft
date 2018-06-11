@@ -22,7 +22,10 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.type.TypeMirror
 
 const val BOOTSTRAP_DEPENDENCIES_ATTRIBUTE = "bootstrapDependencies"
+const val BOOTSTRAP_MODULES_ATTRIBUTE = "bootstrapModules"
+const val APPLICATION_MODULES_ATTRIBUTE = "applicationModules"
 const val DEPENDENCIES_ATTRIBUTE = "dependencies"
+const val MODULES_ATTRIBUTE = "modules"
 
 fun getBootstrapComponentDependencies(
     componentAnnotation: AnnotationMirror

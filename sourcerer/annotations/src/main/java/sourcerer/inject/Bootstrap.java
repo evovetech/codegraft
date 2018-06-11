@@ -44,8 +44,9 @@ public
     @Target(TYPE)
     @Retention(CLASS)
     @interface Module {
+        Class<?> applicationComponent();
+
         Class<?>[] includes() default {};
-        Class<?>[] applicationComponents() default {};
     }
 
     @Documented

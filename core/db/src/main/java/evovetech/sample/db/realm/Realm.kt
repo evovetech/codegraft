@@ -16,7 +16,6 @@
 
 package evovetech.sample.db.realm
 
-import android.app.Application
 import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
@@ -25,7 +24,10 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import sourcerer.inject.BootScope
 import sourcerer.inject.BootstrapComponent
-import sourcerer.inject.FunctionQualifier
+import sourcerer.inject.android.AndroidApplication
+import javax.inject.Named
+
+typealias RealmInit = RealmConfiguration.Builder.() -> RealmConfiguration
 
 @BootstrapComponent(
     bootstrapDependencies = [CrashesComponent::class],
@@ -42,15 +44,12 @@ class RealmBootstrapModule {
     @Provides
     @BootScope
     fun provideRealmConfiguration(
-        app: Application,
-        @FunctionQualifier(
-            params = [RealmConfiguration.Builder::class],
-            returnType = [RealmConfiguration::class]
-        ) init: (RealmConfiguration.Builder.() -> RealmConfiguration)?
+        app: AndroidApplication,
+        @Named("realmInit") realmInit: RealmInit?
     ): RealmConfiguration {
         Realm.init(app)
         val builder = RealmConfiguration.Builder()
-        val realmConfiguration = init?.let { it(builder) } ?: builder.build()
+        val realmConfiguration = realmInit?.let { it(builder) } ?: builder.build()
         Realm.setDefaultConfiguration(realmConfiguration)
         return realmConfiguration
     }

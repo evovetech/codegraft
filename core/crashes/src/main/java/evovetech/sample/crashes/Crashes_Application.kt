@@ -17,13 +17,14 @@
 package evovetech.sample.crashes
 
 import com.crashlytics.android.Crashlytics
+import dagger.Module
+import dagger.Provides
 import io.fabric.sdk.android.Fabric
-import sourcerer.inject.Application.Component
-import sourcerer.inject.Application.Module
-import sourcerer.inject.Application.Provides
-import sourcerer.inject.Application.Singleton
+import sourcerer.inject.Application
+import sourcerer.inject.android.AndroidApplication
+import javax.inject.Singleton
 
-@Component(
+@Application.Component(
     modules = [Crashes2::class]
 )
 interface CrashesComponent2 {

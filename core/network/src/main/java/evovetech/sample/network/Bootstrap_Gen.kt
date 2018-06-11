@@ -16,7 +16,6 @@
 
 package evovetech.sample.network
 
-import android.app.Application
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -27,6 +26,7 @@ import evovetech.sample.crashes.CrashesComponent_BootstrapBuilder
 import io.fabric.sdk.android.Fabric
 import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootScope
+import sourcerer.inject.android.AndroidApplication
 import javax.inject.Singleton
 
 //
@@ -73,7 +73,7 @@ class BootModule {
     @Provides
     @BootScope
     fun provideComponent(
-        app: Application,
+        app: AndroidApplication,
         fabric: Fabric,
         crashes: Crashes?
     ): AppComponent = DaggerAppComponent.builder().run {
@@ -95,14 +95,5 @@ interface BootComponent {
     interface Builder :
         CrashesComponent_BootstrapBuilder {
         fun build(): BootComponent
-    }
-}
-
-object Bootstrap {
-    @JvmStatic inline
-    fun build(init: BootComponent.Builder.() -> Unit): BootComponent {
-        val builder = DaggerBootComponent.builder()
-        builder.init()
-        return builder.build()
     }
 }

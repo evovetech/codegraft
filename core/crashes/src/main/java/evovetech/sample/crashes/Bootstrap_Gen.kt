@@ -24,7 +24,8 @@ import io.fabric.sdk.android.Fabric
 import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootScope
 import sourcerer.inject.BootstrapBuilder
-import sourcerer.inject.FunctionQualifier
+import sourcerer.inject.android.AndroidApplication
+import javax.inject.Named
 import javax.inject.Singleton
 
 //
@@ -46,14 +47,7 @@ interface CrashesComponent_ApplicationComponent : CrashesComponent {
 @BootstrapBuilder(modules = [CrashesBootstrapModule::class])
 interface CrashesComponent_BootstrapBuilder {
     @BindsInstance fun application(app: AndroidApplication)
-
-    @BindsInstance fun fabric(
-        @FunctionQualifier(
-            params = [Fabric.Builder::class],
-            returnType = [Fabric::class]
-        ) init: FabricInit?
-    )
-
+    @BindsInstance fun fabric(@Named("fabric") init: FabricInit?)
     @BindsInstance fun crashes(crashes: Crashes?)
 }
 

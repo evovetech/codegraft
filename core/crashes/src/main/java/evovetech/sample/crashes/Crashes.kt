@@ -22,10 +22,10 @@ import dagger.Provides
 import io.fabric.sdk.android.Fabric
 import sourcerer.inject.BootScope
 import sourcerer.inject.BootstrapComponent
-import sourcerer.inject.FunctionQualifier
+import sourcerer.inject.android.AndroidApplication
+import javax.inject.Named
 import javax.inject.Singleton
 
-typealias AndroidApplication = android.app.Application
 typealias FabricInit = Fabric.Builder.() -> Fabric
 
 @BootstrapComponent(
@@ -44,13 +44,11 @@ class CrashesBootstrapModule {
     @BootScope
     fun provideFabric(
         app: AndroidApplication,
-        @FunctionQualifier(
-            params = [Fabric.Builder::class],
-            returnType = [Fabric::class]
-        ) init: FabricInit?
+        @Named("fabric") init: FabricInit?
     ): Fabric {
         val builder = Fabric.Builder(app)
-        val fabric = init?.let { it(builder) } ?: builder.build()
+        val fabric = init?.let { it(builder) }
+                     ?: builder.build()
         return Fabric.with(fabric)
     }
 }

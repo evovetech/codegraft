@@ -16,7 +16,9 @@
 
 package sourcerer.inject.android
 
-interface AppComponent<Application> {
+typealias AndroidApplication = android.app.Application
+
+interface AppComponent<in Application : AndroidApplication> {
     fun inject(application: Application)
 }
 
@@ -50,7 +52,7 @@ class Bootstrap<out Component : AppComponent<*>>(
     }
 
     data
-    class Builder<Application, out Component : AppComponent<Application>>(
+    class Builder<Application : AndroidApplication, out Component : AppComponent<Application>>(
         val application: Application,
         val builder: sourcerer.inject.android.BootComponent.Builder<BootComponent<Component>>
     ) {

@@ -16,31 +16,27 @@
 
 package evovetech.sample.crashes
 
+import dagger.Module
+import dagger.Provides
 import io.fabric.sdk.android.Fabric
-import sourcerer.inject.Bootstrap.Component
-import sourcerer.inject.Bootstrap.Module
-import sourcerer.inject.Bootstrap.Provides
-import sourcerer.inject.Bootstrap.Singleton
+import sourcerer.inject.BootScope
+import sourcerer.inject.Bootstrap
+import sourcerer.inject.android.AndroidApplication
+import javax.inject.Named
 
-@Component(
-    modules = [CrashesBootstrapModule2::class]
-)
-interface CrashesBootstrapComponent {
-    val fabric: Fabric
-}
-
-@Module(
-    applicationComponents = [CrashesComponent2::class]
+@Module
+@Bootstrap.Module(
+    applicationComponent = CrashesComponent2::class
 )
 class CrashesBootstrapModule2 {
     @Provides
-    @Singleton
+    @BootScope
     fun provideFabric(
         app: AndroidApplication,
-        init: FabricInit?
+        @Named("fabricInit") fabricInit: FabricInit?
     ): Fabric {
         val builder = Fabric.Builder(app)
-        val fabric = init?.let { it(builder) } ?: builder.build()
+        val fabric = fabricInit?.let { it(builder) } ?: builder.build()
         return Fabric.with(fabric)
     }
 }

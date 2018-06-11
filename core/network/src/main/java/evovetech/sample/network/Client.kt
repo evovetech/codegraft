@@ -16,7 +16,6 @@
 
 package evovetech.sample.network
 
-import android.app.Application
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -26,6 +25,7 @@ import sourcerer.inject.BootstrapComponent
 import sourcerer.inject.Plugin
 import sourcerer.inject.PluginKey
 import sourcerer.inject.Plugins
+import sourcerer.inject.android.AndroidApplication
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -53,7 +53,7 @@ class ClientPlugin {
 class ClientModule {
     @Provides
     @Singleton
-    fun provideOkhttp(app: Application): OkHttpClient {
+    fun provideOkhttp(app: AndroidApplication): OkHttpClient {
         return OkHttpClient()
     }
 }
