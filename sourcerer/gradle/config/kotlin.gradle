@@ -27,3 +27,4 @@ for (def id : v7s) {
 }
 
 apply from: "${configDir}/kotlin/${fileName}.gradle"
+apply from: "${configDir}/kapt.gradle"

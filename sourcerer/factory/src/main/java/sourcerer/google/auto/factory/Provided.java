@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package sourcerer.google.auto.factory;
 
-def fileName = "v8"
-def v7s = [
-        'com.android.application',
-        'com.android.library'
-]
-for (def id : v7s) {
-    if (project.plugins.hasPlugin(id)) {
-        fileName = "v7"
-        break
-    }
-}
+import java.lang.annotation.Target;
 
-apply from: "${configDir}/kotlin/${fileName}.gradle"
-apply from: "${configDir}/kapt.gradle"
+import static java.lang.annotation.ElementType.PARAMETER;
+
+/**
+ * An annotation to be applied to parameters that should be provided by an
+ * {@linkplain javax.inject.Inject injected} {@link javax.inject.Provider} in a generated factory.
+ *
+ * @author Gregory Kick
+ */
+@Target(PARAMETER)
+public @interface Provided { }

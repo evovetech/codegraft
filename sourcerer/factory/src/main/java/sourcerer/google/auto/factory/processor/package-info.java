@@ -13,18 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-def fileName = "v8"
-def v7s = [
-        'com.android.application',
-        'com.android.library'
-]
-for (def id : v7s) {
-    if (project.plugins.hasPlugin(id)) {
-        fileName = "v7"
-        break
-    }
-}
-
-apply from: "${configDir}/kotlin/${fileName}.gradle"
-apply from: "${configDir}/kapt.gradle"
+/**
+ * This package contains the annotation processor that implements the
+ * {@link sourcerer.google.auto.factory.AutoFactory} API.
+ */
+package sourcerer.google.auto.factory.processor;
