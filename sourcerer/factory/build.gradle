@@ -25,10 +25,12 @@ plugins {
 apply from: "${rootDir}/gradle/base.gradle"
 
 app.autoValueVersion = '1.6'
+app.googleJavaFormatVersion = '1.6'
 
 dependencies {
     api project(':meta:utils')
     kapt "com.google.auto.value:auto-value:${app.autoValueVersion}"
     api "com.google.auto.value:auto-value-annotations:${app.autoValueVersion}"
+    implementation "com.google.googlejavaformat:google-java-format:${app.googleJavaFormatVersion}"
     anno "com.google.auto.service:auto-service:${app.autoServiceVersion}"
 }
