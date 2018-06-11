@@ -16,50 +16,31 @@
 
 package evovetech.sample.crashes
 
-import com.crashlytics.android.Crashlytics
-import dagger.Module
-import dagger.Provides
 import io.fabric.sdk.android.Fabric
-import sourcerer.inject.BootScope
-import sourcerer.inject.BootstrapComponent
-import sourcerer.inject.FunctionQualifier
-import javax.inject.Singleton
+import sourcerer.inject.Bootstrap.Component
+import sourcerer.inject.Bootstrap.Module
+import sourcerer.inject.Bootstrap.Provides
+import sourcerer.inject.Bootstrap.Singleton
 
-typealias AndroidApplication = android.app.Application
-typealias FabricInit = Fabric.Builder.() -> Fabric
-
-@BootstrapComponent(
-    bootstrapModules = [CrashesBootstrapModule::class],
-    applicationModules = [Crashes::class]
+@Component(
+    modules = [CrashesBootstrapModule2::class]
 )
-interface CrashesComponent {
-    val app: AndroidApplication
+interface CrashesBootstrapComponent {
     val fabric: Fabric
-    val crashlytics: Crashlytics
 }
 
-@Module
-class CrashesBootstrapModule {
+@Module(
+    applicationComponents = [CrashesComponent2::class]
+)
+class CrashesBootstrapModule2 {
     @Provides
-    @BootScope
+    @Singleton
     fun provideFabric(
         app: AndroidApplication,
-        @FunctionQualifier(
-            params = [Fabric.Builder::class],
-            returnType = [Fabric::class]
-        ) init: FabricInit?
+        init: FabricInit?
     ): Fabric {
         val builder = Fabric.Builder(app)
         val fabric = init?.let { it(builder) } ?: builder.build()
         return Fabric.with(fabric)
-    }
-}
-
-@Module
-class Crashes {
-    @Provides
-    @Singleton
-    fun provideCrashlytics(kits: Kits): Crashlytics {
-        return kits[Crashlytics::class]
     }
 }

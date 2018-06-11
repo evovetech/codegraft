@@ -16,16 +16,103 @@
 
 package sourcerer.dev
 
+import com.google.auto.common.MoreElements.getAnnotationMirror
+import com.google.auto.common.MoreElements.isAnnotationPresent
+import com.google.auto.common.MoreTypes
+import com.google.common.base.Preconditions.checkArgument
+import com.google.common.collect.ImmutableList
+import com.google.common.collect.Iterables.getOnlyElement
 import sourcerer.AnnotatedTypeElement
+import sourcerer.inject.ApplicationComponent
+import sourcerer.inject.BootstrapComponent
+import java.util.EnumSet
 import javax.inject.Inject
+import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
+import kotlin.reflect.KClass
 
 data
 class ComponentDescriptor(
-    val element: TypeElement
+    val definitionType: TypeElement,
+    val annotationMirror: AnnotationMirror,
+    val dependencies: ImmutableList<TypeMirror>,
+    // TODO: applicationmodules vs bootmodules
+    val modules: ImmutableList<TypeMirror> = ImmutableList.of()
 ) {
+    enum
+    class Kind(
+        val annotationType: KClass<out Annotation>,
+        val builderAnnotationType: KClass<out Annotation>,
+        val dependenciesAttribute: String,
+        val isTopLevel: Boolean
+    ) {
+        Bootstrap(
+            BootstrapComponent::class,
+            BootstrapComponent.Builder::class,
+            BOOTSTRAP_DEPENDENCIES_ATTRIBUTE,
+            true
+        ),
+        Application(
+            ApplicationComponent::class,
+            ApplicationComponent.Builder::class,
+            DEPENDENCIES_ATTRIBUTE,
+            false
+        );
+
+        fun getDependencies(
+            componentAnnotation: AnnotationMirror
+        ): ImmutableList<TypeMirror> {
+            return MoreAnnotationMirrors.getTypeListValue(componentAnnotation, dependenciesAttribute)
+        }
+
+        companion object {
+            /**
+             * Returns the kind of an annotated element if it is annotated with one of the
+             * [annotation types][.annotationType].
+             *
+             * @throws IllegalArgumentException if the element is annotated with more than one of the
+             * annotation types
+             */
+            @JvmStatic
+            fun forAnnotatedElement(element: TypeElement): Kind? {
+                val kinds = EnumSet.noneOf(Kind::class.java)
+                for (kind in values()) {
+                    if (isAnnotationPresent(element, kind.annotationType.java)) {
+                        kinds.add(kind)
+                    }
+                }
+                checkArgument(
+                    kinds.size <= 1, "%s cannot be annotated with more than one of %s", element, kinds
+                )
+                return getOnlyElement<Kind>(kinds, null)
+            }
+
+            /**
+             * Returns the kind of an annotated element if it is annotated with one of the
+             * [annotation types][.builderAnnotationType].
+             *
+             * @throws IllegalArgumentException if the element is annotated with more than one of the
+             * annotation types
+             */
+            @JvmStatic
+            fun forAnnotatedBuilderElement(element: TypeElement): Kind? {
+                val kinds = EnumSet.noneOf(Kind::class.java)
+                for (kind in values()) {
+                    if (isAnnotationPresent(element, kind.builderAnnotationType.java)) {
+                        kinds.add(kind)
+                    }
+                }
+                checkArgument(
+                    kinds.size <= 1, "%s cannot be annotated with more than one of %s", element, kinds
+                )
+                return getOnlyElement(kinds, null)
+            }
+        }
+    }
+
     class Factory
     @Inject constructor(
         val elements: Elements,
@@ -34,7 +121,22 @@ class ComponentDescriptor(
         fun forComponent(
             componentTypeElement: AnnotatedTypeElement<*>
         ): ComponentDescriptor {
-            return ComponentDescriptor(componentTypeElement.element)
+            val componentDefinitionType = componentTypeElement.element
+            val kind = Kind.forAnnotatedElement(componentDefinitionType)
+                       ?: throw IllegalArgumentException("$componentDefinitionType must be annotated with @Component or @ProductionComponent")
+            return create(componentDefinitionType, kind)
+        }
+
+        private
+        fun create(
+            componentDefinitionType: TypeElement,
+            kind: Kind,
+            parentKind: Kind? = null
+        ): ComponentDescriptor {
+            val declaredComponentType = MoreTypes.asDeclared(componentDefinitionType.asType())
+            val componentMirror = getAnnotationMirror(componentDefinitionType, kind.annotationType.java).get()
+            val dependencies = kind.getDependencies(componentMirror)
+            return ComponentDescriptor(componentDefinitionType, componentMirror, dependencies)
         }
     }
 }

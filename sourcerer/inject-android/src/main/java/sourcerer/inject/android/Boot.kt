@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package sourcerer.inject.android
 
 interface AppComponent<Application> {
     fun inject(application: Application)
@@ -23,7 +23,7 @@ interface AppComponent<Application> {
 interface BootComponent<out Component : AppComponent<*>> {
     val component: Component
 
-    interface Builder<out Boot : BootComponent<*>> : sourcerer.inject.Builder<Boot> {
+    interface Builder<out Boot : BootComponent<*>> : sourcerer.inject.android.Builder<Boot> {
         override
         fun build(): Boot
     }
@@ -38,7 +38,7 @@ val <Component : AppComponent<*>> BootApplication<Component>.component: Componen
 
 open
 class Bootstrap<out Component : AppComponent<*>>(
-    builder: () -> Bootstrap.Builder<*, Component>
+    builder: () -> Builder<*, Component>
 ) : BootComponent<Component> {
     final override
     val component by lazy(builder::build)
@@ -52,7 +52,7 @@ class Bootstrap<out Component : AppComponent<*>>(
     data
     class Builder<Application, out Component : AppComponent<Application>>(
         val application: Application,
-        val builder: BootComponent.Builder<BootComponent<Component>>
+        val builder: sourcerer.inject.android.BootComponent.Builder<BootComponent<Component>>
     ) {
         internal
         fun build(): Component = builder.build().component.apply {

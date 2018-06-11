@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package sourcerer.inject.android
 
-import kotlin.reflect.KClass
+interface Builder<out T> {
+    fun build(): T
+}
 
-@Target(AnnotationTarget.FILE, AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.BINARY)
-@MustBeDocumented
-annotation
-class BootstrapModule(
-    val includes: Array<KClass<*>> = [],
-    val applicationComponents: Array<KClass<*>> = []
-)
+fun <T> Builder<T>.build(
+    init: T.() -> Unit
+): T = build().apply(init)

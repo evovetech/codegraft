@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package sourcerer.dev
 
-import android.app.Application
-import android.util.Log
+import com.google.common.collect.ImmutableList
+import sourcerer.dev.MoreAnnotationMirrors.getTypeListValue
+import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.type.TypeMirror
 
-// Content Provider
-class BootstrapProvider : EmptyContentProvider() {
-    override
-    fun onCreate(): Boolean {
-        val TAG = "BootstrapProvider"
-        val app = context as Application
-        when (app) {
-            is BootApplication<*> -> {
-                Log.d(TAG, "Bootstrapping!!")
-                app.bootstrap.initialize()
-            }
-            else -> {
-                Log.d(TAG, "NO Bootstraps :(")
-            }
-        }
-        return true
-    }
+const val BOOTSTRAP_DEPENDENCIES_ATTRIBUTE = "bootstrapDependencies"
+const val DEPENDENCIES_ATTRIBUTE = "dependencies"
+
+fun getBootstrapComponentDependencies(
+    componentAnnotation: AnnotationMirror
+): ImmutableList<TypeMirror> {
+    checkNotNull(componentAnnotation)
+    return getTypeListValue(componentAnnotation, BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
 }

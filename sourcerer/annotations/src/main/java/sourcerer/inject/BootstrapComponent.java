@@ -27,9 +27,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public
 @interface BootstrapComponent {
-    Class<?>[] bootstrapModules() default {};
-
     Class<?>[] bootstrapDependencies() default {};
+
+    Class<?>[] bootstrapModules() default {};
 
     Class<?>[] applicationModules() default {};
 

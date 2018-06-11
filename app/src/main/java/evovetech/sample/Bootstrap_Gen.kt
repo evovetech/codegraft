@@ -35,9 +35,9 @@ import evovetech.sample.network.ClientPlugin
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
 import sourcerer.inject.ActivityScope
-import sourcerer.inject.BootComponent
 import sourcerer.inject.BootScope
-import sourcerer.inject.Bootstrap
+import sourcerer.inject.android.BootComponent
+import sourcerer.inject.android.Bootstrap
 import javax.inject.Singleton
 
 //
@@ -72,7 +72,7 @@ interface AppComponent :
     RealmComponent_ApplicationComponent,
     CrashesComponent_ApplicationComponent,
     ClientComponent_ApplicationComponent,
-    sourcerer.inject.AppComponent<App> {
+    sourcerer.inject.android.AppComponent<App> {
 
     // TODO:
     fun inject(mainActivity: MainActivity)

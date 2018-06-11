@@ -16,7 +16,6 @@
 
 package evovetech.sample.crashes
 
-import android.app.Application
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -38,7 +37,7 @@ import javax.inject.Singleton
 interface CrashesComponent_ApplicationComponent : CrashesComponent {
     @ApplicationComponent.Builder
     interface Builder {
-        @BindsInstance fun application(app: Application)
+        @BindsInstance fun application(app: AndroidApplication)
         @BindsInstance fun fabric(fabric: Fabric)
         fun crashes(crashes: Crashes)
     }
@@ -46,13 +45,13 @@ interface CrashesComponent_ApplicationComponent : CrashesComponent {
 
 @BootstrapBuilder(modules = [CrashesBootstrapModule::class])
 interface CrashesComponent_BootstrapBuilder {
-    @BindsInstance fun application(app: Application)
+    @BindsInstance fun application(app: AndroidApplication)
 
     @BindsInstance fun fabric(
         @FunctionQualifier(
             params = [Fabric.Builder::class],
             returnType = [Fabric::class]
-        ) init: (Fabric.Builder.() -> Fabric)?
+        ) init: FabricInit?
     )
 
     @BindsInstance fun crashes(crashes: Crashes?)
@@ -74,7 +73,7 @@ class BootModule {
     @Provides
     @BootScope
     fun provideComponent(
-        app: Application,
+        app: AndroidApplication,
         fabric: Fabric,
         crashes: Crashes?
     ): AppComponent {
@@ -97,14 +96,5 @@ interface BootComponent {
     @Component.Builder
     interface Builder : CrashesComponent_BootstrapBuilder {
         fun build(): BootComponent
-    }
-}
-
-object Bootstrap {
-    @JvmStatic inline
-    fun build(init: BootComponent.Builder.() -> Unit): BootComponent {
-        val builder = DaggerBootComponent.builder()
-        builder.init()
-        return builder.build()
     }
 }

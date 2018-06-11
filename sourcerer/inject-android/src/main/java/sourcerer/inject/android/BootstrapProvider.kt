@@ -14,12 +14,26 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package sourcerer.inject.android
 
-interface Builder<out T> {
-    fun build(): T
+import android.app.Application
+import android.util.Log
+
+// Content Provider
+class BootstrapProvider : EmptyContentProvider() {
+    override
+    fun onCreate(): Boolean {
+        val TAG = "BootstrapProvider"
+        val app = context as Application
+        when (app) {
+            is BootApplication<*> -> {
+                Log.d(TAG, "Bootstrapping!!")
+                app.bootstrap.initialize()
+            }
+            else -> {
+                Log.d(TAG, "NO Bootstraps :(")
+            }
+        }
+        return true
+    }
 }
-
-fun <T> Builder<T>.build(
-    init: T.() -> Unit
-): T = build().apply(init)

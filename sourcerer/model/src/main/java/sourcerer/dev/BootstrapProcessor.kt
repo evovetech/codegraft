@@ -53,7 +53,7 @@ class BootstrapProcessStepsModule {
     fun provideProcessSteps(
         buildsStep: BuildsStep,
         bootstrapModuleStep: BootstrapModuleStep,
-        bootstrapComponentStep: BootstrapComponentStep
+        bootstrapComponentStep: ComponentStep
     ): List<ProcessStep> = listOf(
         buildsStep,
         bootstrapModuleStep,
