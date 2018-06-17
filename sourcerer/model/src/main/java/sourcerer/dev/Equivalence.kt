@@ -16,3 +16,8 @@
 
 package sourcerer.dev
 
+import com.google.common.base.Equivalence
+
+fun <T> Equivalence.Wrapper<T>?.unwrap(): T? =
+    this?.get()
+

@@ -20,7 +20,6 @@ import com.google.auto.common.AnnotationMirrors.getAnnotatedAnnotations
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
-import sourcerer.dev.MoreAnnotationMirrors.getTypeListValue
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.lang.model.element.AnnotationMirror
@@ -37,7 +36,7 @@ const val DEPENDENCIES_ATTRIBUTE = "dependencies"
 const val MODULES_ATTRIBUTE = "modules"
 
 val AnnotationMirror.bootstrapComponentDependencies: ImmutableList<TypeMirror>
-    get() = getTypeListValue(this, BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
+    get() = getTypeListValue(BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
 
 val Element.qualifier: AnnotationMirror?
     get() {

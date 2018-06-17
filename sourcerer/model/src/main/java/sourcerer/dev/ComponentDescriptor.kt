@@ -64,26 +64,19 @@ class ComponentDescriptor(
             false
         );
 
-        fun getDependencies(
-            componentAnnotation: AnnotationMirror
-        ): ImmutableList<TypeMirror> {
-            return MoreAnnotationMirrors.getTypeListValue(componentAnnotation, dependenciesAttribute)
-        }
+        val AnnotationMirror.dependencies: ImmutableList<TypeMirror>
+            get() = getTypeListValue(dependenciesAttribute)
 
-        fun getModules(
-            componentAnnotation: AnnotationMirror
-        ): ImmutableList<TypeMirror> {
-            return MoreAnnotationMirrors.getTypeListValue(componentAnnotation, modulesAttribute)
-        }
+        val AnnotationMirror.modules: ImmutableList<TypeMirror>
+            get() = getTypeListValue(modulesAttribute)
 
-        fun getApplicationModules(
-            componentAnnotation: AnnotationMirror
-        ): ImmutableList<TypeMirror> {
-            if (this == Bootstrap) {
-                return MoreAnnotationMirrors.getTypeListValue(componentAnnotation, APPLICATION_MODULES_ATTRIBUTE)
+        val AnnotationMirror.applicationModules: ImmutableList<TypeMirror>
+            get() {
+                if (this == Bootstrap) {
+                    return getTypeListValue(APPLICATION_MODULES_ATTRIBUTE)
+                }
+                return ImmutableList.of()
             }
-            return ImmutableList.of()
-        }
 
         companion object {
             /**
@@ -142,26 +135,27 @@ class ComponentDescriptor(
             val componentDefinitionType = componentTypeElement.element
             val kind = Kind.forAnnotatedElement(componentDefinitionType)
                        ?: throw IllegalArgumentException("$componentDefinitionType must be annotated with @Component or @ProductionComponent")
-            return create(componentDefinitionType, kind)
+            return kind.create(componentDefinitionType)
         }
 
         private
-        fun create(
+        fun Kind.create(
             componentDefinitionType: TypeElement,
-            kind: Kind,
             parentKind: Kind? = null
         ): ComponentDescriptor {
             val declaredComponentType = MoreTypes.asDeclared(componentDefinitionType.asType())
-            val componentMirror = getAnnotationMirror(componentDefinitionType, kind.annotationType.java).get()
-            val dependencies = kind.getDependencies(componentMirror)
-            val modules = kind.getModules(componentMirror)
-                    .map { moduleFactory.create(MoreTypes.asTypeElement(it)) }
-            val applicationModules = kind.getApplicationModules(componentMirror)
+            val componentMirror = getAnnotationMirror(componentDefinitionType, annotationType.java).get()
+            val dependencies = componentMirror.dependencies
+            val modules = componentMirror.modules
+                    .map { MoreTypes.asTypeElement(it) }
+                    .map(moduleFactory::create)
+                    .toImmutableList()
+            val applicationModules = componentMirror.applicationModules
             return ComponentDescriptor(
                 componentDefinitionType,
                 componentMirror,
                 dependencies,
-                modules.toImmutableList(),
+                modules,
                 applicationModules
             )
         }

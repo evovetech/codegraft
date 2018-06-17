@@ -24,11 +24,5 @@ import sourcerer.ProcessStep
 @Module(includes = [EnvModule::class])
 interface BootstrapProcessStepsModule {
     @Binds @IntoSet
-    fun provideBuildsStep(step: BuildsStep): ProcessStep
-
-    @Binds @IntoSet
-    fun provideBootstrapModuleStep(step: BootstrapModuleStep): ProcessStep
-
-    @Binds @IntoSet
     fun provideComponentStep(step: ComponentStep): ProcessStep
 }
