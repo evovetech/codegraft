@@ -18,17 +18,12 @@ package sourcerer.dev
 
 import com.google.auto.service.AutoService
 import dagger.BindsInstance
-import dagger.Component
-import dagger.Module
-import dagger.Provides
 import sourcerer.BaseProcessor
 import sourcerer.ProcessStep
-import sourcerer.processor.Env
 import sourcerer.processor.Env.Options
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
 import javax.inject.Inject
-import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 
 @AutoService(Processor::class)
@@ -38,57 +33,23 @@ class BootstrapProcessor : BaseProcessor() {
 
     override
     fun processSteps(): List<ProcessStep> {
-        val component = DaggerBootstrapProcessorComponent.builder().run {
+        val component = DaggerBootstrapProcessor_Component.builder().run {
             processingEnv(processingEnv)
             build()
         }
         component.inject(this)
         return component.processSteps
     }
-}
 
-@Module
-class BootstrapProcessStepsModule {
-    @Provides
-    fun provideProcessSteps(
-        buildsStep: BuildsStep,
-        bootstrapModuleStep: BootstrapModuleStep,
-        bootstrapComponentStep: ComponentStep
-    ): List<ProcessStep> = listOf(
-        buildsStep,
-        bootstrapModuleStep,
-        bootstrapComponentStep
-    )
+    @dagger.Component(modules = [BootstrapProcessStepsModule::class])
+    interface Component {
+        fun inject(processor: BootstrapProcessor)
+        val processSteps: List<ProcessStep>
 
-    @Provides
-    fun providesTypes(processingEnv: ProcessingEnvironment): Types {
-        return processingEnv.typeUtils
-    }
-
-    @Provides
-    fun providesElements(processingEnv: ProcessingEnvironment): Elements {
-        return processingEnv.elementUtils
-    }
-
-    @Provides
-    fun providesEnv(processingEnv: ProcessingEnvironment): Env {
-        return Env(processingEnv)
-    }
-
-    @Provides
-    fun providesOptions(processingEnv: ProcessingEnvironment): Options {
-        return Options(processingEnv.options)
-    }
-}
-
-@Component(modules = [BootstrapProcessStepsModule::class])
-interface BootstrapProcessorComponent {
-    fun inject(processor: BootstrapProcessor)
-    val processSteps: List<ProcessStep>
-
-    @Component.Builder
-    interface Builder {
-        @BindsInstance fun processingEnv(processingEnv: ProcessingEnvironment)
-        fun build(): BootstrapProcessorComponent
+        @dagger.Component.Builder
+        interface Builder {
+            @BindsInstance fun processingEnv(processingEnv: ProcessingEnvironment)
+            fun build(): Component
+        }
     }
 }

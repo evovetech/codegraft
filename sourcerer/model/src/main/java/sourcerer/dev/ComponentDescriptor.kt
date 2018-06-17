@@ -31,7 +31,6 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
-import javax.lang.model.util.Types
 import kotlin.reflect.KClass
 
 data
@@ -134,7 +133,7 @@ class ComponentDescriptor(
     class Factory
     @Inject constructor(
         val elements: Elements,
-        val types: Types,
+        val types: SourcererTypes,
         val moduleFactory: ModuleDescriptor.Factory
     ) {
         fun forComponent(
@@ -162,7 +161,7 @@ class ComponentDescriptor(
                 componentDefinitionType,
                 componentMirror,
                 dependencies,
-                ImmutableList.copyOf(modules),
+                modules.toImmutableList(),
                 applicationModules
             )
         }

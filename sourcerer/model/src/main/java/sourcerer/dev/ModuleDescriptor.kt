@@ -16,34 +16,68 @@
 
 package sourcerer.dev
 
+import com.google.auto.common.MoreElements
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.common.collect.ImmutableList
+import dagger.Module
 import dagger.Provides
 import javax.inject.Inject
+import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
+import javax.lang.model.element.VariableElement
 import javax.lang.model.util.ElementFilter.methodsIn
 import javax.lang.model.util.Elements
-import javax.lang.model.util.Types
 
 data
 class ModuleDescriptor(
     val definitionType: TypeElement,
-    val providesMethods: ImmutableList<ExecutableElement>
+    val moduleMirror: AnnotationMirror,
+    val providesMethods: ImmutableList<MethodDescriptor>
 ) {
     class Factory
     @Inject constructor(
         val elements: Elements,
-        val types: Types
+        val types: SourcererTypes,
+        val methodFactory: MethodDescriptor.Factory
     ) {
         fun create(
-            moduleElement: TypeElement
+            moduleDefinitionType: TypeElement
         ): ModuleDescriptor {
-            val methods = methodsIn(elements.getAllMembers(moduleElement))
+            val methods = methodsIn(elements.getAllMembers(moduleDefinitionType))
+            val moduleMirror = MoreElements.getAnnotationMirror(moduleDefinitionType, Module::class.java).get()
             val providesMethods = methods.filter { moduleMethod ->
                 isAnnotationPresent(moduleMethod, Provides::class.java)
+            }.map(methodFactory::forProvidesMethod)
+            return ModuleDescriptor(
+                moduleDefinitionType,
+                moduleMirror,
+                providesMethods.toImmutableList()
+            )
+        }
+    }
+
+    data
+    class MethodDescriptor(
+        val element: ExecutableElement,
+        val params: ImmutableList<Pair<Key, VariableElement>>
+    ) {
+        class Factory
+        @Inject constructor(
+            val elements: Elements,
+            val types: SourcererTypes,
+            val keyFactory: Key.Factory
+        ) {
+            fun forProvidesMethod(
+                method: ExecutableElement
+            ): MethodDescriptor {
+                val params = method.parameters.map {
+                    val key = keyFactory.create(it)
+                    Pair(key, it)
+                }
+                val typeParams = method.typeParameters
+                return MethodDescriptor(method, params.toImmutableList())
             }
-            return ModuleDescriptor(moduleElement, ImmutableList.copyOf(providesMethods))
         }
     }
 }

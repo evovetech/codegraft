@@ -47,7 +47,7 @@ class CrashesBootstrapModule {
         @Named("fabric") init: FabricInit?
     ): Fabric {
         val builder = Fabric.Builder(app)
-        val fabric = init?.let { it(builder) }
+        val fabric = init?.run { invoke(builder) }
                      ?: builder.build()
         return Fabric.with(fabric)
     }
