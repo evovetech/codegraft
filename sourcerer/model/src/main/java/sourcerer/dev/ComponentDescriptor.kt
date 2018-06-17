@@ -27,6 +27,7 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import dagger.BindsInstance
+import org.jetbrains.annotations.Nullable
 import sourcerer.AnnotatedTypeElement
 import sourcerer.BaseElement
 import sourcerer.Env
@@ -200,6 +201,7 @@ class BootstrapBuilderGenerator(
 
     override
     fun typeSpec() = typeSpec {
+        addModifiers(PUBLIC)
         addAnnotation(ClassName.get(BootstrapBuilder::class.java).toKlass()) {
             descriptor.modules
                     .mapNotNull { ClassName.get(it.definitionType) }
@@ -210,10 +212,14 @@ class BootstrapBuilderGenerator(
         val applicationModules = descriptor.applicationModules.map { module ->
             val type = module.definitionType
             val name = type.simpleName.toString().decapitalize()
+            val param = ParameterSpec.builder(ClassName.get(type), name).run {
+                addAnnotation(Nullable::class.java)
+                build()
+            }
             MethodSpec.methodBuilder(name).run {
-                //                addAnnotation(BindsInstance::class.java)
+                addAnnotation(BindsInstance::class.java)
                 addModifiers(PUBLIC, ABSTRACT)
-                addParameter(ClassName.get(type), name)
+                addParameter(param)
                 build()
             }
         }
