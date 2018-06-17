@@ -50,10 +50,21 @@ class ComponentStep
         log("")
         val bootstrapComponents = annotationElements.typeInputs<BootstrapComponent>()
                 .map(componentFactory::forComponent)
-        log("bootstrapComponents=$bootstrapComponents")
+        log("bootstrapComponent {")
+        bootstrapComponents
+                .flatMap { it.modules }
+                .forEach {
+                    it.provisionBindings.forEach {
+                        log("    $it")
+                    }
+                    it.dependencies.forEach {
+                        log("    $it")
+                    }
+                }
+        log("}")
         val applicationComponents = annotationElements.typeInputs<ApplicationComponent>()
                 .map(componentFactory::forComponent)
-        log("applicationComponents=$applicationComponents")
+//        log("applicationComponents=$applicationComponents")
         return emptyMap()
     }
 

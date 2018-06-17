@@ -16,14 +16,14 @@
 
 package sourcerer.dev
 
-import com.google.auto.common.MoreElements
+import com.google.auto.common.MoreElements.getAnnotationMirror
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableSet
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.util.ElementFilter.methodsIn
 import javax.lang.model.util.Elements
@@ -32,48 +32,26 @@ data
 class ModuleDescriptor(
     val definitionType: TypeElement,
     val moduleMirror: AnnotationMirror,
-    val providesMethods: ImmutableList<MethodDescriptor>
+    val provisionBindings: ImmutableList<Binding>,
+    val dependencies: ImmutableSet<Dependency> = provisionBindings.flatMap {
+        it.dependencies
+    }.toImmutableSet()
 ) {
     class Factory
     @Inject constructor(
         val elements: Elements,
         val types: SourcererTypes,
-        val methodFactory: MethodDescriptor.Factory
+        val bindingFactory: Binding.Factory
     ) {
         fun create(
             moduleDefinitionType: TypeElement
-        ): ModuleDescriptor {
-            val methods = methodsIn(elements.getAllMembers(moduleDefinitionType))
-            val moduleMirror = MoreElements.getAnnotationMirror(moduleDefinitionType, Module::class.java).get()
-            val providesMethods = methods
+        ) = ModuleDescriptor(
+            definitionType = moduleDefinitionType,
+            moduleMirror = getAnnotationMirror(moduleDefinitionType, Module::class.java).get(),
+            provisionBindings = methodsIn(elements.getAllMembers(moduleDefinitionType))
                     .filter { isAnnotationPresent(it, Provides::class.java) }
-                    .map { methodFactory.forProvidesMethod(it, moduleDefinitionType) }
-            return ModuleDescriptor(
-                moduleDefinitionType,
-                moduleMirror,
-                providesMethods.toImmutableList()
-            )
-        }
-    }
-
-    data
-    class MethodDescriptor(
-        val element: ExecutableElement,
-        val binding: Binding
-    ) {
-        class Factory
-        @Inject constructor(
-            val elements: Elements,
-            val types: SourcererTypes,
-            val bindingFactory: Binding.Factory
-        ) {
-            fun forProvidesMethod(
-                methodElement: ExecutableElement,
-                contibutingModule: TypeElement
-            ) = MethodDescriptor(
-                methodElement,
-                bindingFactory.forProvisionMethod(methodElement, contibutingModule)
-            )
-        }
+                    .map { bindingFactory.forProvisionMethod(it, moduleDefinitionType) }
+                    .toImmutableList()
+        )
     }
 }
