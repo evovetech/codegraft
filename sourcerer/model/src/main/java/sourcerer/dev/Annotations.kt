@@ -16,10 +16,19 @@
 
 package sourcerer.dev
 
+import com.google.auto.common.AnnotationMirrors.getAnnotatedAnnotations
+import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableSet
 import sourcerer.dev.MoreAnnotationMirrors.getTypeListValue
+import javax.inject.Inject
+import javax.inject.Qualifier
 import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.Element
+import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
+import javax.lang.model.util.ElementFilter.constructorsIn
 
 const val BOOTSTRAP_DEPENDENCIES_ATTRIBUTE = "bootstrapDependencies"
 const val BOOTSTRAP_MODULES_ATTRIBUTE = "bootstrapModules"
@@ -27,9 +36,26 @@ const val APPLICATION_MODULES_ATTRIBUTE = "applicationModules"
 const val DEPENDENCIES_ATTRIBUTE = "dependencies"
 const val MODULES_ATTRIBUTE = "modules"
 
-fun getBootstrapComponentDependencies(
-    componentAnnotation: AnnotationMirror
-): ImmutableList<TypeMirror> {
-    checkNotNull(componentAnnotation)
-    return getTypeListValue(componentAnnotation, BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
-}
+val AnnotationMirror.bootstrapComponentDependencies: ImmutableList<TypeMirror>
+    get() = getTypeListValue(this, BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
+
+val Element.qualifier: AnnotationMirror?
+    get() {
+        val qualifierAnnotations = qualifiers
+        return when (qualifierAnnotations.size) {
+            0 -> null
+            1 -> qualifierAnnotations.first()
+            else -> throw IllegalArgumentException(
+                toString() + " was annotated with more than one @Qualifier annotation"
+            )
+        }
+    }
+
+val Element.qualifiers: ImmutableSet<out AnnotationMirror>
+    get() = getAnnotatedAnnotations(this, Qualifier::class.java)
+
+/** Returns the constructors in `type` that are annotated with [Inject].  */
+val TypeElement.injectedConstructors: ImmutableSet<ExecutableElement>
+    get() = constructorsIn(enclosedElements)
+            .filter { constructor -> isAnnotationPresent(constructor, Inject::class.java) }
+            .toImmutableSet()

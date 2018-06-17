@@ -16,20 +16,19 @@
 
 package sourcerer.dev
 
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
+import dagger.multibindings.IntoSet
 import sourcerer.ProcessStep
 
 @Module(includes = [EnvModule::class])
-class BootstrapProcessStepsModule {
-    @Provides
-    fun provideProcessSteps(
-        buildsStep: BuildsStep,
-        bootstrapModuleStep: BootstrapModuleStep,
-        bootstrapComponentStep: ComponentStep
-    ): List<ProcessStep> = listOf(
-        buildsStep,
-        bootstrapModuleStep,
-        bootstrapComponentStep
-    )
+interface BootstrapProcessStepsModule {
+    @Binds @IntoSet
+    fun provideBuildsStep(step: BuildsStep): ProcessStep
+
+    @Binds @IntoSet
+    fun provideBootstrapModuleStep(step: BootstrapModuleStep): ProcessStep
+
+    @Binds @IntoSet
+    fun provideComponentStep(step: ComponentStep): ProcessStep
 }

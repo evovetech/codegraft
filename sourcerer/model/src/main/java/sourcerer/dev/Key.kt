@@ -26,6 +26,8 @@ import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import javax.lang.model.element.ExecutableElement
+import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeMirror
 
 /**
@@ -90,6 +92,23 @@ class Key(
                     .orNull()
             val keyType = types.boxedType(type)
             return Key(keyType, qualifier)
+        }
+
+        fun forQualifiedType(
+            type: TypeMirror,
+            qualifier: AnnotationMirror? = null
+        ) = Key(type.boxed(), qualifier)
+
+        fun forMethod(
+            method: ExecutableElement,
+            keyType: TypeMirror
+        ): Key = forQualifiedType(keyType, method.qualifier)
+
+        private
+        fun TypeMirror.boxed(): TypeMirror = if (this.kind.isPrimitive) {
+            types.boxedClass(this as PrimitiveType).asType()
+        } else {
+            this
         }
     }
 }

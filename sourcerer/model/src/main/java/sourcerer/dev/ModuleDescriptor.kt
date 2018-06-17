@@ -25,7 +25,6 @@ import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
-import javax.lang.model.element.VariableElement
 import javax.lang.model.util.ElementFilter.methodsIn
 import javax.lang.model.util.Elements
 
@@ -46,9 +45,9 @@ class ModuleDescriptor(
         ): ModuleDescriptor {
             val methods = methodsIn(elements.getAllMembers(moduleDefinitionType))
             val moduleMirror = MoreElements.getAnnotationMirror(moduleDefinitionType, Module::class.java).get()
-            val providesMethods = methods.filter { moduleMethod ->
-                isAnnotationPresent(moduleMethod, Provides::class.java)
-            }.map(methodFactory::forProvidesMethod)
+            val providesMethods = methods
+                    .filter { isAnnotationPresent(it, Provides::class.java) }
+                    .map { methodFactory.forProvidesMethod(it, moduleDefinitionType) }
             return ModuleDescriptor(
                 moduleDefinitionType,
                 moduleMirror,
@@ -60,24 +59,21 @@ class ModuleDescriptor(
     data
     class MethodDescriptor(
         val element: ExecutableElement,
-        val params: ImmutableList<Pair<Key, VariableElement>>
+        val binding: Binding
     ) {
         class Factory
         @Inject constructor(
             val elements: Elements,
             val types: SourcererTypes,
-            val keyFactory: Key.Factory
+            val bindingFactory: Binding.Factory
         ) {
             fun forProvidesMethod(
-                method: ExecutableElement
-            ): MethodDescriptor {
-                val params = method.parameters.map {
-                    val key = keyFactory.create(it)
-                    Pair(key, it)
-                }
-                val typeParams = method.typeParameters
-                return MethodDescriptor(method, params.toImmutableList())
-            }
+                methodElement: ExecutableElement,
+                contibutingModule: TypeElement
+            ) = MethodDescriptor(
+                methodElement,
+                bindingFactory.forProvisionMethod(methodElement, contibutingModule)
+            )
         }
     }
 }

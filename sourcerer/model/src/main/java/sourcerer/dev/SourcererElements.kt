@@ -16,22 +16,14 @@
 
 package sourcerer.dev
 
-import com.google.auto.common.MoreTypes.asPrimitiveType
 import javax.inject.Inject
-import javax.lang.model.type.TypeMirror
+import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 
-class SourcererTypes
+class SourcererElements
 @Inject constructor(
-    private val elements: SourcererElements,
+    private val elements: Elements,
     private val types: Types
-) : Types by types {
+) : Elements by elements {
 
-    fun boxedType(
-        type: TypeMirror
-    ): TypeMirror = if (type.kind.isPrimitive) {
-        boxedClass(asPrimitiveType(type)).asType()
-    } else {
-        type
-    }
 }

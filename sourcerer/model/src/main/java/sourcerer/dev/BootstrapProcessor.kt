@@ -39,12 +39,13 @@ class BootstrapProcessor : BaseProcessor() {
         }
         component.inject(this)
         return component.processSteps
+                .toList()
     }
 
     @dagger.Component(modules = [BootstrapProcessStepsModule::class])
     interface Component {
         fun inject(processor: BootstrapProcessor)
-        val processSteps: List<ProcessStep>
+        val processSteps: Set<ProcessStep>
 
         @dagger.Component.Builder
         interface Builder {

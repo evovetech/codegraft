@@ -17,10 +17,19 @@
 package sourcerer.dev
 
 import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 
 fun <T> Collection<T>.toImmutableList(): ImmutableList<T> {
     return ImmutableList.copyOf(this)
+}
+
+fun <T> Collection<T>.toImmutableSet(): ImmutableSet<T> {
+    return ImmutableSet.copyOf(this)
+}
+
+fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V> {
+    return ImmutableMap.copyOf(this)
 }
 
 inline
