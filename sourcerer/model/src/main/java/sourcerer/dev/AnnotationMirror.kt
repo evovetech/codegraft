@@ -47,6 +47,6 @@ fun AnnotationMirror.getTypeListValue(
     name: String
 ): ImmutableList<TypeMirror> {
     return asAnnotationValues(getAnnotationValue(this, name))
-            .map { asType(it) }
+            .map(MoreAnnotationValues::asType)
             .toImmutableList()
 }

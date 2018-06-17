@@ -22,8 +22,10 @@ import com.google.auto.common.MoreTypes
 import com.google.common.base.Preconditions.checkArgument
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables.getOnlyElement
+import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.ParameterSpec
 import dagger.BindsInstance
 import sourcerer.AnnotatedTypeElement
 import sourcerer.BaseElement
@@ -83,8 +85,8 @@ class ComponentDescriptor(
             get() = getTypeListValue(modulesAttribute)
 
         val AnnotationMirror.applicationModules: ImmutableList<TypeMirror>
-            get() = when (annotationType) {
-                BootstrapComponent::class.java -> getTypeListValue(APPLICATION_MODULES_ATTRIBUTE)
+            get() = when (this@Kind) {
+                Bootstrap -> getTypeListValue(APPLICATION_MODULES_ATTRIBUTE)
                 else -> ImmutableList.of()
             }
 
@@ -225,11 +227,16 @@ class BootstrapBuilderGenerator(
             val type = MoreTypes.asDeclared(key.type)
             val element = type.asElement()
             val name = element.simpleName.toString().decapitalize()
-
+            val param = ParameterSpec.builder(ClassName.get(type), name).run {
+                key.qualifier?.let {
+                    addAnnotation(AnnotationSpec.get(it))
+                }
+                build()
+            }
             MethodSpec.methodBuilder(name).run {
                 addAnnotation(BindsInstance::class.java)
                 addModifiers(PUBLIC, ABSTRACT)
-                addParameter(ClassName.get(type), name)
+                addParameter(param)
                 build()
             }
 
