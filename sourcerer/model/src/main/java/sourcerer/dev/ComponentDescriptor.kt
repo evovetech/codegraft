@@ -22,24 +22,36 @@ import com.google.auto.common.MoreTypes
 import com.google.common.base.Preconditions.checkArgument
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables.getOnlyElement
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.MethodSpec
+import dagger.BindsInstance
 import sourcerer.AnnotatedTypeElement
+import sourcerer.BaseElement
+import sourcerer.Env
+import sourcerer.addAnnotation
+import sourcerer.addTo
 import sourcerer.inject.ApplicationComponent
+import sourcerer.inject.BootstrapBuilder
 import sourcerer.inject.BootstrapComponent
+import sourcerer.interfaceBuilder
+import sourcerer.toKlass
+import sourcerer.typeSpec
 import java.util.EnumSet
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.Modifier.ABSTRACT
+import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
-import javax.lang.model.util.Elements
 import kotlin.reflect.KClass
 
 data
 class ComponentDescriptor(
     val definitionType: TypeElement,
     val annotationMirror: AnnotationMirror,
-    val dependencies: ImmutableList<TypeMirror>,
+    val dependencies: ImmutableList<ComponentDescriptor>,
     val modules: ImmutableList<ModuleDescriptor>,
-    val applicationModules: ImmutableList<TypeMirror>
+    val applicationModules: ImmutableList<ModuleDescriptor>
 ) {
     enum
     class Kind(
@@ -71,11 +83,9 @@ class ComponentDescriptor(
             get() = getTypeListValue(modulesAttribute)
 
         val AnnotationMirror.applicationModules: ImmutableList<TypeMirror>
-            get() {
-                if (this == Bootstrap) {
-                    return getTypeListValue(APPLICATION_MODULES_ATTRIBUTE)
-                }
-                return ImmutableList.of()
+            get() = when (annotationType) {
+                BootstrapComponent::class.java -> getTypeListValue(APPLICATION_MODULES_ATTRIBUTE)
+                else -> ImmutableList.of()
             }
 
         companion object {
@@ -123,16 +133,23 @@ class ComponentDescriptor(
         }
     }
 
+    fun generator(env: Env): BootstrapBuilderGenerator {
+        return BootstrapBuilderGenerator(this, env)
+    }
+
     class Factory
     @Inject constructor(
-        val elements: Elements,
+        val elements: SourcererElements,
         val types: SourcererTypes,
         val moduleFactory: ModuleDescriptor.Factory
     ) {
         fun forComponent(
             componentTypeElement: AnnotatedTypeElement<*>
+        ): ComponentDescriptor = forComponent(componentTypeElement.element)
+
+        fun forComponent(
+            componentDefinitionType: TypeElement
         ): ComponentDescriptor {
-            val componentDefinitionType = componentTypeElement.element
             val kind = Kind.forAnnotatedElement(componentDefinitionType)
                        ?: throw IllegalArgumentException("$componentDefinitionType must be annotated with @Component or @ProductionComponent")
             return kind.create(componentDefinitionType)
@@ -146,11 +163,17 @@ class ComponentDescriptor(
             val declaredComponentType = MoreTypes.asDeclared(componentDefinitionType.asType())
             val componentMirror = getAnnotationMirror(componentDefinitionType, annotationType.java).get()
             val dependencies = componentMirror.dependencies
+                    .map(MoreTypes::asTypeElement)
+                    .map(this@Factory::forComponent)
+                    .toImmutableList()
             val modules = componentMirror.modules
-                    .map { MoreTypes.asTypeElement(it) }
+                    .map(MoreTypes::asTypeElement)
                     .map(moduleFactory::create)
                     .toImmutableList()
             val applicationModules = componentMirror.applicationModules
+                    .map(MoreTypes::asTypeElement)
+                    .map(moduleFactory::create)
+                    .toImmutableList()
             return ComponentDescriptor(
                 componentDefinitionType,
                 componentMirror,
@@ -159,5 +182,60 @@ class ComponentDescriptor(
                 applicationModules
             )
         }
+    }
+}
+
+class BootstrapBuilderGenerator(
+    private val descriptor: ComponentDescriptor,
+    private val env: Env,
+    override val rawType: ClassName = ClassName.get(descriptor.definitionType)
+) : BaseElement {
+    override
+    val outExt: String = "BootstrapBuilder2"
+
+    override
+    fun newBuilder() = outKlass.interfaceBuilder()
+
+    override
+    fun typeSpec() = typeSpec {
+        addAnnotation(ClassName.get(BootstrapBuilder::class.java).toKlass()) {
+            descriptor.modules
+                    .mapNotNull { ClassName.get(it.definitionType) }
+                    .forEach(addTo("modules"))
+        }
+
+        // add method for each module
+        val applicationModules = descriptor.applicationModules.map { module ->
+            val type = module.definitionType
+            val name = type.simpleName.toString().decapitalize()
+            MethodSpec.methodBuilder(name).run {
+                //                addAnnotation(BindsInstance::class.java)
+                addModifiers(PUBLIC, ABSTRACT)
+                addParameter(ClassName.get(type), name)
+                build()
+            }
+        }
+
+        env.log("applicationModules = $applicationModules")
+        addMethods(applicationModules)
+
+        val dependencies = descriptor.modules.flatMap { it.dependencies }
+        val dependencyMethods = dependencies.map { dep ->
+            val key = dep.key
+            val type = MoreTypes.asDeclared(key.type)
+            val element = type.asElement()
+            val name = element.simpleName.toString().decapitalize()
+
+            MethodSpec.methodBuilder(name).run {
+                addAnnotation(BindsInstance::class.java)
+                addModifiers(PUBLIC, ABSTRACT)
+                addParameter(ClassName.get(type), name)
+                build()
+            }
+
+        }
+
+        env.log("dependencyMethods = $dependencyMethods")
+        addMethods(dependencyMethods)
     }
 }

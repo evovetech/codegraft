@@ -52,6 +52,7 @@ class ComponentStep
                 .map(componentFactory::forComponent)
         log("bootstrapComponent {")
         bootstrapComponents
+                .onEach { log("    $it") }
                 .flatMap { it.modules }
                 .forEach {
                     it.provisionBindings.forEach {
@@ -62,6 +63,12 @@ class ComponentStep
                     }
                 }
         log("}")
+
+        val env = this
+        bootstrapComponents.forEach {
+            it.generator(env).writeTo(filer)
+        }
+
         val applicationComponents = annotationElements.typeInputs<ApplicationComponent>()
                 .map(componentFactory::forComponent)
 //        log("applicationComponents=$applicationComponents")

@@ -22,6 +22,7 @@ import sourcerer.google.auto.factory.AutoFactory
 import sourcerer.google.auto.factory.Provided
 import sourcerer.processor.Env
 import sourcerer.processor.Env.Options
+import javax.annotation.processing.Filer
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
@@ -46,6 +47,11 @@ class EnvModule {
     @Provides
     fun providesOptions(processingEnv: ProcessingEnvironment): Options {
         return Options(processingEnv.options)
+    }
+
+    @Provides
+    fun providesFiler(processingEnv: ProcessingEnvironment): Filer {
+        return processingEnv.filer
     }
 }
 
