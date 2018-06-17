@@ -22,28 +22,13 @@ import com.google.auto.common.MoreTypes
 import com.google.common.base.Preconditions.checkArgument
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables.getOnlyElement
-import com.squareup.javapoet.AnnotationSpec
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.ParameterSpec
-import dagger.BindsInstance
-import org.jetbrains.annotations.Nullable
 import sourcerer.AnnotatedTypeElement
-import sourcerer.BaseElement
 import sourcerer.Env
-import sourcerer.addAnnotation
-import sourcerer.addTo
 import sourcerer.inject.ApplicationComponent
-import sourcerer.inject.BootstrapBuilder
 import sourcerer.inject.BootstrapComponent
-import sourcerer.interfaceBuilder
-import sourcerer.toKlass
-import sourcerer.typeSpec
 import java.util.EnumSet
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.Modifier.ABSTRACT
-import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 import kotlin.reflect.KClass
@@ -188,67 +173,3 @@ class ComponentDescriptor(
     }
 }
 
-class BootstrapBuilderGenerator(
-    private val descriptor: ComponentDescriptor,
-    private val env: Env,
-    override val rawType: ClassName = ClassName.get(descriptor.definitionType)
-) : BaseElement {
-    override
-    val outExt: String = "BootstrapBuilder2"
-
-    override
-    fun newBuilder() = outKlass.interfaceBuilder()
-
-    override
-    fun typeSpec() = typeSpec {
-        addModifiers(PUBLIC)
-        addAnnotation(ClassName.get(BootstrapBuilder::class.java).toKlass()) {
-            descriptor.modules
-                    .mapNotNull { ClassName.get(it.definitionType) }
-                    .forEach(addTo("modules"))
-        }
-
-        // add method for each module
-        val applicationModules = descriptor.applicationModules.map { module ->
-            val type = module.definitionType
-            val name = type.simpleName.toString().decapitalize()
-            val param = ParameterSpec.builder(ClassName.get(type), name).run {
-                addAnnotation(Nullable::class.java)
-                build()
-            }
-            MethodSpec.methodBuilder(name).run {
-                addAnnotation(BindsInstance::class.java)
-                addModifiers(PUBLIC, ABSTRACT)
-                addParameter(param)
-                build()
-            }
-        }
-
-        env.log("applicationModules = $applicationModules")
-        addMethods(applicationModules)
-
-        val dependencies = descriptor.modules.flatMap { it.dependencies }
-        val dependencyMethods = dependencies.map { dep ->
-            val key = dep.key
-            val type = MoreTypes.asDeclared(key.type)
-            val element = type.asElement()
-            val name = element.simpleName.toString().decapitalize()
-            val param = ParameterSpec.builder(ClassName.get(type), name).run {
-                key.qualifier?.let {
-                    addAnnotation(AnnotationSpec.get(it))
-                }
-                build()
-            }
-            MethodSpec.methodBuilder(name).run {
-                addAnnotation(BindsInstance::class.java)
-                addModifiers(PUBLIC, ABSTRACT)
-                addParameter(param)
-                build()
-            }
-
-        }
-
-        env.log("dependencyMethods = $dependencyMethods")
-        addMethods(dependencyMethods)
-    }
-}
