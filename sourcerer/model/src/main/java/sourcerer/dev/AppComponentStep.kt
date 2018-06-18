@@ -14,20 +14,28 @@
  * limitations under the License.
  */
 
-package evovetech.gradle.transform.plugin
+package sourcerer.dev
 
-import com.android.build.api.transform.Transform
-import com.android.build.gradle.BaseExtension
-import evovetech.gradle.transform.GraphRunRunTransform
-import org.gradle.api.Project
+import sourcerer.Output
+import sourcerer.processor.Env
+import javax.annotation.processing.FilerException
+import javax.inject.Inject
 
-class GraphPlugin : TransformPlugin() {
-    override
-    fun BaseExtension.transformer(
-        project: Project
-    ): Transform? {
-        return GraphRunRunTransform {
-            bootClasspath
+class AppComponentStep
+@Inject constructor(
+    val env: Env
+) {
+    fun process(
+        applicationComponents: List<ComponentDescriptor>
+    ): List<Output> = try {
+        env.run {
+            // TODO: only run when complete
+            AppComponentGenerator(applicationComponents, env.options)
+                    .writeTo(filer)
+            // TODO:
+            emptyList()
         }
+    } catch (_: FilerException) {
+        emptyList()
     }
 }

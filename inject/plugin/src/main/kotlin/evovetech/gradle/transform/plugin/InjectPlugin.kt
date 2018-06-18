@@ -16,33 +16,37 @@
 
 package evovetech.gradle.transform.plugin
 
-import com.android.build.api.transform.Transform
+import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.BasePlugin
+import com.android.build.gradle.FeatureExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.api.BaseVariant
+import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-abstract
-class TransformPlugin : Plugin<Project> {
-    abstract
-    fun BaseExtension.transformer(
-        project: Project
-    ): Transform?
-
-    final override
+class InjectPlugin : Plugin<Project> {
+    override
     fun apply(project: Project) {
         project.plugins.withType(BasePlugin::class.java) {
-            println("plugin=$this")
-            extension.setup(project)
+            extension.setup()
         }
     }
 
     private
-    fun BaseExtension.setup(project: Project) {
-        println("android ext = $this")
-        transformer(project)?.let {
-            registerTransform(it)
+    fun BaseExtension.setup() {
+        val variants: DomainObjectSet<out BaseVariant> = when (this) {
+            is AppExtension -> applicationVariants
+            is LibraryExtension -> libraryVariants
+            is FeatureExtension -> featureVariants
+            else -> return
+        }
+        variants.all {
+            val options = javaCompileOptions.annotationProcessorOptions
+            val packageName = generateBuildConfig.appPackageName
+            options.arguments["evovetech.processor.package"] = packageName
+            println("\nprocessor arguments: ${options.arguments}\n")
         }
     }
 }
-

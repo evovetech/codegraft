@@ -16,43 +16,44 @@
 
 package sourcerer.dev
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import sourcerer.Env
 import sourcerer.google.auto.factory.AutoFactory
 import sourcerer.google.auto.factory.Provided
-import sourcerer.processor.Env
 import sourcerer.processor.Env.Options
 import javax.annotation.processing.Filer
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 
-@Module
+@Module(includes = [EnvModule2::class])
 class EnvModule {
     @Provides
-    fun providesTypes(processingEnv: ProcessingEnvironment): Types {
-        return processingEnv.typeUtils
+    fun providesTypes(env: Env): Types {
+        return env.typeUtils
     }
 
     @Provides
-    fun providesElements(processingEnv: ProcessingEnvironment): Elements {
-        return processingEnv.elementUtils
+    fun providesElements(env: Env): Elements {
+        return env.elementUtils
     }
 
     @Provides
-    fun providesEnv(processingEnv: ProcessingEnvironment): Env {
-        return Env(processingEnv)
+    fun providesOptions(env: Env): Options {
+        return env.options
     }
 
     @Provides
-    fun providesOptions(processingEnv: ProcessingEnvironment): Options {
-        return Options(processingEnv.options)
+    fun providesFiler(env: Env): Filer {
+        return env.filer
     }
+}
 
-    @Provides
-    fun providesFiler(processingEnv: ProcessingEnvironment): Filer {
-        return processingEnv.filer
-    }
+@Module
+interface EnvModule2 {
+    @Binds fun bindsEnv(env: Env): sourcerer.processor.Env
 }
 
 @Module

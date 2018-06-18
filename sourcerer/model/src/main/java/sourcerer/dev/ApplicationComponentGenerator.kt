@@ -24,13 +24,13 @@ import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import dagger.BindsInstance
 import sourcerer.BaseElement
-import sourcerer.Env
 import sourcerer.Klass
 import sourcerer.SourceWriter
 import sourcerer.addAnnotation
 import sourcerer.addTo
 import sourcerer.inject.ApplicationComponent
 import sourcerer.interfaceBuilder
+import sourcerer.processor.Env
 import sourcerer.toKlass
 import sourcerer.typeSpec
 import javax.lang.model.element.Modifier.ABSTRACT
@@ -59,49 +59,6 @@ class ApplicationComponentGenerator(
                     .forEach(addTo("modules"))
         }
         addType(Builder().typeSpec())
-
-//        // add method for each module
-//        val applicationModules = descriptor.applicationModules.map { module ->
-//            val type = module.definitionType
-//            val name = type.simpleName.toString().decapitalize()
-//            val param = ParameterSpec.builder(ClassName.get(type), name).run {
-//                addAnnotation(Nullable::class.java)
-//                build()
-//            }
-//            MethodSpec.methodBuilder(name).run {
-//                addAnnotation(BindsInstance::class.java)
-//                addModifiers(PUBLIC, ABSTRACT)
-//                addParameter(param)
-//                build()
-//            }
-//        }
-//
-//        env.log("applicationModules = $applicationModules")
-//        addMethods(applicationModules)
-//
-//        val dependencies = descriptor.modules.flatMap { it.dependencies }
-//        val dependencyMethods = dependencies.map { dep ->
-//            val key = dep.key
-//            val type = MoreTypes.asDeclared(key.type)
-//            val element = type.asElement()
-//            val name = element.simpleName.toString().decapitalize()
-//            val param = ParameterSpec.builder(ClassName.get(type), name).run {
-//                key.qualifier?.let {
-//                    addAnnotation(AnnotationSpec.get(it))
-//                }
-//                build()
-//            }
-//            MethodSpec.methodBuilder(name).run {
-//                addAnnotation(BindsInstance::class.java)
-//                addModifiers(PUBLIC, ABSTRACT)
-//                addParameter(param)
-//                build()
-//            }
-//
-//        }
-//
-//        env.log("dependencyMethods = $dependencyMethods")
-//        addMethods(dependencyMethods)
     }
 
     inner

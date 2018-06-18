@@ -23,9 +23,9 @@ import com.google.common.base.Preconditions.checkArgument
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables.getOnlyElement
 import sourcerer.AnnotatedTypeElement
-import sourcerer.Env
 import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootstrapComponent
+import sourcerer.processor.Env
 import java.util.EnumSet
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
@@ -119,10 +119,6 @@ class ComponentDescriptor(
                 return getOnlyElement(kinds, null)
             }
         }
-    }
-
-    fun generator(env: Env): BootstrapBuilderGenerator {
-        return BootstrapBuilderGenerator(this, env)
     }
 
     class Factory

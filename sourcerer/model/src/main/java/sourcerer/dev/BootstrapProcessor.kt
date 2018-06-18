@@ -21,7 +21,6 @@ import dagger.BindsInstance
 import sourcerer.BaseProcessor
 import sourcerer.ProcessStep
 import sourcerer.processor.Env.Options
-import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
 import javax.inject.Inject
 import javax.lang.model.util.Types
@@ -34,7 +33,7 @@ class BootstrapProcessor : BaseProcessor() {
     override
     fun processSteps(): List<ProcessStep> {
         val component = DaggerBootstrapProcessor_Component.builder().run {
-            processingEnv(processingEnv)
+            env(env)
             build()
         }
         component.inject(this)
@@ -49,7 +48,7 @@ class BootstrapProcessor : BaseProcessor() {
 
         @dagger.Component.Builder
         interface Builder {
-            @BindsInstance fun processingEnv(processingEnv: ProcessingEnvironment)
+            @BindsInstance fun env(env: sourcerer.Env)
             fun build(): Component
         }
     }

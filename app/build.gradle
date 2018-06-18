@@ -30,6 +30,7 @@ plugins {
     id("realm-android")
 //    id("evovetech.android.transform.bytes")
 //    id("evovetech.android.transform.graph")
+    id("evovetech.android.transform.inject")
 }
 
 apply from: "${configDir}/android/application.gradle"

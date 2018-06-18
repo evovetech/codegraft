@@ -24,11 +24,11 @@ import com.squareup.javapoet.ParameterSpec
 import dagger.BindsInstance
 import org.jetbrains.annotations.Nullable
 import sourcerer.BaseElement
-import sourcerer.Env
 import sourcerer.addAnnotation
 import sourcerer.addTo
 import sourcerer.inject.BootstrapBuilder
 import sourcerer.interfaceBuilder
+import sourcerer.processor.Env
 import sourcerer.toKlass
 import sourcerer.typeSpec
 import javax.lang.model.element.Modifier.ABSTRACT

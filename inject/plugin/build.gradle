@@ -48,5 +48,9 @@ gradlePlugin {
             id = "${prefix}.transform.graph"
             implementationClass = "evovetech.gradle.transform.plugin.GraphPlugin"
         }
+        "transform.inject" {
+            id = "${prefix}.transform.inject"
+            implementationClass = "evovetech.gradle.transform.plugin.InjectPlugin"
+        }
     }
 }

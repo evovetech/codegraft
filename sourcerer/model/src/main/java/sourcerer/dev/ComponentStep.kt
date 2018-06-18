@@ -28,7 +28,9 @@ import javax.inject.Inject
 
 class ComponentStep
 @Inject constructor(
-    val componentFactory: ComponentDescriptor.Factory
+    val componentFactory: ComponentDescriptor.Factory,
+    val bootstrapComponentStep: BootstrapComponentStep,
+    val applicationComponentStep: AppComponentStep
 ) : ProcessStep {
     override
     fun Env.annotations(): Set<AnnotationType> = ComponentDescriptor.Kind.values()
@@ -43,36 +45,13 @@ class ComponentStep
     fun Env.process(
         annotationElements: AnnotationElements
     ): Map<AnnotationType, List<Output>> {
-        val opt = options
-        log("")
-        log("options=$opt")
-        log("package=${opt[Option.Package]}")
-        log("")
         val bootstrapComponents = annotationElements.typeInputs<BootstrapComponent>()
                 .map(componentFactory::forComponent)
-        log("bootstrapComponent {")
-        bootstrapComponents
-                .onEach { log("    $it") }
-                .flatMap { it.modules }
-                .forEach {
-                    it.provisionBindings.forEach {
-                        log("    $it")
-                    }
-                    it.dependencies.forEach {
-                        log("    $it")
-                    }
-                }
-        log("}")
-
-        val env = this
-        bootstrapComponents.forEach {
-            it.generator(env).writeTo(filer)
-            ApplicationComponentGenerator(it, env).writeTo(filer)
-        }
-
+                .let(bootstrapComponentStep::process)
         val applicationComponents = annotationElements.typeInputs<ApplicationComponent>()
                 .map(componentFactory::forComponent)
-//        log("applicationComponents=$applicationComponents")
+                .let(applicationComponentStep::process)
+        // TODO:
         return emptyMap()
     }
 

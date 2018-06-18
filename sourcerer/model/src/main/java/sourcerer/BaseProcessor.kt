@@ -27,7 +27,7 @@ import javax.lang.model.element.Element
 
 abstract
 class BaseProcessor : BasicAnnotationProcessor() {
-    private
+    protected
     val env: Env by lazy {
         Env(this)
     }
@@ -97,7 +97,8 @@ class BaseProcessor : BasicAnnotationProcessor() {
         }
     }
 
-    private class Env(
+    protected
+    class Env(
         parent: BaseProcessor
     ) : sourcerer.Env(
         parent.processingEnv!!
