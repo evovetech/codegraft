@@ -54,6 +54,18 @@ interface AppComponent :
     interface Builder :
         RealmComponent_ApplicationComponent.Builder,
         CrashesComponent_ApplicationComponent.Builder {
+        override fun crashes(crashes: Crashes)
+
+        @BindsInstance
+        override fun fabric(fabric: Fabric)
+
+        @BindsInstance
+        override fun application(application: Application)
+
+        override fun realmModule(realmModule: RealmModule)
+
+        @BindsInstance
+        override fun realmConfiguration(realmConfiguration: RealmConfiguration)
 
         fun build(): AppComponent
     }

@@ -24,7 +24,7 @@ evove {
         }
         update("kotlin") {
             it.module = "org.jetbrains.kotlin:kotlin-gradle-plugin"
-            it.version = "1.2.41"
+            it.version = "1.2.50"
         }
         update("com.android") {
             it.module = "com.android.tools.build:gradle"

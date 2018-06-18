@@ -29,19 +29,17 @@ import sourcerer.Klass
 import sourcerer.SourceWriter
 import sourcerer.addAnnotation
 import sourcerer.addTo
-import sourcerer.google.auto.factory.AutoFactory
-import sourcerer.google.auto.factory.Provided
 import sourcerer.inject.ApplicationComponent
 import sourcerer.interfaceBuilder
 import sourcerer.toKlass
 import sourcerer.typeSpec
+import javax.inject.Inject
 import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
 
-class ApplicationComponentGenerator
-@AutoFactory constructor(
-    @Provided private val env: Env,
+class ApplicationComponentGenerator(
+    private val env: Env,
     private val descriptor: ComponentDescriptor
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.definitionType),
@@ -118,6 +116,15 @@ class ApplicationComponentGenerator
                     build()
                 }
             }.map(this::addMethod)
+        }
+    }
+
+    class Factory
+    @Inject constructor(
+        private val env: Env
+    ) {
+        fun create(descriptor: ComponentDescriptor): ApplicationComponentGenerator {
+            return ApplicationComponentGenerator(env, descriptor)
         }
     }
 }

@@ -54,6 +54,29 @@ class ComponentStep
                 .let(appComponentStep::process)
         return map
     }
+    /*
+    override
+    fun Env.process(
+        annotationElements: AnnotationElements
+    ): Map<AnnotationType, List<Output>> {
+        val map = HashMap<AnnotationType, List<Output>>()
+        val bootstrapComponents = annotationElements.typeInputs<BootstrapComponent>()
+                .map(componentFactory::forComponent)
+                .let(bootstrapComponentStep::process)
+        map[BootstrapComponent::class] = bootstrapComponents
+        map[ApplicationComponent::class] = annotationElements.typeInputs<ApplicationComponent>()
+                .map(componentFactory::forComponent)
+                .let { components ->
+                    when (bootstrapComponents.size) {
+                        0 -> appComponentStep.process(components)
+                        else -> components.map {
+                            DeferredOutput(it.definitionType)
+                        }
+                    }
+                }
+        return map
+    }
+     */
 
     enum
     class Option(

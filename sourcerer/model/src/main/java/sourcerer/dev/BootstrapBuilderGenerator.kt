@@ -27,18 +27,16 @@ import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.addAnnotation
 import sourcerer.addTo
-import sourcerer.google.auto.factory.AutoFactory
-import sourcerer.google.auto.factory.Provided
 import sourcerer.inject.BootstrapBuilder
 import sourcerer.interfaceBuilder
 import sourcerer.toKlass
 import sourcerer.typeSpec
+import javax.inject.Inject
 import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.Modifier.PUBLIC
 
-class BootstrapBuilderGenerator
-@AutoFactory constructor(
-    @Provided private val env: Env,
+class BootstrapBuilderGenerator(
+    private val env: Env,
     private val descriptor: ComponentDescriptor
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.definitionType),
@@ -125,5 +123,14 @@ class BootstrapBuilderGenerator
         val b = MethodSpec.methodBuilder(name)
         b.init()
         return b.build()
+    }
+
+    class Factory
+    @Inject constructor(
+        private val env: Env
+    ) {
+        fun create(descriptor: ComponentDescriptor): BootstrapBuilderGenerator {
+            return BootstrapBuilderGenerator(env, descriptor)
+        }
     }
 }

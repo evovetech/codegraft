@@ -22,8 +22,8 @@ import javax.inject.Inject
 
 class BootstrapComponentStep
 @Inject constructor(
-    private val bootFactory: BootstrapBuilderGeneratorFactory,
-    private val appFactory: ApplicationComponentGeneratorFactory
+    private val bootFactory: BootstrapBuilderGenerator.Factory,
+    private val appFactory: ApplicationComponentGenerator.Factory
 ) {
     fun process(
         bootstrapComponents: List<ComponentDescriptor>

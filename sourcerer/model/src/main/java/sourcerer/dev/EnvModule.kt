@@ -53,7 +53,7 @@ class EnvModule {
 
 @Module
 interface EnvModule2 {
-    @Binds fun bindsEnv(env: Env): sourcerer.processor.Env
+    @Binds fun bindsEnv(env: sourcerer.Env): sourcerer.processor.Env
 }
 
 @Module
