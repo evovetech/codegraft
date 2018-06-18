@@ -67,6 +67,7 @@ class ComponentStep
         val env = this
         bootstrapComponents.forEach {
             it.generator(env).writeTo(filer)
+            ApplicationComponentGenerator(it, env).writeTo(filer)
         }
 
         val applicationComponents = annotationElements.typeInputs<ApplicationComponent>()

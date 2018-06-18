@@ -17,9 +17,13 @@
 package sourcerer.inject
 
 import javax.inject.Scope
+import kotlin.annotation.AnnotationRetention.BINARY
+import kotlin.annotation.AnnotationTarget.CLASS
+import kotlin.annotation.AnnotationTarget.FUNCTION
+import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
 
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.BINARY)
+@Target(CLASS, FUNCTION, VALUE_PARAMETER)
+@Retention(BINARY)
 @MustBeDocumented
 @Scope
 annotation

@@ -18,6 +18,7 @@ package sourcerer.dev
 
 import com.google.common.base.Preconditions.checkState
 import com.google.common.collect.ImmutableSet
+import dagger.model.Scope
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
@@ -27,7 +28,8 @@ import javax.lang.model.type.TypeMirror
 data
 class Dependency(
     val key: Key,
-    val requestElement: Element? = null
+    val requestElement: Element? = null,
+    val scope: Scope? = null
 ) {
 
     class Factory
@@ -52,16 +54,23 @@ class Dependency(
             resolvedType: TypeMirror
         ): Dependency {
             val qualifier = variableElement.qualifier
-            return newDependencyRequest(variableElement, resolvedType, qualifier)
+            return newDependencyRequest(
+                variableElement,
+                resolvedType,
+                qualifier,
+                variableElement.uniqueScope
+            )
         }
 
         private fun newDependencyRequest(
             requestElement: Element,
             type: TypeMirror,
-            qualifier: AnnotationMirror? = null
+            qualifier: AnnotationMirror? = null,
+            scope: Scope? = null
         ) = Dependency(
             key = keyFactory.forQualifiedType(type, qualifier),
-            requestElement = requestElement
+            requestElement = requestElement,
+            scope = scope
         )
     }
 }

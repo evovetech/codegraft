@@ -43,7 +43,7 @@ class CrashesBootstrapModule {
     @Provides
     @BootScope
     fun provideFabric(
-        app: AndroidApplication,
+        @BootScope app: AndroidApplication,
         @Named("fabric") init: FabricInit?
     ): Fabric {
         val builder = Fabric.Builder(app)

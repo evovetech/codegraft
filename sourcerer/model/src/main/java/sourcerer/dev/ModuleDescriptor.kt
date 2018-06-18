@@ -32,11 +32,14 @@ data
 class ModuleDescriptor(
     val definitionType: TypeElement,
     val moduleMirror: AnnotationMirror,
-    val provisionBindings: ImmutableList<Binding>,
-    val dependencies: ImmutableSet<Dependency> = provisionBindings.flatMap {
-        it.dependencies
-    }.toImmutableSet()
+    val provisionBindings: ImmutableList<Binding>
 ) {
+    val dependencies: ImmutableSet<Dependency> by lazy {
+        provisionBindings
+                .flatMap(Binding::dependencies)
+                .toImmutableSet()
+    }
+
     class Factory
     @Inject constructor(
         val elements: Elements,
