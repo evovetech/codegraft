@@ -16,46 +16,28 @@
 
 package evovetech.sample.crashes
 
-import dagger.BindsInstance
+import com.crashlytics.android.Crashlytics
 import dagger.Component
 import dagger.Module
 import dagger.Provides
 import io.fabric.sdk.android.Fabric
-import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootScope
-import sourcerer.inject.BootstrapBuilder
 import sourcerer.inject.android.AndroidApplication
-import javax.inject.Named
 import javax.inject.Singleton
 
 //
 // Generated
 //
 
-// individual component
-// module generated
-@ApplicationComponent(modules = [Crashes::class])
-interface CrashesComponent_ApplicationComponent : CrashesComponent {
-    @ApplicationComponent.Builder
-    interface Builder {
-        @BindsInstance fun application(app: AndroidApplication)
-        @BindsInstance fun fabric(fabric: Fabric)
-        fun crashes(crashes: Crashes)
-    }
-}
-
-@BootstrapBuilder(modules = [CrashesBootstrapModule::class])
-interface CrashesComponent_BootstrapBuilder {
-    @BindsInstance fun application(app: AndroidApplication)
-    @BindsInstance fun fabric(@Named("fabric") init: FabricInit?)
-    @BindsInstance fun crashes(crashes: Crashes?)
-}
-
 // package component
 // application generated
 @Singleton
 @Component(modules = [Crashes::class])
 interface AppComponent : CrashesComponent_ApplicationComponent {
+    override val app: AndroidApplication
+    override val fabric: Fabric
+    override val crashlytics: Crashlytics
+
     @Component.Builder
     interface Builder : CrashesComponent_ApplicationComponent.Builder {
         fun build(): AppComponent
@@ -82,12 +64,12 @@ class BootModule {
     }
 }
 
-@BootScope
-@Component(modules = [BootModule::class])
+//@BootScope
+//@Component(modules = [BootModule::class])
 interface BootComponent {
     val component: AppComponent
 
-    @Component.Builder
+    //    @Component.Builder
     interface Builder : CrashesComponent_BootstrapBuilder {
         fun build(): BootComponent
     }

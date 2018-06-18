@@ -23,28 +23,30 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import dagger.BindsInstance
-import sourcerer.BaseElement
+import sourcerer.Env
+import sourcerer.JavaOutput
 import sourcerer.Klass
 import sourcerer.SourceWriter
 import sourcerer.addAnnotation
 import sourcerer.addTo
+import sourcerer.google.auto.factory.AutoFactory
+import sourcerer.google.auto.factory.Provided
 import sourcerer.inject.ApplicationComponent
 import sourcerer.interfaceBuilder
-import sourcerer.processor.Env
 import sourcerer.toKlass
 import sourcerer.typeSpec
 import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
 
-class ApplicationComponentGenerator(
-    private val descriptor: ComponentDescriptor,
-    private val env: Env,
-    override val rawType: ClassName = ClassName.get(descriptor.definitionType)
-) : BaseElement {
-    override
-    val outExt: String = "ApplicationComponent2"
-
+class ApplicationComponentGenerator
+@AutoFactory constructor(
+    @Provided private val env: Env,
+    private val descriptor: ComponentDescriptor
+) : JavaOutput(
+    rawType = ClassName.get(descriptor.definitionType),
+    outExt = "ApplicationComponent"
+) {
     override
     fun newBuilder() = outKlass.interfaceBuilder()
 
@@ -78,15 +80,18 @@ class ApplicationComponentGenerator(
 //            ElementFilter.methodsIn()
 
             // add method for each module
-            descriptor.applicationModules.map { module ->
-                val type = module.definitionType
-                val name = type.simpleName.toString().decapitalize()
-                MethodSpec.methodBuilder(name).run {
-                    addModifiers(PUBLIC, ABSTRACT)
-                    addParameter(ClassName.get(type), name)
-                    build()
-                }
-            }.map(this::addMethod)
+            descriptor.applicationModules
+                    .filterNot { it.definitionType.modifiers.contains(ABSTRACT) }
+                    .map { module ->
+                        val type = module.definitionType
+                        val name = type.simpleName.toString().decapitalize()
+                        MethodSpec.methodBuilder(name).run {
+                            addModifiers(PUBLIC, ABSTRACT)
+                            addParameter(ClassName.get(type), name)
+                            build()
+                        }
+                    }
+                    .map(this::addMethod)
 
             val bindings = descriptor.modules
                     .flatMap(ModuleDescriptor::provisionBindings)

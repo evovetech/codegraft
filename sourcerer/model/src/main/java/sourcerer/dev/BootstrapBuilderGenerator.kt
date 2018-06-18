@@ -23,25 +23,27 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import dagger.BindsInstance
 import org.jetbrains.annotations.Nullable
-import sourcerer.BaseElement
+import sourcerer.Env
+import sourcerer.JavaOutput
 import sourcerer.addAnnotation
 import sourcerer.addTo
+import sourcerer.google.auto.factory.AutoFactory
+import sourcerer.google.auto.factory.Provided
 import sourcerer.inject.BootstrapBuilder
 import sourcerer.interfaceBuilder
-import sourcerer.processor.Env
 import sourcerer.toKlass
 import sourcerer.typeSpec
 import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.Modifier.PUBLIC
 
-class BootstrapBuilderGenerator(
-    private val descriptor: ComponentDescriptor,
-    private val env: Env,
-    override val rawType: ClassName = ClassName.get(descriptor.definitionType)
-) : BaseElement {
-    override
-    val outExt: String = "BootstrapBuilder2"
-
+class BootstrapBuilderGenerator
+@AutoFactory constructor(
+    @Provided private val env: Env,
+    private val descriptor: ComponentDescriptor
+) : JavaOutput(
+    rawType = ClassName.get(descriptor.definitionType),
+    outExt = "BootstrapBuilder"
+) {
     override
     fun newBuilder() = outKlass.interfaceBuilder()
 
@@ -62,16 +64,15 @@ class BootstrapBuilderGenerator(
                 addAnnotation(Nullable::class.java)
                 build()
             }
-            MethodSpec.methodBuilder(name).run {
-                addAnnotation(BindsInstance::class.java)
-                addModifiers(PUBLIC, ABSTRACT)
-                addParameter(param)
-                build()
-            }
+            Pair(name, { builder: MethodSpec.Builder ->
+                builder.apply {
+                    addAnnotation(BindsInstance::class.java)
+                    addModifiers(PUBLIC, ABSTRACT)
+                    addParameter(param)
+                }
+            })
         }
-
         env.log("applicationModules = $applicationModules")
-        addMethods(applicationModules)
 
         val dependencies = descriptor.modules.flatMap { it.dependencies }
         val dependencyMethods = dependencies.map { dep ->
@@ -85,16 +86,44 @@ class BootstrapBuilderGenerator(
                 }
                 build()
             }
-            MethodSpec.methodBuilder(name).run {
-                addAnnotation(BindsInstance::class.java)
-                addModifiers(PUBLIC, ABSTRACT)
-                addParameter(param)
-                build()
-            }
 
+            Pair(name, { builder: MethodSpec.Builder ->
+                builder.apply {
+                    addAnnotation(BindsInstance::class.java)
+                    addModifiers(PUBLIC, ABSTRACT)
+                    addParameter(param)
+                }
+            })
         }
-
         env.log("dependencyMethods = $dependencyMethods")
-        addMethods(dependencyMethods)
+
+        (applicationModules + dependencyMethods)
+                .groupBy { it.first }
+                .mapValues { it.value.map { it.second } }
+                .flatMap {
+                    val key = it.key
+                    val methods = it.value
+                    val size = methods.size
+
+                    if (size > 1) {
+                        var i = 1
+                        methods.map {
+                            val n = "$key${i++}"
+                            buildMethod(n, it)
+                        }
+                    } else {
+                        methods.map {
+                            buildMethod(key, it)
+                        }
+                    }
+                }
+                .map(this::addMethod)
+    }
+
+    private
+    fun buildMethod(name: String, init: MethodSpec.Builder.() -> Any?): MethodSpec {
+        val b = MethodSpec.methodBuilder(name)
+        b.init()
+        return b.build()
     }
 }

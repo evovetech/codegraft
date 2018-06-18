@@ -16,6 +16,7 @@
 
 package evovetech.sample.network
 
+import com.crashlytics.android.Crashlytics
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -24,28 +25,14 @@ import evovetech.sample.crashes.CrashesBootstrapModule
 import evovetech.sample.crashes.CrashesComponent_ApplicationComponent
 import evovetech.sample.crashes.CrashesComponent_BootstrapBuilder
 import io.fabric.sdk.android.Fabric
-import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootScope
+import sourcerer.inject.Plugins
 import sourcerer.inject.android.AndroidApplication
 import javax.inject.Singleton
 
 //
 // Generated
 //
-
-// individual component
-// module generated
-@ApplicationComponent(
-    // TODO: maybe includes instead of dependencies
-    dependencies = [CrashesComponent_ApplicationComponent::class],
-    modules = [ClientPlugin::class]
-)
-interface ClientComponent_ApplicationComponent : ClientComponent {
-    @ApplicationComponent.Builder
-    interface Builder {
-        fun clientModule(clientModule: ClientModule)
-    }
-}
 
 // package component
 // application generated
@@ -54,6 +41,11 @@ interface ClientComponent_ApplicationComponent : ClientComponent {
 interface AppComponent :
     ClientComponent_ApplicationComponent,
     CrashesComponent_ApplicationComponent {
+
+    override val plugins: Plugins
+    override val app: AndroidApplication
+    override val fabric: Fabric
+    override val crashlytics: Crashlytics
 
     @Component.Builder
     interface Builder :

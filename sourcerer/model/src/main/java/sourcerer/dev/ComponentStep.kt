@@ -30,7 +30,7 @@ class ComponentStep
 @Inject constructor(
     val componentFactory: ComponentDescriptor.Factory,
     val bootstrapComponentStep: BootstrapComponentStep,
-    val applicationComponentStep: AppComponentStep
+    val appComponentStep: AppComponentStep
 ) : ProcessStep {
     override
     fun Env.annotations(): Set<AnnotationType> = ComponentDescriptor.Kind.values()
@@ -45,14 +45,14 @@ class ComponentStep
     fun Env.process(
         annotationElements: AnnotationElements
     ): Map<AnnotationType, List<Output>> {
-        val bootstrapComponents = annotationElements.typeInputs<BootstrapComponent>()
+        val map = HashMap<AnnotationType, List<Output>>()
+        map[BootstrapComponent::class] = annotationElements.typeInputs<BootstrapComponent>()
                 .map(componentFactory::forComponent)
                 .let(bootstrapComponentStep::process)
-        val applicationComponents = annotationElements.typeInputs<ApplicationComponent>()
+        map[ApplicationComponent::class] = annotationElements.typeInputs<ApplicationComponent>()
                 .map(componentFactory::forComponent)
-                .let(applicationComponentStep::process)
-        // TODO:
-        return emptyMap()
+                .let(appComponentStep::process)
+        return map
     }
 
     enum

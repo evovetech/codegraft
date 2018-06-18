@@ -17,24 +17,21 @@
 package sourcerer.dev
 
 import sourcerer.Output
-import sourcerer.processor.Env
 import javax.annotation.processing.FilerException
 import javax.inject.Inject
 
 class BootstrapComponentStep
 @Inject constructor(
-    val env: Env
+    private val bootFactory: BootstrapBuilderGeneratorFactory,
+    private val appFactory: ApplicationComponentGeneratorFactory
 ) {
     fun process(
         bootstrapComponents: List<ComponentDescriptor>
     ): List<Output> = try {
-        env.run {
-            bootstrapComponents.forEach {
-                BootstrapBuilderGenerator(it, env).writeTo(filer)
-                ApplicationComponentGenerator(it, env).writeTo(filer)
-            }
-            // TODO:
-            emptyList()
+        bootstrapComponents.flatMap {
+            val boot = bootFactory.create(it)
+            val app = appFactory.create(it)
+            listOf(boot, app)
         }
     } catch (_: FilerException) {
         emptyList()

@@ -33,13 +33,13 @@ class App : DaggerApplication(), BootApplication<AppComponent> {
     override
     val bootstrap = bootstrap {
         fabric {
-            kits(Crashlytics())
-            build()
+            it.kits(Crashlytics())
+            it.build()
         }
         realm {
-            name("app.realm")
-            schemaVersion(1)
-            build()
+            it.name("app.realm")
+            it.schemaVersion(1)
+            it.build()
         }
         this@App
     }

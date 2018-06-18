@@ -17,6 +17,7 @@
 package evovetech.sample
 
 import android.app.Application
+import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -25,10 +26,8 @@ import dagger.android.ContributesAndroidInjector
 import evovetech.sample.crashes.Crashes
 import evovetech.sample.crashes.CrashesBootstrapModule
 import evovetech.sample.crashes.CrashesComponent_ApplicationComponent
-import evovetech.sample.crashes.CrashesComponent_BootstrapBuilder
 import evovetech.sample.db.realm.RealmBootstrapModule
 import evovetech.sample.db.realm.RealmComponent_ApplicationComponent
-import evovetech.sample.db.realm.RealmComponent_BootstrapBuilder
 import evovetech.sample.db.realm.RealmModule
 import evovetech.sample.network.ClientComponent_ApplicationComponent
 import evovetech.sample.network.ClientPlugin
@@ -38,6 +37,7 @@ import sourcerer.inject.ActivityScope
 import sourcerer.inject.BootScope
 import sourcerer.inject.android.BootComponent
 import sourcerer.inject.android.Bootstrap
+import javax.inject.Named
 import javax.inject.Singleton
 
 //
@@ -122,9 +122,24 @@ interface AndroidBootComponent : BootComponent<AppComponent> {
 
     @Component.Builder
     interface Builder :
-        BootComponent.Builder<AndroidBootComponent>,
-        RealmComponent_BootstrapBuilder,
-        CrashesComponent_BootstrapBuilder {
+        BootComponent.Builder<AndroidBootComponent> {
+        @BindsInstance
+        fun crashes(crashes: Crashes?)
+
+        @BindsInstance
+        fun application(application: Application)
+
+        @BindsInstance
+        fun fabric(@Named("fabric") function1: Function1<Fabric.Builder, Fabric>)
+
+        @BindsInstance
+        fun realmModule(realmModule: RealmModule?)
+
+        @BindsInstance
+        fun realm(
+            @Named("realmInit") function1: Function1<RealmConfiguration.Builder, RealmConfiguration>
+        )
+
         override fun build(): AndroidBootComponent
     }
 }
