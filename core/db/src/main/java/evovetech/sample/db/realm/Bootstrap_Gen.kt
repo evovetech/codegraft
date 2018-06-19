@@ -18,20 +18,24 @@ package evovetech.sample.db.realm
 
 import android.app.Application
 import com.crashlytics.android.Crashlytics
+import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
+import dagger.MembersInjector
 import dagger.Module
 import dagger.Provides
 import evovetech.sample.crashes.Crashes
 import evovetech.sample.crashes.CrashesBootstrapModule
+import evovetech.sample.crashes.CrashesComponent
+import evovetech.sample.crashes.CrashesComponent_Module
 import io.fabric.sdk.android.Fabric
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootScope
 import sourcerer.inject.android.AndroidApplication
 import javax.inject.Inject
 import javax.inject.Named
+import javax.inject.Provider
 import javax.inject.Singleton
 
 class Sample {
@@ -43,49 +47,70 @@ class Sample {
 // Generated
 //
 
-//@Singleton
-//@Component(
-//    modules = [Crashes::class, RealmModule::class]
-//)
-////@ApplicationComponent(includes = [CrashesComponent_ApplicationComponent::class])
-//interface RealmComponent_ApplicationComponent2 : RealmComponent {
-//    override val realm: Realm
-//    override val crashlytics: Crashlytics
+// TODO:
+// @ApplicationComponent(
+//     dependencies=[CrashesComponent_Implementation::class],
+//     modules=[RealmComponent_Module::class]
+// )
 //
-//    override fun inject(sample: Sample)
-//
-//    @Component.Builder
-//    @ApplicationComponent.Builder
-//    interface Builder {
-//        fun realmModule(realmModule: RealmModule)
-//
-//        @BindsInstance
-//        fun realmConfiguration(realmConfiguration: RealmConfiguration)
-//
-//        fun build(): RealmComponent
-//    }
-//}
+@Singleton
+class RealmComponent_Implementation
+@Inject constructor(
+    private val realmProvider: Provider<Realm>,
+    private val crashlyticsProvider: Provider<Crashlytics>,
+    private val sampleInjector: MembersInjector<Sample>
+) : RealmComponent {
+    override
+    val realm: Realm
+        get() = realmProvider.get()
+
+    override
+    val crashlytics: Crashlytics
+        get() = crashlyticsProvider.get()
+
+    override
+    fun inject(sample: Sample) =
+        sampleInjector.injectMembers(sample)
+
+    // TODO:
+    // @ApplicationComponent.Builder
+    interface Builder {
+        fun crashes(crashes: Crashes)
+    }
+}
+
+@Module(includes = [RealmModule::class])
+interface RealmComponent_Module {
+    @Binds
+    fun bindRealmComponent(
+        implementation: RealmComponent_Implementation
+    ): RealmComponent
+}
+
+@Module(includes = [RealmComponent_Module::class])
+class BootData
+@Inject constructor(
+    @get:Provides
+    @Singleton
+    val app: AndroidApplication,
+
+    @get:Provides
+    @Singleton
+    val realmConfiguration: RealmConfiguration
+)
 
 // package component
 // application generated
 @Singleton
 @Component(
     modules = [
-        RealmModule::class,
-        Crashes::class
+        RealmComponent_Module::class,
+        CrashesComponent_Module::class
     ]
 )
-//@ApplicationComponent(
-//    dependencies = [
-//        RealmComponent_ApplicationComponent::class,
-//        CrashesComponent_ApplicationComponent::class
-//    ]
-//)
 interface AppComponent {
-    val realm: Realm
-    val crashlytics: Crashlytics
-    val app: AndroidApplication
-    val fabric: Fabric
+    val crashesComponent: CrashesComponent
+    val realmComponent: RealmComponent
 
     @Component.Builder
     interface Builder {

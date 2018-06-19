@@ -24,6 +24,7 @@ import dagger.Component
 import dagger.MembersInjector
 import dagger.Module
 import dagger.Provides
+import evovetech.sample.crashes.AppComponent.Builder
 import io.fabric.sdk.android.Fabric
 import sourcerer.inject.BootScope
 import sourcerer.inject.android.AndroidApplication
@@ -36,8 +37,11 @@ import javax.inject.Singleton
 // Generated
 //
 
+// TODO:
+// @ApplicationComponent(modules=[CrashesComponent_Module::class])
+//
 @Singleton
-class CrashesComponentImpl
+class CrashesComponent_Implementation
 @Inject constructor(
     private val appProvider: Provider<AndroidApplication>,
     private val fabricProvider: Provider<Fabric>,
@@ -62,13 +66,15 @@ class CrashesComponentImpl
 }
 
 @Module(includes = [Crashes::class])
-interface CrashesComponentImplModule {
+interface CrashesComponent_Module {
     @Binds
-    fun bindCrashesComponent(impl: CrashesComponentImpl): CrashesComponent
+    fun bindCrashesComponent(
+        implementation: CrashesComponent_Implementation
+    ): CrashesComponent
 }
 
-@Module(includes = [CrashesComponentImplModule::class])
-class BootData
+@Module(includes = [CrashesComponent_Module::class])
+class CrashesComponent_BootData
 @Inject constructor(
     @get:Provides
     @Singleton
@@ -81,63 +87,49 @@ class BootData
 
 // package component
 // application generated
+
 @Singleton
-@Component(
-    modules = [
-        BootData::class,
-        Crashes::class,
-        CrashesComponentImplModule::class
-    ]
-)
-//@ApplicationComponent(includes = [CrashesComponent_ApplicationComponent::class])
+@Component(modules = [CrashesComponent_BootData::class])
 interface AppComponent {
     val crashesComponent: CrashesComponent
 
     @Component.Builder
-    abstract
-    class Builder {
-        @Inject
-        fun injectMembers(
-            bootData: BootData,
-            crashes: Crashes?
-        ) {
-            bootData(bootData)
-            crashes?.let {
-                crashes(it)
-            }
-        }
-
-        abstract
+    interface Builder {
+        fun bootData(bootData: CrashesComponent_BootData)
         fun crashes(crashes: Crashes)
-
-        abstract
-        fun bootData(bootData: BootData)
-
-        abstract
         fun build(): AppComponent
+    }
+}
+
+class AppComponent_Builder
+private constructor(
+    private val actual: Builder
+) : Builder by actual {
+    @Inject constructor(
+        bootData: CrashesComponent_BootData,
+        crashes: Crashes?
+    ) : this(
+        actual = DaggerAppComponent.builder()
+    ) {
+        actual.bootData(bootData)
+        crashes?.let {
+            actual.crashes(it)
+        }
     }
 }
 
 @Module(includes = [CrashesBootstrapModule::class])
 class BootModule {
-    @Provides
-    @BootScope
+    @Provides @BootScope
     fun provideComponent(
-        injector: MembersInjector<AppComponent.Builder>
-    ): AppComponent {
-        return DaggerAppComponent.builder().run {
-            injector.injectMembers(this)
-            build()
-        }
-    }
+        builder: AppComponent_Builder
+    ): AppComponent = builder.build()
 }
 
 @BootScope
 @Component(modules = [BootModule::class])
 interface BootComponent {
     val component: AppComponent
-
-    fun inject(builder: AppComponent.Builder)
 
     @Component.Builder
     interface Builder {
