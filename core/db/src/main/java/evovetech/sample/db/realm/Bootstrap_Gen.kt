@@ -116,14 +116,10 @@ class AppComponent_BootData
 // package component
 // application generated
 @Singleton
-@Component(
-    modules = [
-        AppComponent_BootData::class
-    ]
-)
+@Component(modules = [AppComponent_BootData::class])
 interface AppComponent {
-    val crashesComponent: CrashesComponent
-    val realmComponent: RealmComponent
+    val crashes: CrashesComponent
+    val realm: RealmComponent
 
     @Component.Builder
     interface Builder {
