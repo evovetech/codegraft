@@ -39,26 +39,26 @@ import javax.inject.Singleton
 @Singleton
 class CrashesComponentImpl
 @Inject constructor(
-    private val bootData: BootData,
+    private val appProvider: Provider<AndroidApplication>,
+    private val fabricProvider: Provider<Fabric>,
     private val crashlyticsProvider: Provider<Crashlytics>,
     private val sampleInjector: MembersInjector<Sample>
 ) : CrashesComponent {
     override
     val app: AndroidApplication
-        get() = bootData.app
+        get() = appProvider.get()
 
     override
     val fabric: Fabric
-        get() = bootData.fabric
+        get() = fabricProvider.get()
 
     override
     val crashlytics: Crashlytics
         get() = crashlyticsProvider.get()
 
     override
-    fun inject(
-        sample: Sample
-    ) = sampleInjector.injectMembers(sample)
+    fun inject(sample: Sample) =
+        sampleInjector.injectMembers(sample)
 }
 
 @Module(includes = [Crashes::class])
