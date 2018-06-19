@@ -23,7 +23,7 @@ import javax.lang.model.util.Types
 
 class SourcererTypes
 @Inject constructor(
-    private val elements: SourcererElements,
+    val elements: SourcererElements,
     private val types: Types
 ) : Types by types {
 

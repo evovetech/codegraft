@@ -23,7 +23,8 @@ import javax.inject.Inject
 class BootstrapComponentStep
 @Inject constructor(
     private val bootFactory: BootstrapBuilderGenerator.Factory,
-    private val appFactory: ApplicationComponentGenerator.Factory
+    private val appFactory: ApplicationComponentGenerator.Factory,
+    private val componentImplFactory: ComponentImplGenerator.Factory
 ) {
     fun process(
         bootstrapComponents: List<ComponentDescriptor>
@@ -31,7 +32,8 @@ class BootstrapComponentStep
         bootstrapComponents.flatMap {
             val boot = bootFactory.create(it)
             val app = appFactory.create(it)
-            listOf(boot, app)
+            val compImpl = componentImplFactory.create(it)
+            listOf(boot, app, compImpl)
         }
     } catch (_: FilerException) {
         emptyList()

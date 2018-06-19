@@ -16,9 +16,14 @@
 
 package sourcerer.dev
 
+import com.google.auto.common.MoreElements
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
+import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.Modifier.ABSTRACT
+import javax.lang.model.element.TypeElement
+import javax.lang.model.util.ElementFilter.methodsIn
 
 fun <T> Collection<T>.toImmutableList(): ImmutableList<T> {
     return ImmutableList.copyOf(this)
@@ -38,3 +43,8 @@ fun <reified E> immutableSet(init: ImmutableSet.Builder<E>.() -> Unit): Immutabl
     builder.init()
     return builder.build()
 }
+
+fun SourcererElements.abstractMethods(
+    typeElement: TypeElement
+) = methodsIn(getAllMembers(typeElement))
+        .filter(MoreElements.hasModifiers<ExecutableElement>(ABSTRACT)::apply)
