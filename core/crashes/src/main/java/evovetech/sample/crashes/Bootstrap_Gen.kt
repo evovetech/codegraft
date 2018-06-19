@@ -73,29 +73,39 @@ interface CrashesComponent_Module {
     ): CrashesComponent
 }
 
-@Module(includes = [CrashesComponent_Module::class])
+@BootScope
 class CrashesComponent_BootData
 @Inject constructor(
-    @get:Provides
-    @Singleton
     val app: AndroidApplication,
-
-    @get:Provides
-    @Singleton
     val fabric: Fabric
 )
 
 // package component
 // application generated
 
+@Module(includes = [CrashesComponent_Module::class])
+class AppComponent_BootData
+@Inject constructor(
+    @get:Provides
+    val crashes: CrashesComponent_BootData
+) {
+    val app: AndroidApplication
+        @Provides @Singleton
+        get() = crashes.app
+
+    val fabric: Fabric
+        @Provides @Singleton
+        get() = crashes.fabric
+}
+
 @Singleton
-@Component(modules = [CrashesComponent_BootData::class])
+@Component(modules = [AppComponent_BootData::class])
 interface AppComponent {
     val crashesComponent: CrashesComponent
 
     @Component.Builder
     interface Builder {
-        fun bootData(bootData: CrashesComponent_BootData)
+        fun bootData(bootData: AppComponent_BootData)
         fun crashes(crashes: Crashes)
         fun build(): AppComponent
     }
@@ -106,7 +116,7 @@ private constructor(
     private val actual: Builder
 ) : Builder by actual {
     @Inject constructor(
-        bootData: CrashesComponent_BootData,
+        bootData: AppComponent_BootData,
         crashes: Crashes?
     ) : this(
         actual = DaggerAppComponent.builder()

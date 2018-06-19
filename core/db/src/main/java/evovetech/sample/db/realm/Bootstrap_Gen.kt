@@ -27,6 +27,7 @@ import dagger.Provides
 import evovetech.sample.crashes.Crashes
 import evovetech.sample.crashes.CrashesBootstrapModule
 import evovetech.sample.crashes.CrashesComponent
+import evovetech.sample.crashes.CrashesComponent_BootData
 import evovetech.sample.crashes.CrashesComponent_Module
 import io.fabric.sdk.android.Fabric
 import io.realm.Realm
@@ -71,12 +72,6 @@ class RealmComponent_Implementation
     override
     fun inject(sample: Sample) =
         sampleInjector.injectMembers(sample)
-
-    // TODO:
-    // @ApplicationComponent.Builder
-    interface Builder {
-        fun crashes(crashes: Crashes)
-    }
 }
 
 @Module(includes = [RealmModule::class])
@@ -87,25 +82,43 @@ interface RealmComponent_Module {
     ): RealmComponent
 }
 
-@Module(includes = [RealmComponent_Module::class])
-class BootData
+@BootScope
+class RealmComponent_BootData
 @Inject constructor(
-    @get:Provides
-    @Singleton
     val app: AndroidApplication,
-
-    @get:Provides
-    @Singleton
     val realmConfiguration: RealmConfiguration
 )
+
+@Module(
+    includes = [
+        CrashesComponent_Module::class,
+        RealmComponent_Module::class
+    ]
+)
+class AppComponent_BootData
+@Inject constructor(
+    @get:Provides val crashes: CrashesComponent_BootData,
+    @get:Provides val realm: RealmComponent_BootData
+) {
+    val app: AndroidApplication
+        @Provides @Singleton
+        get() = crashes.app
+
+    val fabric: Fabric
+        @Provides @Singleton
+        get() = crashes.fabric
+
+    val realmConfiguration: RealmConfiguration
+        @Provides @Singleton
+        get() = realm.realmConfiguration
+}
 
 // package component
 // application generated
 @Singleton
 @Component(
     modules = [
-        RealmComponent_Module::class,
-        CrashesComponent_Module::class
+        AppComponent_BootData::class
     ]
 )
 interface AppComponent {
@@ -114,20 +127,27 @@ interface AppComponent {
 
     @Component.Builder
     interface Builder {
+        fun bootData(bootData: AppComponent_BootData)
         fun crashes(crashes: Crashes)
-
-        @BindsInstance
-        fun fabric(fabric: Fabric)
-
-        @BindsInstance
-        fun application(application: Application)
-
         fun realmModule(realmModule: RealmModule)
-
-        @BindsInstance
-        fun realmConfiguration(realmConfiguration: RealmConfiguration)
-
         fun build(): AppComponent
+    }
+}
+
+class AppComponent_Builder
+private constructor(
+    private val actual: AppComponent.Builder
+) : AppComponent.Builder by actual {
+    @Inject constructor(
+        bootData: AppComponent_BootData,
+        crashes: Crashes?,
+        realmModule: RealmModule?
+    ) : this(
+        actual = DaggerAppComponent.builder()
+    ) {
+        actual.bootData(bootData)
+        crashes?.let(actual::crashes)
+        realmModule?.let(actual::realmModule)
     }
 }
 
@@ -141,23 +161,8 @@ class BootModule {
     @Provides
     @BootScope
     fun provideComponent(
-        app: AndroidApplication,
-        fabric: Fabric,
-        realmConfiguration: RealmConfiguration,
-        crashes: Crashes?,
-        realmModule: RealmModule?
-    ): AppComponent = DaggerAppComponent.builder().run {
-        application(app)
-        fabric(fabric)
-        realmConfiguration(realmConfiguration)
-        crashes?.let {
-            crashes(it)
-        }
-        realmModule?.let {
-            realmModule(it)
-        }
-        build()
-    }
+        builder: AppComponent_Builder
+    ): AppComponent = builder.build()
 }
 
 @BootScope
