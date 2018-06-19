@@ -37,6 +37,8 @@ typealias RealmInit = RealmConfiguration.Builder.() -> RealmConfiguration
 interface RealmComponent {
     val realm: Realm
     val crashlytics: Crashlytics
+
+    fun inject(sample: Sample)
 }
 
 @Module
@@ -44,7 +46,7 @@ class RealmBootstrapModule {
     @Provides
     @BootScope
     fun provideRealmConfiguration(
-        app: AndroidApplication,
+        @BootScope app: AndroidApplication,
         @Named("realmInit") realmInit: RealmInit?
     ): RealmConfiguration {
         Realm.init(app)

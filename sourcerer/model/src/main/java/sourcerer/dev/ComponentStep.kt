@@ -18,6 +18,7 @@ package sourcerer.dev
 
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
+import sourcerer.DeferredOutput
 import sourcerer.Env
 import sourcerer.Output
 import sourcerer.ProcessStep
@@ -41,6 +42,7 @@ class ComponentStep
     fun supportedOptions(): Iterable<Option> = Option.values()
             .toSet()
 
+    /*
     override
     fun Env.process(
         annotationElements: AnnotationElements
@@ -54,7 +56,8 @@ class ComponentStep
                 .let(appComponentStep::process)
         return map
     }
-    /*
+     */
+
     override
     fun Env.process(
         annotationElements: AnnotationElements
@@ -73,10 +76,11 @@ class ComponentStep
                             DeferredOutput(it.definitionType)
                         }
                     }
+                }.apply {
+                    log("appComponent outputs=$this")
                 }
         return map
     }
-     */
 
     enum
     class Option(

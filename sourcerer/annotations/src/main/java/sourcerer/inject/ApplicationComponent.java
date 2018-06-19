@@ -27,6 +27,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public
 @interface ApplicationComponent {
+    Class<?>[] includes() default {};
+
     Class<?>[] dependencies() default {};
 
     Class<?>[] modules() default {};

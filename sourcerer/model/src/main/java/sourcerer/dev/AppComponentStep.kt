@@ -17,24 +17,18 @@
 package sourcerer.dev
 
 import sourcerer.Output
-import sourcerer.processor.Env
 import javax.annotation.processing.FilerException
 import javax.inject.Inject
 
 class AppComponentStep
 @Inject constructor(
-    val env: Env
+    val factory: AppComponentGenerator.Factory
 ) {
     fun process(
         applicationComponents: List<ComponentDescriptor>
     ): List<Output> = try {
-        env.run {
-            // TODO: only run when complete
-            AppComponentGenerator(applicationComponents, env.options)
-                    .writeTo(filer)
-            // TODO:
-            emptyList()
-        }
+        val output = factory.create(applicationComponents)
+        listOf(output)
     } catch (_: FilerException) {
         emptyList()
     }

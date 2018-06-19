@@ -18,38 +18,102 @@ package evovetech.sample.crashes
 
 import android.app.Application
 import com.crashlytics.android.Crashlytics
+import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
+import dagger.MembersInjector
 import dagger.Module
 import dagger.Provides
 import io.fabric.sdk.android.Fabric
 import sourcerer.inject.BootScope
 import sourcerer.inject.android.AndroidApplication
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
 import javax.inject.Singleton
 
 //
 // Generated
 //
 
+@Singleton
+class CrashesComponentImpl
+@Inject constructor(
+    private val bootData: BootData,
+    private val crashlyticsProvider: Provider<Crashlytics>,
+    private val sampleInjector: MembersInjector<Sample>
+) : CrashesComponent {
+    override
+    val app: AndroidApplication
+        get() = bootData.app
+
+    override
+    val fabric: Fabric
+        get() = bootData.fabric
+
+    override
+    val crashlytics: Crashlytics
+        get() = crashlyticsProvider.get()
+
+    override
+    fun inject(
+        sample: Sample
+    ) = sampleInjector.injectMembers(sample)
+}
+
+@Module(includes = [Crashes::class])
+interface CrashesComponentImplModule {
+    @Binds
+    fun bindCrashesComponent(impl: CrashesComponentImpl): CrashesComponent
+}
+
+@Module(includes = [CrashesComponentImplModule::class])
+class BootData
+@Inject constructor(
+    @get:Provides
+    @Singleton
+    val app: AndroidApplication,
+
+    @get:Provides
+    @Singleton
+    val fabric: Fabric
+)
+
 // package component
 // application generated
 @Singleton
-@Component(modules = [Crashes::class])
-interface AppComponent : CrashesComponent_ApplicationComponent {
-    override val app: AndroidApplication
-    override val fabric: Fabric
-    override val crashlytics: Crashlytics
+@Component(
+    modules = [
+        BootData::class,
+        Crashes::class,
+        CrashesComponentImplModule::class
+    ]
+)
+//@ApplicationComponent(includes = [CrashesComponent_ApplicationComponent::class])
+interface AppComponent {
+    val crashesComponent: CrashesComponent
 
     @Component.Builder
-    interface Builder : CrashesComponent_ApplicationComponent.Builder {
-        override fun crashes(crashes: Crashes)
+    abstract
+    class Builder {
+        @Inject
+        fun injectMembers(
+            bootData: BootData,
+            crashes: Crashes?
+        ) {
+            bootData(bootData)
+            crashes?.let {
+                crashes(it)
+            }
+        }
 
-        @BindsInstance
-        override fun fabric(fabric: Fabric)
+        abstract
+        fun crashes(crashes: Crashes)
 
-        @BindsInstance
-        override fun application(application: Application)
+        abstract
+        fun bootData(bootData: BootData)
 
+        abstract
         fun build(): AppComponent
     }
 }
@@ -59,28 +123,33 @@ class BootModule {
     @Provides
     @BootScope
     fun provideComponent(
-        app: AndroidApplication,
-        fabric: Fabric,
-        crashes: Crashes?
+        injector: MembersInjector<AppComponent.Builder>
     ): AppComponent {
         return DaggerAppComponent.builder().run {
-            application(app)
-            fabric(fabric)
-            crashes?.let {
-                crashes(it)
-            }
+            injector.injectMembers(this)
             build()
         }
     }
 }
 
-//@BootScope
-//@Component(modules = [BootModule::class])
+@BootScope
+@Component(modules = [BootModule::class])
 interface BootComponent {
     val component: AppComponent
 
-    //    @Component.Builder
-    interface Builder : CrashesComponent_BootstrapBuilder {
+    fun inject(builder: AppComponent.Builder)
+
+    @Component.Builder
+    interface Builder {
+        @BindsInstance
+        fun crashes(crashes: Crashes?)
+
+        @BindsInstance
+        fun application(application: Application)
+
+        @BindsInstance
+        fun function1(@Named("fabric") function1: Function1<Fabric.Builder, Fabric>)
+
         fun build(): BootComponent
     }
 }

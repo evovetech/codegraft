@@ -16,6 +16,7 @@
 
 package sourcerer.dev
 
+import com.google.auto.common.MoreElements
 import com.google.auto.common.MoreTypes
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
@@ -34,12 +35,15 @@ import sourcerer.interfaceBuilder
 import sourcerer.toKlass
 import sourcerer.typeSpec
 import javax.inject.Inject
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
+import javax.lang.model.util.ElementFilter.methodsIn
 
 class ApplicationComponentGenerator(
     private val env: Env,
+    private val elements: SourcererElements,
     private val descriptor: ComponentDescriptor
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.definitionType),
@@ -52,6 +56,16 @@ class ApplicationComponentGenerator(
     fun typeSpec() = typeSpec {
         addModifiers(PUBLIC)
         addSuperinterface(TypeName.get(descriptor.definitionType.asType()))
+        methodsIn(elements.getAllMembers(descriptor.definitionType))
+                .filter(MoreElements.hasModifiers<ExecutableElement>(ABSTRACT)::apply)
+                .map(MethodSpec::overriding)
+                .map {
+                    it.addModifiers(ABSTRACT)
+                            .build()
+                }
+//                .map(MethodSpec.Builder::build)
+                .apply { env.log("methods=$this") }
+                .map(this::addMethod)
         addAnnotation(ClassName.get(ApplicationComponent::class.java).toKlass()) {
             descriptor.applicationModules
                     .map(ModuleDescriptor::definitionType)
@@ -121,10 +135,15 @@ class ApplicationComponentGenerator(
 
     class Factory
     @Inject constructor(
-        private val env: Env
+        private val env: Env,
+        private val elements: SourcererElements
     ) {
-        fun create(descriptor: ComponentDescriptor): ApplicationComponentGenerator {
-            return ApplicationComponentGenerator(env, descriptor)
-        }
+        fun create(
+            descriptor: ComponentDescriptor
+        ) = ApplicationComponentGenerator(
+            env = env,
+            elements = elements,
+            descriptor = descriptor
+        )
     }
 }

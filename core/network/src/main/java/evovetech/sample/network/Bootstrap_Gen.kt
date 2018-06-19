@@ -16,7 +16,9 @@
 
 package evovetech.sample.network
 
+import android.app.Application
 import com.crashlytics.android.Crashlytics
+import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -51,6 +53,14 @@ interface AppComponent :
     interface Builder :
         CrashesComponent_ApplicationComponent.Builder,
         ClientComponent_ApplicationComponent.Builder {
+
+        override fun crashes(crashes: Crashes)
+
+        @BindsInstance
+        override fun fabric(fabric: Fabric)
+
+        @BindsInstance
+        override fun application(application: Application)
 
         fun build(): AppComponent
     }

@@ -18,19 +18,21 @@ package sourcerer.dev
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
-import sourcerer.BaseElement
+import sourcerer.JavaOutput
 import sourcerer.interfaceBuilder
 import sourcerer.processor.Env
 import sourcerer.typeSpec
+import javax.inject.Inject
 import javax.inject.Singleton
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.TypeElement
 
 class AppComponentGenerator(
     private val descriptors: List<ComponentDescriptor>,
-    private val options: Env.Options,
-    override val rawType: ClassName = ClassName.get(options[ComponentStep.Option.Package], "AppComponent2")
-) : BaseElement {
+    pkg: String
+) : JavaOutput(
+    rawType = ClassName.get(pkg, "AppComponent2")
+) {
     override
     fun newBuilder() = outKlass.interfaceBuilder()
 
@@ -50,6 +52,18 @@ class AppComponentGenerator(
 //                    .forEach(addTo("modules"))
 //        }
 //        addType(Builder().typeSpec())
+    }
+
+    class Factory
+    @Inject constructor(
+        private val options: Env.Options
+    ) {
+        fun create(
+            descriptors: List<ComponentDescriptor>
+        ) = AppComponentGenerator(
+            descriptors = descriptors,
+            pkg = options[ComponentStep.Option.Package]
+        )
     }
 
 //    inner

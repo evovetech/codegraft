@@ -23,10 +23,16 @@ import io.fabric.sdk.android.Fabric
 import sourcerer.inject.BootScope
 import sourcerer.inject.BootstrapComponent
 import sourcerer.inject.android.AndroidApplication
+import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
 typealias FabricInit = Fabric.Builder.() -> Fabric
+
+class Sample {
+    @Inject lateinit
+    var app: AndroidApplication
+}
 
 @BootstrapComponent(
     bootstrapModules = [CrashesBootstrapModule::class],
@@ -36,6 +42,8 @@ interface CrashesComponent {
     val app: AndroidApplication
     val fabric: Fabric
     val crashlytics: Crashlytics
+
+    fun inject(sample: Sample)
 }
 
 @Module

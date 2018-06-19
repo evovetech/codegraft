@@ -24,48 +24,83 @@ import dagger.Module
 import dagger.Provides
 import evovetech.sample.crashes.Crashes
 import evovetech.sample.crashes.CrashesBootstrapModule
-import evovetech.sample.crashes.CrashesComponent_ApplicationComponent
 import io.fabric.sdk.android.Fabric
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootScope
 import sourcerer.inject.android.AndroidApplication
+import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+
+class Sample {
+    @Inject lateinit
+    var app: AndroidApplication
+}
 
 //
 // Generated
 //
 
+//@Singleton
+//@Component(
+//    modules = [Crashes::class, RealmModule::class]
+//)
+////@ApplicationComponent(includes = [CrashesComponent_ApplicationComponent::class])
+//interface RealmComponent_ApplicationComponent2 : RealmComponent {
+//    override val realm: Realm
+//    override val crashlytics: Crashlytics
+//
+//    override fun inject(sample: Sample)
+//
+//    @Component.Builder
+//    @ApplicationComponent.Builder
+//    interface Builder {
+//        fun realmModule(realmModule: RealmModule)
+//
+//        @BindsInstance
+//        fun realmConfiguration(realmConfiguration: RealmConfiguration)
+//
+//        fun build(): RealmComponent
+//    }
+//}
+
 // package component
 // application generated
 @Singleton
-@Component(modules = [RealmModule::class, Crashes::class])
-interface AppComponent :
-    RealmComponent_ApplicationComponent,
-    CrashesComponent_ApplicationComponent {
-
-    override val realm: Realm
-    override val crashlytics: Crashlytics
-    override val app: AndroidApplication
-    override val fabric: Fabric
+@Component(
+    modules = [
+        RealmModule::class,
+        Crashes::class
+    ]
+)
+//@ApplicationComponent(
+//    dependencies = [
+//        RealmComponent_ApplicationComponent::class,
+//        CrashesComponent_ApplicationComponent::class
+//    ]
+//)
+interface AppComponent {
+    val realm: Realm
+    val crashlytics: Crashlytics
+    val app: AndroidApplication
+    val fabric: Fabric
 
     @Component.Builder
-    interface Builder :
-        RealmComponent_ApplicationComponent.Builder,
-        CrashesComponent_ApplicationComponent.Builder {
-        override fun crashes(crashes: Crashes)
+    interface Builder {
+        fun crashes(crashes: Crashes)
 
         @BindsInstance
-        override fun fabric(fabric: Fabric)
+        fun fabric(fabric: Fabric)
 
         @BindsInstance
-        override fun application(application: Application)
+        fun application(application: Application)
 
-        override fun realmModule(realmModule: RealmModule)
+        fun realmModule(realmModule: RealmModule)
 
         @BindsInstance
-        override fun realmConfiguration(realmConfiguration: RealmConfiguration)
+        fun realmConfiguration(realmConfiguration: RealmConfiguration)
 
         fun build(): AppComponent
     }
