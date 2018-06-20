@@ -114,7 +114,7 @@ interface AppComponent {
 class AppComponent_Builder
 private constructor(
     private val actual: Builder
-) : Builder by actual {
+) {
     @Inject constructor(
         bootData: AppComponent_BootData,
         crashes: Crashes?
@@ -125,6 +125,10 @@ private constructor(
         crashes?.let {
             actual.crashes(it)
         }
+    }
+
+    fun build(): AppComponent {
+        return actual.build()
     }
 }
 

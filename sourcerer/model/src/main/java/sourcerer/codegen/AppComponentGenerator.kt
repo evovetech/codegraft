@@ -20,7 +20,6 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
-import dagger.Component
 import dagger.Module
 import dagger.Provides
 import sourcerer.JavaOutput
@@ -37,130 +36,32 @@ import sourcerer.typeSpec
 import javax.inject.Inject
 import javax.inject.Singleton
 import javax.lang.model.element.Modifier.ABSTRACT
+import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
-
-/*
-
-@Singleton
-@Component(modules = [AppComponent_BootData::class])
-interface AppComponent {
-    val crashesComponent: CrashesComponent
-
-    @Component.Builder
-    interface Builder {
-        fun bootData(bootData: AppComponent_BootData)
-        fun crashes(crashes: Crashes)
-        fun build(): AppComponent
-    }
-}
-
-class AppComponent_Builder
-private constructor(
-    private val actual: AppComponent.Builder
-) : AppComponent.Builder by actual {
-    @Inject constructor(
-        bootData: AppComponent_BootData,
-        crashes: Crashes?
-    ) : this(
-        actual = DaggerAppComponent.builder()
-    ) {
-        actual.bootData(bootData)
-        crashes?.let {
-            actual.crashes(it)
-        }
-    }
-}
- */
 
 class AppComponentGenerator(
     private val descriptors: List<Output>,
     private val pkg: String
 ) {
+    val name = "AppComponent2"
+    val components = descriptors.map { it.component }
+
     fun process(): List<sourcerer.Output> {
-        val bootData = BootData(this)
+        val bootData = BootData()
         val app = App(bootData)
+        val appBuilder = AppBuilder(app)
         return listOf(
             bootData,
-            app
+            app,
+            appBuilder
         )
     }
 
-    /*
-    @Singleton
-    @Component(modules = [AppComponent_BootData::class])
-    interface AppComponent {
-        val crashesComponent: CrashesComponent
-
-        @Component.Builder
-        interface Builder {
-            fun bootData(bootData: AppComponent_BootData)
-            fun crashes(crashes: Crashes)
-            fun build(): AppComponent
-        }
-    }
-    */
-    class App(
-        private val bootData: BootData
-    ) : JavaOutput(
-        rawType = ClassName.get(bootData.pkg.name, "AppComponent2")
+    inner
+    class BootData : JavaOutput(
+        rawType = ClassName.get(pkg, "${name}_BootData")
     ) {
-        val components = bootData.components
-        val descriptors = components.map { it.descriptor }
-
-        override
-        fun newBuilder() = outKlass.interfaceBuilder()
-
-        override
-        fun typeSpec() = typeSpec {
-            addAnnotation(Singleton::class.java)
-//            addAnnotation(ClassName.get(Component::class.java).toKlass()) {
-//                val add = addTo("modules")
-//                add(bootData.outKlass.rawType)
-//            }
-            descriptors.forEach {
-                val type = it.definitionType
-                val name = type.simpleName.toString().decapitalize()
-                val getter = MethodSpec.methodBuilder("get${name.capitalize()}")
-                        .addModifiers(PUBLIC, ABSTRACT)
-                        .returns(TypeName.get(type.asType()))
-                        .build()
-                addMethod(getter)
-            }
-            addType(Builder().typeSpec())
-        }
-
-        inner
-        class Builder : sourcerer.JavaOutput.Builder() {
-            override
-            fun typeSpec() = typeSpec {
-                val parent = this@App
-
-                addModifiers(PUBLIC, STATIC)
-//                addAnnotation(Component.Builder::class.java)
-
-                addMethod(MethodSpec.methodBuilder("bootData").run {
-                    addModifiers(PUBLIC, ABSTRACT)
-                    addParameter(ParameterSpec.builder(bootData.outKlass.rawType, "bootData").build())
-                    build()
-                })
-
-                addMethod(MethodSpec.methodBuilder("build").run {
-                    addModifiers(PUBLIC, ABSTRACT)
-                    returns(parent.outKlass.rawType)
-                    build()
-                })
-            }
-        }
-    }
-
-    class BootData(
-        parent: AppComponentGenerator
-    ) : JavaOutput(
-        rawType = ClassName.get(parent.pkg, "AppComponent_BootData2")
-    ) {
-        val descriptors = parent.descriptors
-        val components = descriptors.map { it.component }
 
         override
         fun newBuilder() = outKlass.classBuilder()
@@ -202,6 +103,100 @@ class AppComponentGenerator(
                 addMethods(methods)
             }
             addMethod(constructor.build())
+        }
+    }
+
+    inner
+    class App(
+        private val bootData: BootData
+    ) : JavaOutput(
+        rawType = ClassName.get(pkg, name)
+    ) {
+        val descriptors = components.map { it.descriptor }
+        val builder = Builder()
+
+        override
+        fun newBuilder() = outKlass.interfaceBuilder()
+
+        override
+        fun typeSpec() = typeSpec {
+            addAnnotation(Singleton::class.java)
+//            addAnnotation(ClassName.get(Component::class.java).toKlass()) {
+//                val add = addTo("modules")
+//                add(bootData.outKlass.rawType)
+//            }
+            descriptors.forEach {
+                val type = it.definitionType
+                val name = type.simpleName.toString().decapitalize()
+                val getter = MethodSpec.methodBuilder("get${name.capitalize()}")
+                        .addModifiers(PUBLIC, ABSTRACT)
+                        .returns(TypeName.get(type.asType()))
+                        .build()
+                addMethod(getter)
+            }
+            addType(builder.typeSpec())
+        }
+
+        inner
+        class Builder : sourcerer.JavaOutput.Builder() {
+            override
+            fun typeSpec() = typeSpec {
+                val parent = this@App
+
+                addModifiers(PUBLIC, STATIC)
+//                addAnnotation(Component.Builder::class.java)
+
+                addMethod(MethodSpec.methodBuilder("bootData").run {
+                    addModifiers(PUBLIC, ABSTRACT)
+                    addParameter(ParameterSpec.builder(bootData.outKlass.rawType, "bootData").build())
+                    build()
+                })
+
+                addMethod(MethodSpec.methodBuilder("build").run {
+                    addModifiers(PUBLIC, ABSTRACT)
+                    returns(parent.outKlass.rawType)
+                    build()
+                })
+            }
+        }
+    }
+
+    /*
+    class AppComponent_Builder
+    private constructor(
+        private val actual: Builder
+    ) {
+        @Inject constructor(
+            bootData: AppComponent_BootData,
+            crashes: Crashes?
+        ) : this(
+            actual = DaggerAppComponent.builder()
+        ) {
+            actual.bootData(bootData)
+            crashes?.let {
+                actual.crashes(it)
+            }
+        }
+
+        fun build(): AppComponent {
+            return actual.build()
+        }
+    }
+     */
+    inner
+    class AppBuilder(
+        private val app: App
+    ) : JavaOutput(
+        rawType = ClassName.get(pkg, "${name}_Builder")
+    ) {
+        override
+        fun newBuilder() = outKlass.classBuilder()
+
+        override
+        fun typeSpec() = typeSpec {
+            // TODO:
+            addModifiers(FINAL)
+
         }
     }
 
