@@ -16,17 +16,15 @@
 
 package sourcerer
 
-import com.google.auto.service.AutoService
 import sourcerer.inject.PluginType
 import sourcerer.lib.LibEnvProcessor
-import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.TypeElement
 
 /**
  * Created by layne on 2/21/18.
  */
-@AutoService(Processor::class)
+//@AutoService(Processor::class)
 class PluginProcessor : LibEnvProcessor() {
     override
     fun process(set: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {

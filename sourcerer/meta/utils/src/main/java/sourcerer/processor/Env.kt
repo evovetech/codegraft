@@ -16,73 +16,51 @@
 
 package sourcerer.processor
 
+import java.util.Locale
 import javax.annotation.processing.Filer
 import javax.annotation.processing.Messager
 import javax.annotation.processing.ProcessingEnvironment
+import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind.ERROR
 import javax.tools.Diagnostic.Kind.NOTE
 
-open
-class Env(
-    processingEnv: ProcessingEnvironment
-) : ProcessingEnvironment by processingEnv {
-    val options: Options by lazy {
-        Options(processingEnv.options)
-    }
+interface ProcessingEnv {
+    val parent: ProcessingEnvironment
+    val options: Options
+        get() = Options(parent.options)
+    val messager: Messager
+        get() = parent.messager
+    val filer: Filer
+        get() = parent.filer
+    val elementUtils: Elements
+        get() = parent.elementUtils
+    val typeUtils: Types
+        get() = parent.typeUtils
+    val sourceVersion: SourceVersion
+        get() = parent.sourceVersion
+    val locale: Locale
+        get() = parent.locale
 
-    fun processingEnv(): ProcessingEnvironment {
-        return this
-    }
+    fun processingEnv() = parent
+    fun messager() = messager
+    fun elements() = elementUtils
+    fun types() = typeUtils
+    fun filer() = filer
 
-    open
-    fun messager(): Messager {
-        return messager
-    }
+    fun log(element: Element, message: String, vararg args: Any) =
+        messager.log(element, message, args)
 
-    open
-    fun elements(): Elements {
-        return elementUtils
-    }
+    fun log(message: String, vararg args: Any) =
+        messager.log(message, args)
 
-    open
-    fun types(): Types {
-        return typeUtils
-    }
+    fun error(element: Element, message: String, vararg args: Any) =
+        messager.error(element, message, args)
 
-    open
-    fun filer(): Filer {
-        return filer
-    }
-
-    fun log(element: Element, message: String, vararg args: Any) {
-        val msg = msg(message, args)
-        messager().printMessage(NOTE, msg, element)
-    }
-
-    fun log(message: String, vararg args: Any) {
-        val msg = msg(message, args)
-        messager().printMessage(NOTE, msg)
-    }
-
-    fun error(element: Element, message: String, vararg args: Any) {
-        val msg = msg(message, args)
-        messager().printMessage(ERROR, msg, element)
-    }
-
-    fun error(message: String, vararg args: Any) {
-        val msg = msg(message, args)
-        messager().printMessage(ERROR, msg)
-    }
-
-    private
-    fun msg(message: String, args: Array<out Any>) = if (args.isEmpty()) {
-        message
-    } else {
-        String.format(message, *args)
-    }
+    fun error(message: String, vararg args: Any) =
+        messager.error(message, args)
 
     companion object {
         const val ALL_ANNOTATIONS = "*"
@@ -98,6 +76,7 @@ class Env(
         }
     }
 
+    open
     class Options(
         private val provided: Map<String, String>
     ) {
@@ -110,4 +89,53 @@ class Env(
             return "Options(provided=$provided)"
         }
     }
+}
+
+open
+class Env(override val parent: ProcessingEnvironment) :
+    ProcessingEnv {
+    constructor(env: ProcessingEnv) :
+            this(env.parent)
+
+    final override
+    val options: Options by lazy {
+        Options(parent.options)
+    }
+
+    companion object {
+        const val ALL_ANNOTATIONS = ProcessingEnv.ALL_ANNOTATIONS
+        val ALL_ANNOTATION_TYPES = ProcessingEnv.ALL_ANNOTATION_TYPES
+    }
+
+    interface Option : ProcessingEnv.Option
+
+    class Options(provided: Map<String, String>) :
+        ProcessingEnv.Options(provided)
+}
+
+fun Messager.log(element: Element, message: String, vararg args: Any) {
+    val msg = msg(message, args)
+    printMessage(NOTE, msg, element)
+}
+
+fun Messager.log(message: String, vararg args: Any) {
+    val msg = msg(message, args)
+    printMessage(NOTE, msg)
+}
+
+fun Messager.error(element: Element, message: String, vararg args: Any) {
+    val msg = msg(message, args)
+    printMessage(ERROR, msg, element)
+}
+
+fun Messager.error(message: String, vararg args: Any) {
+    val msg = msg(message, args)
+    printMessage(ERROR, msg)
+}
+
+private
+fun msg(message: String, args: Array<out Any>) = if (args.isEmpty()) {
+    message
+} else {
+    String.format(message, *args)
 }
