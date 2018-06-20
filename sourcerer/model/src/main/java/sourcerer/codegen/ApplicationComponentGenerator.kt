@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package sourcerer.codegen
 
 import com.google.auto.common.MoreElements
 import com.google.auto.common.MoreTypes
@@ -30,6 +30,11 @@ import sourcerer.Klass
 import sourcerer.SourceWriter
 import sourcerer.addAnnotation
 import sourcerer.addTo
+import sourcerer.dev.Binding
+import sourcerer.dev.ComponentDescriptor
+import sourcerer.dev.Dependency
+import sourcerer.dev.ModuleDescriptor
+import sourcerer.dev.SourcererElements
 import sourcerer.inject.ApplicationComponent
 import sourcerer.interfaceBuilder
 import sourcerer.toKlass

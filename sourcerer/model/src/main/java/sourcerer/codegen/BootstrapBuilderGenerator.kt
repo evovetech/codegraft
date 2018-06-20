@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package sourcerer.codegen
 
 import com.google.auto.common.MoreTypes
 import com.squareup.javapoet.AnnotationSpec
@@ -27,6 +27,7 @@ import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.addAnnotation
 import sourcerer.addTo
+import sourcerer.dev.ComponentDescriptor
 import sourcerer.inject.BootstrapBuilder
 import sourcerer.interfaceBuilder
 import sourcerer.toKlass

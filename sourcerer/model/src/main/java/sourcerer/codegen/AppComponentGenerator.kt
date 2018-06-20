@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package sourcerer.codegen
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
 import sourcerer.JavaOutput
+import sourcerer.dev.ComponentDescriptor
+import sourcerer.dev.ComponentStep.Option.Package
 import sourcerer.interfaceBuilder
 import sourcerer.processor.Env
 import sourcerer.typeSpec
@@ -62,7 +64,7 @@ class AppComponentGenerator(
             descriptors: List<ComponentDescriptor>
         ) = AppComponentGenerator(
             descriptors = descriptors,
-            pkg = options[ComponentStep.Option.Package]
+            pkg = options[Package]
         )
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package sourcerer.codegen
 
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
@@ -27,7 +27,13 @@ import com.squareup.javapoet.TypeSpec
 import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.classBuilder
-import sourcerer.dev.ComponentImplGenerator.Method.Kind.Provider
+import sourcerer.codegen.ComponentImplGenerator.Method.Kind.MembersInjector
+import sourcerer.codegen.ComponentImplGenerator.Method.Kind.Provider
+import sourcerer.dev.ComponentDescriptor
+import sourcerer.dev.SourcererElements
+import sourcerer.dev.SourcererTypes
+import sourcerer.dev.abstractMethods
+import sourcerer.dev.qualifier
 import sourcerer.typeSpec
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -79,11 +85,11 @@ class ComponentImplGenerator(
     ) : ExecutableElement by method {
         val element: Element = when (kind) {
             Kind.Provider -> method
-            Kind.MembersInjector -> method.parameters.first()
+            MembersInjector -> method.parameters.first()
         }
         val type: TypeMirror = when (kind) {
             Kind.Provider -> method.returnType
-            Kind.MembersInjector -> element.asType()
+            MembersInjector -> element.asType()
         }
         val name = element.simpleName.toString().let { n ->
             val name = when (kind) {
@@ -169,7 +175,7 @@ class ComponentImplGenerator(
             ): Method {
                 val kind = when (method.parameters.size) {
                     0 -> Kind.Provider
-                    else -> Kind.MembersInjector
+                    else -> MembersInjector
                 }
                 return Method(kind, types, method)
             }

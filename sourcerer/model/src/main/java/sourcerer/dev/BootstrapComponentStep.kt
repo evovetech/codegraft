@@ -17,6 +17,9 @@
 package sourcerer.dev
 
 import sourcerer.Output
+import sourcerer.codegen.ApplicationComponentGenerator
+import sourcerer.codegen.BootstrapBuilderGenerator
+import sourcerer.codegen.ComponentImplGenerator
 import javax.annotation.processing.FilerException
 import javax.inject.Inject
 
