@@ -19,6 +19,7 @@ package sourcerer.dev
 import sourcerer.Output
 import sourcerer.codegen.ApplicationComponentGenerator
 import sourcerer.codegen.BootstrapBuilderGenerator
+import sourcerer.codegen.ComponentBootDataGenerator
 import sourcerer.codegen.ComponentImplementationGenerator
 import sourcerer.codegen.ComponentModuleGenerator
 import javax.annotation.processing.FilerException
@@ -29,7 +30,8 @@ class BootstrapComponentStep
     private val bootFactory: BootstrapBuilderGenerator.Factory,
     private val appFactory: ApplicationComponentGenerator.Factory,
     private val componentImplementationFactory: ComponentImplementationGenerator.Factory,
-    private val componentModuleFactory: ComponentModuleGenerator.Factory
+    private val componentModuleFactory: ComponentModuleGenerator.Factory,
+    private val componentBootDataFactory: ComponentBootDataGenerator.Factory
 ) {
     fun process(
         bootstrapComponents: List<ComponentDescriptor>
@@ -39,7 +41,14 @@ class BootstrapComponentStep
             val app = appFactory.create(descriptor)
             val componentImplementation = componentImplementationFactory.create(descriptor)
             val componentModule = componentModuleFactory.create(descriptor, componentImplementation)
-            listOf(boot, app, componentImplementation, componentModule)
+            val componentBootData = componentBootDataFactory.create(descriptor)
+            listOf(
+                boot,
+                app,
+                componentImplementation,
+                componentModule,
+                componentBootData
+            )
         }
     } catch (_: FilerException) {
         emptyList()

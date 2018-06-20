@@ -37,6 +37,7 @@ import sourcerer.dev.qualifier
 import sourcerer.typeSpec
 import javax.inject.Inject
 import javax.inject.Singleton
+import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier.FINAL
@@ -103,10 +104,8 @@ class ComponentImplementationGenerator(
         val fieldType = kind.wrap(types, type)
 
         private
-        fun TypeSpec.Builder.addFieldSpec(): FieldSpec = FieldSpec.builder(TypeName.get(fieldType), fieldName)
-                .addModifiers(PRIVATE, FINAL)
-                .build()
-                .apply { addField(this) }
+        fun TypeSpec.Builder.addFieldSpec(): FieldSpec =
+            addFieldSpec(fieldType, fieldName)
 
         private
         fun TypeSpec.Builder.addMethodSpec(fieldSpec: FieldSpec): MethodSpec = MethodSpec.overriding(this@Method)
@@ -121,19 +120,8 @@ class ComponentImplementationGenerator(
         fun TypeSpec.Builder.write(constructor: MethodSpec.Builder): Method {
             val fieldSpec = addFieldSpec()
             val methodSpec = addMethodSpec(fieldSpec)
-            constructor.addToConstructor(fieldSpec)
+            constructor.addToConstructor(fieldSpec, qualifier)
             return this@Method
-        }
-
-        fun MethodSpec.Builder.addToConstructor(
-            fieldSpec: FieldSpec
-        ): ParameterSpec = ParameterSpec.builder(fieldSpec.type, fieldSpec.name).run {
-            qualifier?.let(AnnotationSpec::get)
-                    ?.let(this::addAnnotation)
-            build()
-        }.also { paramSpec ->
-            addStatement("this.\$N = \$N", fieldSpec, paramSpec)
-            addParameter(paramSpec)
         }
 
         enum class Kind(
@@ -198,3 +186,23 @@ class ComponentImplementationGenerator(
         )
     }
 }
+
+fun MethodSpec.Builder.addToConstructor(
+    fieldSpec: FieldSpec,
+    qualifier: AnnotationMirror? = null
+): ParameterSpec = ParameterSpec.builder(fieldSpec.type, fieldSpec.name).run {
+    qualifier?.let(AnnotationSpec::get)
+            ?.let(this::addAnnotation)
+    build()
+}.also { paramSpec ->
+    addStatement("this.\$N = \$N", fieldSpec, paramSpec)
+    addParameter(paramSpec)
+}
+
+fun TypeSpec.Builder.addFieldSpec(
+    fieldType: TypeMirror,
+    fieldName: String
+): FieldSpec = FieldSpec.builder(TypeName.get(fieldType), fieldName)
+        .addModifiers(PRIVATE, FINAL)
+        .build()
+        .apply { addField(this) }
