@@ -17,35 +17,78 @@
 package sourcerer.codegen
 
 import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.TypeName
 import sourcerer.JavaOutput
-import sourcerer.dev.ComponentDescriptor
+import sourcerer.dev.BootstrapComponentStep.Output
 import sourcerer.dev.ComponentStep.Option.Package
 import sourcerer.interfaceBuilder
 import sourcerer.processor.Env
 import sourcerer.typeSpec
 import javax.inject.Inject
-import javax.inject.Singleton
-import javax.lang.model.element.Modifier.PUBLIC
-import javax.lang.model.element.TypeElement
+
+/*
+@Module(includes = [CrashesComponent_Module::class])
+class AppComponent_BootData
+@Inject constructor(
+    @get:Provides
+    val crashes: CrashesComponent_BootData
+) {
+    val app: AndroidApplication
+        @Provides @Singleton
+        get() = crashes.app
+
+    val fabric: Fabric
+        @Provides @Singleton
+        get() = crashes.fabric
+}
+
+@Singleton
+@Component(modules = [AppComponent_BootData::class])
+interface AppComponent {
+    val crashesComponent: CrashesComponent
+
+    @Component.Builder
+    interface Builder {
+        fun bootData(bootData: AppComponent_BootData)
+        fun crashes(crashes: Crashes)
+        fun build(): AppComponent
+    }
+}
+
+class AppComponent_Builder
+private constructor(
+    private val actual: Builder
+) : Builder by actual {
+    @Inject constructor(
+        bootData: AppComponent_BootData,
+        crashes: Crashes?
+    ) : this(
+        actual = DaggerAppComponent.builder()
+    ) {
+        actual.bootData(bootData)
+        crashes?.let {
+            actual.crashes(it)
+        }
+    }
+}
+ */
 
 class AppComponentGenerator(
-    private val descriptors: List<ComponentDescriptor>,
+    private val descriptors: List<Output>,
     pkg: String
 ) : JavaOutput(
-    rawType = ClassName.get(pkg, "AppComponent2")
+    rawType = ClassName.get(pkg, "AppComponent_BootData")
 ) {
     override
     fun newBuilder() = outKlass.interfaceBuilder()
 
     override
     fun typeSpec() = typeSpec {
-        addModifiers(PUBLIC)
-        addAnnotation(Singleton::class.java)
-        descriptors.map(ComponentDescriptor::definitionType)
-                .map(TypeElement::asType)
-                .map(TypeName::get)
-                .map(this::addSuperinterface)
+        //        addModifiers(PUBLIC)
+//        addAnnotation(Singleton::class.java)
+//        descriptors.map(ComponentDescriptor::definitionType)
+//                .map(TypeElement::asType)
+//                .map(TypeName::get)
+//                .map(this::addSuperinterface)
 
 //        addAnnotation(ClassName.get(ApplicationComponent::class.java).toKlass()) {
 //            descriptor.applicationModules
@@ -61,7 +104,7 @@ class AppComponentGenerator(
         private val options: Env.Options
     ) {
         fun create(
-            descriptors: List<ComponentDescriptor>
+            descriptors: List<Output>
         ) = AppComponentGenerator(
             descriptors = descriptors,
             pkg = options[Package]

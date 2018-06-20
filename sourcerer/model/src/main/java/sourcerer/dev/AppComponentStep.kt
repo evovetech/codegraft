@@ -16,7 +16,6 @@
 
 package sourcerer.dev
 
-import sourcerer.Output
 import sourcerer.codegen.AppComponentGenerator
 import javax.annotation.processing.FilerException
 import javax.inject.Inject
@@ -26,11 +25,23 @@ class AppComponentStep
     val factory: AppComponentGenerator.Factory
 ) {
     fun process(
-        applicationComponents: List<ComponentDescriptor>
+        components: List<BootstrapComponentStep.Output>
     ): List<Output> = try {
-        val output = factory.create(applicationComponents)
-        listOf(output)
+        listOf(
+            Output(
+                appComponentGenerator = factory.create(components)
+            )
+        )
     } catch (_: FilerException) {
         emptyList()
+    }
+
+    data
+    class Output(
+        val appComponentGenerator: AppComponentGenerator
+    ) {
+        val outputs: List<sourcerer.Output> = listOf(
+            appComponentGenerator
+        )
     }
 }

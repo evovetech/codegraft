@@ -18,7 +18,6 @@ package sourcerer.dev
 
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
-import sourcerer.DeferredOutput
 import sourcerer.Env
 import sourcerer.Output
 import sourcerer.ProcessStep
@@ -66,19 +65,11 @@ class ComponentStep
         val bootstrapComponents = annotationElements.typeInputs<BootstrapComponent>()
                 .map(componentFactory::forComponent)
                 .let(bootstrapComponentStep::process)
-        map[BootstrapComponent::class] = bootstrapComponents
-        map[ApplicationComponent::class] = annotationElements.typeInputs<ApplicationComponent>()
-                .map(componentFactory::forComponent)
-                .let { components ->
-                    when (bootstrapComponents.size) {
-                        0 -> appComponentStep.process(components)
-                        else -> components.map {
-                            DeferredOutput(it.definitionType)
-                        }
-                    }
-                }.apply {
-                    log("appComponent outputs=$this")
-                }
+        map[BootstrapComponent::class] = bootstrapComponents.flatMap(BootstrapComponentStep.Output::outputs)
+
+        val appComponent = appComponentStep.process(bootstrapComponents)
+        map[ApplicationComponent::class] = appComponent.flatMap(AppComponentStep.Output::outputs)
+
         return map
     }
 

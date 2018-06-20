@@ -16,7 +16,6 @@
 
 package sourcerer.dev
 
-import sourcerer.Output
 import sourcerer.codegen.ApplicationComponentGenerator
 import sourcerer.codegen.BootstrapBuilderGenerator
 import sourcerer.codegen.ComponentBootDataGenerator
@@ -36,21 +35,50 @@ class BootstrapComponentStep
     fun process(
         bootstrapComponents: List<ComponentDescriptor>
     ): List<Output> = try {
-        bootstrapComponents.flatMap { descriptor ->
-            val boot = bootFactory.create(descriptor)
-            val app = appFactory.create(descriptor)
-            val componentImplementation = componentImplementationFactory.create(descriptor)
-            val componentModule = componentModuleFactory.create(descriptor, componentImplementation)
-            val componentBootData = componentBootDataFactory.create(descriptor)
-            listOf(
-                boot,
-                app,
-                componentImplementation,
-                componentModule,
-                componentBootData
+        bootstrapComponents.map { descriptor ->
+            Output(
+                bootstrapBuilder = bootFactory.create(descriptor),
+                oldApplicationComponent = appFactory.create(descriptor),
+                component = ComponentOutput.create(this, descriptor)
             )
         }
     } catch (_: FilerException) {
         emptyList()
+    }
+
+    data
+    class Output(
+        val bootstrapBuilder: BootstrapBuilderGenerator,
+        val oldApplicationComponent: ApplicationComponentGenerator,
+        val component: ComponentOutput
+    ) {
+        val outputs: List<sourcerer.Output> = listOf(
+            bootstrapBuilder,
+            oldApplicationComponent,
+            component.implementation,
+            component.module,
+            component.bootData
+        )
+    }
+
+    data
+    class ComponentOutput(
+        val implementation: ComponentImplementationGenerator,
+        val module: ComponentModuleGenerator,
+        val bootData: ComponentBootDataGenerator
+    ) {
+        companion object {
+            fun create(
+                step: BootstrapComponentStep,
+                descriptor: ComponentDescriptor
+            ): ComponentOutput {
+                val implementation = step.componentImplementationFactory.create(descriptor)
+                return ComponentOutput(
+                    implementation = implementation,
+                    module = step.componentModuleFactory.create(descriptor, implementation),
+                    bootData = step.componentBootDataFactory.create(descriptor)
+                )
+            }
+        }
     }
 }
