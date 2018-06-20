@@ -71,12 +71,12 @@ class ApplicationComponentGenerator(
 //                .map(MethodSpec.Builder::build)
                 .apply { env.log("methods=$this") }
                 .map(this::addMethod)
-        addAnnotation(ClassName.get(ApplicationComponent::class.java).toKlass()) {
-            descriptor.applicationModules
-                    .map(ModuleDescriptor::definitionType)
-                    .mapNotNull(ClassName::get)
-                    .forEach(addTo("modules"))
-        }
+//        addAnnotation(ClassName.get(ApplicationComponent::class.java).toKlass()) {
+//            descriptor.applicationModules
+//                    .map(ModuleDescriptor::definitionType)
+//                    .mapNotNull(ClassName::get)
+//                    .forEach(addTo("modules"))
+//        }
         addType(Builder().typeSpec())
     }
 

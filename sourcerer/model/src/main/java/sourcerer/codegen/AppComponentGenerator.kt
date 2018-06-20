@@ -76,7 +76,7 @@ class AppComponentGenerator(
     private val descriptors: List<Output>,
     pkg: String
 ) : JavaOutput(
-    rawType = ClassName.get(pkg, "AppComponent_BootData")
+    rawType = ClassName.get(pkg, "AppComponent_BootData2")
 ) {
     override
     fun newBuilder() = outKlass.interfaceBuilder()
