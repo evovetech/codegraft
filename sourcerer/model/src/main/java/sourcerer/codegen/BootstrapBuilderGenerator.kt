@@ -16,11 +16,7 @@
 
 package sourcerer.codegen
 
-import com.google.auto.common.MoreTypes
-import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.ParameterSpec
 import dagger.BindsInstance
 import org.jetbrains.annotations.Nullable
 import sourcerer.Env
@@ -57,13 +53,10 @@ class BootstrapBuilderGenerator(
 
         // add method for each module
         val applicationModules = descriptor.applicationModules.map { module ->
-            val type = module.definitionType
-            val name = type.simpleName.toString().decapitalize()
-            val param = ParameterSpec.builder(ClassName.get(type), name).run {
+            val param = module.definitionType.buildParameter {
                 addAnnotation(Nullable::class.java)
-                build()
             }
-            MethodBuilder(name) {
+            MethodBuilder(param.name) {
                 addAnnotation(BindsInstance::class.java)
                 addModifiers(PUBLIC, ABSTRACT)
                 addParameter(param)
@@ -73,17 +66,8 @@ class BootstrapBuilderGenerator(
 
         val dependencies = descriptor.modules.flatMap { it.dependencies }
         val dependencyMethods = dependencies.map { dep ->
-            val key = dep.key
-            val type = MoreTypes.asDeclared(key.type)
-            val element = type.asElement()
-            val name = element.simpleName.toString().decapitalize()
-            val param = ParameterSpec.builder(ClassName.get(type), name).run {
-                key.qualifier?.let {
-                    addAnnotation(AnnotationSpec.get(it))
-                }
-                build()
-            }
-            MethodBuilder(name) {
+            val param = dep.buildParameter()
+            MethodBuilder(param.name) {
                 addAnnotation(BindsInstance::class.java)
                 addModifiers(PUBLIC, ABSTRACT)
                 addParameter(param)
@@ -94,13 +78,6 @@ class BootstrapBuilderGenerator(
         (applicationModules + dependencyMethods)
                 .buildUnique()
                 .map(this::addMethod)
-    }
-
-    private
-    fun buildMethod(name: String, init: MethodSpec.Builder.() -> Any?): MethodSpec {
-        val b = MethodSpec.methodBuilder(name)
-        b.init()
-        return b.build()
     }
 
     class Factory
