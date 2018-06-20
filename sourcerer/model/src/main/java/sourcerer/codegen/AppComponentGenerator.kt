@@ -125,10 +125,10 @@ class AppComponentGenerator(
         override
         fun typeSpec() = typeSpec {
             addAnnotation(Singleton::class.java)
-            addAnnotation(ClassName.get(Component::class.java).toKlass()) {
-                val add = addTo("modules")
-                add(bootData.outKlass.rawType)
-            }
+//            addAnnotation(ClassName.get(Component::class.java).toKlass()) {
+//                val add = addTo("modules")
+//                add(bootData.outKlass.rawType)
+//            }
             descriptors.forEach {
                 val type = it.definitionType
                 val name = type.simpleName.toString().decapitalize()
@@ -148,7 +148,7 @@ class AppComponentGenerator(
                 val parent = this@App
 
                 addModifiers(PUBLIC, STATIC)
-                addAnnotation(Component.Builder::class.java)
+//                addAnnotation(Component.Builder::class.java)
 
                 addMethod(MethodSpec.methodBuilder("bootData").run {
                     addModifiers(PUBLIC, ABSTRACT)
@@ -214,11 +214,12 @@ class AppComponentGenerator(
                 addParameter(bootDataParam)
                 // TODO: add module parameters
                 addStatement(CodeBlock.builder().run {
-                    add("return \$T.builder()\n", daggerComponentType)
-                    indent()
-                    add(".bootData(\$N)\n", bootDataParam)
-                    add(".build()")
-                    unindent()
+                    add("return null")
+//                    add("return \$T.builder()\n", daggerComponentType)
+//                    indent()
+//                    add(".bootData(\$N)\n", bootDataParam)
+//                    add(".build()")
+//                    unindent()
                     build()
                 })
                 returns(componentType)
