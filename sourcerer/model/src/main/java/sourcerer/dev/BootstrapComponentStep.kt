@@ -19,7 +19,7 @@ package sourcerer.dev
 import sourcerer.Output
 import sourcerer.codegen.ApplicationComponentGenerator
 import sourcerer.codegen.BootstrapBuilderGenerator
-import sourcerer.codegen.ComponentImplGenerator
+import sourcerer.codegen.ComponentImplementationGenerator
 import javax.annotation.processing.FilerException
 import javax.inject.Inject
 
@@ -27,7 +27,7 @@ class BootstrapComponentStep
 @Inject constructor(
     private val bootFactory: BootstrapBuilderGenerator.Factory,
     private val appFactory: ApplicationComponentGenerator.Factory,
-    private val componentImplFactory: ComponentImplGenerator.Factory
+    private val componentImplFactory: ComponentImplementationGenerator.Factory
 ) {
     fun process(
         bootstrapComponents: List<ComponentDescriptor>

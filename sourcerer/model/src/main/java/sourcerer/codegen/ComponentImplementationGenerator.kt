@@ -27,8 +27,8 @@ import com.squareup.javapoet.TypeSpec
 import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.classBuilder
-import sourcerer.codegen.ComponentImplGenerator.Method.Kind.MembersInjector
-import sourcerer.codegen.ComponentImplGenerator.Method.Kind.Provider
+import sourcerer.codegen.ComponentImplementationGenerator.Method.Kind.MembersInjector
+import sourcerer.codegen.ComponentImplementationGenerator.Method.Kind.Provider
 import sourcerer.dev.ComponentDescriptor
 import sourcerer.dev.SourcererElements
 import sourcerer.dev.SourcererTypes
@@ -46,7 +46,7 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import kotlin.reflect.KClass
 
-class ComponentImplGenerator(
+class ComponentImplementationGenerator(
     private val env: Env,
     private val types: SourcererTypes,
     private val elements: SourcererElements,
@@ -190,7 +190,7 @@ class ComponentImplGenerator(
     ) {
         fun create(
             descriptor: ComponentDescriptor
-        ) = ComponentImplGenerator(
+        ) = ComponentImplementationGenerator(
             env = env,
             types = types,
             elements = elements,
