@@ -63,13 +63,11 @@ class BootstrapBuilderGenerator(
                 addAnnotation(Nullable::class.java)
                 build()
             }
-            Pair(name, { builder: MethodSpec.Builder ->
-                builder.apply {
-                    addAnnotation(BindsInstance::class.java)
-                    addModifiers(PUBLIC, ABSTRACT)
-                    addParameter(param)
-                }
-            })
+            MethodBuilder(name) {
+                addAnnotation(BindsInstance::class.java)
+                addModifiers(PUBLIC, ABSTRACT)
+                addParameter(param)
+            }
         }
         env.log("applicationModules = $applicationModules")
 
@@ -85,37 +83,16 @@ class BootstrapBuilderGenerator(
                 }
                 build()
             }
-
-            Pair(name, { builder: MethodSpec.Builder ->
-                builder.apply {
-                    addAnnotation(BindsInstance::class.java)
-                    addModifiers(PUBLIC, ABSTRACT)
-                    addParameter(param)
-                }
-            })
+            MethodBuilder(name) {
+                addAnnotation(BindsInstance::class.java)
+                addModifiers(PUBLIC, ABSTRACT)
+                addParameter(param)
+            }
         }
         env.log("dependencyMethods = $dependencyMethods")
 
         (applicationModules + dependencyMethods)
-                .groupBy { it.first }
-                .mapValues { it.value.map { it.second } }
-                .flatMap {
-                    val key = it.key
-                    val methods = it.value
-                    val size = methods.size
-
-                    if (size > 1) {
-                        var i = 1
-                        methods.map {
-                            val n = "$key${i++}"
-                            buildMethod(n, it)
-                        }
-                    } else {
-                        methods.map {
-                            buildMethod(key, it)
-                        }
-                    }
-                }
+                .buildUnique()
                 .map(this::addMethod)
     }
 
