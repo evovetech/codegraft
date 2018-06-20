@@ -20,6 +20,7 @@ import sourcerer.Output
 import sourcerer.codegen.ApplicationComponentGenerator
 import sourcerer.codegen.BootstrapBuilderGenerator
 import sourcerer.codegen.ComponentImplementationGenerator
+import sourcerer.codegen.ComponentModuleGenerator
 import javax.annotation.processing.FilerException
 import javax.inject.Inject
 
@@ -27,16 +28,18 @@ class BootstrapComponentStep
 @Inject constructor(
     private val bootFactory: BootstrapBuilderGenerator.Factory,
     private val appFactory: ApplicationComponentGenerator.Factory,
-    private val componentImplFactory: ComponentImplementationGenerator.Factory
+    private val componentImplementationFactory: ComponentImplementationGenerator.Factory,
+    private val componentModuleFactory: ComponentModuleGenerator.Factory
 ) {
     fun process(
         bootstrapComponents: List<ComponentDescriptor>
     ): List<Output> = try {
-        bootstrapComponents.flatMap {
-            val boot = bootFactory.create(it)
-            val app = appFactory.create(it)
-            val compImpl = componentImplFactory.create(it)
-            listOf(boot, app, compImpl)
+        bootstrapComponents.flatMap { descriptor ->
+            val boot = bootFactory.create(descriptor)
+            val app = appFactory.create(descriptor)
+            val componentImplementation = componentImplementationFactory.create(descriptor)
+            val componentModule = componentModuleFactory.create(descriptor, componentImplementation)
+            listOf(boot, app, componentImplementation, componentModule)
         }
     } catch (_: FilerException) {
         emptyList()
