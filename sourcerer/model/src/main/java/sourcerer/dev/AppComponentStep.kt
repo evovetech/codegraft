@@ -41,7 +41,9 @@ class AppComponentStep
         val appComponentGenerator: AppComponentGenerator
     ) {
         val outputs: List<sourcerer.Output> = listOf(
-            appComponentGenerator
-        )
+            appComponentGenerator.process()
+        ).flatMap {
+            it
+        }
     }
 }

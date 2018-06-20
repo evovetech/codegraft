@@ -74,16 +74,26 @@ private constructor(
 
 class AppComponentGenerator(
     private val descriptors: List<Output>,
-    pkg: String
-) : JavaOutput(
-    rawType = ClassName.get(pkg, "AppComponent_BootData2")
+    private val pkg: String
 ) {
-    override
-    fun newBuilder() = outKlass.interfaceBuilder()
+    fun process(): List<sourcerer.Output> {
+        val bootData = BootData(this)
+        return listOf(
+            bootData
+        )
+    }
 
-    override
-    fun typeSpec() = typeSpec {
-        //        addModifiers(PUBLIC)
+    class BootData(
+        private val parent: AppComponentGenerator
+    ) : JavaOutput(
+        rawType = ClassName.get(parent.pkg, "AppComponent_BootData2")
+    ) {
+        override
+        fun newBuilder() = outKlass.interfaceBuilder()
+
+        override
+        fun typeSpec() = typeSpec {
+            //        addModifiers(PUBLIC)
 //        addAnnotation(Singleton::class.java)
 //        descriptors.map(ComponentDescriptor::definitionType)
 //                .map(TypeElement::asType)
@@ -97,6 +107,7 @@ class AppComponentGenerator(
 //                    .forEach(addTo("modules"))
 //        }
 //        addType(Builder().typeSpec())
+        }
     }
 
     class Factory
