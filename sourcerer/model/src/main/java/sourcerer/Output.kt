@@ -47,6 +47,15 @@ class JavaOutput(
         element: TypeElement,
         outExt: String
     ) : this(ClassName.get(element), outExt)
+
+    abstract inner
+    class Builder : SourceWriter {
+        override
+        val outKlass: Klass = "Builder".toKlass()
+
+        override
+        fun newBuilder() = outKlass.interfaceBuilder()
+    }
 }
 
 abstract

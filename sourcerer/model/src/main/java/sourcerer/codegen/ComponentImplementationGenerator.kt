@@ -202,7 +202,15 @@ fun MethodSpec.Builder.addToConstructor(
 fun TypeSpec.Builder.addFieldSpec(
     fieldType: TypeMirror,
     fieldName: String
-): FieldSpec = FieldSpec.builder(TypeName.get(fieldType), fieldName)
+): FieldSpec = addFieldSpec(
+    TypeName.get(fieldType),
+    fieldName
+)
+
+fun TypeSpec.Builder.addFieldSpec(
+    fieldType: TypeName,
+    fieldName: String
+): FieldSpec = FieldSpec.builder(fieldType, fieldName)
         .addModifiers(PRIVATE, FINAL)
         .build()
         .apply { addField(this) }

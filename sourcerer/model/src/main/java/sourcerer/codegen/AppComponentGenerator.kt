@@ -17,29 +17,30 @@
 package sourcerer.codegen
 
 import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.ParameterSpec
+import com.squareup.javapoet.TypeName
+import dagger.Component
+import dagger.Module
+import dagger.Provides
 import sourcerer.JavaOutput
+import sourcerer.addAnnotation
+import sourcerer.addTo
+import sourcerer.classBuilder
 import sourcerer.dev.BootstrapComponentStep.Output
 import sourcerer.dev.ComponentStep.Option.Package
 import sourcerer.interfaceBuilder
+import sourcerer.name
 import sourcerer.processor.Env
+import sourcerer.toKlass
 import sourcerer.typeSpec
 import javax.inject.Inject
+import javax.inject.Singleton
+import javax.lang.model.element.Modifier.ABSTRACT
+import javax.lang.model.element.Modifier.PUBLIC
+import javax.lang.model.element.Modifier.STATIC
 
 /*
-@Module(includes = [CrashesComponent_Module::class])
-class AppComponent_BootData
-@Inject constructor(
-    @get:Provides
-    val crashes: CrashesComponent_BootData
-) {
-    val app: AndroidApplication
-        @Provides @Singleton
-        get() = crashes.app
-
-    val fabric: Fabric
-        @Provides @Singleton
-        get() = crashes.fabric
-}
 
 @Singleton
 @Component(modules = [AppComponent_BootData::class])
@@ -56,8 +57,8 @@ interface AppComponent {
 
 class AppComponent_Builder
 private constructor(
-    private val actual: Builder
-) : Builder by actual {
+    private val actual: AppComponent.Builder
+) : AppComponent.Builder by actual {
     @Inject constructor(
         bootData: AppComponent_BootData,
         crashes: Crashes?
@@ -78,35 +79,129 @@ class AppComponentGenerator(
 ) {
     fun process(): List<sourcerer.Output> {
         val bootData = BootData(this)
+        val app = App(bootData)
         return listOf(
-            bootData
+            bootData,
+            app
         )
     }
 
-    class BootData(
-        private val parent: AppComponentGenerator
+    /*
+    @Singleton
+    @Component(modules = [AppComponent_BootData::class])
+    interface AppComponent {
+        val crashesComponent: CrashesComponent
+
+        @Component.Builder
+        interface Builder {
+            fun bootData(bootData: AppComponent_BootData)
+            fun crashes(crashes: Crashes)
+            fun build(): AppComponent
+        }
+    }
+    */
+    class App(
+        private val bootData: BootData
     ) : JavaOutput(
-        rawType = ClassName.get(parent.pkg, "AppComponent_BootData2")
+        rawType = ClassName.get(bootData.pkg.name, "AppComponent2")
     ) {
+        val components = bootData.components
+        val descriptors = components.map { it.descriptor }
+
         override
         fun newBuilder() = outKlass.interfaceBuilder()
 
         override
         fun typeSpec() = typeSpec {
-            //        addModifiers(PUBLIC)
-//        addAnnotation(Singleton::class.java)
-//        descriptors.map(ComponentDescriptor::definitionType)
-//                .map(TypeElement::asType)
-//                .map(TypeName::get)
-//                .map(this::addSuperinterface)
+            addAnnotation(Singleton::class.java)
+//            addAnnotation(ClassName.get(Component::class.java).toKlass()) {
+//                val add = addTo("modules")
+//                add(bootData.outKlass.rawType)
+//            }
+            descriptors.forEach {
+                val type = it.definitionType
+                val name = type.simpleName.toString().decapitalize()
+                val getter = MethodSpec.methodBuilder("get${name.capitalize()}")
+                        .addModifiers(PUBLIC, ABSTRACT)
+                        .returns(TypeName.get(type.asType()))
+                        .build()
+                addMethod(getter)
+            }
+            addType(Builder().typeSpec())
+        }
 
-//        addAnnotation(ClassName.get(ApplicationComponent::class.java).toKlass()) {
-//            descriptor.applicationModules
-//                    .map(ModuleDescriptor::definitionType)
-//                    .mapNotNull(ClassName::get)
-//                    .forEach(addTo("modules"))
-//        }
-//        addType(Builder().typeSpec())
+        inner
+        class Builder : sourcerer.JavaOutput.Builder() {
+            override
+            fun typeSpec() = typeSpec {
+                val parent = this@App
+
+                addModifiers(PUBLIC, STATIC)
+//                addAnnotation(Component.Builder::class.java)
+
+                addMethod(MethodSpec.methodBuilder("bootData").run {
+                    addModifiers(PUBLIC, ABSTRACT)
+                    addParameter(ParameterSpec.builder(bootData.outKlass.rawType, "bootData").build())
+                    build()
+                })
+
+                addMethod(MethodSpec.methodBuilder("build").run {
+                    addModifiers(PUBLIC, ABSTRACT)
+                    returns(parent.outKlass.rawType)
+                    build()
+                })
+            }
+        }
+    }
+
+    class BootData(
+        parent: AppComponentGenerator
+    ) : JavaOutput(
+        rawType = ClassName.get(parent.pkg, "AppComponent_BootData2")
+    ) {
+        val descriptors = parent.descriptors
+        val components = descriptors.map { it.component }
+
+        override
+        fun newBuilder() = outKlass.classBuilder()
+
+        override
+        fun typeSpec() = typeSpec {
+            val modules = components.map { it.module }
+            addAnnotation(ClassName.get(Module::class.java).toKlass()) {
+                modules.map { it.outKlass.rawType }
+                        .forEach(addTo("includes"))
+            }
+
+            val constructor = MethodSpec.constructorBuilder()
+                    .addAnnotation(Inject::class.java)
+            val boots = components.map { it.bootData }
+            boots.forEach { boot ->
+                val type = boot.outKlass.rawType
+                val fieldSpec = addFieldSpec(type, type.name.decapitalize())
+                val getter = MethodSpec.methodBuilder("get${fieldSpec.name.capitalize()}").run {
+                    addAnnotation(Provides::class.java)
+                    addStatement("return \$N", fieldSpec)
+                    returns(type)
+                    build()
+                }
+                addMethod(getter)
+                constructor.addToConstructor(fieldSpec)
+
+                val typeSpec = boot.typeSpec()
+                val methodSpecs = typeSpec.methodSpecs.filterNot(MethodSpec::isConstructor)
+                val methods = methodSpecs.map { method ->
+                    val name = method.name
+                    MethodSpec.methodBuilder(name)
+                            .addAnnotation(Provides::class.java)
+                            .addAnnotation(Singleton::class.java)
+                            .returns(method.returnType)
+                            .addStatement("return \$N.\$L()", fieldSpec, name)
+                            .build()
+                }
+                addMethods(methods)
+            }
+            addMethod(constructor.build())
         }
     }
 
@@ -121,59 +216,4 @@ class AppComponentGenerator(
             pkg = options[Package]
         )
     }
-
-//    inner
-//    class Builder : SourceWriter {
-//        override
-//        val outKlass: Klass = "Builder".toKlass()
-//
-//        override
-//        fun newBuilder() = outKlass.interfaceBuilder()
-//
-//        override
-//        fun typeSpec() = typeSpec {
-//            addModifiers(PUBLIC, STATIC)
-//            addAnnotation(ApplicationComponent.Builder::class.java)
-//
-//            // TODO: override all methods for clarity
-////            ElementFilter.methodsIn()
-//
-//            // add method for each module
-//            descriptor.applicationModules.map { module ->
-//                val type = module.definitionType
-//                val name = type.simpleName.toString().decapitalize()
-//                MethodSpec.methodBuilder(name).run {
-//                    addModifiers(PUBLIC, ABSTRACT)
-//                    addParameter(ClassName.get(type), name)
-//                    build()
-//                }
-//            }.map(this::addMethod)
-//
-//            val bindings = descriptor.modules
-//                    .flatMap(ModuleDescriptor::provisionBindings)
-//                    .map(Binding::key)
-//            val scopedDependencies = descriptor.modules
-//                    .flatMap(ModuleDescriptor::dependencies)
-//                    .filter { it.scope != null }
-//                    .map(Dependency::key)
-//            val methods = bindings + scopedDependencies
-//            methods.map { key ->
-//                val type = key.type
-//                val element = MoreTypes.asElement(type)
-//                val name = element.simpleName.toString().decapitalize()
-//                val param = ParameterSpec.builder(ClassName.get(type), name).run {
-//                    key.qualifier?.let {
-//                        addAnnotation(AnnotationSpec.get(it))
-//                    }
-//                    build()
-//                }
-//                MethodSpec.methodBuilder(name).run {
-//                    addModifiers(PUBLIC, ABSTRACT)
-//                    addAnnotation(BindsInstance::class.java)
-//                    addParameter(param)
-//                    build()
-//                }
-//            }.map(this::addMethod)
-//        }
-//    }
 }

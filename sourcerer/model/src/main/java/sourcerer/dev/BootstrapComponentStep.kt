@@ -63,6 +63,7 @@ class BootstrapComponentStep
 
     data
     class ComponentOutput(
+        val descriptor: ComponentDescriptor,
         val implementation: ComponentImplementationGenerator,
         val module: ComponentModuleGenerator,
         val bootData: ComponentBootDataGenerator
@@ -74,6 +75,7 @@ class BootstrapComponentStep
             ): ComponentOutput {
                 val implementation = step.componentImplementationFactory.create(descriptor)
                 return ComponentOutput(
+                    descriptor = descriptor,
                     implementation = implementation,
                     module = step.componentModuleFactory.create(descriptor, implementation),
                     bootData = step.componentBootDataFactory.create(descriptor)
