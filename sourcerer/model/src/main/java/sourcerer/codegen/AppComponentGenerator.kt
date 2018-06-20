@@ -17,9 +17,11 @@
 package sourcerer.codegen
 
 import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
+import dagger.Component
 import dagger.Module
 import dagger.Provides
 import sourcerer.JavaOutput
@@ -28,6 +30,7 @@ import sourcerer.addTo
 import sourcerer.classBuilder
 import sourcerer.dev.BootstrapComponentStep.Output
 import sourcerer.dev.ComponentStep.Option.Package
+import sourcerer.inject.BootScope
 import sourcerer.interfaceBuilder
 import sourcerer.name
 import sourcerer.processor.Env
@@ -50,11 +53,12 @@ class AppComponentGenerator(
     fun process(): List<sourcerer.Output> {
         val bootData = BootData()
         val app = App(bootData)
-        val appBuilder = AppBuilder(app)
+//        val appBuilder = AppBuilder(app)
+        val bootModule = BootModule(app, bootData)
         return listOf(
             bootData,
             app,
-            appBuilder
+            bootModule
         )
     }
 
@@ -121,10 +125,10 @@ class AppComponentGenerator(
         override
         fun typeSpec() = typeSpec {
             addAnnotation(Singleton::class.java)
-//            addAnnotation(ClassName.get(Component::class.java).toKlass()) {
-//                val add = addTo("modules")
-//                add(bootData.outKlass.rawType)
-//            }
+            addAnnotation(ClassName.get(Component::class.java).toKlass()) {
+                val add = addTo("modules")
+                add(bootData.outKlass.rawType)
+            }
             descriptors.forEach {
                 val type = it.definitionType
                 val name = type.simpleName.toString().decapitalize()
@@ -144,11 +148,12 @@ class AppComponentGenerator(
                 val parent = this@App
 
                 addModifiers(PUBLIC, STATIC)
-//                addAnnotation(Component.Builder::class.java)
+                addAnnotation(Component.Builder::class.java)
 
                 addMethod(MethodSpec.methodBuilder("bootData").run {
                     addModifiers(PUBLIC, ABSTRACT)
                     addParameter(ParameterSpec.builder(bootData.outKlass.rawType, "bootData").build())
+                    returns(outKlass.rawType)
                     build()
                 })
 
@@ -162,32 +167,29 @@ class AppComponentGenerator(
     }
 
     /*
-    class AppComponent_Builder
-    private constructor(
-        private val actual: Builder
-    ) {
-        @Inject constructor(
+    @Module(includes = [CrashesBootstrapModule::class])
+    class BootModule {
+        @Provides @BootScope
+        fun provideComponent(
             bootData: AppComponent_BootData,
             crashes: Crashes?
-        ) : this(
-            actual = DaggerAppComponent.builder()
-        ) {
-            actual.bootData(bootData)
+        ): AppComponent {
+            val builder = DaggerAppComponent.builder()
+            builder.bootData(bootData)
             crashes?.let {
-                actual.crashes(it)
+                builder.crashes(it)
             }
-        }
-
-        fun build(): AppComponent {
-            return actual.build()
+            return builder.build()
         }
     }
      */
+
     inner
-    class AppBuilder(
-        private val app: App
+    class BootModule(
+        private val app: App,
+        private val bootData: BootData
     ) : JavaOutput(
-        rawType = ClassName.get(pkg, "${name}_Builder")
+        rawType = ClassName.get(pkg, "BootModule2")
     ) {
         override
         fun newBuilder() = outKlass.classBuilder()
@@ -196,7 +198,36 @@ class AppComponentGenerator(
         fun typeSpec() = typeSpec {
             // TODO:
             addModifiers(FINAL)
+            val modules = components.flatMap { it.descriptor.modules }
+            addAnnotation(ClassName.get(Module::class.java).toKlass()) {
+                modules.map { TypeName.get(it.definitionType.asType()) }
+                        .forEach(addTo("includes"))
+            }
+            val componentType = app.outKlass.rawType
+            val daggerComponentType = ClassName.get(componentType.packageName(), "Dagger${componentType.name}")
+            val bootDataType = bootData.outKlass.rawType
+            addMethod(MethodSpec.methodBuilder("provideComponent").run {
+                addAnnotation(Provides::class.java)
+                addAnnotation(BootScope::class.java)
 
+                val bootDataParam = ParameterSpec.builder(bootDataType, "bootData").build()
+                addParameter(bootDataParam)
+                // TODO: add module parameters
+                addStatement(CodeBlock.builder().run {
+                    add("return \$T.builder()\n", daggerComponentType)
+                    indent()
+                    add(".bootData(\$N)\n", bootDataParam)
+                    add(".build()")
+                    unindent()
+                    build()
+                })
+                returns(componentType)
+                build()
+            })
+//            addAnnotation(ClassName.get(Component::class.java).toKlass()) {
+//                val add = addTo("modules")
+//                add(bootData.outKlass.rawType)
+//            }
         }
     }
 

@@ -41,7 +41,7 @@ interface SourceWriter {
             .writeTo(filer)
 }
 
-fun AnnotationSpec.Builder.addTo(name: String): (ClassName) -> Unit = {
+fun AnnotationSpec.Builder.addTo(name: String): (TypeName) -> Unit = {
     addMember(name, "\$T.class", it)
 }
 

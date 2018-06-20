@@ -24,7 +24,6 @@ import dagger.Component
 import dagger.MembersInjector
 import dagger.Module
 import dagger.Provides
-import evovetech.sample.crashes.AppComponent.Builder
 import io.fabric.sdk.android.Fabric
 import sourcerer.inject.BootScope
 import sourcerer.inject.android.AndroidApplication
@@ -111,33 +110,20 @@ interface AppComponent {
     }
 }
 
-class AppComponent_Builder
-private constructor(
-    private val actual: Builder
-) {
-    @Inject constructor(
-        bootData: AppComponent_BootData,
-        crashes: Crashes?
-    ) : this(
-        actual = DaggerAppComponent.builder()
-    ) {
-        actual.bootData(bootData)
-        crashes?.let {
-            actual.crashes(it)
-        }
-    }
-
-    fun build(): AppComponent {
-        return actual.build()
-    }
-}
-
 @Module(includes = [CrashesBootstrapModule::class])
 class BootModule {
     @Provides @BootScope
     fun provideComponent(
-        builder: AppComponent_Builder
-    ): AppComponent = builder.build()
+        bootData: AppComponent_BootData,
+        crashes: Crashes?
+    ): AppComponent {
+        val builder = DaggerAppComponent.builder()
+        builder.bootData(bootData)
+        crashes?.let {
+            builder.crashes(it)
+        }
+        return builder.build()
+    }
 }
 
 @BootScope
