@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.codegen
+package dagger.internal.codegen
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
@@ -36,19 +36,19 @@ class ComponentBootDataGenerator(
     private val env: Env,
     private val types: SourcererTypes,
     private val elements: SourcererElements,
-    private val descriptor: ComponentDescriptor
+    private val descriptor: SrcComponentDescriptor
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.definitionType),
     outExt = "BootData"
 ) {
     private val allBindings by lazy {
-        descriptor.modules.flatMap(ModuleDescriptor::provisionBindings)
+        descriptor.modules.flatMap(SrcModuleDescriptor::provisionBindings)
     }
     private val scopedBindings by lazy {
         allBindings.filter { it.scope != null }
     }
     private val allDependencies by lazy {
-        descriptor.modules.flatMap(ModuleDescriptor::dependencies)
+        descriptor.modules.flatMap(SrcModuleDescriptor::dependencies)
     }
     private val scopedDependencies by lazy {
         allDependencies.filter { it.scope != null }
@@ -89,7 +89,7 @@ class ComponentBootDataGenerator(
         private val elements: SourcererElements
     ) {
         fun create(
-            descriptor: ComponentDescriptor
+            descriptor: SrcComponentDescriptor
         ) = ComponentBootDataGenerator(
             env = env,
             types = types,

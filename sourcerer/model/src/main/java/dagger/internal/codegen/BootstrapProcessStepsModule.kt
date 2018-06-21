@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package sourcerer.codegen
+package dagger.internal.codegen
 
-import sourcerer.codegen.Key
+import dagger.Binds
+import dagger.Module
+import dagger.multibindings.IntoSet
+import sourcerer.ProcessStep
 
-interface Keyed {
-    val key: Key
+@Module(includes = [EnvModule::class])
+internal
+interface BootstrapProcessStepsModule {
+    @Binds @IntoSet
+    fun provideComponentStep(step: ComponentStep): ProcessStep
 }

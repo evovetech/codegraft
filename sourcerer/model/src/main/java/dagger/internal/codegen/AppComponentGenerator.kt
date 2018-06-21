@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.codegen
+package dagger.internal.codegen
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.CodeBlock
@@ -31,7 +31,6 @@ import sourcerer.JavaOutput
 import sourcerer.addAnnotation
 import sourcerer.addTo
 import sourcerer.classBuilder
-import dagger.internal.codegen.ComponentOutput
 import dagger.internal.codegen.ComponentStep.Option.Package
 import sourcerer.inject.BootScope
 import sourcerer.interfaceBuilder

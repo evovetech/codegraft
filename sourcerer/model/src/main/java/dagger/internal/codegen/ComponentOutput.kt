@@ -17,16 +17,12 @@
 package dagger.internal.codegen
 
 import sourcerer.Output
-import sourcerer.codegen.ComponentBootDataGenerator
-import sourcerer.codegen.ComponentImplementationGenerator
-import sourcerer.codegen.ComponentModuleGenerator
-import sourcerer.codegen.ComponentDescriptor
 import javax.annotation.processing.FilerException
 import javax.inject.Inject
 
 internal data
 class ComponentOutput(
-    val descriptor: ComponentDescriptor,
+    val descriptor: SrcComponentDescriptor,
     val implementation: ComponentImplementationGenerator,
     val module: ComponentModuleGenerator,
     val bootData: ComponentBootDataGenerator
@@ -39,7 +35,7 @@ class ComponentOutput(
         private val componentBootDataFactory: ComponentBootDataGenerator.Factory
     ) {
         fun create(
-            descriptors: List<ComponentDescriptor>
+            descriptors: List<SrcComponentDescriptor>
         ): List<ComponentOutput> = try {
             descriptors.map(this::create)
         } catch (_: FilerException) {
@@ -47,7 +43,7 @@ class ComponentOutput(
         }
 
         fun create(
-            descriptor: ComponentDescriptor
+            descriptor: SrcComponentDescriptor
         ): ComponentOutput {
             val implementation = componentImplementationFactory.create(descriptor)
             return ComponentOutput(

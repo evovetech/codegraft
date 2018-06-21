@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.codegen
+package dagger.internal.codegen
 
 import com.google.auto.common.MoreElements.getAnnotationMirror
 import com.google.auto.common.MoreElements.isAnnotationPresent
@@ -23,11 +23,9 @@ import com.google.common.base.Preconditions.checkArgument
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables.getOnlyElement
 import com.squareup.javapoet.ClassName
-import dagger.internal.codegen.Dependency
-import dagger.internal.codegen.getTypeListValue
 import sourcerer.AnnotatedTypeElement
-import sourcerer.codegen.ComponentDescriptor.MethodKind.MEMBERS_INJECTION
-import sourcerer.codegen.ComponentDescriptor.MethodKind.PROVISION
+import dagger.internal.codegen.SrcComponentDescriptor.MethodKind.MEMBERS_INJECTION
+import dagger.internal.codegen.SrcComponentDescriptor.MethodKind.PROVISION
 import sourcerer.inject.BootstrapComponent
 import sourcerer.qualifiedName
 import java.util.EnumSet
@@ -41,11 +39,11 @@ import javax.lang.model.type.TypeMirror
 import kotlin.reflect.KClass
 
 data
-class ComponentDescriptor(
+class SrcComponentDescriptor(
     val definitionType: TypeElement,
     val annotationMirror: AnnotationMirror,
-    val modules: ImmutableList<ModuleDescriptor>,
-    val applicationModules: ImmutableList<ModuleDescriptor>,
+    val modules: ImmutableList<SrcModuleDescriptor>,
+    val applicationModules: ImmutableList<SrcModuleDescriptor>,
     val methods: ImmutableList<Pair<ExecutableElement, ExecutableType>>
 ) {
     enum
@@ -59,8 +57,8 @@ class ComponentDescriptor(
         Bootstrap(
             BootstrapComponent::class,
             BootstrapComponent.Builder::class,
-            dagger.internal.codegen.BOOTSTRAP_DEPENDENCIES_ATTRIBUTE,
-            dagger.internal.codegen.BOOTSTRAP_MODULES_ATTRIBUTE,
+            BOOTSTRAP_DEPENDENCIES_ATTRIBUTE,
+            BOOTSTRAP_MODULES_ATTRIBUTE,
             true
         );
 
@@ -69,7 +67,7 @@ class ComponentDescriptor(
 
         val AnnotationMirror.applicationModules: ImmutableList<TypeMirror>
             get() = when (this@Kind) {
-                Bootstrap -> getTypeListValue(dagger.internal.codegen.APPLICATION_MODULES_ATTRIBUTE)
+                Bootstrap -> getTypeListValue(APPLICATION_MODULES_ATTRIBUTE)
                 else -> ImmutableList.of()
             }
 
@@ -123,22 +121,22 @@ class ComponentDescriptor(
     @Inject constructor(
         val elements: SourcererElements,
         val types: SourcererTypes,
-        val moduleFactory: sourcerer.codegen.ModuleDescriptor.Factory
+        val moduleFactory: dagger.internal.codegen.SrcModuleDescriptor.Factory
     ) {
         fun forStoredComponent(
             className: ClassName
-        ): ComponentDescriptor {
+        ): SrcComponentDescriptor {
             val typeElement = elements.getTypeElement(className.qualifiedName)
             return forComponent(typeElement)
         }
 
         fun forComponent(
             componentTypeElement: AnnotatedTypeElement<*>
-        ): ComponentDescriptor = forComponent(componentTypeElement.element)
+        ): SrcComponentDescriptor = forComponent(componentTypeElement.element)
 
         fun forComponent(
             componentDefinitionType: TypeElement
-        ): ComponentDescriptor {
+        ): SrcComponentDescriptor {
             val kind = Kind.forAnnotatedElement(
                 componentDefinitionType
             )
@@ -150,7 +148,7 @@ class ComponentDescriptor(
         fun Kind.create(
             componentDefinitionType: TypeElement,
             parentKind: Kind? = null
-        ): ComponentDescriptor {
+        ): SrcComponentDescriptor {
             val declaredComponentType = MoreTypes.asDeclared(componentDefinitionType.asType())
             val componentMirror = getAnnotationMirror(componentDefinitionType, annotationType.java).get()
             val modules = componentMirror.modules
@@ -169,7 +167,7 @@ class ComponentDescriptor(
                         Pair(componentMethod, resolvedMethod)
                     }
                     .toImmutableList()
-            return ComponentDescriptor(
+            return SrcComponentDescriptor(
                 componentDefinitionType,
                 componentMirror,
                 modules,

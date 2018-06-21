@@ -23,10 +23,6 @@ import dagger.internal.codegen.RequestKinds.extractKeyType
 import dagger.internal.codegen.RequestKinds.getRequestKind
 import dagger.model.RequestKind
 import dagger.model.Scope
-import sourcerer.codegen.Key
-import sourcerer.codegen.Keyed
-import sourcerer.codegen.SourcererTypes
-import sourcerer.codegen.immutableSet
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element

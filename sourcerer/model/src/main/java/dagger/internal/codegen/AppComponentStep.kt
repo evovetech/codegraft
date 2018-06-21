@@ -16,7 +16,6 @@
 
 package dagger.internal.codegen
 
-import sourcerer.codegen.AppComponentGenerator
 import javax.inject.Inject
 
 internal

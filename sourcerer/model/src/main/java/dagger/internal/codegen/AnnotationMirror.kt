@@ -22,7 +22,6 @@ import com.google.common.base.Equivalence
 import com.google.common.collect.ImmutableList
 import dagger.internal.codegen.MoreAnnotationValues.asAnnotationValues
 import dagger.internal.codegen.MoreAnnotationValues.asType
-import sourcerer.codegen.toImmutableList
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Name
 import javax.lang.model.type.TypeMirror

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.codegen
+package dagger.internal.codegen
 
 import com.google.auto.common.MoreElements.getAnnotationMirror
 import com.google.auto.common.MoreElements.isAnnotationPresent
@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import dagger.Module
 import dagger.Provides
-import dagger.internal.codegen.Dependency
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
@@ -30,14 +29,14 @@ import javax.lang.model.util.ElementFilter.methodsIn
 import javax.lang.model.util.Elements
 
 data
-class ModuleDescriptor(
+class SrcModuleDescriptor(
     val definitionType: TypeElement,
     val moduleMirror: AnnotationMirror,
-    val provisionBindings: ImmutableList<Binding>
+    val provisionBindings: ImmutableList<SrcBinding>
 ) {
     val dependencies: ImmutableSet<Dependency> by lazy {
         provisionBindings
-                .flatMap(Binding::dependencies)
+                .flatMap(SrcBinding::dependencies)
                 .toImmutableSet()
     }
 
@@ -46,11 +45,11 @@ class ModuleDescriptor(
     @Inject constructor(
         val elements: Elements,
         val types: SourcererTypes,
-        val bindingFactory: sourcerer.codegen.Binding.Factory
+        val bindingFactory: SrcBinding.Factory
     ) {
         fun create(
             moduleDefinitionType: TypeElement
-        ) = ModuleDescriptor(
+        ) = SrcModuleDescriptor(
             definitionType = moduleDefinitionType,
             moduleMirror = getAnnotationMirror(moduleDefinitionType, Module::class.java).get(),
             provisionBindings = methodsIn(elements.getAllMembers(moduleDefinitionType))

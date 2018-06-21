@@ -18,8 +18,8 @@ package dagger.internal.codegen
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
-import sourcerer.codegen.ComponentDescriptor.Factory
-import sourcerer.codegen.ComponentDescriptor.Kind
+import dagger.internal.codegen.SrcComponentDescriptor.Factory
+import dagger.internal.codegen.SrcComponentDescriptor.Kind
 import okio.Okio
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
@@ -28,9 +28,6 @@ import sourcerer.Output
 import sourcerer.ProcessStep
 import sourcerer.SourcererOutput
 import sourcerer.StoredFile
-import sourcerer.codegen.ComponentDescriptor
-import sourcerer.codegen.SourcererElements
-import sourcerer.codegen.SourcererTypes
 import sourcerer.getResources
 import sourcerer.inject.BootstrapComponent
 import sourcerer.io.Reader
@@ -116,7 +113,7 @@ constructor(
                 .readAll()
 
         private
-        fun componentOutput(components: List<ComponentDescriptor>): SrcOutput {
+        fun componentOutput(components: List<SrcComponentDescriptor>): SrcOutput {
             return SrcOutput(this, components.map {
                 ClassName.get(it.definitionType)
             })

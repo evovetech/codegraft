@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.codegen
+package dagger.internal.codegen
 
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
@@ -27,9 +27,8 @@ import com.squareup.javapoet.TypeSpec
 import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.classBuilder
-import sourcerer.codegen.ComponentImplementationGenerator.Method.Kind.MembersInjector
-import sourcerer.codegen.ComponentImplementationGenerator.Method.Kind.Provider
-import dagger.internal.codegen.qualifier
+import dagger.internal.codegen.ComponentImplementationGenerator.Method.Kind.MembersInjector
+import dagger.internal.codegen.ComponentImplementationGenerator.Method.Kind.Provider
 import sourcerer.typeSpec
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -48,7 +47,7 @@ class ComponentImplementationGenerator(
     private val env: Env,
     private val types: SourcererTypes,
     private val elements: SourcererElements,
-    private val descriptor: ComponentDescriptor
+    private val descriptor: SrcComponentDescriptor
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.definitionType),
     outExt = "Implementation"
@@ -171,7 +170,7 @@ class ComponentImplementationGenerator(
         private val elements: SourcererElements
     ) {
         fun create(
-            descriptor: ComponentDescriptor
+            descriptor: SrcComponentDescriptor
         ) = ComponentImplementationGenerator(
             env = env,
             types = types,

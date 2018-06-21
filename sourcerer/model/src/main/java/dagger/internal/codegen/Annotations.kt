@@ -20,7 +20,6 @@ import com.google.auto.common.AnnotationMirrors.getAnnotatedAnnotations
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
-import sourcerer.codegen.toImmutableSet
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.lang.model.element.AnnotationMirror

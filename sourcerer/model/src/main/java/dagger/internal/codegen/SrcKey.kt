@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.codegen
+package dagger.internal.codegen
 
 import com.google.auto.common.AnnotationMirrors
 import com.google.auto.common.MoreElements.isAnnotationPresent
@@ -24,7 +24,6 @@ import com.google.common.base.Equivalence
 import com.google.common.collect.FluentIterable
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
-import dagger.internal.codegen.qualifier
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.lang.model.element.AnnotationMirror
@@ -132,7 +131,8 @@ val Key.fieldName: String
 val Key.getterMethodName: String
     get() = "get${name.capitalize()}"
 
-fun Key.getterMethod(init: MethodSpec.Builder.() -> Unit) = MethodBuilder(getterMethodName) {
-    init()
-    returns(typeName)
-}
+fun Key.getterMethod(init: MethodSpec.Builder.() -> Unit) =
+    MethodBuilder(getterMethodName) {
+        init()
+        returns(typeName)
+    }

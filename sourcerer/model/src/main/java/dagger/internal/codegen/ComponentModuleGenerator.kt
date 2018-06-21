@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.codegen
+package dagger.internal.codegen
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
@@ -36,7 +36,7 @@ class ComponentModuleGenerator(
     private val env: Env,
     private val types: SourcererTypes,
     private val elements: SourcererElements,
-    private val descriptor: ComponentDescriptor,
+    private val descriptor: SrcComponentDescriptor,
     private val implGenerator: ComponentImplementationGenerator
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.definitionType),
@@ -50,7 +50,7 @@ class ComponentModuleGenerator(
         addModifiers(PUBLIC)
         addAnnotation(ClassName.get(Module::class.java).toKlass()) {
             descriptor.applicationModules
-                    .map(ModuleDescriptor::definitionType)
+                    .map(SrcModuleDescriptor::definitionType)
                     .mapNotNull(ClassName::get)
                     .forEach(addTo("includes"))
         }
@@ -73,7 +73,7 @@ class ComponentModuleGenerator(
         private val elements: SourcererElements
     ) {
         fun create(
-            descriptor: ComponentDescriptor,
+            descriptor: SrcComponentDescriptor,
             implGenerator: ComponentImplementationGenerator
         ) = ComponentModuleGenerator(
             env = env,

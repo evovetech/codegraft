@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-package sourcerer.codegen
+package dagger.internal.codegen
 
 import com.google.auto.common.MoreTypes
 import com.google.auto.common.MoreTypes.asExecutable
 import com.google.common.collect.ImmutableSet
-import dagger.internal.codegen.Dependency
-import dagger.internal.codegen.uniqueScope
+import dagger.internal.codegen.DaggerElements.ENCLOSING_TYPE_ELEMENT
 import dagger.model.Scope
 import javax.inject.Inject
 import javax.lang.model.element.Element
-import javax.lang.model.element.ElementVisitor
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
-import javax.lang.model.util.SimpleElementVisitor6
 
 /** An object that declares or specifies a binding.  */
 data
-class Binding(
+class SrcBinding(
     override val key: Key,
     val dependencies: ImmutableSet<Dependency> = ImmutableSet.of(),
     val bindingElement: Element? = null,
@@ -47,16 +44,16 @@ class Binding(
     @Inject constructor(
         val types: SourcererTypes,
         val elements: SourcererElements,
-        val keyFactory: sourcerer.codegen.Key.Factory,
+        val keyFactory: dagger.internal.codegen.Key.Factory,
         val dependencyFactory: dagger.internal.codegen.Dependency.Factory
     ) {
         fun forProvisionMethod(
             method: ExecutableElement,
             contributingModule: TypeElement
-        ): Binding {
+        ): SrcBinding {
             val methodType = asExecutable(types.asMemberOf(MoreTypes.asDeclared(contributingModule.asType()), method))
             val returnType = methodType.returnType
-            return Binding(
+            return SrcBinding(
                 key = keyFactory.forMethod(method, returnType),
                 dependencies = dependencyFactory.forRequiredResolvedVariables(
                     method.parameters,
@@ -67,20 +64,5 @@ class Binding(
                 scope = method.uniqueScope
             )
         }
-    }
-}
-
-/**
- * A visitor that returns the input or the closest enclosing element that is a
- * [TypeElement].
- */
-val ENCLOSING_TYPE_ELEMENT: ElementVisitor<TypeElement, Void> = object : SimpleElementVisitor6<TypeElement, Void>() {
-    override fun defaultAction(e: Element, p: Void?): TypeElement {
-        return visit(e.enclosingElement)
-    }
-
-    override
-    fun visitType(e: TypeElement, p: Void): TypeElement {
-        return e
     }
 }
