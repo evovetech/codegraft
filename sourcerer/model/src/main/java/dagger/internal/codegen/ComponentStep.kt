@@ -23,6 +23,7 @@ import dagger.internal.codegen.BootstrapComponentDescriptor.Kind
 import okio.Okio
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
+import sourcerer.DeferredOutput
 import sourcerer.Env
 import sourcerer.Output
 import sourcerer.ProcessStep
@@ -60,22 +61,29 @@ constructor(
         annotationElements: AnnotationElements
     ): Map<AnnotationType, List<Output>> {
         val map = HashMap<AnnotationType, List<Output>>()
-        val generatedComponents = annotationElements.typeInputs<BootstrapComponent>()
-                .map(componentFactory::forComponent)
-                .map(componentOutputFactory::create)
-        val generatedOutputs = generatedComponents.flatMap(ComponentOutput::outputs)
-        val sourcererOutput = sourcerer.output(generatedComponents)
+        val bootstrapComponents = annotationElements.typeInputs<BootstrapComponent>()
+        try {
+            val generatedComponents = bootstrapComponents
+                    .map(componentFactory::forComponent)
+                    .map(componentOutputFactory::create)
+            val generatedOutputs = generatedComponents.flatMap(ComponentOutput::outputs)
+            val sourcererOutput = sourcerer.output(generatedComponents)
 
-        val storedComponents = sourcerer.storedOutputs()
-                .map(componentFactory::forStoredComponent)
-                .map(componentOutputFactory::create)
-        log("storedComponents = $storedComponents")
+            val storedComponents = sourcerer.storedOutputs()
+                    .map(componentFactory::forStoredComponent)
+                    .map(componentOutputFactory::create)
+            log("storedComponents = $storedComponents")
 
-        val appComponent = appComponentStep.process(generatedComponents, storedComponents)
-        val appComponentOutputs = appComponent.flatMap(AppComponentStep.Output::outputs)
+            val appComponent = appComponentStep.process(generatedComponents, storedComponents)
+            val appComponentOutputs = appComponent.flatMap(AppComponentStep.Output::outputs)
 
-        // outputs
-        map[BootstrapComponent::class] = generatedOutputs + sourcererOutput + appComponentOutputs
+            // outputs
+            map[BootstrapComponent::class] = generatedOutputs + sourcererOutput + appComponentOutputs
+        } catch (e: TypeNotPresentException) {
+            map[BootstrapComponent::class] = bootstrapComponents.map {
+                DeferredOutput(it.element)
+            }
+        }
         return map
     }
 
