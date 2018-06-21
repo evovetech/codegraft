@@ -17,6 +17,7 @@
 package sourcerer.dev
 
 import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.TypeName
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
 import sourcerer.Env
@@ -34,7 +35,8 @@ class ComponentStep
 @Inject constructor(
     val componentFactory: ComponentDescriptor.Factory,
     val bootstrapComponentStep: BootstrapComponentStep,
-    val appComponentStep: AppComponentStep
+    val appComponentStep: AppComponentStep,
+    val sourcerer: BootstrapSourcerer
 ) : ProcessStep {
     override
     fun Env.annotations(): Set<AnnotationType> = ComponentDescriptor.Kind.values()
@@ -70,9 +72,8 @@ class ComponentStep
                 .map(componentFactory::forComponent)
                 .let(bootstrapComponentStep::process)
         val bootstrapOutputs = bootstrapComponents.flatMap(BootstrapComponentStep.Output::outputs)
-        val srcrOutput = bootstrapComponents.map { it.component.descriptor }
-                .let { SrcrOutput(it) }
-        map[BootstrapComponent::class] = bootstrapOutputs + srcrOutput
+        val sourcererOutput = sourcerer.output(bootstrapComponents)
+        map[BootstrapComponent::class] = bootstrapOutputs + sourcererOutput
 
         val appComponent = appComponentStep.process(bootstrapComponents)
         map[ApplicationComponent::class] = appComponent.flatMap(AppComponentStep.Output::outputs)
@@ -91,20 +92,39 @@ class ComponentStep
         );
     }
 
-    class SrcrOutput(
-        bootstrapComponents: List<ComponentDescriptor>
-    ) : SourcererOutput() {
-        private val file = ClassName.get(BootstrapComponent::class.java).metaFile
-        private val classes = bootstrapComponents.map {
-            ClassName.get(it.definitionType)
+    class BootstrapSourcerer
+    @Inject constructor(
+        val types: SourcererTypes,
+        val elements: SourcererElements
+    ) {
+        internal
+        val file = ClassName.get(BootstrapComponent::class.java).metaFile
+
+        internal
+        fun output(outputs: List<BootstrapComponentStep.Output>): SrcOutput {
+            return componentOutput(outputs.map {
+                it.component.descriptor
+            })
         }
 
+        private
+        fun componentOutput(components: List<ComponentDescriptor>): SrcOutput {
+            return SrcOutput(this, components.map {
+                ClassName.get(it.definitionType)
+            })
+        }
+    }
+
+    class SrcOutput(
+        private val bootstrap: BootstrapSourcerer,
+        private val typeNames: List<TypeName>
+    ) : SourcererOutput() {
         override
-        fun file() = file
+        fun file() = bootstrap.file
 
         override
         fun write(writer: Writer) {
-            writer.writeTypeNames(classes)
+            writer.writeTypeNames(typeNames)
         }
     }
 }
