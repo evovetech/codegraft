@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.codegen
 
-import sourcerer.codegen.Key
+import com.google.auto.common.MoreTypes
+import com.google.common.base.Equivalence
+import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
 
-interface Keyed {
-    val key: Key
+interface Wrapper<T : Any> {
+    val wrappedType: Equivalence.Wrapper<T>
+}
+
+interface TypeMirrorWrapper<T : TypeMirror> : Wrapper<T> {
+    val type: T
+        get() = wrappedType.get()!!
+    val typeElement: TypeElement
+        get() = MoreTypes.asTypeElement(type)
 }

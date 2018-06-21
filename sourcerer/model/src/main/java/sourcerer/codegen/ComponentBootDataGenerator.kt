@@ -21,7 +21,6 @@ import com.squareup.javapoet.MethodSpec
 import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.classBuilder
-import dagger.internal.codegen.Keyed
 import sourcerer.inject.BootScope
 import sourcerer.typeSpec
 import javax.inject.Inject

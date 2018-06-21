@@ -16,12 +16,9 @@
 
 package dagger.internal.codegen
 
-import com.google.auto.common.AnnotationMirrors
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Iterables.getOnlyElement
-import dagger.internal.codegen.DiagnosticFormatting.stripCommonTypePrefixes
 import dagger.model.Scope
-import sourcerer.codegen.toImmutableSet
 import sourcerer.inject.BootScope
 import javax.inject.Singleton
 import javax.lang.model.element.Element
@@ -56,16 +53,15 @@ val Element.uniqueScope: Scope?
  * Does not return any annotation values, since [@Scope][javax.inject.Scope] annotations
  * are not supposed to have any.
  */
-fun getReadableSource(scope: Scope): String {
-    return stripCommonTypePrefixes("@" + scope.scopeAnnotationElement().qualifiedName)
-}
+val Scope.readableSource: String
+    get() = Scopes.getReadableSource(this)
 
 /** Returns all of the associated scopes for a source code element.  */
 val Element.scopes: ImmutableSet<Scope>
-    get() = AnnotationMirrors.getAnnotatedAnnotations(this, javax.inject.Scope::class.java)
-            .map { Scope.scope(it) }
-            .toImmutableSet()
+    get() = Scopes.scopesOf(this)
 
-private fun Elements.scope(scopeAnnotationClass: Class<out Annotation>): Scope {
+private fun Elements.scope(
+    scopeAnnotationClass: Class<out Annotation>
+): Scope {
     return getTypeElement(scopeAnnotationClass.canonicalName).scope
 }

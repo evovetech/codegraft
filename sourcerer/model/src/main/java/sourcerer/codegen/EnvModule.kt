@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.codegen
 
 import dagger.Binds
 import dagger.Module

@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.codegen
 
-import com.google.auto.common.MoreTypes
-import com.google.common.base.Equivalence
-import javax.lang.model.element.TypeElement
-import javax.lang.model.type.TypeMirror
+import dagger.Binds
+import dagger.Module
+import dagger.internal.codegen.ComponentStep
+import dagger.multibindings.IntoSet
+import sourcerer.ProcessStep
 
-interface Wrapper<T : Any> {
-    val wrappedType: Equivalence.Wrapper<T>
-}
-
-interface TypeMirrorWrapper<T : TypeMirror> : Wrapper<T> {
-    val type: T
-        get() = wrappedType.get()!!
-    val typeElement: TypeElement
-        get() = MoreTypes.asTypeElement(type)
+@Module(includes = [EnvModule::class])
+internal
+interface BootstrapProcessStepsModule {
+    @Binds @IntoSet
+    fun provideComponentStep(step: ComponentStep): ProcessStep
 }

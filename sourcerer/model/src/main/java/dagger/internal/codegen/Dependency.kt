@@ -23,6 +23,7 @@ import dagger.model.Scope
 import dagger.producers.Produced
 import dagger.producers.Producer
 import sourcerer.codegen.Key
+import sourcerer.codegen.Keyed
 import sourcerer.codegen.SourcererTypes
 import sourcerer.codegen.immutableSet
 import javax.inject.Inject

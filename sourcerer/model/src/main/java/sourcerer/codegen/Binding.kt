@@ -20,7 +20,6 @@ import com.google.auto.common.MoreTypes
 import com.google.auto.common.MoreTypes.asExecutable
 import com.google.common.collect.ImmutableSet
 import dagger.internal.codegen.Dependency
-import dagger.internal.codegen.Keyed
 import dagger.internal.codegen.uniqueScope
 import dagger.model.Scope
 import javax.inject.Inject

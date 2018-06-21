@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.codegen
 
 import com.google.auto.service.AutoService
 import dagger.BindsInstance
