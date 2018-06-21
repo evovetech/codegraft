@@ -56,6 +56,9 @@ class ComponentImplementationGenerator(
     rawType = ClassName.get(descriptor.definitionType),
     outExt = "Implementation2"
 ) {
+//    val componentType = descriptor.definitionType
+//    val provisionMethods =
+
     override
     fun newBuilder() = outKlass.classBuilder()
 

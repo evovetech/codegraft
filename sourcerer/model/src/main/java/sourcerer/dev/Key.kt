@@ -22,6 +22,9 @@ import com.google.auto.common.MoreTypes
 import com.google.auto.common.MoreTypes.asTypeElement
 import com.google.common.base.Equivalence
 import com.google.common.collect.FluentIterable
+import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.TypeName
+import sourcerer.codegen.MethodBuilder
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.lang.model.element.AnnotationMirror
@@ -111,4 +114,20 @@ class Key(
             this
         }
     }
+}
+
+val Key.typeName: TypeName
+    get() = TypeName.get(type)
+val Key.element: Element
+    get() = MoreTypes.asElement(type)
+val Key.name: String
+    get() = element.simpleName.toString()
+val Key.fieldName: String
+    get() = name.decapitalize()
+val Key.getterMethodName: String
+    get() = "get${name.capitalize()}"
+
+fun Key.getterMethod(init: MethodSpec.Builder.() -> Unit) = MethodBuilder(getterMethodName) {
+    init()
+    returns(typeName)
 }

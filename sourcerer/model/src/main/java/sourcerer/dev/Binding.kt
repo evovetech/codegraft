@@ -36,15 +36,19 @@ interface BindDec {
         get() = bindingElement?.accept<TypeElement, Void>(ENCLOSING_TYPE_ELEMENT, null)
 }
 
+interface Keyed {
+    val key: Key
+}
+
 /** An object that declares or specifies a binding.  */
 data
 class Binding(
-    val key: Key,
+    override val key: Key,
     val dependencies: ImmutableSet<Dependency> = ImmutableSet.of(),
     val bindingElement: Element? = null,
     val contributionModule: TypeElement? = null,
     val scope: Scope? = null
-) {
+) : Keyed {
     val bindingTypeElement: TypeElement? by lazy {
         bindingElement?.accept<TypeElement, Void>(ENCLOSING_TYPE_ELEMENT, null)
     }

@@ -27,10 +27,10 @@ import javax.lang.model.type.TypeMirror
 
 data
 class Dependency(
-    val key: Key,
+    override val key: Key,
     val requestElement: Element? = null,
     val scope: Scope? = null
-) {
+) : Keyed {
 
     class Factory
     @Inject constructor(

@@ -18,6 +18,7 @@ package sourcerer.codegen
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.CodeBlock
+import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
@@ -32,6 +33,10 @@ import sourcerer.addTo
 import sourcerer.classBuilder
 import sourcerer.dev.ComponentOutput
 import sourcerer.dev.ComponentStep.Option.Package
+import sourcerer.dev.Key
+import sourcerer.dev.fieldName
+import sourcerer.dev.getterMethod
+import sourcerer.dev.getterMethodName
 import sourcerer.inject.BootScope
 import sourcerer.interfaceBuilder
 import sourcerer.name
@@ -84,35 +89,45 @@ class AppComponentGenerator(
 
             val constructor = MethodSpec.constructorBuilder()
                     .addAnnotation(Inject::class.java)
-            val boots = components.map { it.bootData }
-            boots.forEach { boot ->
-                val type = boot.outKlass.rawType
-                val fieldSpec = addFieldSpec(type, type.name.decapitalize())
-                val getter = MethodSpec.methodBuilder("get${fieldSpec.name.capitalize()}").run {
-                    addAnnotation(Provides::class.java)
-                    addStatement("return \$N", fieldSpec)
-                    returns(type)
-                    build()
-                }
-                addMethod(getter)
-                constructor.addToConstructor(fieldSpec)
+            val bootMethods = components
+                    .map { it.bootData }
+                    .map { boot ->
+                        val type = boot.outKlass.rawType
+                        val fieldSpec = addFieldSpec(type, type.name.decapitalize())
+                        val getter = MethodSpec.methodBuilder("get${fieldSpec.name.capitalize()}").run {
+                            addAnnotation(Provides::class.java)
+                            addStatement("return \$N", fieldSpec)
+                            returns(type)
+                            build()
+                        }
+                        addMethod(getter)
+                        constructor.addToConstructor(fieldSpec)
+                        boot.scopedKeys.map { key ->
+                            BootMethod(key, fieldSpec)
+                        }
+                    }
+                    .flatMap { it }
+                    .groupBy { it.key }
+                    .mapValues { it.value.first() }
+                    .values
+                    .map { (key, fieldSpec) ->
+                        key.getterMethod {
+                            addAnnotation(Provides::class.java)
+                            addAnnotation(Singleton::class.java)
+                            addStatement("return \$N.\$L()", fieldSpec, key.getterMethodName)
+                        }
+                    }
 
-                val typeSpec = boot.typeSpec()
-                val methodSpecs = typeSpec.methodSpecs.filterNot(MethodSpec::isConstructor)
-                val methods = methodSpecs.map { method ->
-                    val name = method.name
-                    MethodSpec.methodBuilder(name)
-                            .addAnnotation(Provides::class.java)
-                            .addAnnotation(Singleton::class.java)
-                            .returns(method.returnType)
-                            .addStatement("return \$N.\$L()", fieldSpec, name)
-                            .build()
-                }
-                addMethods(methods)
-            }
+            addMethods(bootMethods.buildUnique())
             addMethod(constructor.build())
         }
     }
+
+    data
+    class BootMethod(
+        val key: Key,
+        val fieldSpec: FieldSpec
+    )
 
     inner
     class App(
@@ -270,6 +285,9 @@ class AppComponentGenerator(
                 val dependencies = descriptors
                         .flatMap { it.modules }
                         .flatMap { it.dependencies }
+                        .groupBy { it.key }
+                        .mapValues { it.value.first() }
+                        .values
                 val dependencyMethods = dependencies.map { dep ->
                     val param = dep.buildParameter()
                     MethodBuilder(param.name) {
