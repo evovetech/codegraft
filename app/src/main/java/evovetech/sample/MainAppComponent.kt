@@ -54,11 +54,6 @@ class AndroidBootComponent(
 }
 
 @Module
-class AndroidAppModule {
-
-}
-
-@Module
 class AndroidBootModule {
     @Provides
     @BootScope
