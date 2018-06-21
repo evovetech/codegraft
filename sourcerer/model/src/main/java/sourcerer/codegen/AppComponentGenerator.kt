@@ -142,6 +142,7 @@ class AppComponentGenerator(
 
         override
         fun typeSpec() = typeSpec {
+            addModifiers(PUBLIC)
             addAnnotation(Singleton::class.java)
             addAnnotation(ClassName.get(Component::class.java).toKlass()) {
                 val add = addTo("modules")

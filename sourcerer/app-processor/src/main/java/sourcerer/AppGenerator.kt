@@ -16,17 +16,15 @@
 
 package sourcerer
 
-import com.google.auto.service.AutoService
 import sourcerer.activity.MainProcessor
 import sourcerer.lib.LibEnvProcessor
-import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.TypeElement
 
 /**
  * Created by layne on 2/20/18.
  */
-@AutoService(Processor::class)
+//@AutoService(Processor::class)
 class AppGenerator : LibEnvProcessor() {
     private var done: Boolean = false
 
@@ -64,5 +62,5 @@ class AppGenerator : LibEnvProcessor() {
     }
 }
 
-@AutoService(Processor::class)
+//@AutoService(Processor::class)
 class AppProcessor : MainProcessor(false)

@@ -26,17 +26,18 @@ import sourcerer.inject.android.BootApplication
 import javax.inject.Inject
 
 //@AndroidApplication(AppBoot::class)
-class App : DaggerApplication(), BootApplication<AppComponent> {
+class App : DaggerApplication(), BootApplication<AndroidAppComponent> {
     @Inject lateinit
     var fabric: Fabric
 
     override
     val bootstrap = bootstrap {
-        fabric {
+        // TODO: better naming
+        function12 {
             it.kits(Crashlytics())
             it.build()
         }
-        realm {
+        function11 {
             it.name("app.realm")
             it.schemaVersion(1)
             it.build()

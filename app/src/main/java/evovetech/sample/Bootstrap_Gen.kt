@@ -16,29 +16,7 @@
 
 package evovetech.sample
 
-import android.app.Application
-import dagger.BindsInstance
-import dagger.Component
-import dagger.Module
-import dagger.Provides
-import dagger.android.AndroidInjectionModule
-import dagger.android.ContributesAndroidInjector
-import evovetech.sample.crashes.Crashes
-import evovetech.sample.crashes.CrashesBootstrapModule
-import evovetech.sample.crashes.CrashesComponent_ApplicationComponent
-import evovetech.sample.db.realm.RealmBootstrapModule
-import evovetech.sample.db.realm.RealmComponent_ApplicationComponent
-import evovetech.sample.db.realm.RealmModule
-import evovetech.sample.network.ClientComponent_ApplicationComponent
-import evovetech.sample.network.ClientPlugin
-import io.fabric.sdk.android.Fabric
-import io.realm.RealmConfiguration
-import sourcerer.inject.ActivityScope
-import sourcerer.inject.BootScope
-import sourcerer.inject.android.BootComponent
 import sourcerer.inject.android.Bootstrap
-import javax.inject.Named
-import javax.inject.Singleton
 
 //
 // Generated
@@ -47,117 +25,24 @@ import javax.inject.Singleton
 // package component
 // application generated
 
-// TODO:
-@Module(
-    includes = [
-        AndroidInjectionModule::class
-    ]
-)
-interface MainActivityModule {
-    @ActivityScope
-    @ContributesAndroidInjector
-    fun contributeMainActivity(): MainActivity
-}
-
-@Singleton
-@Component(
-    modules = [
-        ClientPlugin::class,
-        RealmModule::class,
-        Crashes::class,
-        MainActivityModule::class
-    ]
-)
-interface AppComponent :
-    RealmComponent_ApplicationComponent,
-    CrashesComponent_ApplicationComponent,
-    ClientComponent_ApplicationComponent,
-    sourcerer.inject.android.AppComponent<App> {
-
-    // TODO:
-    fun inject(mainActivity: MainActivity)
-
-    @Component.Builder
-    interface Builder :
-        RealmComponent_ApplicationComponent.Builder,
-        CrashesComponent_ApplicationComponent.Builder,
-        ClientComponent_ApplicationComponent.Builder {
-        fun build(): AppComponent
-    }
-}
-
-@Module(
-    includes = [
-        RealmBootstrapModule::class,
-        CrashesBootstrapModule::class
-    ]
-)
-class BootModule {
-    @Provides
-    @BootScope
-    fun provideComponent(
-        app: Application,
-        fabric: Fabric,
-        realmConfiguration: RealmConfiguration,
-        crashes: Crashes?,
-        realmModule: RealmModule?
-    ): AppComponent = DaggerAppComponent.builder().run {
-        application(app)
-        fabric(fabric)
-        realmConfiguration(realmConfiguration)
-        crashes?.let {
-            crashes(it)
-        }
-        realmModule?.let {
-            realmModule(it)
-        }
-        build()
-    }
-}
-
-@BootScope
-@Component(modules = [BootModule::class])
-interface AndroidBootComponent : BootComponent<AppComponent> {
-    override val component: AppComponent
-
-    @Component.Builder
-    interface Builder :
-        BootComponent.Builder<AndroidBootComponent> {
-        @BindsInstance
-        fun crashes(crashes: Crashes?)
-
-        @BindsInstance
-        fun application(application: Application)
-
-        @BindsInstance
-        fun fabric(@Named("fabric") function1: Function1<Fabric.Builder, Fabric>)
-
-        @BindsInstance
-        fun realmModule(realmModule: RealmModule?)
-
-        @BindsInstance
-        fun realm(
-            @Named("realmInit") function1: Function1<RealmConfiguration.Builder, RealmConfiguration>
-        )
-
-        override fun build(): AndroidBootComponent
-    }
-}
-
 fun bootstrap(boot: BootstrapInit) = Bootstrap(builder = {
-    DaggerAndroidBootComponent.builder()
+    DaggerBootComponent.builder()
             .bootstrap(boot)
 })
 
 private
-typealias BootstrapInit = AndroidBootComponent.Builder.() -> App
+typealias BootstrapInit = BootComponent.Builder.() -> App
 
 private
-typealias BootstrapBuilder = Bootstrap.Builder<App, AppComponent>
+typealias BootstrapBuilder = Bootstrap.Builder<App, AndroidAppComponent>
 
 private
-fun AndroidBootComponent.Builder.bootstrap(init: BootstrapInit): BootstrapBuilder {
+fun BootComponent.Builder.bootstrap(init: BootstrapInit): BootstrapBuilder {
     val app = init()
+    app(app)
     application(app)
-    return BootstrapBuilder(app, this)
+    val buildMethod = this::build
+    return BootstrapBuilder(app) {
+        AndroidBootComponent(buildMethod())
+    }
 }

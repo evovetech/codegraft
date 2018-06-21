@@ -16,13 +16,19 @@
 
 package evovetech.sample
 
-import kotlin.annotation.AnnotationRetention.BINARY
-import kotlin.reflect.KClass
+import dagger.Module
+import dagger.android.AndroidInjectionModule
+import dagger.android.ContributesAndroidInjector
+import sourcerer.inject.ActivityScope
 
-@MustBeDocumented
-@Target(AnnotationTarget.CLASS)
-@Retention(BINARY)
-annotation
-class AndroidApplication(
-    val value: KClass<out Bootstrap2<*>>
+// TODO:
+@Module(
+    includes = [
+        AndroidInjectionModule::class
+    ]
 )
+interface MainActivityModule {
+    @ActivityScope
+    @ContributesAndroidInjector
+    fun contributeMainActivity(): MainActivity
+}

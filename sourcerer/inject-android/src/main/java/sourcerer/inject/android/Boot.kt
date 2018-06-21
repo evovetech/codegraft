@@ -56,6 +56,17 @@ class Bootstrap<out Component : AppComponent<*>>(
         val application: Application,
         val builder: sourcerer.inject.android.BootComponent.Builder<BootComponent<Component>>
     ) {
+        constructor(
+            application: Application,
+            buildFunc: () -> BootComponent<Component>
+        ) : this(
+            application,
+            object : sourcerer.inject.android.BootComponent.Builder<BootComponent<Component>> {
+                override
+                fun build() = buildFunc()
+            }
+        )
+
         internal
         fun build(): Component = builder.build().component.apply {
             inject(application)
