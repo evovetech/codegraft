@@ -29,11 +29,7 @@ import sourcerer.JavaOutput
 import sourcerer.classBuilder
 import sourcerer.codegen.ComponentImplementationGenerator.Method.Kind.MembersInjector
 import sourcerer.codegen.ComponentImplementationGenerator.Method.Kind.Provider
-import sourcerer.dev.ComponentDescriptor
-import sourcerer.dev.SourcererElements
-import sourcerer.dev.SourcererTypes
-import sourcerer.dev.abstractMethods
-import sourcerer.dev.qualifier
+import dagger.internal.codegen.qualifier
 import sourcerer.typeSpec
 import javax.inject.Inject
 import javax.inject.Singleton

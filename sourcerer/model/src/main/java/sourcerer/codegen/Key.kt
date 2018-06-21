@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package sourcerer.codegen
 
 import com.google.auto.common.AnnotationMirrors
 import com.google.auto.common.MoreElements.isAnnotationPresent
@@ -24,7 +24,7 @@ import com.google.common.base.Equivalence
 import com.google.common.collect.FluentIterable
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
-import sourcerer.codegen.MethodBuilder
+import dagger.internal.codegen.qualifier
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.lang.model.element.AnnotationMirror

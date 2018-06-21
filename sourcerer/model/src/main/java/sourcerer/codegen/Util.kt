@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package sourcerer.codegen
 
 import com.google.auto.common.MoreElements
 import com.google.common.collect.ImmutableList

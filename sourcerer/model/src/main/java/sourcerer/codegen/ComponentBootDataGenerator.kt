@@ -21,14 +21,7 @@ import com.squareup.javapoet.MethodSpec
 import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.classBuilder
-import sourcerer.dev.ComponentDescriptor
-import sourcerer.dev.Key
-import sourcerer.dev.Keyed
-import sourcerer.dev.ModuleDescriptor
-import sourcerer.dev.SourcererElements
-import sourcerer.dev.SourcererTypes
-import sourcerer.dev.fieldName
-import sourcerer.dev.getterMethod
+import dagger.internal.codegen.Keyed
 import sourcerer.inject.BootScope
 import sourcerer.typeSpec
 import javax.inject.Inject

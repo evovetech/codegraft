@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package sourcerer.codegen
 
 import com.google.auto.common.MoreTypes
 import com.google.auto.common.MoreTypes.asExecutable
 import com.google.common.collect.ImmutableSet
+import dagger.internal.codegen.Dependency
+import dagger.internal.codegen.Keyed
+import dagger.internal.codegen.uniqueScope
 import dagger.model.Scope
 import javax.inject.Inject
 import javax.lang.model.element.Element
@@ -45,8 +48,8 @@ class Binding(
     @Inject constructor(
         val types: SourcererTypes,
         val elements: SourcererElements,
-        val keyFactory: Key.Factory,
-        val dependencyFactory: Dependency.Factory
+        val keyFactory: sourcerer.codegen.Key.Factory,
+        val dependencyFactory: dagger.internal.codegen.Dependency.Factory
     ) {
         fun forProvisionMethod(
             method: ExecutableElement,

@@ -31,11 +31,8 @@ import sourcerer.JavaOutput
 import sourcerer.addAnnotation
 import sourcerer.addTo
 import sourcerer.classBuilder
-import sourcerer.dev.ComponentOutput
-import sourcerer.dev.ComponentStep.Option.Package
-import sourcerer.dev.Key
-import sourcerer.dev.getterMethod
-import sourcerer.dev.getterMethodName
+import dagger.internal.codegen.ComponentOutput
+import dagger.internal.codegen.ComponentStep.Option.Package
 import sourcerer.inject.BootScope
 import sourcerer.interfaceBuilder
 import sourcerer.name

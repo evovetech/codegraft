@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package dagger.internal.codegen
 
 import com.google.auto.common.AnnotationMirrors
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Iterables.getOnlyElement
+import dagger.internal.codegen.DiagnosticFormatting.stripCommonTypePrefixes
 import dagger.model.Scope
+import sourcerer.codegen.toImmutableSet
 import sourcerer.inject.BootScope
 import javax.inject.Singleton
 import javax.lang.model.element.Element

@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package dagger.internal.codegen
+
+import sourcerer.codegen.Key
 
 interface Keyed {
     val key: Key

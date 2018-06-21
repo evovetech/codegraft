@@ -22,7 +22,7 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
-import sourcerer.dev.Dependency
+import dagger.internal.codegen.Dependency
 import sourcerer.join
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package dagger.internal.codegen
 
 import com.google.auto.common.MoreTypes
 import com.google.common.base.Equivalence

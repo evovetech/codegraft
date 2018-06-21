@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package dagger.internal.codegen
 
 import com.google.common.base.Preconditions.checkState
 import com.google.common.collect.ImmutableSet
@@ -22,6 +22,9 @@ import dagger.Lazy
 import dagger.model.Scope
 import dagger.producers.Produced
 import dagger.producers.Producer
+import sourcerer.codegen.Key
+import sourcerer.codegen.SourcererTypes
+import sourcerer.codegen.immutableSet
 import javax.inject.Inject
 import javax.inject.Provider
 import javax.lang.model.element.AnnotationMirror

@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package dagger.internal.codegen
 
 import com.google.auto.common.AnnotationMirrors
 import com.google.auto.common.AnnotationMirrors.getAnnotationValue
 import com.google.common.base.Equivalence
 import com.google.common.collect.ImmutableList
-import sourcerer.dev.MoreAnnotationValues.asAnnotationValues
-import sourcerer.dev.MoreAnnotationValues.asType
+import dagger.internal.codegen.MoreAnnotationValues.asAnnotationValues
+import dagger.internal.codegen.MoreAnnotationValues.asType
+import sourcerer.codegen.toImmutableList
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Name
 import javax.lang.model.type.TypeMirror

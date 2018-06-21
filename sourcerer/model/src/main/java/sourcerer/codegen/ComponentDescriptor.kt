@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package sourcerer.codegen
 
 import com.google.auto.common.MoreElements.getAnnotationMirror
 import com.google.auto.common.MoreElements.isAnnotationPresent
@@ -23,6 +23,10 @@ import com.google.common.base.Preconditions.checkArgument
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables.getOnlyElement
 import com.squareup.javapoet.ClassName
+import dagger.internal.codegen.Dependency
+import dagger.internal.codegen.getTypeListValue
+import sourcerer.codegen.ComponentDescriptor.MethodKind.MEMBERS_INJECTION
+import sourcerer.codegen.ComponentDescriptor.MethodKind.PROVISION
 import sourcerer.AnnotatedTypeElement
 import sourcerer.inject.BootstrapComponent
 import sourcerer.qualifiedName
@@ -53,8 +57,8 @@ class ComponentDescriptor(
         Bootstrap(
             BootstrapComponent::class,
             BootstrapComponent.Builder::class,
-            BOOTSTRAP_DEPENDENCIES_ATTRIBUTE,
-            BOOTSTRAP_MODULES_ATTRIBUTE,
+            dagger.internal.codegen.BOOTSTRAP_DEPENDENCIES_ATTRIBUTE,
+            dagger.internal.codegen.BOOTSTRAP_MODULES_ATTRIBUTE,
             true
         );
 
@@ -63,7 +67,7 @@ class ComponentDescriptor(
 
         val AnnotationMirror.applicationModules: ImmutableList<TypeMirror>
             get() = when (this@Kind) {
-                Bootstrap -> getTypeListValue(APPLICATION_MODULES_ATTRIBUTE)
+                Bootstrap -> getTypeListValue(dagger.internal.codegen.APPLICATION_MODULES_ATTRIBUTE)
                 else -> ImmutableList.of()
             }
 
@@ -117,7 +121,7 @@ class ComponentDescriptor(
     @Inject constructor(
         val elements: SourcererElements,
         val types: SourcererTypes,
-        val moduleFactory: ModuleDescriptor.Factory
+        val moduleFactory: sourcerer.codegen.ModuleDescriptor.Factory
     ) {
         fun forStoredComponent(
             className: ClassName
@@ -133,7 +137,9 @@ class ComponentDescriptor(
         fun forComponent(
             componentDefinitionType: TypeElement
         ): ComponentDescriptor {
-            val kind = Kind.forAnnotatedElement(componentDefinitionType)
+            val kind = Kind.forAnnotatedElement(
+                componentDefinitionType
+            )
                        ?: throw IllegalArgumentException("$componentDefinitionType must be annotated with @Component or @ProductionComponent")
             return kind.create(componentDefinitionType)
         }
@@ -180,7 +186,7 @@ class ComponentDescriptor(
                 dependencyRequest: Dependency
             ): MethodDescriptor {
                 return MethodDescriptor(
-                    MethodKind.PROVISION,
+                    PROVISION,
                     Optional.of(dependencyRequest),
                     methodElement
                 )
@@ -191,7 +197,7 @@ class ComponentDescriptor(
                 dependencyRequest: Dependency
             ): MethodDescriptor {
                 return MethodDescriptor(
-                    MethodKind.MEMBERS_INJECTION,
+                    MEMBERS_INJECTION,
                     Optional.of(dependencyRequest),
                     methodElement
                 )

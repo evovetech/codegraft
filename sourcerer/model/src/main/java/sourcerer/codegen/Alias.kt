@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package sourcerer.codegen
 
 internal
 typealias SourcererTypes = dagger.internal.codegen.SourcererTypes

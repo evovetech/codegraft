@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package dagger.internal.codegen
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
+import sourcerer.codegen.ComponentDescriptor.Factory
+import sourcerer.codegen.ComponentDescriptor.Kind
 import okio.Okio
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
@@ -26,6 +28,9 @@ import sourcerer.Output
 import sourcerer.ProcessStep
 import sourcerer.SourcererOutput
 import sourcerer.StoredFile
+import sourcerer.codegen.ComponentDescriptor
+import sourcerer.codegen.SourcererElements
+import sourcerer.codegen.SourcererTypes
 import sourcerer.getResources
 import sourcerer.inject.BootstrapComponent
 import sourcerer.io.Reader
@@ -39,14 +44,14 @@ import javax.inject.Inject
 class ComponentStep
 @Inject internal
 constructor(
-    val componentFactory: ComponentDescriptor.Factory,
+    val componentFactory: Factory,
     val componentOutputFactory: ComponentOutput.Factory,
     val appComponentStep: AppComponentStep,
     val sourcerer: BootstrapSourcerer
 ) : ProcessStep {
     override
-    fun Env.annotations(): Set<AnnotationType> = ComponentDescriptor.Kind.values()
-            .map(ComponentDescriptor.Kind::annotationType)
+    fun Env.annotations(): Set<AnnotationType> = Kind.values()
+            .map(Kind::annotationType)
             .toSet()
 
     override

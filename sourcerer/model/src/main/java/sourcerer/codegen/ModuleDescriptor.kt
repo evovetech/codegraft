@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package sourcerer.codegen
 
 import com.google.auto.common.MoreElements.getAnnotationMirror
 import com.google.auto.common.MoreElements.isAnnotationPresent
@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import dagger.Module
 import dagger.Provides
+import dagger.internal.codegen.Dependency
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
@@ -45,7 +46,7 @@ class ModuleDescriptor(
     @Inject constructor(
         val elements: Elements,
         val types: SourcererTypes,
-        val bindingFactory: Binding.Factory
+        val bindingFactory: sourcerer.codegen.Binding.Factory
     ) {
         fun create(
             moduleDefinitionType: TypeElement

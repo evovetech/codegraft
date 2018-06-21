@@ -24,10 +24,6 @@ import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.addAnnotation
 import sourcerer.addTo
-import sourcerer.dev.ComponentDescriptor
-import sourcerer.dev.ModuleDescriptor
-import sourcerer.dev.SourcererElements
-import sourcerer.dev.SourcererTypes
 import sourcerer.interfaceBuilder
 import sourcerer.toKlass
 import sourcerer.typeSpec

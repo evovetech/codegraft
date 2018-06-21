@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package dagger.internal.codegen
 
 import sourcerer.Output
 import sourcerer.codegen.ComponentBootDataGenerator
 import sourcerer.codegen.ComponentImplementationGenerator
 import sourcerer.codegen.ComponentModuleGenerator
+import sourcerer.codegen.ComponentDescriptor
 import javax.annotation.processing.FilerException
 import javax.inject.Inject
 
