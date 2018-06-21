@@ -30,7 +30,7 @@ import sourcerer.JavaOutput
 import sourcerer.addAnnotation
 import sourcerer.addTo
 import sourcerer.classBuilder
-import sourcerer.dev.BootstrapComponentStep.Output
+import sourcerer.dev.ComponentOutput
 import sourcerer.dev.ComponentStep.Option.Package
 import sourcerer.inject.BootScope
 import sourcerer.interfaceBuilder
@@ -46,11 +46,12 @@ import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
 
 class AppComponentGenerator(
-    private val descriptors: List<Output>,
+    generatedComponents: List<ComponentOutput>,
+    storedComponents: List<ComponentOutput>,
     private val pkg: String
 ) {
     val name = "AppComponent2"
-    val components = descriptors.map { it.component }
+    val components = generatedComponents + storedComponents
 
     fun process(): List<sourcerer.Output> {
         val bootData = BootData()
@@ -299,9 +300,11 @@ class AppComponentGenerator(
         private val options: Env.Options
     ) {
         fun create(
-            descriptors: List<Output>
+            generatedComponents: List<ComponentOutput>,
+            storedComponents: List<ComponentOutput>
         ) = AppComponentGenerator(
-            descriptors = descriptors,
+            generatedComponents = generatedComponents,
+            storedComponents = storedComponents,
             pkg = options[Package]
         )
     }

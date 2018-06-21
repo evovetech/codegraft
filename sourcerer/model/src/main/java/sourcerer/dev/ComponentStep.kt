@@ -40,7 +40,7 @@ import javax.inject.Inject
 class ComponentStep
 @Inject constructor(
     val componentFactory: ComponentDescriptor.Factory,
-    val bootstrapComponentStep: BootstrapComponentStep,
+    val componentOutputFactory: ComponentOutput.Factory,
     val appComponentStep: AppComponentStep,
     val sourcerer: BootstrapSourcerer
 ) : ProcessStep {
@@ -74,18 +74,19 @@ class ComponentStep
         annotationElements: AnnotationElements
     ): Map<AnnotationType, List<Output>> {
         val map = HashMap<AnnotationType, List<Output>>()
-        val bootstrapComponents = annotationElements.typeInputs<BootstrapComponent>()
+        val generatedComponents = annotationElements.typeInputs<BootstrapComponent>()
                 .map(componentFactory::forComponent)
-                .let(bootstrapComponentStep::process)
-        val bootstrapOutputs = bootstrapComponents.flatMap(BootstrapComponentStep.Output::outputs)
-        val sourcererOutput = sourcerer.output(bootstrapComponents)
-        map[BootstrapComponent::class] = bootstrapOutputs + sourcererOutput
+                .map(componentOutputFactory::create)
+        val generatedOutputs = generatedComponents.flatMap(ComponentOutput::outputs)
+        val sourcererOutput = sourcerer.output(generatedComponents)
+        map[BootstrapComponent::class] = generatedOutputs + sourcererOutput
 
         val storedComponents = sourcerer.storedOutputs()
                 .map(componentFactory::forStoredComponent)
+                .map(componentOutputFactory::create)
         log("storedComponents = $storedComponents")
 
-        val appComponent = appComponentStep.process(bootstrapComponents)
+        val appComponent = appComponentStep.process(generatedComponents, storedComponents)
         map[ApplicationComponent::class] = appComponent.flatMap(AppComponentStep.Output::outputs)
 
         return map
@@ -112,9 +113,9 @@ class ComponentStep
         val file = ClassName.get(BootstrapComponent::class.java).metaFile
 
         internal
-        fun output(outputs: List<BootstrapComponentStep.Output>): SrcOutput {
+        fun output(outputs: List<ComponentOutput>): SrcOutput {
             return componentOutput(outputs.map {
-                it.component.descriptor
+                it.descriptor
             })
         }
 
