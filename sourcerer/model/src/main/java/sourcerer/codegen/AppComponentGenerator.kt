@@ -55,7 +55,6 @@ class AppComponentGenerator(
     fun process(): List<sourcerer.Output> {
         val bootData = BootData()
         val app = App(bootData)
-//        val appBuilder = AppBuilder(app)
         val bootModule = BootModule(app, bootData)
         val bootComponent = BootComponent(app, bootModule)
         return listOf(
@@ -170,24 +169,6 @@ class AppComponentGenerator(
         }
     }
 
-    /*
-    @Module(includes = [CrashesBootstrapModule::class])
-    class BootModule {
-        @Provides @BootScope
-        fun provideComponent(
-            bootData: AppComponent_BootData,
-            crashes: Crashes?
-        ): AppComponent {
-            val builder = DaggerAppComponent.builder()
-            builder.bootData(bootData)
-            crashes?.let {
-                builder.crashes(it)
-            }
-            return builder.build()
-        }
-    }
-     */
-
     inner
     class BootModule(
         private val app: App,
@@ -229,34 +210,8 @@ class AppComponentGenerator(
                 returns(componentType)
                 build()
             })
-//            addAnnotation(ClassName.get(Component::class.java).toKlass()) {
-//                val add = addTo("modules")
-//                add(bootData.outKlass.rawType)
-//            }
         }
     }
-
-    /*
-    @BootScope
-    @Component(modules = [BootModule::class])
-    interface BootComponent {
-        val component: AppComponent
-
-        @Component.Builder
-        interface Builder {
-            @BindsInstance
-            fun crashes(crashes: Crashes?)
-
-            @BindsInstance
-            fun application(application: Application)
-
-            @BindsInstance
-            fun function1(@Named("fabric") function1: Function1<Fabric.Builder, Fabric>)
-
-            fun build(): BootComponent
-        }
-    }
-    */
 
     inner
     class BootComponent(
