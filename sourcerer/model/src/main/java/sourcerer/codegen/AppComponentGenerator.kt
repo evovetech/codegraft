@@ -279,17 +279,14 @@ class AppComponentGenerator(
                 val add = addTo("modules")
                 add(bootModule.outKlass.rawType)
             }
-            descriptors
-                    .map {
-                        val name = it.definitionType.simpleName.toString().decapitalize()
-                        val type = ClassName.get(it.definitionType)
-                        MethodBuilder(name) {
-                            addModifiers(PUBLIC, ABSTRACT)
-                            returns(type)
-                        }
-                    }
-                    .buildUnique()
-                    .map(this::addMethod)
+
+            // appcomponent
+            val type = app.outKlass.rawType
+            addMethod(MethodBuilder("get${app.outKlass.name.capitalize()}") {
+                addModifiers(PUBLIC, ABSTRACT)
+                returns(type)
+            }.build())
+
             addType(builder.typeSpec())
         }
 
