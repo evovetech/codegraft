@@ -36,7 +36,7 @@ class ComponentModuleGenerator(
     private val env: Env,
     private val types: SourcererTypes,
     private val elements: SourcererElements,
-    private val descriptor: SrcComponentDescriptor,
+    private val descriptor: BootstrapComponentDescriptor,
     private val implGenerator: ComponentImplementationGenerator
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.definitionType),
@@ -50,7 +50,7 @@ class ComponentModuleGenerator(
         addModifiers(PUBLIC)
         addAnnotation(ClassName.get(Module::class.java).toKlass()) {
             descriptor.applicationModules
-                    .map(SrcModuleDescriptor::definitionType)
+                    .map(ModuleDescriptor::moduleElement)
                     .mapNotNull(ClassName::get)
                     .forEach(addTo("includes"))
         }
@@ -73,7 +73,7 @@ class ComponentModuleGenerator(
         private val elements: SourcererElements
     ) {
         fun create(
-            descriptor: SrcComponentDescriptor,
+            descriptor: BootstrapComponentDescriptor,
             implGenerator: ComponentImplementationGenerator
         ) = ComponentModuleGenerator(
             env = env,

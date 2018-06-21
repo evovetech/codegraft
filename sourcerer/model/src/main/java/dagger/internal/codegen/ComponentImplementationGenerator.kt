@@ -47,7 +47,7 @@ class ComponentImplementationGenerator(
     private val env: Env,
     private val types: SourcererTypes,
     private val elements: SourcererElements,
-    private val descriptor: SrcComponentDescriptor
+    private val descriptor: BootstrapComponentDescriptor
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.definitionType),
     outExt = "Implementation"
@@ -170,7 +170,7 @@ class ComponentImplementationGenerator(
         private val elements: SourcererElements
     ) {
         fun create(
-            descriptor: SrcComponentDescriptor
+            descriptor: BootstrapComponentDescriptor
         ) = ComponentImplementationGenerator(
             env = env,
             types = types,

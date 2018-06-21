@@ -18,8 +18,8 @@ package dagger.internal.codegen
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
-import dagger.internal.codegen.SrcComponentDescriptor.Factory
-import dagger.internal.codegen.SrcComponentDescriptor.Kind
+import dagger.internal.codegen.BootstrapComponentDescriptor.Factory
+import dagger.internal.codegen.BootstrapComponentDescriptor.Kind
 import okio.Okio
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
@@ -113,7 +113,7 @@ constructor(
                 .readAll()
 
         private
-        fun componentOutput(components: List<SrcComponentDescriptor>): SrcOutput {
+        fun componentOutput(components: List<BootstrapComponentDescriptor>): SrcOutput {
             return SrcOutput(this, components.map {
                 ClassName.get(it.definitionType)
             })

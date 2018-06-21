@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 internal data
 class ComponentOutput(
-    val descriptor: SrcComponentDescriptor,
+    val descriptor: BootstrapComponentDescriptor,
     val implementation: ComponentImplementationGenerator,
     val module: ComponentModuleGenerator,
     val bootData: ComponentBootDataGenerator
@@ -35,7 +35,7 @@ class ComponentOutput(
         private val componentBootDataFactory: ComponentBootDataGenerator.Factory
     ) {
         fun create(
-            descriptors: List<SrcComponentDescriptor>
+            descriptors: List<BootstrapComponentDescriptor>
         ): List<ComponentOutput> = try {
             descriptors.map(this::create)
         } catch (_: FilerException) {
@@ -43,7 +43,7 @@ class ComponentOutput(
         }
 
         fun create(
-            descriptor: SrcComponentDescriptor
+            descriptor: BootstrapComponentDescriptor
         ): ComponentOutput {
             val implementation = componentImplementationFactory.create(descriptor)
             return ComponentOutput(

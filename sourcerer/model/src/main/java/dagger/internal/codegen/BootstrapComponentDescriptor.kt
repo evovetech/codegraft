@@ -24,12 +24,9 @@ import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables.getOnlyElement
 import com.squareup.javapoet.ClassName
 import sourcerer.AnnotatedTypeElement
-import dagger.internal.codegen.SrcComponentDescriptor.MethodKind.MEMBERS_INJECTION
-import dagger.internal.codegen.SrcComponentDescriptor.MethodKind.PROVISION
 import sourcerer.inject.BootstrapComponent
 import sourcerer.qualifiedName
 import java.util.EnumSet
-import java.util.Optional
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
@@ -39,25 +36,24 @@ import javax.lang.model.type.TypeMirror
 import kotlin.reflect.KClass
 
 data
-class SrcComponentDescriptor(
+class BootstrapComponentDescriptor
+internal constructor(
     val definitionType: TypeElement,
     val annotationMirror: AnnotationMirror,
-    val modules: ImmutableList<SrcModuleDescriptor>,
-    val applicationModules: ImmutableList<SrcModuleDescriptor>,
+    val modules: ImmutableList<ModuleDescriptor>,
+    val applicationModules: ImmutableList<ModuleDescriptor>,
     val methods: ImmutableList<Pair<ExecutableElement, ExecutableType>>
 ) {
     enum
     class Kind(
         val annotationType: KClass<out Annotation>,
         val builderAnnotationType: KClass<out Annotation>,
-        val dependenciesAttribute: String,
         val modulesAttribute: String,
         val isTopLevel: Boolean
     ) {
         Bootstrap(
             BootstrapComponent::class,
             BootstrapComponent.Builder::class,
-            BOOTSTRAP_DEPENDENCIES_ATTRIBUTE,
             BOOTSTRAP_MODULES_ATTRIBUTE,
             true
         );
@@ -121,22 +117,23 @@ class SrcComponentDescriptor(
     @Inject constructor(
         val elements: SourcererElements,
         val types: SourcererTypes,
-        val moduleFactory: dagger.internal.codegen.SrcModuleDescriptor.Factory
+        val moduleFactory: ModuleDescriptor.Factory
     ) {
         fun forStoredComponent(
             className: ClassName
-        ): SrcComponentDescriptor {
+        ): BootstrapComponentDescriptor {
+            val c: ComponentDescriptor
             val typeElement = elements.getTypeElement(className.qualifiedName)
             return forComponent(typeElement)
         }
 
         fun forComponent(
             componentTypeElement: AnnotatedTypeElement<*>
-        ): SrcComponentDescriptor = forComponent(componentTypeElement.element)
+        ): BootstrapComponentDescriptor = forComponent(componentTypeElement.element)
 
         fun forComponent(
             componentDefinitionType: TypeElement
-        ): SrcComponentDescriptor {
+        ): BootstrapComponentDescriptor {
             val kind = Kind.forAnnotatedElement(
                 componentDefinitionType
             )
@@ -148,7 +145,7 @@ class SrcComponentDescriptor(
         fun Kind.create(
             componentDefinitionType: TypeElement,
             parentKind: Kind? = null
-        ): SrcComponentDescriptor {
+        ): BootstrapComponentDescriptor {
             val declaredComponentType = MoreTypes.asDeclared(componentDefinitionType.asType())
             val componentMirror = getAnnotationMirror(componentDefinitionType, annotationType.java).get()
             val modules = componentMirror.modules
@@ -159,7 +156,6 @@ class SrcComponentDescriptor(
                     .map(MoreTypes::asTypeElement)
                     .map(moduleFactory::create)
                     .toImmutableList()
-
             val unimplementedMethods = elements.getUnimplementedMethods(componentDefinitionType)
                     .map { componentMethod ->
                         val resolvedMethod =
@@ -167,7 +163,7 @@ class SrcComponentDescriptor(
                         Pair(componentMethod, resolvedMethod)
                     }
                     .toImmutableList()
-            return SrcComponentDescriptor(
+            return BootstrapComponentDescriptor(
                 componentDefinitionType,
                 componentMirror,
                 modules,
@@ -175,44 +171,6 @@ class SrcComponentDescriptor(
                 unimplementedMethods
             )
         }
-    }
-
-    /** A function that returns all [.scopes] of its input.  */
-    internal data
-    class MethodDescriptor(
-        val kind: MethodKind,
-        val dependencyRequest: Optional<Dependency>,
-        val methodElement: ExecutableElement
-    ) {
-        companion object {
-            fun forProvision(
-                methodElement: ExecutableElement,
-                dependencyRequest: Dependency
-            ): MethodDescriptor {
-                return MethodDescriptor(
-                    PROVISION,
-                    Optional.of(dependencyRequest),
-                    methodElement
-                )
-            }
-
-            fun forMembersInjection(
-                methodElement: ExecutableElement,
-                dependencyRequest: Dependency
-            ): MethodDescriptor {
-                return MethodDescriptor(
-                    MEMBERS_INJECTION,
-                    Optional.of(dependencyRequest),
-                    methodElement
-                )
-            }
-        }
-    }
-
-    internal enum
-    class MethodKind {
-        PROVISION,
-        MEMBERS_INJECTION;
     }
 }
 

@@ -16,6 +16,8 @@
 
 package dagger.internal.codegen
 
+import dagger.model.Key
+
 interface Keyed {
     val key: Key
 }

@@ -22,6 +22,7 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
+import dagger.model.DependencyRequest
 import sourcerer.join
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
@@ -76,6 +77,15 @@ class ParamBuilder(
     }
 }
 
+internal
+fun ContributionBinding.buildParameter(
+    init: ParameterSpec.Builder.() -> Unit = {}
+): ParameterSpec {
+    val type = contributedType()
+    val name = MoreTypes.asElement(type).simpleName.toString().decapitalize()
+    return type.buildParameter(name, init)
+}
+
 fun ClassName.buildParameter(
     init: ParameterSpec.Builder.() -> Unit = {}
 ): ParameterSpec {
@@ -105,7 +115,7 @@ fun DeclaredType.buildParameter(
     return buildParameter(name, init)
 }
 
-fun Dependency.buildParameter(
+fun DependencyRequest.buildParameter(
     init: ParameterSpec.Builder.() -> Unit = {}
 ): ParameterSpec {
     val type = MoreTypes.asDeclared(key.type)

@@ -18,6 +18,7 @@ package dagger.internal.codegen
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
+import dagger.model.Key
 import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.classBuilder
@@ -27,8 +28,9 @@ import javax.inject.Inject
 import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PUBLIC
 
-val Collection<Keyed>.keys: Set<Key>
-    get() = map(Keyed::key)
+internal
+val Collection<BindingDeclaration>.keys: Set<Key>
+    get() = map(BindingDeclaration::key)
             .toSet()
 
 internal
@@ -36,26 +38,26 @@ class ComponentBootDataGenerator(
     private val env: Env,
     private val types: SourcererTypes,
     private val elements: SourcererElements,
-    private val descriptor: SrcComponentDescriptor
+    private val descriptor: BootstrapComponentDescriptor
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.definitionType),
     outExt = "BootData"
 ) {
     private val allBindings by lazy {
-        descriptor.modules.flatMap(SrcModuleDescriptor::provisionBindings)
+        descriptor.modules.flatMap(ModuleDescriptor::bindings)
     }
     private val scopedBindings by lazy {
-        allBindings.filter { it.scope != null }
+        allBindings.filter { it.scope().isPresent }
     }
-    private val allDependencies by lazy {
-        descriptor.modules.flatMap(SrcModuleDescriptor::dependencies)
-    }
-    private val scopedDependencies by lazy {
-        allDependencies.filter { it.scope != null }
-    }
+//    private val allDependencies by lazy {
+//        descriptor.modules.flatMap(ModuleDescriptor::)
+//    }
+//    private val scopedDependencies by lazy {
+//        allDependencies.filter { it.scope != null }
+//    }
 
     val scopedKeys: Set<Key> by lazy {
-        (scopedBindings + scopedDependencies).keys
+        scopedBindings.keys
     }
 
     override
@@ -89,7 +91,7 @@ class ComponentBootDataGenerator(
         private val elements: SourcererElements
     ) {
         fun create(
-            descriptor: SrcComponentDescriptor
+            descriptor: BootstrapComponentDescriptor
         ) = ComponentBootDataGenerator(
             env = env,
             types = types,

@@ -26,12 +26,13 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import dagger.internal.codegen.ComponentStep.Option.Package
+import dagger.model.Key
 import org.jetbrains.annotations.Nullable
 import sourcerer.JavaOutput
 import sourcerer.addAnnotation
 import sourcerer.addTo
 import sourcerer.classBuilder
-import dagger.internal.codegen.ComponentStep.Option.Package
 import sourcerer.inject.BootScope
 import sourcerer.interfaceBuilder
 import sourcerer.name
@@ -198,7 +199,7 @@ class AppComponentGenerator(
             addModifiers(FINAL)
             val modules = components.flatMap { it.descriptor.modules }
             addAnnotation(ClassName.get(Module::class.java).toKlass()) {
-                modules.map { TypeName.get(it.definitionType.asType()) }
+                modules.map { TypeName.get(it.moduleElement().asType()) }
                         .forEach(addTo("includes"))
             }
             val componentType = app.outKlass.rawType
@@ -268,7 +269,7 @@ class AppComponentGenerator(
                 val applicationModules = descriptors
                         .flatMap { it.applicationModules }
                         .map { module ->
-                            val param = module.definitionType.buildParameter {
+                            val param = module.moduleElement().buildParameter {
                                 addAnnotation(Nullable::class.java)
                             }
                             MethodBuilder(param.name) {
@@ -281,8 +282,8 @@ class AppComponentGenerator(
 
                 val dependencies = descriptors
                         .flatMap { it.modules }
-                        .flatMap { it.dependencies }
-                        .groupBy { it.key }
+                        .flatMap { it.bindings() }
+                        .groupBy { it.key() }
                         .mapValues { it.value.first() }
                         .values
                 val dependencyMethods = dependencies.map { dep ->
