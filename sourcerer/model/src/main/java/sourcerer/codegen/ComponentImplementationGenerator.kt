@@ -54,7 +54,7 @@ class ComponentImplementationGenerator(
     private val descriptor: ComponentDescriptor
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.definitionType),
-    outExt = "Implementation2"
+    outExt = "Implementation"
 ) {
 //    val componentType = descriptor.definitionType
 //    val provisionMethods =

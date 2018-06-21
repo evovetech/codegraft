@@ -53,7 +53,7 @@ class ComponentModuleGenerator(
     private val implGenerator: ComponentImplementationGenerator
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.definitionType),
-    outExt = "Module2"
+    outExt = "Module"
 ) {
     override
     fun newBuilder() = outKlass.interfaceBuilder()

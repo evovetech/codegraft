@@ -46,7 +46,7 @@ class ComponentBootDataGenerator(
     private val descriptor: ComponentDescriptor
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.definitionType),
-    outExt = "BootData2"
+    outExt = "BootData"
 ) {
     private val allBindings by lazy {
         descriptor.modules.flatMap(ModuleDescriptor::provisionBindings)
