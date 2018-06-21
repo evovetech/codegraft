@@ -37,8 +37,6 @@ typealias RealmInit = RealmConfiguration.Builder.() -> RealmConfiguration
 interface RealmComponent {
     val realm: Realm
     val crashlytics: Crashlytics
-
-    fun inject(sample: Sample)
 }
 
 @Module

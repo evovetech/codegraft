@@ -34,7 +34,6 @@ import sourcerer.classBuilder
 import sourcerer.dev.ComponentOutput
 import sourcerer.dev.ComponentStep.Option.Package
 import sourcerer.dev.Key
-import sourcerer.dev.fieldName
 import sourcerer.dev.getterMethod
 import sourcerer.dev.getterMethodName
 import sourcerer.inject.BootScope
@@ -55,7 +54,7 @@ class AppComponentGenerator(
     storedComponents: List<ComponentOutput>,
     private val pkg: String
 ) {
-    val name = "AppComponent2"
+    val name = "AppComponent"
     val components = generatedComponents + storedComponents
 
     fun process(): List<sourcerer.Output> {
@@ -190,7 +189,7 @@ class AppComponentGenerator(
         private val app: App,
         private val bootData: BootData
     ) : JavaOutput(
-        rawType = ClassName.get(pkg, "BootModule2")
+        rawType = ClassName.get(pkg, "BootModule")
     ) {
         override
         fun newBuilder() = outKlass.classBuilder()
@@ -234,7 +233,7 @@ class AppComponentGenerator(
         private val app: App,
         private val bootModule: BootModule
     ) : JavaOutput(
-        rawType = ClassName.get(pkg, "BootComponent2")
+        rawType = ClassName.get(pkg, "BootComponent")
     ) {
         val descriptors = components.map { it.descriptor }
         val builder = Builder()
