@@ -16,22 +16,66 @@
 
 package dagger.internal.codegen
 
+import com.google.common.collect.ImmutableSet
 import javax.inject.Inject
+import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.Element
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
+import kotlin.reflect.KClass
 
 internal class SourcererElements
 @Inject constructor(
     val elements: DaggerElements,
     val types: DaggerTypes
 ) : Elements by elements {
-    fun getUnimplementedMethods(type: TypeElement) =
+    fun getUnimplementedMethods(type: TypeElement): ImmutableSet<ExecutableElement> =
         elements.getUnimplementedMethods(type)
 
-    fun getTypeElement(clazz: Class<*>) =
-        elements.getTypeElement(clazz)
+    inline
+    fun <reified T> getTypeElement(): TypeElement =
+        getTypeElement(T::class)
 
-    fun checkTypePresent(typeName: String) =
+    fun getTypeElement(klass: KClass<*>): TypeElement =
+        elements.getTypeElement(klass.java)
+
+    fun checkTypePresent(typeName: String): TypeElement =
         elements.checkTypePresent(typeName)
+
+    companion object {
+        /**
+         * Returns `true` iff the given element has an [AnnotationMirror] whose
+         * [annotation type][AnnotationMirror.getAnnotationType] has the same canonical name
+         * as any of that of `annotationClasses`.
+         */
+        fun isAnyAnnotationPresent(
+            element: Element,
+            annotationClasses: Iterable<Class<out Annotation>>
+        ): Boolean = DaggerElements.isAnyAnnotationPresent(element, annotationClasses)
+
+        @SafeVarargs
+        fun isAnyAnnotationPresent(
+            element: Element,
+            first: Class<out Annotation>,
+            vararg otherAnnotations: Class<out Annotation>
+        ): Boolean = DaggerElements.isAnyAnnotationPresent(
+            element,
+            first,
+            *otherAnnotations
+        )
+
+        /**
+         * Returns `true` iff the given element has an [AnnotationMirror] whose [ ][AnnotationMirror.getAnnotationType] is equivalent to `annotationType`.
+         */
+        fun isAnnotationPresent(
+            element: Element,
+            annotationType: TypeMirror
+        ): Boolean = DaggerElements.isAnnotationPresent(
+            element,
+            annotationType
+        )
+    }
 }
 

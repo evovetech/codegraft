@@ -26,7 +26,9 @@ import javax.inject.Inject
 import javax.inject.Provider
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.VariableElement
+import javax.lang.model.type.ExecutableType
 import javax.lang.model.type.TypeMirror
 
 data
@@ -66,6 +68,15 @@ class Dependency(
                 variableElement.uniqueScope
             )
         }
+
+        fun forComponentProvisionMethod(
+            provisionMethod: ExecutableElement,
+            provisionMethodType: ExecutableType
+        ): Dependency = newDependencyRequest(
+            provisionMethod,
+            provisionMethodType.returnType,
+            provisionMethod.qualifier
+        )
 
         private fun newDependencyRequest(
             requestElement: Element,

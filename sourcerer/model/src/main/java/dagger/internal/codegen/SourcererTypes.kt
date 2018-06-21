@@ -37,23 +37,33 @@ internal class SourcererTypes
         type
     }
 
-     fun nonObjectSuperclass(type: DeclaredType?): Optional<DeclaredType> {
+    fun nonObjectSuperclass(type: DeclaredType): Optional<DeclaredType> {
         return types.nonObjectSuperclass(type)
     }
 
-     fun unwrapTypeOrObject(type: TypeMirror?): TypeMirror {
+    fun unwrapTypeOrObject(type: TypeMirror): TypeMirror {
         return types.unwrapTypeOrObject(type)
     }
 
-     fun rewrapType(type: TypeMirror?, wrappingClass: Class<*>?): DeclaredType {
+    fun rewrapType(type: TypeMirror, wrappingClass: Class<*>): DeclaredType {
         return types.rewrapType(type, wrappingClass)
     }
 
-     fun wrapType(type: TypeMirror?, wrappingClass: Class<*>?): TypeMirror {
+    inline
+    fun <reified T> rewrapType(
+        type: TypeMirror
+    ): TypeMirror = rewrapType(type, T::class.java)
+
+    fun wrapType(type: TypeMirror, wrappingClass: Class<*>): TypeMirror {
         return types.wrapType(type, wrappingClass)
     }
 
-    fun unwrapType(type: TypeMirror?): TypeMirror {
+    inline
+    fun <reified T> wrapType(
+        type: TypeMirror
+    ): TypeMirror = wrapType(type, T::class.java)
+
+    fun unwrapType(type: TypeMirror): TypeMirror {
         return types.unwrapType(type)
     }
 }

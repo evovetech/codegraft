@@ -27,8 +27,10 @@ import sourcerer.AnnotatedTypeElement
 import sourcerer.inject.BootstrapComponent
 import sourcerer.qualifiedName
 import java.util.EnumSet
+import java.util.Optional
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 import kotlin.reflect.KClass
@@ -163,6 +165,44 @@ class ComponentDescriptor(
                 applicationModules
             )
         }
+    }
+
+    /** A function that returns all [.scopes] of its input.  */
+    internal data
+    class MethodDescriptor(
+        val kind: MethodKind,
+        val dependencyRequest: Optional<Dependency>,
+        val methodElement: ExecutableElement
+    ) {
+        companion object {
+            fun forProvision(
+                methodElement: ExecutableElement,
+                dependencyRequest: Dependency
+            ): MethodDescriptor {
+                return MethodDescriptor(
+                    MethodKind.PROVISION,
+                    Optional.of(dependencyRequest),
+                    methodElement
+                )
+            }
+
+            fun forMembersInjection(
+                methodElement: ExecutableElement,
+                dependencyRequest: Dependency
+            ): MethodDescriptor {
+                return MethodDescriptor(
+                    MethodKind.MEMBERS_INJECTION,
+                    Optional.of(dependencyRequest),
+                    methodElement
+                )
+            }
+        }
+    }
+
+    internal enum
+    class MethodKind {
+        PROVISION,
+        MEMBERS_INJECTION;
     }
 }
 
