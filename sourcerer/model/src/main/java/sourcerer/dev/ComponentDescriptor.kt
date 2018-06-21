@@ -22,10 +22,11 @@ import com.google.auto.common.MoreTypes
 import com.google.common.base.Preconditions.checkArgument
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables.getOnlyElement
+import com.squareup.javapoet.ClassName
 import sourcerer.AnnotatedTypeElement
 import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootstrapComponent
-import sourcerer.processor.Env
+import sourcerer.qualifiedName
 import java.util.EnumSet
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
@@ -127,6 +128,13 @@ class ComponentDescriptor(
         val types: SourcererTypes,
         val moduleFactory: ModuleDescriptor.Factory
     ) {
+        fun forStoredComponent(
+            className: ClassName
+        ): ComponentDescriptor {
+            val typeElement = elements.getTypeElement(className.qualifiedName)
+            return forComponent(typeElement)
+        }
+
         fun forComponent(
             componentTypeElement: AnnotatedTypeElement<*>
         ): ComponentDescriptor = forComponent(componentTypeElement.element)

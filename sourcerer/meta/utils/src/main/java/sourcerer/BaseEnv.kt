@@ -19,6 +19,7 @@ package sourcerer
 import sourcerer.io.Reader
 import sourcerer.io.Writer
 import sourcerer.processor.Env
+import sourcerer.processor.ProcessingEnv
 import java.net.URL
 import java.util.ArrayList
 import javax.lang.model.element.Element
@@ -57,7 +58,7 @@ abstract class BaseEnv(env: Env) : Env(env) {
     }
 }
 
-fun Env.getResources(path: String): List<URL> {
+fun ProcessingEnv.getResources(path: String): List<URL> {
     val resources = ArrayList<URL>()
     val urls = javaClass.classLoader.getResources(path)
     if (urls.hasMoreElements()) {

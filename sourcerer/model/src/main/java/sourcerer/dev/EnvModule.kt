@@ -23,6 +23,7 @@ import sourcerer.Env
 import sourcerer.google.auto.factory.AutoFactory
 import sourcerer.google.auto.factory.Provided
 import sourcerer.processor.Env.Options
+import sourcerer.processor.ProcessingEnv
 import javax.annotation.processing.Filer
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.util.Elements
@@ -54,6 +55,7 @@ class EnvModule {
 @Module
 interface EnvModule2 {
     @Binds fun bindsEnv(env: sourcerer.Env): sourcerer.processor.Env
+    @Binds fun bindsEnv2(env: sourcerer.processor.Env): ProcessingEnv
 }
 
 @Module
