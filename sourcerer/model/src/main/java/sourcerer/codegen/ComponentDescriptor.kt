@@ -25,9 +25,9 @@ import com.google.common.collect.Iterables.getOnlyElement
 import com.squareup.javapoet.ClassName
 import dagger.internal.codegen.Dependency
 import dagger.internal.codegen.getTypeListValue
+import sourcerer.AnnotatedTypeElement
 import sourcerer.codegen.ComponentDescriptor.MethodKind.MEMBERS_INJECTION
 import sourcerer.codegen.ComponentDescriptor.MethodKind.PROVISION
-import sourcerer.AnnotatedTypeElement
 import sourcerer.inject.BootstrapComponent
 import sourcerer.qualifiedName
 import java.util.EnumSet
@@ -36,6 +36,7 @@ import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.ExecutableType
 import javax.lang.model.type.TypeMirror
 import kotlin.reflect.KClass
 
@@ -44,7 +45,8 @@ class ComponentDescriptor(
     val definitionType: TypeElement,
     val annotationMirror: AnnotationMirror,
     val modules: ImmutableList<ModuleDescriptor>,
-    val applicationModules: ImmutableList<ModuleDescriptor>
+    val applicationModules: ImmutableList<ModuleDescriptor>,
+    val methods: ImmutableList<Pair<ExecutableElement, ExecutableType>>
 ) {
     enum
     class Kind(
@@ -161,14 +163,18 @@ class ComponentDescriptor(
                     .toImmutableList()
 
             val unimplementedMethods = elements.getUnimplementedMethods(componentDefinitionType)
-            unimplementedMethods.map { componentMethod ->
-                val resolvedMethod = MoreTypes.asExecutable(types.asMemberOf(declaredComponentType, componentMethod));
-            }
+                    .map { componentMethod ->
+                        val resolvedMethod =
+                            MoreTypes.asExecutable(types.asMemberOf(declaredComponentType, componentMethod))
+                        Pair(componentMethod, resolvedMethod)
+                    }
+                    .toImmutableList()
             return ComponentDescriptor(
                 componentDefinitionType,
                 componentMirror,
                 modules,
-                applicationModules
+                applicationModules,
+                unimplementedMethods
             )
         }
     }

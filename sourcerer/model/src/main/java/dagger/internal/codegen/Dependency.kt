@@ -18,16 +18,16 @@ package dagger.internal.codegen
 
 import com.google.common.base.Preconditions.checkState
 import com.google.common.collect.ImmutableSet
-import dagger.Lazy
+import com.google.common.collect.Iterables.getOnlyElement
+import dagger.internal.codegen.RequestKinds.extractKeyType
+import dagger.internal.codegen.RequestKinds.getRequestKind
+import dagger.model.RequestKind
 import dagger.model.Scope
-import dagger.producers.Produced
-import dagger.producers.Producer
 import sourcerer.codegen.Key
 import sourcerer.codegen.Keyed
 import sourcerer.codegen.SourcererTypes
 import sourcerer.codegen.immutableSet
 import javax.inject.Inject
-import javax.inject.Provider
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
@@ -38,6 +38,7 @@ import javax.lang.model.type.TypeMirror
 data
 class Dependency(
     override val key: Key,
+    val kind: RequestKind,
     val requestElement: Element? = null,
     val scope: Scope? = null
 ) : Keyed {
@@ -66,10 +67,10 @@ class Dependency(
         ): Dependency {
             val qualifier = variableElement.qualifier
             return newDependencyRequest(
-                variableElement,
-                resolvedType,
-                qualifier,
-                variableElement.uniqueScope
+                requestElement = variableElement,
+                type = resolvedType,
+                qualifier = qualifier,
+                scope = variableElement.uniqueScope
             )
         }
 
@@ -77,56 +78,37 @@ class Dependency(
             provisionMethod: ExecutableElement,
             provisionMethodType: ExecutableType
         ): Dependency = newDependencyRequest(
-            provisionMethod,
-            provisionMethodType.returnType,
-            provisionMethod.qualifier
+            requestElement = provisionMethod,
+            type = provisionMethodType.returnType,
+            qualifier = provisionMethod.qualifier
         )
+
+        fun forComponentMembersInjectionMethod(
+            membersInjectionMethod: ExecutableElement,
+            membersInjectionMethodType: ExecutableType
+        ): Dependency {
+            val membersInjectedType = getOnlyElement<TypeMirror>(membersInjectionMethodType.parameterTypes)
+            return Dependency(
+                key = keyFactory.forMembersInjectedType(membersInjectedType),
+                kind = RequestKind.MEMBERS_INJECTION,
+                requestElement = membersInjectionMethod
+            )
+        }
 
         private fun newDependencyRequest(
-            requestElement: Element,
             type: TypeMirror,
+            requestElement: Element? = null,
             qualifier: AnnotationMirror? = null,
             scope: Scope? = null
-        ) = Dependency(
-            key = keyFactory.forQualifiedType(type, qualifier),
-            requestElement = requestElement,
-            scope = scope
-        )
+        ): Dependency {
+            val kind = getRequestKind(type)
+            val keyType = extractKeyType(kind, type)
+            return Dependency(
+                key = keyFactory.forQualifiedType(keyType, qualifier),
+                kind = kind,
+                requestElement = requestElement,
+                scope = scope
+            )
+        }
     }
-}
-
-/**
- * Represents the different kinds of [types][javax.lang.model.type.TypeMirror] that may be
- * requested as dependencies for the same key. For example, `String`, `Provider<String>`, and `Lazy<String>` can all be requested if a key exists for `String`; they have the [.INSTANCE], [.PROVIDER], and [.LAZY] request kinds,
- * respectively.
- */
-enum class RequestKind {
-    /** A default request for an instance. E.g.: `FooType`  */
-    INSTANCE,
-
-    /** A request for a [Provider]. E.g.: `Provider<FooType>`  */
-    PROVIDER,
-
-    /** A request for a [Lazy]. E.g.: `Lazy<FooType>`  */
-    LAZY,
-
-    /** A request for a [Provider] of a [Lazy]. E.g.: `Provider<Lazy<FooType>>`  */
-    PROVIDER_OF_LAZY,
-
-    /**
-     * A request for a members injection. E.g. `void inject(FooType);`. Can only be requested by
-     * component interfaces.
-     */
-    MEMBERS_INJECTION,
-
-    /** A request for a [Producer]. E.g.: `Producer<FooType>`  */
-    PRODUCER,
-
-    /** A request for a [Produced]. E.g.: `Produced<FooType>`  */
-    PRODUCED,
-
-    /**
-     * A request for a [com.google.common.util.concurrent.ListenableFuture]. E.g.: `ListenableFuture<FooType>`. These can only be requested by component interfaces.
-     */
-    FUTURE
 }

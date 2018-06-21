@@ -103,6 +103,10 @@ class Key(
             qualifier: AnnotationMirror? = null
         ) = Key(type.boxed(), qualifier)
 
+        fun forMembersInjectedType(
+            type: TypeMirror
+        ) = Key(type)
+
         fun forMethod(
             method: ExecutableElement,
             keyType: TypeMirror
