@@ -49,15 +49,22 @@ class ComponentBootDataGenerator(
     private val scopedBindings by lazy {
         allBindings.filter { it.scope().isPresent }
     }
-//    private val allDependencies by lazy {
-//        descriptor.modules.flatMap(ModuleDescriptor::)
-//    }
-//    private val scopedDependencies by lazy {
-//        allDependencies.filter { it.scope != null }
-//    }
+    private val allDependencies by lazy {
+        descriptor.modules.flatMap(ModuleDescriptor::dependencies)
+    }
+    private val scopedDependencies by lazy {
+        allDependencies.filter {
+            it.requestElement().map {
+                it.uniqueScope
+            }.isPresent
+        }
+    }
 
     val scopedKeys: Set<Key> by lazy {
-        scopedBindings.keys
+        val bindingKeys = scopedBindings.keys
+        val depKeys = scopedDependencies.map(Dependency::key)
+                .toSet()
+        bindingKeys + depKeys
     }
 
     override

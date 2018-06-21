@@ -282,8 +282,8 @@ class AppComponentGenerator(
 
                 val dependencies = descriptors
                         .flatMap { it.modules }
-                        .flatMap { it.bindings() }
-                        .groupBy { it.key() }
+                        .flatMap { it.dependencies }
+                        .groupBy { it.key }
                         .mapValues { it.value.first() }
                         .values
                 val dependencyMethods = dependencies.map { dep ->
