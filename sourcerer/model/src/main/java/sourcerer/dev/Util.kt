@@ -44,6 +44,7 @@ fun <reified E> immutableSet(init: ImmutableSet.Builder<E>.() -> Unit): Immutabl
     return builder.build()
 }
 
+internal
 fun SourcererElements.abstractMethods(
     typeElement: TypeElement
 ) = methodsIn(getAllMembers(typeElement))

@@ -27,7 +27,6 @@ import sourcerer.ProcessStep
 import sourcerer.SourcererOutput
 import sourcerer.StoredFile
 import sourcerer.getResources
-import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootstrapComponent
 import sourcerer.io.Reader
 import sourcerer.io.Writer
@@ -38,7 +37,8 @@ import java.net.URL
 import javax.inject.Inject
 
 class ComponentStep
-@Inject constructor(
+@Inject internal
+constructor(
     val componentFactory: ComponentDescriptor.Factory,
     val componentOutputFactory: ComponentOutput.Factory,
     val appComponentStep: AppComponentStep,
@@ -53,22 +53,6 @@ class ComponentStep
     fun supportedOptions(): Iterable<Option> = Option.values()
             .toSet()
 
-    /*
-    override
-    fun Env.process(
-        annotationElements: AnnotationElements
-    ): Map<AnnotationType, List<Output>> {
-        val map = HashMap<AnnotationType, List<Output>>()
-        map[BootstrapComponent::class] = annotationElements.typeInputs<BootstrapComponent>()
-                .map(componentFactory::forComponent)
-                .let(bootstrapComponentStep::process)
-        map[ApplicationComponent::class] = annotationElements.typeInputs<ApplicationComponent>()
-                .map(componentFactory::forComponent)
-                .let(appComponentStep::process)
-        return map
-    }
-     */
-
     override
     fun Env.process(
         annotationElements: AnnotationElements
@@ -79,7 +63,6 @@ class ComponentStep
                 .map(componentOutputFactory::create)
         val generatedOutputs = generatedComponents.flatMap(ComponentOutput::outputs)
         val sourcererOutput = sourcerer.output(generatedComponents)
-        map[BootstrapComponent::class] = generatedOutputs + sourcererOutput
 
         val storedComponents = sourcerer.storedOutputs()
                 .map(componentFactory::forStoredComponent)
@@ -87,8 +70,10 @@ class ComponentStep
         log("storedComponents = $storedComponents")
 
         val appComponent = appComponentStep.process(generatedComponents, storedComponents)
-        map[ApplicationComponent::class] = appComponent.flatMap(AppComponentStep.Output::outputs)
+        val appComponentOutputs = appComponent.flatMap(AppComponentStep.Output::outputs)
 
+        // outputs
+        map[BootstrapComponent::class] = generatedOutputs + sourcererOutput + appComponentOutputs
         return map
     }
 
@@ -103,6 +88,7 @@ class ComponentStep
         );
     }
 
+    internal
     class BootstrapSourcerer
     @Inject constructor(
         val env: ProcessingEnv,
@@ -158,6 +144,7 @@ class ComponentStep
                 .mapNotNull { it as? ClassName }
     }
 
+    internal
     class SrcOutput(
         private val bootstrap: BootstrapSourcerer,
         private val typeNames: List<TypeName>

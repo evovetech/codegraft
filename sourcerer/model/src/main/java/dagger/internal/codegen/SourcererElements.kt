@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package sourcerer.dev
+package dagger.internal.codegen
 
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoSet
-import sourcerer.ProcessStep
+import javax.inject.Inject
+import javax.lang.model.element.TypeElement
+import javax.lang.model.util.Elements
 
-@Module(includes = [EnvModule::class])
-internal
-interface BootstrapProcessStepsModule {
-    @Binds @IntoSet
-    fun provideComponentStep(step: ComponentStep): ProcessStep
+internal class SourcererElements
+@Inject constructor(
+    val elements: DaggerElements,
+    val types: DaggerTypes
+) : Elements by elements {
+    fun getUnimplementedMethods(type: TypeElement) =
+        elements.getUnimplementedMethods(type)
+
+    fun getTypeElement(clazz: Class<*>) =
+        elements.getTypeElement(clazz)
+
+    fun checkTypePresent(typeName: String) =
+        elements.checkTypePresent(typeName)
 }
+

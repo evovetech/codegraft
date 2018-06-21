@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables.getOnlyElement
 import com.squareup.javapoet.ClassName
 import sourcerer.AnnotatedTypeElement
-import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootstrapComponent
 import sourcerer.qualifiedName
 import java.util.EnumSet
@@ -38,7 +37,6 @@ data
 class ComponentDescriptor(
     val definitionType: TypeElement,
     val annotationMirror: AnnotationMirror,
-    val dependencies: ImmutableList<ComponentDescriptor>,
     val modules: ImmutableList<ModuleDescriptor>,
     val applicationModules: ImmutableList<ModuleDescriptor>
 ) {
@@ -56,17 +54,7 @@ class ComponentDescriptor(
             BOOTSTRAP_DEPENDENCIES_ATTRIBUTE,
             BOOTSTRAP_MODULES_ATTRIBUTE,
             true
-        ),
-        Application(
-            ApplicationComponent::class,
-            ApplicationComponent.Builder::class,
-            DEPENDENCIES_ATTRIBUTE,
-            MODULES_ATTRIBUTE,
-            false
         );
-
-        val AnnotationMirror.dependencies: ImmutableList<TypeMirror>
-            get() = getTypeListValue(dependenciesAttribute)
 
         val AnnotationMirror.modules: ImmutableList<TypeMirror>
             get() = getTypeListValue(modulesAttribute)
@@ -122,6 +110,7 @@ class ComponentDescriptor(
         }
     }
 
+    internal
     class Factory
     @Inject constructor(
         val elements: SourcererElements,
@@ -154,10 +143,6 @@ class ComponentDescriptor(
         ): ComponentDescriptor {
             val declaredComponentType = MoreTypes.asDeclared(componentDefinitionType.asType())
             val componentMirror = getAnnotationMirror(componentDefinitionType, annotationType.java).get()
-            val dependencies = componentMirror.dependencies
-                    .map(MoreTypes::asTypeElement)
-                    .map(this@Factory::forComponent)
-                    .toImmutableList()
             val modules = componentMirror.modules
                     .map(MoreTypes::asTypeElement)
                     .map(moduleFactory::create)
@@ -166,10 +151,14 @@ class ComponentDescriptor(
                     .map(MoreTypes::asTypeElement)
                     .map(moduleFactory::create)
                     .toImmutableList()
+
+            val unimplementedMethods = elements.getUnimplementedMethods(componentDefinitionType)
+            unimplementedMethods.map { componentMethod ->
+                val resolvedMethod = MoreTypes.asExecutable(types.asMemberOf(declaredComponentType, componentMethod));
+            }
             return ComponentDescriptor(
                 componentDefinitionType,
                 componentMirror,
-                dependencies,
                 modules,
                 applicationModules
             )

@@ -35,16 +35,7 @@ import javax.inject.Inject
 import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.Modifier.PUBLIC
 
-/*
-@Module(includes = [Crashes::class])
-interface CrashesComponent_Module {
-    @Binds
-    fun bindCrashesComponent(
-        implementation: CrashesComponent_Implementation
-    ): CrashesComponent
-}
-*/
-
+internal
 class ComponentModuleGenerator(
     private val env: Env,
     private val types: SourcererTypes,

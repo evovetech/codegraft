@@ -19,6 +19,7 @@ package sourcerer.dev
 import sourcerer.codegen.AppComponentGenerator
 import javax.inject.Inject
 
+internal
 class AppComponentStep
 @Inject constructor(
     val factory: AppComponentGenerator.Factory

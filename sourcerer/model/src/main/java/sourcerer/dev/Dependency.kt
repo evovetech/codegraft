@@ -18,8 +18,12 @@ package sourcerer.dev
 
 import com.google.common.base.Preconditions.checkState
 import com.google.common.collect.ImmutableSet
+import dagger.Lazy
 import dagger.model.Scope
+import dagger.producers.Produced
+import dagger.producers.Producer
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.VariableElement
@@ -32,6 +36,7 @@ class Dependency(
     val scope: Scope? = null
 ) : Keyed {
 
+    internal
     class Factory
     @Inject constructor(
         val types: SourcererTypes,
@@ -73,4 +78,40 @@ class Dependency(
             scope = scope
         )
     }
+}
+
+/**
+ * Represents the different kinds of [types][javax.lang.model.type.TypeMirror] that may be
+ * requested as dependencies for the same key. For example, `String`, `Provider<String>`, and `Lazy<String>` can all be requested if a key exists for `String`; they have the [.INSTANCE], [.PROVIDER], and [.LAZY] request kinds,
+ * respectively.
+ */
+enum class RequestKind {
+    /** A default request for an instance. E.g.: `FooType`  */
+    INSTANCE,
+
+    /** A request for a [Provider]. E.g.: `Provider<FooType>`  */
+    PROVIDER,
+
+    /** A request for a [Lazy]. E.g.: `Lazy<FooType>`  */
+    LAZY,
+
+    /** A request for a [Provider] of a [Lazy]. E.g.: `Provider<Lazy<FooType>>`  */
+    PROVIDER_OF_LAZY,
+
+    /**
+     * A request for a members injection. E.g. `void inject(FooType);`. Can only be requested by
+     * component interfaces.
+     */
+    MEMBERS_INJECTION,
+
+    /** A request for a [Producer]. E.g.: `Producer<FooType>`  */
+    PRODUCER,
+
+    /** A request for a [Produced]. E.g.: `Produced<FooType>`  */
+    PRODUCED,
+
+    /**
+     * A request for a [com.google.common.util.concurrent.ListenableFuture]. E.g.: `ListenableFuture<FooType>`. These can only be requested by component interfaces.
+     */
+    FUTURE
 }

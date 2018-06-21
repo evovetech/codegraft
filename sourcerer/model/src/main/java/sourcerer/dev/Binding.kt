@@ -27,19 +27,6 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.util.SimpleElementVisitor6
 
-interface BindDec {
-    val key: Key
-    val dependencies: ImmutableSet<Dependency>
-    val bindingElement: Element?
-    val contributionModule: TypeElement?
-    val bindingTypeElement: TypeElement?
-        get() = bindingElement?.accept<TypeElement, Void>(ENCLOSING_TYPE_ELEMENT, null)
-}
-
-interface Keyed {
-    val key: Key
-}
-
 /** An object that declares or specifies a binding.  */
 data
 class Binding(
@@ -53,6 +40,7 @@ class Binding(
         bindingElement?.accept<TypeElement, Void>(ENCLOSING_TYPE_ELEMENT, null)
     }
 
+    internal
     class Factory
     @Inject constructor(
         val types: SourcererTypes,

@@ -66,6 +66,7 @@ class Key(
         } ?: typeQualifiedName
     }
 
+    internal
     class Factory
     @Inject constructor(
         val types: SourcererTypes

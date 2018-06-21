@@ -40,6 +40,7 @@ class ModuleDescriptor(
                 .toImmutableSet()
     }
 
+    internal
     class Factory
     @Inject constructor(
         val elements: Elements,

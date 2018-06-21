@@ -49,6 +49,7 @@ import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
 
+internal
 class AppComponentGenerator(
     generatedComponents: List<ComponentOutput>,
     storedComponents: List<ComponentOutput>,

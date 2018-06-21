@@ -47,6 +47,7 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 import kotlin.reflect.KClass
 
+internal
 class ComponentImplementationGenerator(
     private val env: Env,
     private val types: SourcererTypes,
@@ -73,12 +74,6 @@ class ComponentImplementationGenerator(
                 .map { Method.parse(types, it).apply { write(constructorBuilder) } }
         val constructor = constructorBuilder.build()
                 .apply { addMethod(this) }
-//        addAnnotation(ClassName.get(ApplicationComponent::class.java).toKlass()) {
-//            descriptor.applicationModules
-//                    .map(ModuleDescriptor::definitionType)
-//                    .mapNotNull(ClassName::get)
-//                    .forEach(addTo("modules"))
-//        }
     }
 
     class Method

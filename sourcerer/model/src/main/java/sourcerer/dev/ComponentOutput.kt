@@ -23,13 +23,14 @@ import sourcerer.codegen.ComponentModuleGenerator
 import javax.annotation.processing.FilerException
 import javax.inject.Inject
 
-data
+internal data
 class ComponentOutput(
     val descriptor: ComponentDescriptor,
     val implementation: ComponentImplementationGenerator,
     val module: ComponentModuleGenerator,
     val bootData: ComponentBootDataGenerator
 ) {
+
     class Factory
     @Inject constructor(
         private val componentImplementationFactory: ComponentImplementationGenerator.Factory,

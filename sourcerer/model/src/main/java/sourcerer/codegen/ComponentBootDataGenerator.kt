@@ -39,6 +39,7 @@ val Collection<Keyed>.keys: Set<Key>
     get() = map(Keyed::key)
             .toSet()
 
+internal
 class ComponentBootDataGenerator(
     private val env: Env,
     private val types: SourcererTypes,

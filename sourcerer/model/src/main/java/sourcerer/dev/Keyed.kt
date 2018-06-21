@@ -16,14 +16,6 @@
 
 package sourcerer.dev
 
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoSet
-import sourcerer.ProcessStep
-
-@Module(includes = [EnvModule::class])
-internal
-interface BootstrapProcessStepsModule {
-    @Binds @IntoSet
-    fun provideComponentStep(step: ComponentStep): ProcessStep
+interface Keyed {
+    val key: Key
 }
