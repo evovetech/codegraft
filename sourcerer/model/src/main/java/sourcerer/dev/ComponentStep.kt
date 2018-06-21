@@ -16,13 +16,17 @@
 
 package sourcerer.dev
 
+import com.squareup.javapoet.ClassName
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
 import sourcerer.Env
 import sourcerer.Output
 import sourcerer.ProcessStep
+import sourcerer.SourcererOutput
 import sourcerer.inject.ApplicationComponent
 import sourcerer.inject.BootstrapComponent
+import sourcerer.io.Writer
+import sourcerer.metaFile
 import sourcerer.typeInputs
 import javax.inject.Inject
 
@@ -65,7 +69,10 @@ class ComponentStep
         val bootstrapComponents = annotationElements.typeInputs<BootstrapComponent>()
                 .map(componentFactory::forComponent)
                 .let(bootstrapComponentStep::process)
-        map[BootstrapComponent::class] = bootstrapComponents.flatMap(BootstrapComponentStep.Output::outputs)
+        val bootstrapOutputs = bootstrapComponents.flatMap(BootstrapComponentStep.Output::outputs)
+        val srcrOutput = bootstrapComponents.map { it.component.descriptor }
+                .let { SrcrOutput(it) }
+        map[BootstrapComponent::class] = bootstrapOutputs + srcrOutput
 
         val appComponent = appComponentStep.process(bootstrapComponents)
         map[ApplicationComponent::class] = appComponent.flatMap(AppComponentStep.Output::outputs)
@@ -82,5 +89,22 @@ class ComponentStep
             "evovetech.processor.package",
             "evovetech.processor"
         );
+    }
+
+    class SrcrOutput(
+        bootstrapComponents: List<ComponentDescriptor>
+    ) : SourcererOutput() {
+        private val file = ClassName.get(BootstrapComponent::class.java).metaFile
+        private val classes = bootstrapComponents.map {
+            ClassName.get(it.definitionType)
+        }
+
+        override
+        fun file() = file
+
+        override
+        fun write(writer: Writer) {
+            writer.writeTypeNames(classes)
+        }
     }
 }
