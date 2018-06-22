@@ -24,11 +24,11 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
+import dagger.internal.codegen.ComponentImplementationGenerator.Method.Kind.MembersInjector
+import dagger.internal.codegen.ComponentImplementationGenerator.Method.Kind.Provider
 import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.classBuilder
-import dagger.internal.codegen.ComponentImplementationGenerator.Method.Kind.MembersInjector
-import dagger.internal.codegen.ComponentImplementationGenerator.Method.Kind.Provider
 import sourcerer.typeSpec
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -66,7 +66,7 @@ class ComponentImplementationGenerator(
         val constructorBuilder = MethodSpec.constructorBuilder()
                 .addAnnotation(Inject::class.java)
         val methods = elements.abstractMethods(descriptor.definitionType)
-                .map { Method.parse(types, it).apply { write(constructorBuilder) } }
+                .map { Method.parse(types, elements, it).apply { write(constructorBuilder) } }
         val constructor = constructorBuilder.build()
                 .apply { addMethod(this) }
     }
@@ -75,6 +75,7 @@ class ComponentImplementationGenerator(
     private constructor(
         val kind: Kind,
         val types: SourcererTypes,
+        val elements: SourcererElements,
         method: ExecutableElement
     ) : ExecutableElement by method {
         val element: Element = when (kind) {
@@ -94,7 +95,7 @@ class ComponentImplementationGenerator(
         }
         val qualifier = element.qualifier
         val fieldName = kind.fieldName(name)
-        val fieldType = kind.wrap(types, type)
+        val fieldType = kind.wrap(types, elements, type)
 
         private
         fun TypeSpec.Builder.addFieldSpec(): FieldSpec =
@@ -128,8 +129,9 @@ class ComponentImplementationGenerator(
 
             fun wrap(
                 types: SourcererTypes,
+                elements: SourcererElements,
                 typeMirror: TypeMirror
-            ): DeclaredType = types.elements
+            ): DeclaredType = elements
                     .getTypeElement(wrapperType.java.canonicalName)
                     .let { types.getDeclaredType(it, typeMirror) }
 
@@ -152,13 +154,14 @@ class ComponentImplementationGenerator(
             @JvmStatic
             fun parse(
                 types: SourcererTypes,
+                elements: SourcererElements,
                 method: ExecutableElement
             ): Method {
                 val kind = when (method.parameters.size) {
                     0 -> Kind.Provider
                     else -> MembersInjector
                 }
-                return Method(kind, types, method)
+                return Method(kind, types, elements, method)
             }
         }
     }
