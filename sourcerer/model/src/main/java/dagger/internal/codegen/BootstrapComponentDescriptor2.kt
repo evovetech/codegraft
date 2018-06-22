@@ -20,7 +20,6 @@ import com.google.auto.common.MoreElements
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.auto.common.MoreTypes
 import com.google.auto.value.AutoValue
-import com.google.auto.value.extension.memoized.Memoized
 import com.google.common.base.Preconditions.checkArgument
 import com.google.common.base.Verify.verify
 import com.google.common.collect.FluentIterable
@@ -161,172 +160,178 @@ class BootstrapComponentDescriptor2 {
         }
     }
 
-    internal abstract
-    fun kind(): Kind
+    abstract
+    val kind: Kind
 
-    internal abstract
-    fun componentAnnotation(): AnnotationMirror
+    abstract
+    val componentAnnotation: AnnotationMirror
 
     /**
      * The type (interface or abstract class) that defines the component. This is the element to which
      * the [Component] annotation was applied.
      */
-    internal abstract
-    fun componentDefinitionType(): TypeElement
+    abstract
+    val componentDefinitionType: TypeElement
 
     /**
      * The set of [modules][ModuleDescriptor] declared directly in [Component.modules].
      * Use [.transitiveModules] to get the full set of modules available upon traversing
      * [Module.includes].
      */
-    internal abstract
-    fun bootstrapModules(): Modules
+    abstract
+    val modules: Modules
 
-    internal abstract
-    fun applicationModules(): Modules
+    abstract
+    val applicationModules: Modules?
 
     /**
      * The scopes of the component.
      */
-    internal abstract
-    fun scopes(): ImmutableSet<Scope>
+    abstract
+    val scopes: ImmutableSet<Scope>
 
     /**
      * All [Subcomponent]s which are direct children of this component. This includes
      * subcomponents installed from [Module.subcomponents] as well as subcomponent [ ][.subcomponentsByFactoryMethod] and [ ][.subcomponentsByBuilderMethod].
      */
-    fun subcomponents(): ImmutableSet<BootstrapComponentDescriptor2> {
-        return ImmutableSet.builder<BootstrapComponentDescriptor2>()
-                .addAll(subcomponentsByFactoryMethod().values)
-                .addAll(subcomponentsByBuilderMethod().values)
-                .addAll(subcomponentsFromModules())
+    val subcomponents: ImmutableSet<BootstrapComponentDescriptor2>
+        get() = ImmutableSet.builder<BootstrapComponentDescriptor2>()
+                .addAll(subcomponentsByFactoryMethod.values)
+                .addAll(subcomponentsByBuilderMethod.values)
+                .addAll(subcomponentsFromModules)
                 .build()
-    }
 
     /**
      * All [direct child][Subcomponent] components that are declared by a [ ][Module.subcomponents].
      */
-    internal abstract
-    fun subcomponentsFromModules(): ImmutableSet<BootstrapComponentDescriptor2>
+    abstract
+    val subcomponentsFromModules: ImmutableSet<BootstrapComponentDescriptor2>
 
     /**
      * All [direct child][Subcomponent] components that are declared by a subcomponent
      * factory method.
      */
-    internal abstract
-    fun subcomponentsByFactoryMethod(): ImmutableBiMap<ComponentMethodDescriptor, BootstrapComponentDescriptor2>
+    abstract
+    val subcomponentsByFactoryMethod: ImmutableBiMap<ComponentMethodDescriptor, BootstrapComponentDescriptor2>
 
     /**
      * All [direct child][Subcomponent] components that are declared by a subcomponent
      * builder method.
      */
-    internal abstract
-    fun subcomponentsByBuilderMethod(): ImmutableBiMap<ComponentMethodDescriptor, BootstrapComponentDescriptor2>
+    abstract
+    val subcomponentsByBuilderMethod: ImmutableBiMap<ComponentMethodDescriptor, BootstrapComponentDescriptor2>
 
     /**
      * All [direct child][Subcomponent] components that are declared by an entry point
      * method. This is equivalent to the set of values from [.subcomponentsByFactoryMethod]
      * and [.subcomponentsByBuilderMethod].
      */
-    fun subcomponentsFromEntryPoints(): ImmutableSet<BootstrapComponentDescriptor2> {
-        return ImmutableSet.builder<BootstrapComponentDescriptor2>()
-                .addAll(subcomponentsByFactoryMethod().values)
-                .addAll(subcomponentsByBuilderMethod().values)
+    val subcomponentsFromEntryPoints: ImmutableSet<BootstrapComponentDescriptor2>
+        get() = ImmutableSet.builder<BootstrapComponentDescriptor2>()
+                .addAll(subcomponentsByFactoryMethod.values)
+                .addAll(subcomponentsByBuilderMethod.values)
                 .build()
-    }
 
-    @Memoized open
-    fun subcomponentsByBuilderType(): ImmutableBiMap<TypeElement, BootstrapComponentDescriptor2> {
+    val subcomponentsByBuilderType: ImmutableBiMap<TypeElement, BootstrapComponentDescriptor2> by lazy {
         val subcomponentsByBuilderType = ImmutableBiMap.builder<TypeElement, BootstrapComponentDescriptor2>()
-        for (subcomponent in subcomponents()) {
-            if (subcomponent.builderSpec().isPresent) {
+        for (subcomponent in subcomponents) {
+            if (subcomponent.builderSpec.isPresent) {
                 subcomponentsByBuilderType.put(
-                    subcomponent.builderSpec().get().builderDefinitionType(), subcomponent
+                    subcomponent.builderSpec.get().builderDefinitionType(), subcomponent
                 )
             }
         }
-        return subcomponentsByBuilderType.build()
+        subcomponentsByBuilderType.build()
     }
 
-    internal abstract
-    fun componentMethods(): ImmutableSet<ComponentMethodDescriptor>
+    abstract
+    val componentMethods: ImmutableSet<ComponentMethodDescriptor>
 
     /**
      * The entry point methods on the component type.
      */
-    fun entryPointMethods(): ImmutableSet<ComponentMethodDescriptor> {
-        return componentMethods()
-                .filter { method -> method.dependencyRequest().isPresent }
+    val entryPointMethods: ImmutableSet<ComponentMethodDescriptor>
+        get() = componentMethods
+                .filter { method -> method.dependencyRequest.isPresent }
                 .toImmutableSet()
-    }
 
     // TODO(gak): Consider making this non-optional and revising the
     // interaction between the spec & generation
     internal abstract
-    fun builderSpec(): Optional<BuilderSpec>
+    val builderSpec: Optional<BuilderSpec>
 
     /**
      * For [@Component][Component]s, all [@CanReleaseReferences][CanReleaseReferences]
      * scopes associated with this component or any subcomponent. Otherwise empty.
      */
-    fun releasableReferencesScopes(): ImmutableSet<Scope> = if (kind() == BOOTSTRAP_COMPONENT) {
-        FluentIterable.from(SUBCOMPONENT_TRAVERSER.breadthFirst(this))
-                .transformAndConcat { it?.scopes() }
-                .filterNotNull()
-                .filter { it.canReleaseReferences() }
-                .toImmutableSet()
-    } else {
-        ImmutableSet.of()
-    }
+    val releasableReferencesScopes: ImmutableSet<Scope>
+        get() = if (kind == BOOTSTRAP_COMPONENT) {
+            FluentIterable.from(SUBCOMPONENT_TRAVERSER.breadthFirst(this))
+                    .transformAndConcat { it?.scopes }
+                    .filterNotNull()
+                    .filter { it.canReleaseReferences() }
+                    .toImmutableSet()
+        } else {
+            ImmutableSet.of()
+        }
 
     /**
      * A function that returns all [.scopes] of its input.
      */
     @AutoValue
-    internal abstract class ComponentMethodDescriptor {
-        internal abstract fun kind(): ComponentMethodKind
-        internal abstract fun dependencyRequest(): Optional<DependencyRequest>
-        internal abstract fun methodElement(): ExecutableElement
+    abstract
+    class ComponentMethodDescriptor {
+        abstract val kind: ComponentMethodKind
+        abstract val dependencyRequest: Optional<DependencyRequest>
+        abstract val methodElement: ExecutableElement
 
         companion object {
-
             fun create(
                 kind: ComponentMethodKind,
                 dependencyRequest: Optional<DependencyRequest>,
                 methodElement: ExecutableElement
-            ): ComponentMethodDescriptor {
-                return AutoValue_BootstrapComponentDescriptor2_ComponentMethodDescriptor(
-                    kind, dependencyRequest, methodElement
-                )
-            }
+            ): ComponentMethodDescriptor = AutoValue_BootstrapComponentDescriptor2_ComponentMethodDescriptor(
+                kind,
+                dependencyRequest,
+                methodElement
+            )
 
             fun forProvision(
-                methodElement: ExecutableElement, dependencyRequest: DependencyRequest
-            ): ComponentMethodDescriptor {
-                return create(ComponentMethodKind.PROVISION, Optional.of(dependencyRequest), methodElement)
-            }
+                methodElement: ExecutableElement,
+                dependencyRequest: DependencyRequest
+            ): ComponentMethodDescriptor = create(
+                ComponentMethodKind.PROVISION,
+                Optional.of(dependencyRequest),
+                methodElement
+            )
 
             fun forMembersInjection(
-                methodElement: ExecutableElement, dependencyRequest: DependencyRequest
-            ): ComponentMethodDescriptor {
-                return create(
-                    ComponentMethodKind.MEMBERS_INJECTION, Optional.of(dependencyRequest), methodElement
-                )
-            }
+                methodElement: ExecutableElement,
+                dependencyRequest: DependencyRequest
+            ): ComponentMethodDescriptor = create(
+                ComponentMethodKind.MEMBERS_INJECTION,
+                Optional.of(dependencyRequest),
+                methodElement
+            )
 
             fun forSubcomponent(
-                kind: ComponentMethodKind, methodElement: ExecutableElement
-            ): ComponentMethodDescriptor {
-                return create(kind, Optional.empty(), methodElement)
-            }
+                kind: ComponentMethodKind,
+                methodElement: ExecutableElement
+            ): ComponentMethodDescriptor = create(
+                kind,
+                Optional.empty(),
+                methodElement
+            )
 
             fun forSubcomponentBuilder(
                 kind: ComponentMethodKind,
                 dependencyRequestForBuilder: DependencyRequest,
                 methodElement: ExecutableElement
-            ): ComponentMethodDescriptor {
-                return create(kind, Optional.of(dependencyRequestForBuilder), methodElement)
-            }
+            ): ComponentMethodDescriptor = create(
+                kind,
+                Optional.of(dependencyRequestForBuilder),
+                methodElement
+            )
         }
     }
 
@@ -400,7 +405,7 @@ class BootstrapComponentDescriptor2 {
             val modules = modulesFactory.create(componentMirror, kind.modulesAttribute)
             val applicationModules = when (kind) {
                 BOOTSTRAP_COMPONENT -> modulesFactory.create(componentMirror, APPLICATION_MODULES_ATTRIBUTE)
-                else -> Modules()
+                else -> null
             }
             val subcomponentsFromModules = modules.transitiveModules
                     .flatMap(ModuleDescriptor::subcomponentDeclarations)
@@ -425,12 +430,12 @@ class BootstrapComponentDescriptor2 {
                 val componentMethodDescriptor =
                     getDescriptorForComponentMethod(componentDefinitionType, kind, componentMethod)
                 componentMethodsBuilder.add(componentMethodDescriptor)
-                when (componentMethodDescriptor.kind()) {
+                when (componentMethodDescriptor.kind) {
                     BootstrapComponentDescriptor2.ComponentMethodKind.SUBCOMPONENT -> subcomponentsByFactoryMethod.put(
                         componentMethodDescriptor,
                         create(
                             MoreElements.asType(MoreTypes.asElement(resolvedMethod.returnType)),
-                            componentMethodDescriptor.kind().componentKind(),
+                            componentMethodDescriptor.kind.componentKind(),
                             Optional.of(kind)
                         )
                     )
@@ -438,7 +443,7 @@ class BootstrapComponentDescriptor2 {
                         componentMethodDescriptor,
                         create(
                             MoreElements.asType(MoreTypes.asElement(resolvedMethod.returnType).enclosingElement),
-                            componentMethodDescriptor.kind().componentKind(),
+                            componentMethodDescriptor.kind.componentKind(),
                             Optional.of(kind)
                         )
                     )
@@ -455,13 +460,14 @@ class BootstrapComponentDescriptor2 {
             }
             val builderType = Optional.ofNullable(getOnlyElement(enclosedBuilders, null))
             val builderSpec = createBuilderSpec(builderType)
+            val scopes = scopesOf(componentDefinitionType)
             return AutoValue_BootstrapComponentDescriptor2(
                 kind,
                 componentMirror,
                 componentDefinitionType,
                 modules,
                 applicationModules,
-                scopesOf(componentDefinitionType),
+                scopes,
                 subcomponentsFromModules,
                 subcomponentsByFactoryMethod.build(),
                 subcomponentsByBuilderMethod.build(),
@@ -510,7 +516,8 @@ class BootstrapComponentDescriptor2 {
             }
 
             // a typical provision method
-            if (componentMethod.parameters.isEmpty() && componentMethod.returnType.kind != VOID) {
+            if (componentMethod.parameters.isEmpty()
+                && componentMethod.returnType.kind != VOID) {
                 when (componentKind) {
                     BOOTSTRAP_COMPONENT,
                     SUBCOMPONENT -> return ComponentMethodDescriptor.forProvision(
@@ -573,8 +580,10 @@ class BootstrapComponentDescriptor2 {
             )
         }
 
-        private fun requirementForBuilderMethod(
-            method: ExecutableElement, resolvedType: ExecutableType
+        private
+        fun requirementForBuilderMethod(
+            method: ExecutableElement,
+            resolvedType: ExecutableType
         ): ComponentRequirement {
             checkArgument(method.parameters.size == 1)
             if (isAnnotationPresent(method, BindsInstance::class.java)) {
@@ -590,16 +599,17 @@ class BootstrapComponentDescriptor2 {
             }
 
             val type = getOnlyElement(resolvedType.parameterTypes)
-            return if (ConfigurationAnnotations.getModuleAnnotation(MoreTypes.asTypeElement(type)).isPresent)
+            return if (ConfigurationAnnotations.getModuleAnnotation(MoreTypes.asTypeElement(type)).isPresent) {
                 ComponentRequirement.forModule(type)
-            else
+            } else {
                 ComponentRequirement.forDependency(type)
+            }
         }
     }
 
     data
     class Modules(
-        val modules: ImmutableSet<ModuleDescriptor> = ImmutableSet.of()
+        val modules: ImmutableSet<ModuleDescriptor>
     ) : Set<ModuleDescriptor> by modules {
         val transitiveModules = transitiveModules(modules)
         val transitiveModuleTypes: ImmutableSet<TypeElement>
