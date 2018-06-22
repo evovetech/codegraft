@@ -16,38 +16,29 @@
 
 package dagger.internal.codegen
 
-import com.google.auto.common.MoreElements
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.auto.common.MoreTypes
 import com.google.auto.value.AutoValue
 import com.google.common.base.Preconditions.checkArgument
 import com.google.common.base.Verify.verify
 import com.google.common.collect.FluentIterable
-import com.google.common.collect.ImmutableBiMap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Iterables.getOnlyElement
 import com.google.common.collect.Sets.immutableEnumSet
-import com.google.common.graph.Traverser
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Lazy
 import dagger.Module
-import dagger.Subcomponent
 import dagger.internal.codegen.BootstrapComponentDescriptor2.Kind.BOOTSTRAP_COMPONENT
-import dagger.internal.codegen.BootstrapComponentDescriptor2.Kind.SUBCOMPONENT
 import dagger.internal.codegen.ConfigurationAnnotations.enclosedBuilders
-import dagger.internal.codegen.ConfigurationAnnotations.isSubcomponent
-import dagger.internal.codegen.ConfigurationAnnotations.isSubcomponentBuilder
 import dagger.internal.codegen.DaggerElements.getAnnotationMirror
-import dagger.internal.codegen.InjectionAnnotations.getQualifier
 import dagger.internal.codegen.ModuleDescriptor.Kind.MODULE
 import dagger.internal.codegen.MoreAnnotationMirrors.getTypeListValue
 import dagger.internal.codegen.Scopes.scopesOf
 import dagger.model.DependencyRequest
 import dagger.model.Scope
 import dagger.producers.ProductionComponent
-import dagger.releasablereferences.CanReleaseReferences
 import sourcerer.inject.BootstrapComponent
 import java.util.EnumSet
 import java.util.LinkedHashSet
@@ -84,12 +75,6 @@ class BootstrapComponentDescriptor2 {
             BootstrapComponent.Builder::class,
             BOOTSTRAP_MODULES_ATTRIBUTE,
             true
-        ),
-        SUBCOMPONENT(
-            Subcomponent::class,
-            Subcomponent.Builder::class,
-            MODULES_ATTRIBUTE,
-            false
         );
 
         fun annotationType(): Class<out Annotation> {
@@ -101,19 +86,9 @@ class BootstrapComponentDescriptor2 {
         }
 
         fun moduleKinds(): ImmutableSet<ModuleDescriptor.Kind> = when (this) {
-            BOOTSTRAP_COMPONENT,
-            SUBCOMPONENT -> immutableEnumSet(
+            BOOTSTRAP_COMPONENT -> immutableEnumSet(
                 MODULE
             )
-        }
-
-        fun subcomponentKinds(): ImmutableSet<Kind> {
-            return when (this) {
-                BOOTSTRAP_COMPONENT,
-                SUBCOMPONENT -> ImmutableSet.of(
-                    SUBCOMPONENT
-                )
-            }
         }
 
         companion object {
@@ -190,60 +165,6 @@ class BootstrapComponentDescriptor2 {
     abstract
     val scopes: ImmutableSet<Scope>
 
-    /**
-     * All [Subcomponent]s which are direct children of this component. This includes
-     * subcomponents installed from [Module.subcomponents] as well as subcomponent [ ][.subcomponentsByFactoryMethod] and [ ][.subcomponentsByBuilderMethod].
-     */
-    val subcomponents: ImmutableSet<BootstrapComponentDescriptor2>
-        get() = ImmutableSet.builder<BootstrapComponentDescriptor2>()
-                .addAll(subcomponentsByFactoryMethod.values)
-                .addAll(subcomponentsByBuilderMethod.values)
-                .addAll(subcomponentsFromModules)
-                .build()
-
-    /**
-     * All [direct child][Subcomponent] components that are declared by a [ ][Module.subcomponents].
-     */
-    abstract
-    val subcomponentsFromModules: ImmutableSet<BootstrapComponentDescriptor2>
-
-    /**
-     * All [direct child][Subcomponent] components that are declared by a subcomponent
-     * factory method.
-     */
-    abstract
-    val subcomponentsByFactoryMethod: ImmutableBiMap<ComponentMethodDescriptor, BootstrapComponentDescriptor2>
-
-    /**
-     * All [direct child][Subcomponent] components that are declared by a subcomponent
-     * builder method.
-     */
-    abstract
-    val subcomponentsByBuilderMethod: ImmutableBiMap<ComponentMethodDescriptor, BootstrapComponentDescriptor2>
-
-    /**
-     * All [direct child][Subcomponent] components that are declared by an entry point
-     * method. This is equivalent to the set of values from [.subcomponentsByFactoryMethod]
-     * and [.subcomponentsByBuilderMethod].
-     */
-    val subcomponentsFromEntryPoints: ImmutableSet<BootstrapComponentDescriptor2>
-        get() = ImmutableSet.builder<BootstrapComponentDescriptor2>()
-                .addAll(subcomponentsByFactoryMethod.values)
-                .addAll(subcomponentsByBuilderMethod.values)
-                .build()
-
-    val subcomponentsByBuilderType: ImmutableBiMap<TypeElement, BootstrapComponentDescriptor2> by lazy {
-        val subcomponentsByBuilderType = ImmutableBiMap.builder<TypeElement, BootstrapComponentDescriptor2>()
-        for (subcomponent in subcomponents) {
-            if (subcomponent.builderSpec.isPresent) {
-                subcomponentsByBuilderType.put(
-                    subcomponent.builderSpec.get().builderDefinitionType(), subcomponent
-                )
-            }
-        }
-        subcomponentsByBuilderType.build()
-    }
-
     abstract
     val componentMethods: ImmutableSet<ComponentMethodDescriptor>
 
@@ -257,23 +178,8 @@ class BootstrapComponentDescriptor2 {
 
     // TODO(gak): Consider making this non-optional and revising the
     // interaction between the spec & generation
-    internal abstract
+    abstract
     val builderSpec: Optional<BuilderSpec>
-
-    /**
-     * For [@Component][Component]s, all [@CanReleaseReferences][CanReleaseReferences]
-     * scopes associated with this component or any subcomponent. Otherwise empty.
-     */
-    val releasableReferencesScopes: ImmutableSet<Scope>
-        get() = if (kind == BOOTSTRAP_COMPONENT) {
-            FluentIterable.from(SUBCOMPONENT_TRAVERSER.breadthFirst(this))
-                    .transformAndConcat { it?.scopes }
-                    .filterNotNull()
-                    .filter { it.canReleaseReferences() }
-                    .toImmutableSet()
-        } else {
-            ImmutableSet.of()
-        }
 
     /**
      * A function that returns all [.scopes] of its input.
@@ -313,47 +219,12 @@ class BootstrapComponentDescriptor2 {
                 Optional.of(dependencyRequest),
                 methodElement
             )
-
-            fun forSubcomponent(
-                kind: ComponentMethodKind,
-                methodElement: ExecutableElement
-            ): ComponentMethodDescriptor = create(
-                kind,
-                Optional.empty(),
-                methodElement
-            )
-
-            fun forSubcomponentBuilder(
-                kind: ComponentMethodKind,
-                dependencyRequestForBuilder: DependencyRequest,
-                methodElement: ExecutableElement
-            ): ComponentMethodDescriptor = create(
-                kind,
-                Optional.of(dependencyRequestForBuilder),
-                methodElement
-            )
         }
     }
 
     internal enum class ComponentMethodKind {
         PROVISION,
-        PRODUCTION,
-        MEMBERS_INJECTION,
-        SUBCOMPONENT,
-        SUBCOMPONENT_BUILDER;
-
-        val isSubcomponentKind: Boolean
-            get() = this == SUBCOMPONENT
-
-        /**
-         * Returns the component kind associated with this component method, if it exists. Otherwise,
-         * throws.
-         */
-        fun componentKind(): Kind = when (this) {
-            SUBCOMPONENT,
-            SUBCOMPONENT_BUILDER -> Kind.SUBCOMPONENT
-            else -> throw IllegalStateException("no component associated with method " + this)
-        }
+        MEMBERS_INJECTION;
     }
 
     @AutoValue
@@ -400,59 +271,13 @@ class BootstrapComponentDescriptor2 {
             kind: Kind,
             parentKind: Optional<Kind>
         ): BootstrapComponentDescriptor2 {
-            val declaredComponentType = MoreTypes.asDeclared(componentDefinitionType.asType())
             val componentMirror = getAnnotationMirror(componentDefinitionType, kind.annotationType()).get()
             val modules = modulesFactory.create(componentMirror, kind.modulesAttribute)
-            val applicationModules = when (kind) {
-                BOOTSTRAP_COMPONENT -> modulesFactory.create(componentMirror, APPLICATION_MODULES_ATTRIBUTE)
-                else -> null
-            }
-            val subcomponentsFromModules = modules.transitiveModules
-                    .flatMap(ModuleDescriptor::subcomponentDeclarations)
-                    .map(SubcomponentDeclaration::subcomponentType)
-                    .map { subcomponent ->
-                        create(
-                            subcomponent,
-                            Kind.forAnnotatedElement(subcomponent).get(),
-                            Optional.of(kind)
-                        )
-                    }
-                    .toImmutableSet()
+            val applicationModules = modulesFactory.create(componentMirror, APPLICATION_MODULES_ATTRIBUTE)
             val unimplementedMethods = elements.getUnimplementedMethods(componentDefinitionType)
-            val componentMethodsBuilder = ImmutableSet.builder<ComponentMethodDescriptor>()
-
-            val subcomponentsByFactoryMethod =
-                ImmutableBiMap.builder<ComponentMethodDescriptor, BootstrapComponentDescriptor2>()
-            val subcomponentsByBuilderMethod =
-                ImmutableBiMap.builder<ComponentMethodDescriptor, BootstrapComponentDescriptor2>()
-            for (componentMethod in unimplementedMethods) {
-                val resolvedMethod = MoreTypes.asExecutable(types.asMemberOf(declaredComponentType, componentMethod))
-                val componentMethodDescriptor =
-                    getDescriptorForComponentMethod(componentDefinitionType, kind, componentMethod)
-                componentMethodsBuilder.add(componentMethodDescriptor)
-                when (componentMethodDescriptor.kind) {
-                    BootstrapComponentDescriptor2.ComponentMethodKind.SUBCOMPONENT -> subcomponentsByFactoryMethod.put(
-                        componentMethodDescriptor,
-                        create(
-                            MoreElements.asType(MoreTypes.asElement(resolvedMethod.returnType)),
-                            componentMethodDescriptor.kind.componentKind(),
-                            Optional.of(kind)
-                        )
-                    )
-                    BootstrapComponentDescriptor2.ComponentMethodKind.SUBCOMPONENT_BUILDER -> subcomponentsByBuilderMethod.put(
-                        componentMethodDescriptor,
-                        create(
-                            MoreElements.asType(MoreTypes.asElement(resolvedMethod.returnType).enclosingElement),
-                            componentMethodDescriptor.kind.componentKind(),
-                            Optional.of(kind)
-                        )
-                    )
-                    else -> {
-                        // nothing special to do for other methods.
-                    }
-                }
-            }
-
+            val componentMethods = unimplementedMethods.map { componentMethod ->
+                getDescriptorForComponentMethod(componentDefinitionType, kind, componentMethod)
+            }.toImmutableSet()
             val enclosedBuilders = if (kind.builderAnnotationType() == null) {
                 ImmutableList.of()
             } else {
@@ -468,10 +293,7 @@ class BootstrapComponentDescriptor2 {
                 modules,
                 applicationModules,
                 scopes,
-                subcomponentsFromModules,
-                subcomponentsByFactoryMethod.build(),
-                subcomponentsByBuilderMethod.build(),
-                componentMethodsBuilder.build(),
+                componentMethods,
                 builderSpec
             )
         }
@@ -495,23 +317,6 @@ class BootstrapComponentDescriptor2 {
                             resolvedComponentMethod
                         )
                     )
-                } else if (!getQualifier(componentMethod).isPresent) {
-                    val returnTypeElement = MoreTypes.asElement(returnType)
-                    if (isSubcomponent(returnTypeElement)) {
-                        return ComponentMethodDescriptor.forSubcomponent(
-                            ComponentMethodKind.SUBCOMPONENT,
-                            componentMethod
-                        )
-                    } else if (isSubcomponentBuilder(returnTypeElement)) {
-                        val dependencyRequest = dependencyRequestFactory.forComponentProvisionMethod(
-                            componentMethod, resolvedComponentMethod
-                        )
-                        return ComponentMethodDescriptor.forSubcomponentBuilder(
-                            ComponentMethodKind.SUBCOMPONENT_BUILDER,
-                            dependencyRequest,
-                            componentMethod
-                        )
-                    }
                 }
             }
 
@@ -519,8 +324,7 @@ class BootstrapComponentDescriptor2 {
             if (componentMethod.parameters.isEmpty()
                 && componentMethod.returnType.kind != VOID) {
                 when (componentKind) {
-                    BOOTSTRAP_COMPONENT,
-                    SUBCOMPONENT -> return ComponentMethodDescriptor.forProvision(
+                    BOOTSTRAP_COMPONENT -> return ComponentMethodDescriptor.forProvision(
                         componentMethod,
                         dependencyRequestFactory.forComponentProvisionMethod(
                             componentMethod,
@@ -654,13 +458,6 @@ class BootstrapComponentDescriptor2 {
                 }
             }
         }
-
-        /**
-         * [Traverser] for the subcomponent tree.
-         */
-        private val SUBCOMPONENT_TRAVERSER = Traverser.forTree<BootstrapComponentDescriptor2>(
-            BootstrapComponentDescriptor2::subcomponents
-        )
 
         /**
          * No-argument methods defined on [Object] that are ignored for contribution.
