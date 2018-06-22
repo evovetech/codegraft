@@ -35,6 +35,10 @@ import javax.lang.model.type.ExecutableType
 import javax.lang.model.type.TypeMirror
 import kotlin.reflect.KClass
 
+fun say() {
+    val c: BootstrapComponentDescriptor2
+}
+
 data
 class BootstrapComponentDescriptor
 internal constructor(
@@ -42,7 +46,8 @@ internal constructor(
     val annotationMirror: AnnotationMirror,
     val modules: ImmutableList<ModuleDescriptor>,
     val applicationModules: ImmutableList<ModuleDescriptor>,
-    val methods: ImmutableList<Pair<ExecutableElement, ExecutableType>>
+    val methods: ImmutableList<Pair<ExecutableElement, ExecutableType>>,
+    val descriptor2: BootstrapComponentDescriptor2? = null
 ) {
     enum
     class Kind(
@@ -117,12 +122,12 @@ internal constructor(
     @Inject constructor(
         val elements: SourcererElements,
         val types: SourcererTypes,
-        val moduleFactory: ModuleDescriptor.Factory
+        val moduleFactory: ModuleDescriptor.Factory,
+        val component2Factory: BootstrapComponentDescriptor2.Factory
     ) {
         fun forStoredComponent(
             className: ClassName
         ): BootstrapComponentDescriptor {
-            val c: ComponentDescriptor
             val typeElement = elements.getTypeElement(className.qualifiedName)
             return forComponent(typeElement)
         }
@@ -134,11 +139,11 @@ internal constructor(
         fun forComponent(
             componentDefinitionType: TypeElement
         ): BootstrapComponentDescriptor {
-            val kind = Kind.forAnnotatedElement(
-                componentDefinitionType
-            )
+            val kind = Kind.forAnnotatedElement(componentDefinitionType)
                        ?: throw IllegalArgumentException("$componentDefinitionType must be annotated with @Component or @ProductionComponent")
-            return kind.create(componentDefinitionType)
+            val one = kind.create(componentDefinitionType)
+            val two = component2Factory.forComponent(componentDefinitionType)
+            return one.copy(descriptor2 = two)
         }
 
         private
