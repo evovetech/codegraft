@@ -16,27 +16,16 @@
 
 package dagger.internal.codegen
 
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.TypeName
 import dagger.internal.codegen.BootstrapComponentDescriptor.Factory
 import dagger.internal.codegen.BootstrapComponentDescriptor.Kind
-import okio.Okio
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
 import sourcerer.DeferredOutput
 import sourcerer.Env
 import sourcerer.Output
 import sourcerer.ProcessStep
-import sourcerer.SourcererOutput
-import sourcerer.StoredFile
-import sourcerer.getResources
 import sourcerer.inject.BootstrapComponent
-import sourcerer.io.Reader
-import sourcerer.io.Writer
-import sourcerer.metaFile
-import sourcerer.processor.ProcessingEnv
 import sourcerer.typeInputs
-import java.net.URL
 import javax.inject.Inject
 
 class ComponentStep
@@ -96,75 +85,5 @@ constructor(
             "evovetech.processor.package",
             "evovetech.processor"
         );
-    }
-
-    internal
-    class BootstrapSourcerer
-    @Inject constructor(
-        val env: ProcessingEnv,
-        val types: SourcererTypes,
-        val elements: SourcererElements
-    ) {
-        internal
-        val file = ClassName.get(BootstrapComponent::class.java).metaFile
-
-        internal
-        fun output(outputs: List<ComponentOutput>): SrcOutput {
-            return componentOutput(outputs.map {
-                it.descriptor
-            })
-        }
-
-        internal
-        fun storedOutputs() = env.getResources(file.extFilePath())
-                .map(this::load)
-                .readAll()
-
-        private
-        fun componentOutput(components: List<BootstrapComponentDescriptor>): SrcOutput {
-            return SrcOutput(this, components.map {
-                ClassName.get(it.definitionType)
-            })
-        }
-
-        private
-        fun load(url: URL) = Okio.buffer(Okio.source(url.openStream())).use { source ->
-            file.assertCanRead(Reader.newReader(source))
-            StoredFile(source.readByteArray())
-        }
-
-        private
-        fun StoredFile.read(): List<TypeName> = read {
-            it.readTypeNames()
-        }
-
-        private
-        fun Collection<StoredFile>.readAll() = flatMap { it.read() }
-                .mapNotNull { it as? ClassName }
-    }
-
-    class SrcInput(
-        private val storedFiles: Collection<StoredFile>
-    ) {
-        fun StoredFile.read(): List<TypeName> = read {
-            it.readTypeNames()
-        }
-
-        fun readAll() = storedFiles.flatMap { it.read() }
-                .mapNotNull { it as? ClassName }
-    }
-
-    internal
-    class SrcOutput(
-        private val bootstrap: BootstrapSourcerer,
-        private val typeNames: List<TypeName>
-    ) : SourcererOutput() {
-        override
-        fun file() = bootstrap.file
-
-        override
-        fun write(writer: Writer) {
-            writer.writeTypeNames(typeNames)
-        }
     }
 }
