@@ -17,53 +17,26 @@
 package dagger.internal.codegen
 
 import com.google.auto.common.MoreTypes.asPrimitiveType
-import java.util.Optional
-import javax.inject.Inject
-import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
-import javax.lang.model.util.Types
 
-internal class SourcererTypes
-@Inject constructor(
-    val elements: SourcererElements,
-    val types: DaggerTypes
-) : Types by types {
+internal
+typealias SourcererTypes = DaggerTypes
 
-    fun boxedType(
-        type: TypeMirror
-    ): TypeMirror = if (type.kind.isPrimitive) {
-        boxedClass(asPrimitiveType(type)).asType()
-    } else {
-        type
-    }
-
-    fun nonObjectSuperclass(type: DeclaredType): Optional<DeclaredType> {
-        return types.nonObjectSuperclass(type)
-    }
-
-    fun unwrapTypeOrObject(type: TypeMirror): TypeMirror {
-        return types.unwrapTypeOrObject(type)
-    }
-
-    fun rewrapType(type: TypeMirror, wrappingClass: Class<*>): DeclaredType {
-        return types.rewrapType(type, wrappingClass)
-    }
-
-    inline
-    fun <reified T> rewrapType(
-        type: TypeMirror
-    ): TypeMirror = rewrapType(type, T::class.java)
-
-    fun wrapType(type: TypeMirror, wrappingClass: Class<*>): TypeMirror {
-        return types.wrapType(type, wrappingClass)
-    }
-
-    inline
-    fun <reified T> wrapType(
-        type: TypeMirror
-    ): TypeMirror = wrapType(type, T::class.java)
-
-    fun unwrapType(type: TypeMirror): TypeMirror {
-        return types.unwrapType(type)
-    }
+internal
+fun SourcererTypes.boxedType(
+    type: TypeMirror
+): TypeMirror = if (type.kind.isPrimitive) {
+    boxedClass(asPrimitiveType(type)).asType()
+} else {
+    type
 }
+
+internal inline
+fun <reified T> SourcererTypes.rewrapType(
+    type: TypeMirror
+): TypeMirror = rewrapType(type, T::class.java)
+
+internal inline
+fun <reified T> SourcererTypes.wrapType(
+    type: TypeMirror
+): TypeMirror = wrapType(type, T::class.java)
