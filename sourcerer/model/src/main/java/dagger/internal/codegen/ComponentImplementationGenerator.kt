@@ -26,7 +26,6 @@ import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
 import dagger.MembersInjector
 import dagger.internal.codegen.BootstrapComponentDescriptor2.ComponentMethodDescriptor
-import dagger.internal.codegen.BootstrapComponentDescriptor2.ComponentMethodKind
 import dagger.internal.codegen.BootstrapComponentDescriptor2.ComponentMethodKind.MEMBERS_INJECTION
 import dagger.internal.codegen.BootstrapComponentDescriptor2.ComponentMethodKind.PROVISION
 import sourcerer.Env
@@ -102,9 +101,9 @@ class ComponentImplementationGenerator(
         fun TypeSpec.Builder.addFieldSpec(): FieldSpec =
             addFieldSpec(fieldType, fieldName)
 
-        fun ComponentMethodKind.methodStatement(
-            fieldSpec: FieldSpec,
-            methodSpec: MethodSpec.Builder
+        private
+        fun methodStatement(
+            fieldSpec: FieldSpec
         ) = CodeBlock.builder().run {
             val provided = CodeBlock.of("\$N.get()", fieldSpec)
             val code = when (kind) {
@@ -129,7 +128,7 @@ class ComponentImplementationGenerator(
                 .apply {
                     qualifier?.let(AnnotationSpec::get)
                             ?.let(this::addAnnotation)
-                    addStatement(kind.methodStatement(fieldSpec, this))
+                    addStatement(methodStatement(fieldSpec))
                 }
                 .build()
                 .apply { addMethod(this) }
