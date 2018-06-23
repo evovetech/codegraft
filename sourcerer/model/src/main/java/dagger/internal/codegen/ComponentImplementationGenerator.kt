@@ -24,23 +24,24 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
-import dagger.internal.codegen.ComponentImplementationGenerator.Method.Kind.MembersInjector
-import dagger.internal.codegen.ComponentImplementationGenerator.Method.Kind.Provider
+import dagger.MembersInjector
+import dagger.internal.codegen.BootstrapComponentDescriptor2.ComponentMethodDescriptor
+import dagger.internal.codegen.BootstrapComponentDescriptor2.ComponentMethodKind
+import dagger.internal.codegen.BootstrapComponentDescriptor2.ComponentMethodKind.MEMBERS_INJECTION
+import dagger.internal.codegen.BootstrapComponentDescriptor2.ComponentMethodKind.PROVISION
 import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.classBuilder
 import sourcerer.typeSpec
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.inject.Singleton
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PRIVATE
 import javax.lang.model.element.Modifier.PUBLIC
-import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
-import kotlin.reflect.KClass
 
 internal
 class ComponentImplementationGenerator(
@@ -52,8 +53,7 @@ class ComponentImplementationGenerator(
     rawType = ClassName.get(descriptor.definitionType),
     outExt = "Implementation"
 ) {
-//    val componentType = descriptor.definitionType
-//    val provisionMethods =
+    private val descriptor2 = descriptor.descriptor2
 
     override
     fun newBuilder() = outKlass.classBuilder()
@@ -65,44 +65,67 @@ class ComponentImplementationGenerator(
         addSuperinterface(TypeName.get(descriptor.definitionType.asType()))
         val constructorBuilder = MethodSpec.constructorBuilder()
                 .addAnnotation(Inject::class.java)
-        val methods = elements.abstractMethods(descriptor.definitionType)
-                .map { Method.parse(types, elements, it).apply { write(constructorBuilder) } }
+
+        val methods = descriptor2?.componentMethods.orEmpty()
+                .map { method -> Method(types, method) }
+                .map { method -> method.apply { write(constructorBuilder) } }
         val constructor = constructorBuilder.build()
                 .apply { addMethod(this) }
     }
 
     class Method
-    private constructor(
-        val kind: Kind,
+    internal constructor(
         val types: SourcererTypes,
-        val elements: SourcererElements,
-        method: ExecutableElement
-    ) : ExecutableElement by method {
-        val element: Element = when (kind) {
-            Kind.Provider -> method
-            MembersInjector -> method.parameters.first()
-        }
-        val type: TypeMirror = when (kind) {
-            Kind.Provider -> method.returnType
-            MembersInjector -> element.asType()
-        }
-        val name = element.simpleName.toString().let { n ->
-            val name = when (kind) {
-                Provider -> n.removePrefix("get")
-                else -> n
+        val method: ComponentMethodDescriptor
+    ) : ExecutableElement by method.methodElement {
+        val kind = method.kind
+        val dependency = method.dependencyRequest.get()
+        val key = dependency.key
+        val type: TypeMirror = key.type
+        val providedType: TypeMirror
+        val fieldName: String = when (kind) {
+            PROVISION -> {
+                providedType = type
+                ""
             }
-            name.decapitalize()
+            MEMBERS_INJECTION -> {
+                providedType = types.wrapType<MembersInjector<*>>(type)
+                "MembersInjector"
+            }
+        }.let {
+            val elementName = types.asElement(type).simpleName.toString()
+            "${elementName.decapitalize()}${it}Provider"
         }
-        val qualifier = element.qualifier
-        val fieldName = kind.fieldName(name)
-        val fieldType = kind.wrap(types, elements, type)
+        val fieldType = types.wrapType<Provider<*>>(providedType)
 
         private
         fun TypeSpec.Builder.addFieldSpec(): FieldSpec =
             addFieldSpec(fieldType, fieldName)
 
+        fun ComponentMethodKind.methodStatement(
+            fieldSpec: FieldSpec,
+            methodSpec: MethodSpec.Builder
+        ) = CodeBlock.builder().run {
+            val provided = CodeBlock.of("\$N.get()", fieldSpec)
+            val code = when (kind) {
+                PROVISION -> {
+                    val returnBlock = CodeBlock.of("return")
+                    CodeBlock.join(listOf(returnBlock, provided), " ")
+                }
+                MEMBERS_INJECTION -> {
+                    val paramName = parameters.first().simpleName.toString()
+                    val injectMembers = CodeBlock.of("injectMembers(\$L)", paramName)
+                    CodeBlock.join(listOf(provided, injectMembers), ".")
+                }
+            }
+            add(code)
+            build()
+        }
+
         private
-        fun TypeSpec.Builder.addMethodSpec(fieldSpec: FieldSpec): MethodSpec = MethodSpec.overriding(this@Method)
+        fun TypeSpec.Builder.addMethodSpec(
+            fieldSpec: FieldSpec
+        ): MethodSpec = MethodSpec.overriding(this@Method)
                 .apply {
                     qualifier?.let(AnnotationSpec::get)
                             ?.let(this::addAnnotation)
@@ -116,53 +139,6 @@ class ComponentImplementationGenerator(
             val methodSpec = addMethodSpec(fieldSpec)
             constructor.addToConstructor(fieldSpec, qualifier)
             return this@Method
-        }
-
-        enum class Kind(
-            private val wrapperType: KClass<*>
-        ) {
-            Provider(javax.inject.Provider::class),
-            MembersInjector(dagger.MembersInjector::class);
-
-            fun fieldName(name: String) =
-                "${name.decapitalize()}${this.name}"
-
-            fun wrap(
-                types: SourcererTypes,
-                elements: SourcererElements,
-                typeMirror: TypeMirror
-            ): DeclaredType = elements
-                    .getTypeElement(wrapperType.java.canonicalName)
-                    .let { types.getDeclaredType(it, typeMirror) }
-
-            fun methodStatement(
-                fieldSpec: FieldSpec,
-                methodSpec: MethodSpec.Builder
-            ) = CodeBlock.builder().run {
-                when (this@Kind) {
-                    Provider -> add("return \$N.get()", fieldSpec)
-                    MembersInjector -> {
-                        val method = methodSpec.build()
-                        add("\$N.injectMembers(\$N)", fieldSpec, method.parameters.first())
-                    }
-                }
-                build()
-            }
-        }
-
-        companion object Creator {
-            @JvmStatic
-            fun parse(
-                types: SourcererTypes,
-                elements: SourcererElements,
-                method: ExecutableElement
-            ): Method {
-                val kind = when (method.parameters.size) {
-                    0 -> Kind.Provider
-                    else -> MembersInjector
-                }
-                return Method(kind, types, elements, method)
-            }
         }
     }
 

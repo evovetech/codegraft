@@ -16,6 +16,7 @@
 
 package evovetech.sample.db.realm
 
+import android.app.Application
 import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
@@ -35,6 +36,7 @@ typealias RealmInit = RealmConfiguration.Builder.() -> RealmConfiguration
     applicationModules = [RealmModule::class]
 )
 interface RealmComponent {
+    val application: Application
     val realm: Realm
     val crashlytics: Crashlytics
 }
