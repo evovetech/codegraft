@@ -21,6 +21,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import okhttp3.OkHttpClient
+import sourcerer.inject.BootScope
 import sourcerer.inject.BootstrapComponent
 import sourcerer.inject.Plugin
 import sourcerer.inject.PluginKey
@@ -34,6 +35,12 @@ interface ClientComponent {
     val plugins: Plugins
 }
 
+@BootstrapComponent(applicationModules = [ClientPlugin::class])
+interface ClientComponent2 {
+    val plugins: Plugins
+    val client: Client
+}
+
 @Singleton
 class Client
 @Inject constructor(
@@ -43,17 +50,17 @@ class Client
 @Module(includes = [ClientModule::class])
 abstract
 class ClientPlugin {
-    @Binds
-    @IntoMap
+    @Binds @IntoMap
     @PluginKey(Client::class)
     abstract fun bindClient(client: Client): Plugin
 }
 
 @Module
 class ClientModule {
-    @Provides
-    @Singleton
-    fun provideOkhttp(app: AndroidApplication): OkHttpClient {
+    @Provides @Singleton
+    fun provideOkhttp(
+        @BootScope app: AndroidApplication
+    ): OkHttpClient {
         return OkHttpClient()
     }
 }

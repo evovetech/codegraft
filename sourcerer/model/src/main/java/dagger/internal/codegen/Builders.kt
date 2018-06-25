@@ -44,6 +44,24 @@ class MethodBuilder(
     }
 }
 
+fun <T> Collection<Pair<MethodBuilder, T>>.buildUniquePairs() = groupBy {
+    it.first.name
+}.flatMap { (key, pairs) ->
+    val size = pairs.size
+    val builders = if (size > 1) {
+        var i = 1
+        pairs.map { (method, t) ->
+            val n = "$key${i++}"
+            Pair(method.withName(n), t)
+        }
+    } else {
+        pairs
+    }
+    builders.map { (method, t) ->
+        Pair(method.build(), t)
+    }
+}
+
 fun Collection<MethodBuilder>.buildUnique() = groupBy {
     it.name
 }.flatMap { (key, methods) ->

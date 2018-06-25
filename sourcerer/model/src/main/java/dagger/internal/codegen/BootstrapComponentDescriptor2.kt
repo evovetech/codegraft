@@ -157,7 +157,7 @@ class BootstrapComponentDescriptor2 {
     val modules: Modules
 
     abstract
-    val applicationModules: Modules?
+    val applicationModules: Modules
 
     /**
      * The scopes of the component.

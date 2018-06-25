@@ -45,11 +45,12 @@ class ComponentOutput(
         fun create(
             descriptor: BootstrapComponentDescriptor
         ): ComponentOutput {
-            val implementation = componentImplementationFactory.create(descriptor)
+            val descriptor2 = descriptor.descriptor2!!
+            val implementation = componentImplementationFactory.create(descriptor2)
             return ComponentOutput(
                 descriptor = descriptor,
                 implementation = implementation,
-                module = componentModuleFactory.create(descriptor, implementation),
+                module = componentModuleFactory.create(descriptor2, implementation),
                 bootData = componentBootDataFactory.create(descriptor)
             )
         }

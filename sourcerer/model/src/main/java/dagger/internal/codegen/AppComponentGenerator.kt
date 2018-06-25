@@ -16,6 +16,8 @@
 
 package dagger.internal.codegen
 
+import com.google.auto.common.MoreElements.hasModifiers
+import com.google.common.collect.ImmutableSet
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.FieldSpec
@@ -26,6 +28,7 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import dagger.internal.codegen.BootstrapComponentDescriptor2.Modules
 import dagger.internal.codegen.ComponentStep.Option.Package
 import dagger.model.Key
 import org.jetbrains.annotations.Nullable
@@ -36,6 +39,7 @@ import sourcerer.classBuilder
 import sourcerer.inject.BootScope
 import sourcerer.interfaceBuilder
 import sourcerer.name
+import sourcerer.nestedBuilder
 import sourcerer.processor.Env
 import sourcerer.toKlass
 import sourcerer.typeSpec
@@ -45,6 +49,7 @@ import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
+import javax.lang.model.element.TypeElement
 
 internal
 class AppComponentGenerator(
@@ -132,8 +137,17 @@ class AppComponentGenerator(
     ) : JavaOutput(
         rawType = ClassName.get(pkg, name)
     ) {
+        private
         val descriptors = components.map { it.descriptor }
-        val builder = Builder()
+        private
+        val modules = descriptors
+                .mapNotNull(BootstrapComponentDescriptor::descriptor2)
+                .map(BootstrapComponentDescriptor2::applicationModules)
+                .flatMap(Modules::transitiveModules)
+                .filterNot { hasModifiers<TypeElement>(ABSTRACT).apply(it.moduleElement()) }
+                .toImmutableSet()
+        internal
+        val builder = Builder(modules)
 
         override
         fun newBuilder() = outKlass.interfaceBuilder()
@@ -159,26 +173,47 @@ class AppComponentGenerator(
         }
 
         inner
-        class Builder : sourcerer.JavaOutput.Builder() {
+        class Builder(
+            val modules: ImmutableSet<ModuleDescriptor>
+        ) : sourcerer.JavaOutput.Builder() {
+            private
+            val bootMethodBuilder = MethodBuilder("bootData") {
+                addModifiers(PUBLIC, ABSTRACT)
+                addParameter(ParameterSpec.builder(bootData.outKlass.rawType, "bootData").build())
+                returns(outKlass.rawType)
+            }.let {
+                Pair(it, false)
+            }
+            private
+            val moduleMethodBuilders = modules.map { module ->
+                val element = module.moduleElement()
+                val name = element.simpleName.toString().decapitalize()
+                val type = TypeName.get(element.asType())
+                MethodBuilder(name) {
+                    addModifiers(PUBLIC, ABSTRACT)
+                    addParameter(ParameterSpec.builder(type, name).build())
+                    returns(outKlass.rawType)
+                }
+            }.map {
+                Pair(it, true)
+            }
+            val setMethods = (moduleMethodBuilders + bootMethodBuilder)
+                    .buildUniquePairs()
+            val bootMethod = setMethods.filterNot { it.second }
+                    .map { it.first }
+            val moduleMethods = setMethods.filter { it.second }
+                    .map { it.first }
+            val buildMethod = MethodBuilder("build") {
+                addModifiers(PUBLIC, ABSTRACT)
+                returns(this@App.outKlass.rawType)
+            }
+
             override
             fun typeSpec() = typeSpec {
-                val parent = this@App
-
                 addModifiers(PUBLIC, STATIC)
                 addAnnotation(Component.Builder::class.java)
-
-                addMethod(MethodSpec.methodBuilder("bootData").run {
-                    addModifiers(PUBLIC, ABSTRACT)
-                    addParameter(ParameterSpec.builder(bootData.outKlass.rawType, "bootData").build())
-                    returns(outKlass.rawType)
-                    build()
-                })
-
-                addMethod(MethodSpec.methodBuilder("build").run {
-                    addModifiers(PUBLIC, ABSTRACT)
-                    returns(parent.outKlass.rawType)
-                    build()
-                })
+                addMethods(setMethods.map(Pair<MethodSpec, *>::first))
+                addMethod(buildMethod.build())
             }
         }
     }
@@ -190,6 +225,38 @@ class AppComponentGenerator(
     ) : JavaOutput(
         rawType = ClassName.get(pkg, "BootModule")
     ) {
+        val componentType = app.outKlass.rawType
+        val daggerComponentType = ClassName.get(componentType.packageName(), "Dagger${componentType.name}")
+        val bootDataType = bootData.outKlass.rawType
+        val builderType = componentType.nestedBuilder()
+
+        val builderName = "builder"
+        val mapper: (MethodSpec, Boolean) -> Pair<ParameterSpec, CodeBlock> = { spec, nullable ->
+            var param = spec.parameters.first()
+            val paramName = param.name
+            val methodName = spec.name
+            val codeBlock = CodeBlock.builder()
+            val statement = CodeBlock.of("\$N.\$N(\$N)", builderName, methodName, paramName)
+            if (nullable) {
+                codeBlock.beginControlFlow("if (\$N != null)", paramName)
+                        .addStatement(statement)
+                        .endControlFlow()
+                param = param.toBuilder()
+                        .addAnnotation(Nullable::class.java)
+                        .build()
+            } else {
+                codeBlock.addStatement(statement)
+            }
+            Pair(param, codeBlock.build())
+        }
+        val moduleMethods = app.builder.moduleMethods.map {
+            mapper(it, true)
+        }
+        val bootMethod = app.builder.bootMethod.map {
+            mapper(it, false)
+        }
+        val builderMethods = moduleMethods + bootMethod
+
         override
         fun newBuilder() = outKlass.classBuilder()
 
@@ -202,25 +269,15 @@ class AppComponentGenerator(
                 modules.map { TypeName.get(it.moduleElement().asType()) }
                         .forEach(addTo("includes"))
             }
-            val componentType = app.outKlass.rawType
-            val daggerComponentType = ClassName.get(componentType.packageName(), "Dagger${componentType.name}")
-            val bootDataType = bootData.outKlass.rawType
+
             addMethod(MethodSpec.methodBuilder("provideComponent").run {
                 addAnnotation(Provides::class.java)
                 addAnnotation(BootScope::class.java)
-
-                val bootDataParam = ParameterSpec.builder(bootDataType, "bootData").build()
-                addParameter(bootDataParam)
-                // TODO: add module parameters
-                addStatement(CodeBlock.builder().run {
-                    //                    add("return null")
-                    add("return \$T.builder()\n", daggerComponentType)
-                    indent()
-                    add(".bootData(\$N)\n", bootDataParam)
-                    add(".build()")
-                    unindent()
-                    build()
-                })
+                addParameters(builderMethods.map { it.first })
+                addStatement("\$T \$N = \$T.builder()", builderType, builderName, daggerComponentType)
+                builderMethods.map { it.second }
+                        .map(this::addCode)
+                addStatement("return \$N.build()", builderName)
                 returns(componentType)
                 build()
             })
@@ -266,14 +323,21 @@ class AppComponentGenerator(
                 addModifiers(PUBLIC, STATIC)
                 addAnnotation(Component.Builder::class.java)
 
-                val applicationModules = descriptors
-                        .flatMap { it.applicationModules }
+                val applicationModules = bootModule.moduleMethods.map { (param, codeblock) ->
+                    MethodBuilder(param.name) {
+                        addAnnotation(BindsInstance::class.java)
+                        addModifiers(PUBLIC, ABSTRACT)
+                        addParameter(param)
+                        returns(outKlass.rawType)
+                    }
+                }
+                val bootstrapModules = descriptors.flatMap { it.modules }
+                        .filterNot { module -> hasModifiers<TypeElement>(ABSTRACT).apply(module.moduleElement()) }
                         .map { module ->
-                            val param = module.moduleElement().buildParameter {
-                                addAnnotation(Nullable::class.java)
-                            }
-                            MethodBuilder(param.name) {
-                                addAnnotation(BindsInstance::class.java)
+                            val name = module.moduleElement().simpleName.toString().decapitalize()
+                            val type = TypeName.get(module.moduleElement().asType())
+                            val param = ParameterSpec.builder(type, name).build()
+                            MethodBuilder(name) {
                                 addModifiers(PUBLIC, ABSTRACT)
                                 addParameter(param)
                                 returns(outKlass.rawType)
@@ -296,7 +360,7 @@ class AppComponentGenerator(
                     }
                 }
 
-                (applicationModules + dependencyMethods)
+                (dependencyMethods + applicationModules + bootstrapModules)
                         .buildUnique()
                         .map(this::addMethod)
 

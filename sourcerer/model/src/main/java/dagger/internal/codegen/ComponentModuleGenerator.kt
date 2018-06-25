@@ -30,16 +30,18 @@ import sourcerer.typeSpec
 import javax.inject.Inject
 import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.Modifier.PUBLIC
+import javax.lang.model.element.TypeElement
 
 internal
 class ComponentModuleGenerator(
     private val env: Env,
     private val types: SourcererTypes,
     private val elements: SourcererElements,
-    private val descriptor: BootstrapComponentDescriptor,
-    private val implGenerator: ComponentImplementationGenerator
+    private val descriptor: BootstrapComponentDescriptor2,
+    private val implGenerator: ComponentImplementationGenerator,
+    private val definitionType: TypeElement = descriptor.componentDefinitionType
 ) : JavaOutput(
-    rawType = ClassName.get(descriptor.definitionType),
+    rawType = ClassName.get(definitionType),
     outExt = "Module"
 ) {
     override
@@ -55,9 +57,9 @@ class ComponentModuleGenerator(
                     .forEach(addTo("includes"))
         }
 
-        val returnType = ClassName.get(descriptor.definitionType)
+        val returnType = ClassName.get(definitionType)
         val implType = implGenerator.outKlass.rawType
-        addMethod(MethodSpec.methodBuilder("bind${descriptor.definitionType.simpleName}").run {
+        addMethod(MethodSpec.methodBuilder("bind${definitionType.simpleName}").run {
             addModifiers(PUBLIC, ABSTRACT)
             addAnnotation(Binds::class.java)
             addParameter(implType, implType.simpleName().decapitalize())
@@ -73,7 +75,7 @@ class ComponentModuleGenerator(
         private val elements: SourcererElements
     ) {
         fun create(
-            descriptor: BootstrapComponentDescriptor,
+            descriptor: BootstrapComponentDescriptor2,
             implGenerator: ComponentImplementationGenerator
         ) = ComponentModuleGenerator(
             env = env,

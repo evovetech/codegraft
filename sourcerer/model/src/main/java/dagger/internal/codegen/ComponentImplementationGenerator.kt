@@ -47,13 +47,11 @@ class ComponentImplementationGenerator(
     private val env: Env,
     private val types: SourcererTypes,
     private val elements: SourcererElements,
-    private val descriptor: BootstrapComponentDescriptor
+    private val descriptor: BootstrapComponentDescriptor2
 ) : JavaOutput(
-    rawType = ClassName.get(descriptor.definitionType),
+    rawType = ClassName.get(descriptor.componentDefinitionType),
     outExt = "Implementation"
 ) {
-    private val descriptor2 = descriptor.descriptor2
-
     override
     fun newBuilder() = outKlass.classBuilder()
 
@@ -61,15 +59,13 @@ class ComponentImplementationGenerator(
     fun typeSpec() = typeSpec {
         addAnnotation(Singleton::class.java)
         addModifiers(PUBLIC, FINAL)
-        addSuperinterface(TypeName.get(descriptor.definitionType.asType()))
+        addSuperinterface(TypeName.get(descriptor.componentDefinitionType.asType()))
         val constructorBuilder = MethodSpec.constructorBuilder()
                 .addAnnotation(Inject::class.java)
-
-        val methods = descriptor2?.componentMethods.orEmpty()
+        descriptor?.componentMethods.orEmpty()
                 .map { method -> Method(types, method) }
                 .map { method -> method.apply { write(constructorBuilder) } }
-        val constructor = constructorBuilder.build()
-                .apply { addMethod(this) }
+        addMethod(constructorBuilder.build())
     }
 
     class Method
@@ -148,7 +144,7 @@ class ComponentImplementationGenerator(
         private val elements: SourcererElements
     ) {
         fun create(
-            descriptor: BootstrapComponentDescriptor
+            descriptor: BootstrapComponentDescriptor2
         ) = ComponentImplementationGenerator(
             env = env,
             types = types,
