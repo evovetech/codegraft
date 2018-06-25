@@ -77,21 +77,16 @@ class ComponentImplementationGenerator(
         val dependency = method.dependencyRequest.get()
         val key = dependency.key
         val type: TypeMirror = key.type
-        val providedType: TypeMirror
-        val fieldName: String = when (kind) {
+        val providedType: TypeMirror = when (kind) {
             PROVISION -> {
-                providedType = type
-                ""
+                type
             }
             MEMBERS_INJECTION -> {
-                providedType = types.wrapType<MembersInjector<*>>(type)
-                "MembersInjector"
+                types.wrapType<MembersInjector<*>>(type)
             }
-        }.let {
-            val elementName = types.asElement(type).simpleName.toString()
-            "${elementName.decapitalize()}${it}Provider"
         }
         val fieldType = types.wrapType<Provider<*>>(providedType)
+        val fieldName = fieldType.getFieldName()
 
         private
         fun TypeSpec.Builder.addFieldSpec(): FieldSpec =
