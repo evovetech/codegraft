@@ -129,7 +129,7 @@ fun TypeMirror.buildParameter(
 fun DeclaredType.buildParameter(
     init: ParameterSpec.Builder.() -> Unit = {}
 ): ParameterSpec {
-    val name = asElement().simpleName.toString().decapitalize()
+    val name = getFieldName()
     return buildParameter(name, init)
 }
 

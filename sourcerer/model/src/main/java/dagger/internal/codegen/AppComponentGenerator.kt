@@ -162,7 +162,7 @@ class AppComponentGenerator(
             }
             descriptors.forEach {
                 val type = it.definitionType
-                val name = type.simpleName.toString().decapitalize()
+                val name = type.asType().getFieldName()
                 val getter = MethodSpec.methodBuilder("get${name.capitalize()}")
                         .addModifiers(PUBLIC, ABSTRACT)
                         .returns(TypeName.get(type.asType()))
@@ -187,7 +187,7 @@ class AppComponentGenerator(
             private
             val moduleMethodBuilders = modules.map { module ->
                 val element = module.moduleElement()
-                val name = element.simpleName.toString().decapitalize()
+                val name = element.asType().getFieldName()
                 val type = TypeName.get(element.asType())
                 MethodBuilder(name) {
                     addModifiers(PUBLIC, ABSTRACT)
@@ -334,7 +334,7 @@ class AppComponentGenerator(
                 val bootstrapModules = descriptors.flatMap { it.modules }
                         .filterNot { module -> hasModifiers<TypeElement>(ABSTRACT).apply(module.moduleElement()) }
                         .map { module ->
-                            val name = module.moduleElement().simpleName.toString().decapitalize()
+                            val name = module.moduleElement().asType().getFieldName()
                             val type = TypeName.get(module.moduleElement().asType())
                             val param = ParameterSpec.builder(type, name).build()
                             MethodBuilder(name) {

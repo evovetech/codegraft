@@ -32,12 +32,11 @@ class App : DaggerApplication(), BootApplication<AndroidAppComponent> {
 
     override
     val bootstrap = bootstrap {
-        // TODO: better naming
-        function12 {
+        builderFabricFunction1 {
             it.kits(Crashlytics())
             it.build()
         }
-        function11 {
+        builderRealmConfigurationFunction1 {
             it.name("app.realm")
             it.schemaVersion(1)
             it.build()
