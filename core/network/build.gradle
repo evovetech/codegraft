@@ -40,5 +40,7 @@ dependencies {
     api(okhttp3.core)
     implementation(retrofit2.core)
     kapt("evovetech.sourcerer:lib-processor:${app.sourcererVersion}")
+    kaptTest("evovetech.sourcerer:app-processor:${app.sourcererVersion}")
+    kaptAndroidTest("evovetech.sourcerer:app-processor:${app.sourcererVersion}")
     implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"
 }

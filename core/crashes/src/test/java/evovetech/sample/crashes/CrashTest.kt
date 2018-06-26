@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 
-plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    id("kotlin-android-extensions")
-    id("kotlin-kapt")
-//    id("evovetech.android.transform.graph")
+package evovetech.sample.crashes
+
+import org.junit.Test
+
+class CrashTest {
+    @Test
+    fun testCrashes() {
+        println("TEST!!")
+    }
 }
-
-apply from: "${configDir}/android/base.gradle"
-
-dependencies {
-    api("evovetech.sourcerer:annotations:${app.sourcererVersion}")
-    api("evovetech.sourcerer:inject:${app.sourcererVersion}")
-    api("evovetech.sourcerer:inject-android:${app.sourcererVersion}")
-}
-
-apply from: "${configDir}/versions/dagger.gradle"
-dependencies(dagger.applyAndroid('implementation'))

@@ -17,43 +17,36 @@
 package sourcerer
 
 import com.google.auto.service.AutoService
-import com.google.common.collect.ImmutableSet
-import dagger.internal.codegen.BootstrapProcessor
-import sourcerer.inject.LibComponent
-import sourcerer.inject.LibModule
-import sourcerer.lib.LibEnvProcessor
 import javax.annotation.processing.Processor
-import javax.annotation.processing.RoundEnvironment
-import javax.lang.model.element.TypeElement
 
 /**
  * Created by layne on 2/20/18.
  */
 //@AutoService(Processor::class)
-class LibProcessor : LibEnvProcessor() {
-    override fun getSupportedAnnotationTypes(): Set<String> {
-        return ImmutableSet.builder<String>()
-                .add<LibModule>()
-                .add<LibComponent>()
-                .build()
-    }
-
-    override fun process(set: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean = withEnv {
-        roundEnv.elementsAnnotatedWith<LibComponent>()
-                .takeUnless { it.isEmpty() }
-                ?.also { elements ->
-                    components.readAnnotations(elements)
-                    components.writeSourcererFiles()
-                }
-        roundEnv.elementsAnnotatedWith<LibModule>()
-                .takeUnless { it.isEmpty() }
-                ?.also { elements ->
-                    modules.readAnnotations(elements)
-                    modules.writeSourcererFiles()
-                }
-        false
-    }
-}
+//class LibProcessor : LibEnvProcessor() {
+//    override fun getSupportedAnnotationTypes(): Set<String> {
+//        return ImmutableSet.builder<String>()
+//                .add<LibModule>()
+//                .add<LibComponent>()
+//                .build()
+//    }
+//
+//    override fun process(set: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean = withEnv {
+//        roundEnv.elementsAnnotatedWith<LibComponent>()
+//                .takeUnless { it.isEmpty() }
+//                ?.also { elements ->
+//                    components.readAnnotations(elements)
+//                    components.writeSourcererFiles()
+//                }
+//        roundEnv.elementsAnnotatedWith<LibModule>()
+//                .takeUnless { it.isEmpty() }
+//                ?.also { elements ->
+//                    modules.readAnnotations(elements)
+//                    modules.writeSourcererFiles()
+//                }
+//        false
+//    }
+//}
 
 @AutoService(Processor::class)
-class AppProcessor : BootstrapProcessor(false)
+class LibProcessor : MainProcessor(false)

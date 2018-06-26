@@ -17,7 +17,6 @@
 package sourcerer
 
 import com.google.auto.service.AutoService
-import dagger.internal.codegen.BootstrapProcessor
 import sourcerer.lib.LibEnvProcessor
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -65,4 +64,4 @@ class AppGenerator : LibEnvProcessor() {
 }
 
 @AutoService(Processor::class)
-class AppProcessor : BootstrapProcessor(true)
+class AppProcessor : MainProcessor(true)

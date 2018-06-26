@@ -38,8 +38,8 @@ constructor(
     val appComponentStep: AppComponentStep,
     val sourcerer: BootstrapSourcerer
 ) : ProcessStep {
-    private
-    var processed: Boolean = false
+    internal
+    var processed: Boolean = true
 
     internal
     val generatedComponents = ArrayList<ComponentOutput>()
@@ -65,14 +65,16 @@ constructor(
                     .map(componentOutputFactory::create)
             val generatedOutputs = generatedComponents.flatMap(ComponentOutput::outputs)
             val sourcererOutput = sourcerer.output(generatedComponents)
-            processed = true
 
             // outputs
             map[BootstrapComponent::class] = generatedOutputs + sourcererOutput
+
+            processed = true
         } catch (e: TypeNotPresentException) {
             map[BootstrapComponent::class] = bootstrapComponents.map {
                 DeferredOutput(it.element)
             }
+            processed = false
         }
         return map
     }

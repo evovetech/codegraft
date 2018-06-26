@@ -20,6 +20,7 @@ import dagger.BindsInstance
 import sourcerer.BaseProcessor
 import sourcerer.ProcessStep
 import sourcerer.processor.Env.Options
+import sourcerer.processor.ProcessingEnv
 import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,6 +36,9 @@ class BootstrapProcessor(
     private
     var processed = false
 
+    val processingEnv: ProcessingEnv
+        get() = env
+
     override
     fun processSteps(): List<ProcessStep> {
         val component = DaggerBootstrapProcessor_Component.builder().run {
@@ -48,16 +52,27 @@ class BootstrapProcessor(
 
     override
     fun postRound(roundEnv: RoundEnvironment) {
+        env.log(
+            "postRound($roundEnv) " +
+            "{ " +
+            "isApplication=$isApplication, " +
+            "processingOver=${roundEnv.processingOver()}, " +
+            "processed=$processed, " +
+            "componentStep.processed=${componentStep.processed}" +
+            " }"
+        )
         if (isApplication
             && !roundEnv.processingOver()
-            && !processed) {
+            && !processed
+            && componentStep.processed) {
             val outputs = componentStep.run {
                 env.postProcess()
             }
-            if (outputs.isNotEmpty()) {
-                postProcess(outputs)
-                processed = true
-            }
+            env.log("postRound: outputs=$outputs")
+            postProcess(outputs)
+            processed = true
+        } else {
+            env.log("postRound: no outputs")
         }
     }
 
