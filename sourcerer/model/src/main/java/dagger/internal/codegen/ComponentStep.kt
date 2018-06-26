@@ -27,7 +27,9 @@ import sourcerer.ProcessStep
 import sourcerer.inject.BootstrapComponent
 import sourcerer.typeInputs
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class ComponentStep
 @Inject internal
 constructor(
@@ -36,6 +38,12 @@ constructor(
     val appComponentStep: AppComponentStep,
     val sourcerer: BootstrapSourcerer
 ) : ProcessStep {
+    private
+    var processed: Boolean = false
+
+    internal
+    val generatedComponents = ArrayList<ComponentOutput>()
+
     override
     fun Env.annotations(): Set<AnnotationType> = Kind.values()
             .map(Kind::annotationType)
@@ -52,28 +60,34 @@ constructor(
         val map = HashMap<AnnotationType, List<Output>>()
         val bootstrapComponents = annotationElements.typeInputs<BootstrapComponent>()
         try {
-            val generatedComponents = bootstrapComponents
+            generatedComponents += bootstrapComponents
                     .map(componentFactory::forComponent)
                     .map(componentOutputFactory::create)
             val generatedOutputs = generatedComponents.flatMap(ComponentOutput::outputs)
             val sourcererOutput = sourcerer.output(generatedComponents)
-
-            val storedComponents = sourcerer.storedOutputs()
-                    .map(componentFactory::forStoredComponent)
-                    .map(componentOutputFactory::create)
-            log("storedComponents = $storedComponents")
-
-            val appComponent = appComponentStep.process(generatedComponents, storedComponents)
-            val appComponentOutputs = appComponent.flatMap(AppComponentStep.Output::outputs)
+            processed = true
 
             // outputs
-            map[BootstrapComponent::class] = generatedOutputs + sourcererOutput + appComponentOutputs
+            map[BootstrapComponent::class] = generatedOutputs + sourcererOutput
         } catch (e: TypeNotPresentException) {
             map[BootstrapComponent::class] = bootstrapComponents.map {
                 DeferredOutput(it.element)
             }
         }
         return map
+    }
+
+    fun Env.postProcess(): List<Output> {
+        if (!processed) {
+            return emptyList()
+        }
+
+        val storedComponents = sourcerer.storedOutputs()
+                .map(componentFactory::forStoredComponent)
+                .map(componentOutputFactory::create)
+        log("storedComponents = $storedComponents")
+        val appComponent = appComponentStep.process(generatedComponents, storedComponents)
+        return appComponent.flatMap(AppComponentStep.Output::outputs)
     }
 
     enum

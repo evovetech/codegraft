@@ -74,7 +74,6 @@ class BootstrapSourcerer
     fun Collection<StoredFile>.readAll() = flatMap { it.read() }
             .mapNotNull { it as? ClassName }
 
-    internal
     class Output(
         private val bootstrap: BootstrapSourcerer,
         private val typeNames: List<TypeName>

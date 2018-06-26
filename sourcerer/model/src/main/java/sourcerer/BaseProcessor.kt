@@ -18,6 +18,7 @@ package sourcerer
 
 import com.google.auto.common.BasicAnnotationProcessor
 import sourcerer.processor.Env.Option
+import sourcerer.processor.ProcessingEnv
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 
@@ -57,6 +58,12 @@ class BaseProcessor : BasicAnnotationProcessor() {
             .map(Option::key)
             .toSet()
 
+    fun postProcess(outputs: List<Output>) {
+        outputs.map {
+            env.mapOutput(it)
+        }
+    }
+
     private
     class Step(
         val env: Env,
@@ -81,20 +88,8 @@ class BaseProcessor : BasicAnnotationProcessor() {
         ) = env.process(annotationElements)
                 .flatMap { it.value }
                 .onEach { env.log("output=$it") }
-                .mapNotNull(::mapOutput)
+                .mapNotNull(env::mapOutput)
                 .toSet()
-
-        private
-        fun mapOutput(
-            output: Output
-        ): Element? = when (output) {
-            is DeferredOutput -> output.element
-            is NoOutput -> null
-            is BaseOutput -> {
-                output.writeTo(env.filer())
-                null
-            }
-        }
     }
 
     protected
@@ -105,5 +100,16 @@ class BaseProcessor : BasicAnnotationProcessor() {
     ) {
         override
         val processorType = parent::class
+    }
+}
+
+fun ProcessingEnv.mapOutput(
+    output: Output
+): Element? = when (output) {
+    is DeferredOutput -> output.element
+    is NoOutput -> null
+    is BaseOutput -> {
+        output.writeTo(filer)
+        null
     }
 }

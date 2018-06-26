@@ -55,8 +55,8 @@ class AndroidBootComponent(
 
 @Module
 class AndroidBootModule {
-    @Provides
-    @BootScope
+    // TODO: @Binds
+    @Provides @BootScope
     fun provideContext(@BootScope app: App): Context {
         return app
     }

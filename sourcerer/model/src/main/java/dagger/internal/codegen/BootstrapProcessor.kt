@@ -16,19 +16,24 @@
 
 package dagger.internal.codegen
 
-import com.google.auto.service.AutoService
 import dagger.BindsInstance
 import sourcerer.BaseProcessor
 import sourcerer.ProcessStep
 import sourcerer.processor.Env.Options
-import javax.annotation.processing.Processor
+import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject
+import javax.inject.Singleton
 import javax.lang.model.util.Types
 
-@AutoService(Processor::class)
-class BootstrapProcessor : BaseProcessor() {
+open
+class BootstrapProcessor(
+    val isApplication: Boolean
+) : BaseProcessor() {
     @Inject lateinit var types: Types
     @Inject lateinit var options: Options
+    @Inject lateinit var componentStep: ComponentStep
+    private
+    var processed = false
 
     override
     fun processSteps(): List<ProcessStep> {
@@ -41,6 +46,22 @@ class BootstrapProcessor : BaseProcessor() {
                 .toList()
     }
 
+    override
+    fun postRound(roundEnv: RoundEnvironment) {
+        if (isApplication
+            && !roundEnv.processingOver()
+            && !processed) {
+            val outputs = componentStep.run {
+                env.postProcess()
+            }
+            if (outputs.isNotEmpty()) {
+                postProcess(outputs)
+                processed = true
+            }
+        }
+    }
+
+    @Singleton
     @dagger.Component(modules = [BootstrapProcessStepsModule::class])
     interface Component {
         fun inject(processor: BootstrapProcessor)
