@@ -34,6 +34,5 @@ include(
         ':app-processor',
         ':lib-processor',
         ':inject',
-        ':inject-android',
-        ':factory'
+        ':inject-android'
 )

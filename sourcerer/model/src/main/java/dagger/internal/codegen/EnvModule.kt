@@ -20,12 +20,9 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import sourcerer.Env
-import sourcerer.google.auto.factory.AutoFactory
-import sourcerer.google.auto.factory.Provided
 import sourcerer.processor.Env.Options
 import sourcerer.processor.ProcessingEnv
 import javax.annotation.processing.Filer
-import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 
@@ -56,15 +53,4 @@ class EnvModule {
 interface EnvModule2 {
     @Binds fun bindsEnv(env: sourcerer.Env): sourcerer.processor.Env
     @Binds fun bindsEnv2(env: sourcerer.processor.Env): ProcessingEnv
-}
-
-@Module
-class SampleModule
-@AutoFactory constructor(
-    @Provided val processingEnv: ProcessingEnvironment
-) {
-    @Provides
-    fun providesTypes(): Types {
-        return processingEnv.typeUtils
-    }
 }
