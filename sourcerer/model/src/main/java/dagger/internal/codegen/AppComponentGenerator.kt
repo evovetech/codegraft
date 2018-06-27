@@ -28,7 +28,7 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import dagger.internal.codegen.BootstrapComponentDescriptor2.Modules
+import dagger.internal.codegen.BootstrapComponentDescriptor.Modules
 import dagger.internal.codegen.ComponentStep.Option.Package
 import dagger.model.Key
 import org.jetbrains.annotations.Nullable
@@ -141,8 +141,7 @@ class AppComponentGenerator(
         val descriptors = components.map { it.descriptor }
         private
         val modules = descriptors
-                .mapNotNull(BootstrapComponentDescriptor::descriptor2)
-                .map(BootstrapComponentDescriptor2::applicationModules)
+                .map(BootstrapComponentDescriptor::applicationModules)
                 .flatMap(Modules::transitiveModules)
                 .filterNot { hasModifiers<TypeElement>(ABSTRACT).apply(it.moduleElement()) }
                 .toImmutableSet()
@@ -161,7 +160,7 @@ class AppComponentGenerator(
                 add(bootData.outKlass.rawType)
             }
             descriptors.forEach {
-                val type = it.definitionType
+                val type = it.componentDefinitionType
                 val name = type.asType().getFieldName()
                 val getter = MethodSpec.methodBuilder("get${name.capitalize()}")
                         .addModifiers(PUBLIC, ABSTRACT)

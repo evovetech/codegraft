@@ -37,7 +37,7 @@ class ComponentModuleGenerator(
     private val env: Env,
     private val types: SourcererTypes,
     private val elements: SourcererElements,
-    private val descriptor: BootstrapComponentDescriptor2,
+    private val descriptor: BootstrapComponentDescriptor,
     private val implGenerator: ComponentImplementationGenerator,
     private val definitionType: TypeElement = descriptor.componentDefinitionType
 ) : JavaOutput(
@@ -75,7 +75,7 @@ class ComponentModuleGenerator(
         private val elements: SourcererElements
     ) {
         fun create(
-            descriptor: BootstrapComponentDescriptor2,
+            descriptor: BootstrapComponentDescriptor,
             implGenerator: ComponentImplementationGenerator
         ) = ComponentModuleGenerator(
             env = env,

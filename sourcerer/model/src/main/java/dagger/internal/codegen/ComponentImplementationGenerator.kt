@@ -25,9 +25,9 @@ import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
 import dagger.MembersInjector
-import dagger.internal.codegen.BootstrapComponentDescriptor2.ComponentMethodDescriptor
-import dagger.internal.codegen.BootstrapComponentDescriptor2.ComponentMethodKind.MEMBERS_INJECTION
-import dagger.internal.codegen.BootstrapComponentDescriptor2.ComponentMethodKind.PROVISION
+import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodDescriptor
+import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodKind.MEMBERS_INJECTION
+import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodKind.PROVISION
 import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.classBuilder
@@ -47,7 +47,7 @@ class ComponentImplementationGenerator(
     private val env: Env,
     private val types: SourcererTypes,
     private val elements: SourcererElements,
-    private val descriptor: BootstrapComponentDescriptor2
+    private val descriptor: BootstrapComponentDescriptor
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.componentDefinitionType),
     outExt = "Implementation"
@@ -139,7 +139,7 @@ class ComponentImplementationGenerator(
         private val elements: SourcererElements
     ) {
         fun create(
-            descriptor: BootstrapComponentDescriptor2
+            descriptor: BootstrapComponentDescriptor
         ) = ComponentImplementationGenerator(
             env = env,
             types = types,

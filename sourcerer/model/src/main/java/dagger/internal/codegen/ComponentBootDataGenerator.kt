@@ -40,7 +40,7 @@ class ComponentBootDataGenerator(
     private val elements: SourcererElements,
     private val descriptor: BootstrapComponentDescriptor
 ) : JavaOutput(
-    rawType = ClassName.get(descriptor.definitionType),
+    rawType = ClassName.get(descriptor.componentDefinitionType),
     outExt = "BootData"
 ) {
     private val allBindings by lazy {

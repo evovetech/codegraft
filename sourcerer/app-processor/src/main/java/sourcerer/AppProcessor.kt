@@ -19,8 +19,5 @@ package sourcerer
 import com.google.auto.service.AutoService
 import javax.annotation.processing.Processor
 
-/**
- * Created by layne on 2/20/18.
- */
 @AutoService(Processor::class)
-class LibProcessor : MainProcessor(false)
+class AppProcessor : MainProcessor(true)

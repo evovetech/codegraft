@@ -33,7 +33,7 @@ fun componentCanMakeNewInstances(typeElement: TypeElement): Boolean =
 
 internal
 fun SourcererElements.isComponentContributionMethod(method: ExecutableElement): Boolean {
-    return BootstrapComponentDescriptor2.isComponentContributionMethod(this, method)
+    return BootstrapComponentDescriptor.isComponentContributionMethod(this, method)
 }
 
 fun <T> Collection<T>.toImmutableList(): ImmutableList<T> {

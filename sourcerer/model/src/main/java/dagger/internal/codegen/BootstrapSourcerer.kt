@@ -55,7 +55,7 @@ class BootstrapSourcerer
     private
     fun componentOutput(components: List<BootstrapComponentDescriptor>): Output {
         return Output(this, components.map {
-            ClassName.get(it.definitionType)
+            ClassName.get(it.componentDefinitionType)
         })
     }
 
