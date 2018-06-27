@@ -18,6 +18,7 @@ package dagger.internal.codegen
 
 import dagger.internal.codegen.BootstrapComponentDescriptor.Factory
 import dagger.internal.codegen.BootstrapComponentDescriptor.Kind
+import dagger.internal.codegen.ComponentStep.Option
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
 import sourcerer.DeferredOutput
@@ -25,6 +26,7 @@ import sourcerer.Env
 import sourcerer.Output
 import sourcerer.ProcessStep
 import sourcerer.inject.BootstrapComponent
+import sourcerer.processor.ProcessingEnv.Options
 import sourcerer.typeInputs
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -100,6 +102,19 @@ constructor(
         Package(
             "evovetech.processor.package",
             "evovetech.processor"
+        ),
+        Application(
+            "evovetech.processor.application",
+            "android.app.Application"
         );
     }
 }
+
+val Options.Package: String
+    get() = this[Option.Package]
+val Options.Application: Class<*>?
+    get() = try {
+        Class.forName(this[Option.Application])
+    } catch (_: Throwable) {
+        null
+    }
