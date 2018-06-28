@@ -34,6 +34,7 @@ configurations.all { Configuration c ->
     }
 }
 
+
 configurations {
     anno
 }
