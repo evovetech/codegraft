@@ -20,12 +20,18 @@ import com.android.build.api.transform.Transform
 import com.android.build.gradle.BaseExtension
 import evovetech.gradle.transform.ByteBuddyRunRunTransform
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.dependencies
 
 class ByteBuddyPlugin : TransformPlugin() {
     override
     fun BaseExtension.transformer(
         project: Project
-    ): Transform = ByteBuddyRunRunTransform {
-        bootClasspath
+    ): Transform {
+        project.dependencies {
+            add("runtimeOnly", "evovetech.android.inject:core:0.5.0")
+        }
+        return ByteBuddyRunRunTransform {
+            bootClasspath
+        }
     }
 }
