@@ -75,7 +75,7 @@ import java.util.EnumMap
 import javax.xml.parsers.SAXParserFactory
 
 private
-const val sourcererVersion = "0.1-SNAPSHOT"
+const val sourcererVersion = "0.5.0-SNAPSHOT"
 private
 const val javaPoetVersion = "1.11.1"
 
