@@ -18,17 +18,39 @@ apply plugin: 'maven-publish'
 
 def pubName = ext.pubName
 def pub = publishing.publications.create(pubName, MavenPublication)
+def pompom = pom
 
 afterEvaluate {
+    def android = extensions.findByName("android")
     configure(pub) {
-        from components.java
+        MavenPublication
+        if (android) {
+            groupId pompom.groupId
+            def variants
+            if (android.hasProperty('libraryVariants')) {
+                variants = android.libraryVariants
+            } else {
+                variants = android.applicationVariants
+            }
+            def variant = variants
+                    .matching { it.buildType.name == 'release' }
+                    .first()
+            def output = variant.outputs.first()
+            artifact(output.outputFile) {
+                extension "aar"
+                builtBy(variant.assemble)
+            }
+//            artifact("${buildDir}/outputs/aar/${project.name}-release.aar")
+        } else {
+            from components.java
+        }
         if (project.tasks.findByName('sourcesJar')) {
-            artifact sourcesJar {
+            artifact(sourcesJar) {
                 classifier "sources"
             }
         }
         if (project.tasks.findByName('javadocJar')) {
-            artifact javadocJar {
+            artifact(javadocJar) {
                 classifier "javadoc"
             }
         }

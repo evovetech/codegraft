@@ -23,9 +23,14 @@ dokka {
     outputDirectory = "$buildDir/javadoc"
 }
 
+def android = extensions.findByName("android")
 if (!project.tasks.findByName('sourcesJar')) {
     task sourcesJar(type: Jar) {
-        from sourceSets.main.allSource.srcDirs
+        if (android) {
+            from android.sourceSets.main.java.srcDirs
+        } else {
+            from sourceSets.main.allSource.srcDirs
+        }
         classifier = 'sources'
     }
 }
