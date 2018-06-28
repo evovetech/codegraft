@@ -31,6 +31,7 @@ dependencies {
     compileOnly 'org.jetbrains.kotlin:kotlin-gradle-plugin'
     compileOnly "com.android.tools.build:gradle:${androidVersion}"
     compileOnly "com.android.tools.build:builder:${androidVersion}"
+    runtimeOnly(group: 'com.google.android', name: 'android', version: '4.1.1.4')
 }
 
 def prefix = "evovetech.android"

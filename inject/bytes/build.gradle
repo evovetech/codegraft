@@ -42,10 +42,7 @@ dependencies {
     api "com.google.auto.value:auto-value-annotations:${app.autoValueVersion}"
     anno "com.google.auto.service:auto-service:${app.autoServiceVersion}"
     anno "com.google.auto.factory:auto-factory:${app.autoFactoryVersion}"
-//    compileOnly(project(':core')) {
-//        artifact {
-//            name = ''
-//            classifier='release'
-//        }
-//    }
+
+    implementation project(':core')
+    compileOnly(group: 'com.google.android', name: 'android', version: '4.1.1.4')
 }

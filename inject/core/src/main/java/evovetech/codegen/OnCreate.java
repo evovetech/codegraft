@@ -19,7 +19,7 @@ package evovetech.codegen;
 import android.util.Log;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 
-final
+public final
 class OnCreate {
     public static
     void log(@SuperCall Runnable super$onCreate) {

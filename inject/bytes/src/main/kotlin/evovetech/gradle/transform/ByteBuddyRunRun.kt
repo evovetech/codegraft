@@ -16,7 +16,9 @@
 
 package evovetech.gradle.transform
 
+import android.app.Application
 import com.android.build.api.transform.TransformInvocation
+import evovetech.codegen.OnCreate
 import evovetech.gradle.transform.content.Output
 import evovetech.gradle.transform.content.allFiles
 import evovetech.gradle.transform.content.classFileLocator
@@ -24,10 +26,8 @@ import net.bytebuddy.ByteBuddy
 import net.bytebuddy.ClassFileVersion
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.build.EntryPoint.Default.REBASE
-import net.bytebuddy.build.Plugin
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.ClassFileLocator.Compound
-import net.bytebuddy.dynamic.DynamicType.Builder
 import net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer.Suffixing
 import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.matcher.ElementMatchers.named
@@ -37,59 +37,36 @@ import net.bytebuddy.pool.TypePool.ClassLoading
 import net.bytebuddy.pool.TypePool.Default.ReaderMode.FAST
 import net.bytebuddy.pool.TypePool.Default.WithLazyResolution
 import java.io.File
-
-abstract
-class BBRunRun2(
-    val typePool: TypePool,
-    val classFileVersion: ClassFileVersion = ClassFileVersion.JAVA_V7
-) {
-    val entryPoint: EntryPoint = REBASE
-    val androidApplication = typePool.describe("evovetech.sample.AndroidApplication")
-            .resolve()
-
-    fun newByteBuddy(): ByteBuddy =
-        entryPoint.byteBuddy(classFileVersion)
-}
-
-abstract
-class BBRunRunPlugin : Plugin {
-    override
-    fun apply(builder: Builder<*>, typeDescription: TypeDescription): Builder<*> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override
-    fun matches(target: TypeDescription): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-}
-
-interface ByteBuddyProcessor {
-    fun process(): Boolean
-}
+import kotlin.reflect.KClass
 
 class ByteBuddyRunRun(
-    val bootClasspath: () -> List<File>,
+    bootClasspath: () -> List<File>,
     delegate: TransformInvocation
 ) : RunRun(delegate) {
-    val classFileLocator = (refInputs + primaryInputs).map {
-        it.classFileLocator
-    }.let {
-        val boot = bootClasspath().map {
-            it.classFileLocator
-        }
-        Compound(boot + it)
+    private
+    val bootClassFileLocator by lazy {
+        Compound(bootClasspath().map { it.classFileLocator })
     }
-    val typePool: TypePool = WithLazyResolution(
-        Simple(),
-        classFileLocator,
-        FAST,
-        ClassLoading.ofBootPath()
-    )
+    val classFileLocator by lazy {
+        (refInputs + primaryInputs).map {
+            it.classFileLocator
+        }.let {
+            Compound(it + bootClassFileLocator)
+        }
+    }
+    val typePool: TypePool by lazy {
+        WithLazyResolution(
+            Simple(),
+            classFileLocator,
+            FAST,
+            ClassLoading.ofBootPath()
+        )
+    }
     val classFileVersion = ClassFileVersion.JAVA_V7
     val entryPoint: EntryPoint = REBASE
-    val androidApplication = typePool.describe("evovetech.sample.AndroidApplication")
-            .resolve()
+    val androidApplication by lazy {
+        typePool.resolve<Application>()
+    }
 
     fun newByteBuddy(): ByteBuddy =
         entryPoint.byteBuddy(classFileVersion)
@@ -113,23 +90,24 @@ class ByteBuddyRunRun(
             output.copyToDest()
         }
         if (!src.endsWith(CLASS_FILE_EXTENSION)) {
+            println("src=$src")
             return copy()
         }
 
         val typeName = src.replace('/', '.')
                 .substring(0, src.length - CLASS_FILE_EXTENSION.length)
         val typeDescription = typePool.describe(typeName).resolve()
-        val anno = typeDescription.declaredAnnotations.ofType(androidApplication)
-                   ?: return copy()
-        println("anno=$anno")
+        if (!typeDescription.isAssignableTo(androidApplication)) {
+            println("type=$typeDescription")
+            return copy()
+        }
         val byteBuddy = newByteBuddy()
         val methodTransformer = Suffixing("original")
         try {
-            val onCreate = typePool.describe("evovetech.sample.OnCreate").resolve()
             val maps = entryPoint.transform(typeDescription, byteBuddy, classFileLocator, methodTransformer)
                     .defineProperty("defined", String::class.java)
                     .field(named("defined")).value("one")
-                    .method(named("onCreate")).intercept(MethodDelegation.to(onCreate))
+                    .method(named("onCreate")).intercept(methodDelegation<OnCreate>())
                     .make()
                     .saveIn(output.base)
             println("maps=$maps")
@@ -139,3 +117,14 @@ class ByteBuddyRunRun(
         }
     }
 }
+
+inline
+fun <reified T> TypePool.resolve() =
+    resolve(T::class)
+
+fun TypePool.resolve(type: KClass<*>): TypeDescription = describe(type.java.canonicalName)
+        .resolve()
+
+inline
+fun <reified T> methodDelegation() =
+    MethodDelegation.to(T::class.java)

@@ -38,6 +38,7 @@ val File.classFileLocator: ClassFileLocator
         ClassFileLocator.ForFolder(this)
     } else {
         val jarFile = JarFile(this)
+        println("jarFile=$jarFile")
         ClassFileLocator.ForJarFile(jarFile)
     }
 

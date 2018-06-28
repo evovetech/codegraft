@@ -24,7 +24,7 @@ apply plugin: 'evovetech.settings'
 apply from: "${configDir}/evovetech/settings.gradle"
 
 include(
-//        ':core',
+        ':core',
         ':bytes',
         ':plugin',
 )

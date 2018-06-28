@@ -28,7 +28,7 @@ plugins {
     id("io.fabric")
 //    id("com.google.firebase.firebase-perf")
     id("realm-android")
-//    id("evovetech.android.transform.bytes")
+    id("evovetech.android.transform.bytes")
 //    id("evovetech.android.transform.graph")
     id("evovetech.android.transform.inject")
 }
