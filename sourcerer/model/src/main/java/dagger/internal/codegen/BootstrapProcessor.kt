@@ -19,8 +19,9 @@ package dagger.internal.codegen
 import dagger.BindsInstance
 import sourcerer.BaseProcessor
 import sourcerer.ProcessStep
-import sourcerer.processor.Env.Options
+import sourcerer.processor.Env
 import sourcerer.processor.ProcessingEnv
+import sourcerer.processor.ProcessingEnv.Options
 import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -84,7 +85,7 @@ class BootstrapProcessor(
 
         @dagger.Component.Builder
         interface Builder {
-            @BindsInstance fun env(env: sourcerer.Env)
+            @BindsInstance fun env(env: Env)
             fun build(): Component
         }
     }

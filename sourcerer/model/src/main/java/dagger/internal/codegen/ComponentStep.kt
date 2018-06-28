@@ -22,10 +22,11 @@ import dagger.internal.codegen.ComponentStep.Option
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
 import sourcerer.DeferredOutput
-import sourcerer.Env
 import sourcerer.Output
 import sourcerer.ProcessStep
 import sourcerer.inject.BootstrapComponent
+import sourcerer.processor.Env
+import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Options
 import sourcerer.typeInputs
 import javax.inject.Inject
@@ -98,7 +99,7 @@ constructor(
     class Option(
         override val key: String,
         override val defaultValue: String
-    ) : sourcerer.processor.Env.Option {
+    ) : ProcessingEnv.Option {
         Package(
             "evovetech.processor.package",
             "evovetech.processor"

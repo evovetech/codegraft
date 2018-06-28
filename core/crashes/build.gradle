@@ -32,9 +32,5 @@ dependencies(dagger.applyAndroid('implementation'))
 
 dependencies {
     api project(':core:annotations')
-    kapt("evovetech.sourcerer:lib-processor:${app.sourcererVersion}")
-    kaptTest("evovetech.sourcerer:app-processor:${app.sourcererVersion}")
-    kaptAndroidTest("evovetech.sourcerer:app-processor:${app.sourcererVersion}")
-
     implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"
 }

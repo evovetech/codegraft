@@ -14,19 +14,8 @@
  * limitations under the License.
  */
 
-package sourcerer
+package dagger.internal.codegen
 
-import sourcerer.processor.Env
-import sourcerer.processor.ProcessingEnv.Option
+import sourcerer.processor.ProcessingEnv
 
-interface ProcessStep {
-    fun Env.annotations():
-            Set<AnnotationType>
-
-    fun Env.process(
-        annotationElements: AnnotationElements
-    ): Map<AnnotationType, List<Output>>
-
-    fun supportedOptions(): Iterable<Option> =
-        emptySet()
-}
+typealias Env = ProcessingEnv

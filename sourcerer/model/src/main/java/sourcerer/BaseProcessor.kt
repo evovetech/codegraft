@@ -17,8 +17,10 @@
 package sourcerer
 
 import com.google.auto.common.BasicAnnotationProcessor
-import sourcerer.processor.Env.Option
+import sourcerer.processor.Env
 import sourcerer.processor.ProcessingEnv
+import sourcerer.processor.ProcessingEnv.Option
+import sourcerer.processor.newEnv
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 
@@ -30,7 +32,7 @@ abstract
 class BaseProcessor : BasicAnnotationProcessor() {
     protected
     val env: Env by lazy {
-        Env(this)
+        newEnv(this, processingEnv)
     }
     private
     val steps by lazy {
@@ -90,16 +92,6 @@ class BaseProcessor : BasicAnnotationProcessor() {
                 .onEach { env.log("output=$it") }
                 .mapNotNull(env::mapOutput)
                 .toSet()
-    }
-
-    protected
-    class Env(
-        parent: BaseProcessor
-    ) : sourcerer.Env(
-        parent.processingEnv!!
-    ) {
-        override
-        val processorType = parent::class
     }
 }
 

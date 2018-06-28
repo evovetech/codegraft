@@ -18,6 +18,7 @@ package sourcerer
 
 import sourcerer.io.Reader
 import sourcerer.io.Writer
+import sourcerer.processor.BaseProcessingEnv
 import sourcerer.processor.Env
 import sourcerer.processor.ProcessingEnv
 import java.net.URL
@@ -28,7 +29,8 @@ import javax.lang.model.element.Element
  * Created by layne on 2/21/18.
  */
 
-abstract class BaseEnv(env: Env) : Env(env) {
+abstract
+class BaseEnv(env: Env) : BaseProcessingEnv(env) {
     abstract val file: MetaInf.File
     private val classLoader: ClassLoader = javaClass.classLoader
 

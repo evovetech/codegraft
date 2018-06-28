@@ -22,6 +22,7 @@ import sourcerer.inject.Generated
 import sourcerer.inject.IntoCollection
 import sourcerer.io.Reader
 import sourcerer.io.Writer
+import sourcerer.processor.Env
 import java.net.URL
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass

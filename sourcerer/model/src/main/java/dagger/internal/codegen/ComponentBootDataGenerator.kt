@@ -19,7 +19,6 @@ package dagger.internal.codegen
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
 import dagger.model.Key
-import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.classBuilder
 import sourcerer.inject.BootScope

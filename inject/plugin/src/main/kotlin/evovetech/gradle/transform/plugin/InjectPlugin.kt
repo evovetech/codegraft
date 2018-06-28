@@ -16,6 +16,7 @@
 
 package evovetech.gradle.transform.plugin
 
+import com.android.SdkConstants
 import com.android.SdkConstants.ATTR_FUNCTIONAL_TEST
 import com.android.SdkConstants.ATTR_HANDLE_PROFILING
 import com.android.SdkConstants.ATTR_LABEL
@@ -37,10 +38,13 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.BasePlugin
 import com.android.build.gradle.FeatureExtension
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.api.AnnotationProcessorOptions
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.BaseVariantOutput
+import com.android.build.gradle.api.TestVariant
 import com.android.build.gradle.tasks.ManifestProcessorTask
 import com.android.manifmerger.PlaceholderHandler
+import com.android.utils.FileUtils
 import com.android.utils.XmlUtils
 import com.google.common.collect.Maps
 import evovetech.gradle.transform.plugin.ManifestFile.Attribute.ApplicationName
@@ -58,86 +62,175 @@ import evovetech.gradle.transform.plugin.ManifestFile.Attribute.VersionName
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.kotlin.dsl.dependencies
+import org.jetbrains.kotlin.daemon.common.findWithTransform
+import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.DefaultHandler
 import java.io.File
 import java.util.EnumMap
 import javax.xml.parsers.SAXParserFactory
 
+private
+const val sourcererVersion = "0.1-SNAPSHOT"
+private
+const val javaPoetVersion = "1.11.1"
+
 class InjectPlugin : Plugin<Project> {
     override
     fun apply(project: Project) {
+        val wrapper = ProjectWrapper(project)
+
         project.plugins.withType(BasePlugin::class.java) {
-            mapPlugin(project)
-                    .setup()
+            project.dependencies {
+                add("kapt", "evovetech.sourcerer:model:$sourcererVersion")
+            }
+            wrapper.setup(extension)
+        }
+
+        project.plugins.withType(KotlinAndroidPluginWrapper::class.java) {
+            project.extensions.findByType(KaptExtension::class.java)
+                    ?.apply(wrapper::setup)
         }
     }
+
 }
 
-fun BasePlugin<*>.mapPlugin(project: Project) =
-    PluginWrapper(project, this)
-
-class PluginWrapper<P : BasePlugin<*>>(
-    project: Project,
-    private val plugin: P
+class ProjectWrapper(
+    project: Project
 ) : Project by project {
-
-    fun setup() {
-        plugin.extension.setup()
+    fun setup(kapt: KaptExtension) {
+        kapt.arguments {
+            val v = variant
+            when (v) {
+                is BaseVariant -> {
+                    v.initTask()
+                }
+            }
+        }
     }
 
-    private
-    fun BaseExtension.setup(): Unit = when (this) {
-        is AppExtension -> setup()
-        is LibraryExtension -> setup()
-        is FeatureExtension -> setup()
+    fun setup(android: BaseExtension): Unit = when (android) {
+        is AppExtension -> {
+            android.setup()
+        }
+        is LibraryExtension -> {
+            project.dependencies {
+                add("kapt", "evovetech.sourcerer:lib-processor:$sourcererVersion")
+                add("kaptAndroidTest", "evovetech.sourcerer:app-processor:$sourcererVersion")
+                add("kaptTest", "evovetech.sourcerer:app-processor:$sourcererVersion")
+            }
+            android.setup()
+        }
+        is FeatureExtension -> android.setup()
         else -> Unit
     }
 
     private
+    fun Configuration.add(depName: String) {
+        project.dependencies.add(name, "evovetech.sourcerer:$depName-processor:$sourcererVersion")
+    }
+
+    private
     fun AppExtension.setup() {
-        applicationVariants.setup()
+        applicationVariants.all {
+            kapt { add("app") }
+        }
     }
 
     private
     fun LibraryExtension.setup() {
-        libraryVariants.setup()
+        libraryVariants.setup {
+            testVariants.setup()
+            unitTestVariants.setup()
+        }
     }
 
     private
     fun FeatureExtension.setup() {
-        featureVariants.setup()
+        featureVariants.setup {
+            testVariants.setup()
+            unitTestVariants.setup()
+        }
     }
 
     private
-    fun <T : BaseVariant> DomainObjectSet<T>.setup(block: T.() -> Unit = {}) = all {
-        val packageName = generateBuildConfig.appPackageName
-        javaCompileOptions.annotationProcessorOptions.apply {
-            arguments["evovetech.processor.package"] = packageName
-        }
-        outputs.map(BaseVariantOutput::getProcessManifest)
-                .map(this::initialize)
+    fun <T : BaseVariant> T.kapt(config: Configuration.() -> Unit) {
+        val kaptName = "kapt${name.capitalize()}"
+        project.configurations
+                .matching {
+                    val matches = it.name == kaptName
+                    println("$kaptName == ${it.name} ? $matches")
+                    matches
+                }
+                .all(config)
     }
+
+    private
+    fun <T : BaseVariant> DomainObjectSet<T>.setup(
+        block: T.() -> Unit = {}
+    ) = all {
+        val variant = this
+        val adder: Configuration.() -> Unit = {
+            when (variant) {
+                is TestVariant -> add("app")
+                else -> add("lib")
+            }
+        }
+        annotationProcessorConfiguration.apply(adder)
+        kapt(adder)
+        block()
+    }
+
+    private
+    fun <T : BaseVariant> T.initTask() = initTasks.findWithTransform { func ->
+        val task = func(javaCompileOptions.annotationProcessorOptions)
+        Pair(task != null, task)
+    }
+
+    private
+    val <T : BaseVariant> T.initTasks: List<(AnnotationProcessorOptions) -> ManifestProcessorTask?>
+        get() {
+            val tasks = outputs.mapNotNull(::initialize)
+            return when (this) {
+                is TestVariant -> tasks + testedVariant.initTasks
+                else -> tasks
+            }
+        }
 }
 
-fun BaseVariant.initialize(
+val ManifestProcessorTask.manifestFile
+    get() = FileUtils.join(manifestOutputDirectory, SdkConstants.ANDROID_MANIFEST_XML)
+            .toManifestFile()
+
+fun initialize(
+    output: BaseVariantOutput
+): (AnnotationProcessorOptions) -> ManifestProcessorTask? = initialize(output.processManifest)
+
+fun initialize(
     task: ManifestProcessorTask
-) = task.doLast {
-    val file = task.manifestOutputDirectory
-                       ?.let(File::listFiles)
-                       ?.find { it.extension == "xml" }
-               ?: return@doLast
-    file.toManifestFile().run {
-        javaCompileOptions.annotationProcessorOptions.apply {
-            ApplicationName.value?.let {
-                arguments["evovetech.processor.manifest"] = it
+) = { options: AnnotationProcessorOptions ->
+    task.manifestFile?.run {
+        options.apply {
+            Package.value?.let {
+                arguments["evovetech.processor.package"] = it
             }
+            InstTargetPkg.value?.let {
+                arguments["evovetech.processor.package"] = it
+            }
+            ApplicationName.value?.let {
+                arguments["evovetech.processor.application"] = it
+            }
+
             println("\nprocessor arguments {")
             arguments.forEach { (k, v) ->
                 println("  $k=$v")
             }
             println("}\n")
         }
+        task
     }
 }
 
@@ -148,8 +241,11 @@ val ParserFactory: SAXParserFactory by lazy {
     factory
 }
 
-fun File.toManifestFile(): ManifestFile =
+fun File.toManifestFile(): ManifestFile? = if (exists()) {
     ManifestFile(this)
+} else {
+    null
+}
 
 class ManifestFile(
     private val manifestFile: File

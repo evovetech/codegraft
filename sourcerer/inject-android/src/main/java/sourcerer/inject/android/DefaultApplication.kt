@@ -14,20 +14,9 @@
  * limitations under the License.
  */
 
-package sourcerer
+package sourcerer.inject.android
 
-import javax.annotation.processing.ProcessingEnvironment
-import javax.annotation.processing.Processor
-import kotlin.reflect.KClass
+open
+class DefaultApplication : AndroidApplication() {
 
-/**
- * Created by layne on 3/19/18.
- */
-abstract
-class Env : sourcerer.processor.Env {
-    abstract
-    val processorType: KClass<out Processor>
-
-    constructor(env: Env) : super(env)
-    constructor(processingEnv: ProcessingEnvironment) : super(processingEnv)
 }

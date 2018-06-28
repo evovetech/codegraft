@@ -29,7 +29,6 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import dagger.internal.codegen.BootstrapComponentDescriptor.Modules
-import dagger.internal.codegen.ComponentStep.Option.Package
 import dagger.model.Key
 import org.jetbrains.annotations.Nullable
 import sourcerer.JavaOutput
@@ -40,7 +39,7 @@ import sourcerer.inject.BootScope
 import sourcerer.interfaceBuilder
 import sourcerer.name
 import sourcerer.nestedBuilder
-import sourcerer.processor.Env
+import sourcerer.processor.ProcessingEnv
 import sourcerer.toKlass
 import sourcerer.typeSpec
 import javax.inject.Inject
@@ -376,15 +375,19 @@ class AppComponentGenerator(
 
     class Factory
     @Inject constructor(
-        private val options: Env.Options
+        private val options: ProcessingEnv.Options
     ) {
+        init {
+            println("\npkg=${options.Package}\n")
+        }
+
         fun create(
             generatedComponents: List<ComponentOutput>,
             storedComponents: List<ComponentOutput>
         ) = AppComponentGenerator(
             generatedComponents = generatedComponents,
             storedComponents = storedComponents,
-            pkg = options[Package]
+            pkg = options.Package
         )
     }
 }

@@ -17,6 +17,7 @@
 package sourcerer
 
 import sourcerer.lib.LibEnvProcessor
+import sourcerer.processor.ProcessingEnv
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.TypeElement
 
@@ -53,7 +54,7 @@ class AppGenerator : LibEnvProcessor() {
     class Option(
         override val key: String,
         override val defaultValue: String
-    ) : sourcerer.processor.Env.Option {
+    ) : ProcessingEnv.Option {
         Package(
             "evovetech.processor.package",
             "evovetech.processor"

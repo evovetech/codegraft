@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package sourcerer
+package sourcerer.inject
 
-import sourcerer.processor.Env
-import sourcerer.processor.ProcessingEnv.Option
+import javax.inject.Qualifier
+import kotlin.annotation.AnnotationRetention.RUNTIME
 
-interface ProcessStep {
-    fun Env.annotations():
-            Set<AnnotationType>
-
-    fun Env.process(
-        annotationElements: AnnotationElements
-    ): Map<AnnotationType, List<Output>>
-
-    fun supportedOptions(): Iterable<Option> =
-        emptySet()
-}
+@Retention(RUNTIME)
+@MustBeDocumented
+@Qualifier
+annotation
+class Package(
+    val value: String
+)

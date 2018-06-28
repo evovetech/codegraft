@@ -18,6 +18,7 @@ package sourcerer
 
 import com.squareup.javapoet.ClassName
 import sourcerer.io.Reader
+import sourcerer.processor.Env
 import kotlin.reflect.KClass
 
 /**

@@ -16,13 +16,14 @@
 
 package sourcerer.lib
 
+import sourcerer.processor.BaseProcessingEnv
 import sourcerer.processor.Env
 
 /**
  * Created by layne on 2/21/18.
  */
 
-class LibEnv(env: Env) : Env(env) {
+class LibEnv(env: Env) : BaseProcessingEnv(env) {
     val modules: LibModuleEnv = LibModuleEnv(env)
     val components: LibComponentEnv = LibComponentEnv(modules)
 }

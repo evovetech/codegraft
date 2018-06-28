@@ -20,14 +20,34 @@ import java.util.Locale
 import javax.annotation.processing.Filer
 import javax.annotation.processing.Messager
 import javax.annotation.processing.ProcessingEnvironment
+import javax.annotation.processing.Processor
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 import javax.tools.Diagnostic.Kind.ERROR
 import javax.tools.Diagnostic.Kind.NOTE
+import kotlin.reflect.KClass
+
+typealias Env = ProcessingEnv
+
+open
+class BaseProcessingEnv(
+    override val processorType: KClass<out Processor>,
+    override val parent: ProcessingEnvironment
+) : ProcessingEnv {
+    constructor(
+        env: Env
+    ) : this(env.processorType, env.parent)
+
+    constructor(
+        processor: Processor,
+        env: ProcessingEnvironment
+    ) : this(processor::class, env)
+}
 
 interface ProcessingEnv {
+    val processorType: KClass<out Processor>
     val parent: ProcessingEnvironment
     val options: Options
         get() = Options(parent.options)
@@ -51,16 +71,16 @@ interface ProcessingEnv {
     fun filer() = filer
 
     fun log(element: Element, message: String, vararg args: Any) =
-        messager.log(element, message, args)
+        Unit//  messager.log(element, message, args)
 
     fun log(message: String, vararg args: Any) =
-        messager.log(message, args)
+        Unit//messager.log(message, args)
 
     fun error(element: Element, message: String, vararg args: Any) =
-        messager.error(element, message, args)
+        Unit// messager.error(element, message, args)
 
     fun error(message: String, vararg args: Any) =
-        messager.error(message, args)
+       Unit// messager.error(message, args)
 
     companion object {
         const val ALL_ANNOTATIONS = "*"
@@ -91,27 +111,10 @@ interface ProcessingEnv {
     }
 }
 
-open
-class Env(override val parent: ProcessingEnvironment) :
-    ProcessingEnv {
-    constructor(env: ProcessingEnv) :
-            this(env.parent)
-
-    final override
-    val options: Options by lazy {
-        Options(parent.options)
-    }
-
-    companion object {
-        const val ALL_ANNOTATIONS = ProcessingEnv.ALL_ANNOTATIONS
-        val ALL_ANNOTATION_TYPES = ProcessingEnv.ALL_ANNOTATION_TYPES
-    }
-
-    interface Option : ProcessingEnv.Option
-
-    class Options(provided: Map<String, String>) :
-        ProcessingEnv.Options(provided)
-}
+fun newEnv(
+    processor: Processor,
+    processingEnvironment: ProcessingEnvironment
+): ProcessingEnv = BaseProcessingEnv(processor, processingEnvironment)
 
 fun Messager.log(element: Element, message: String, vararg args: Any) {
     val msg = msg(message, args)

@@ -18,6 +18,7 @@ package sourcerer
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeSpec
+import sourcerer.processor.Env
 import javax.lang.model.element.TypeElement
 import kotlin.reflect.KClass
 

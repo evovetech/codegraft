@@ -16,6 +16,8 @@
 
 package sourcerer
 
+import sourcerer.processor.Env
+
 class MultiStep(
     init: Builder.() -> Unit
 ) : ProcessStep {

@@ -62,7 +62,6 @@ dependencies {
     implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"
 //    implementation "com.google.firebase:firebase-perf:${app.firebaseVersion}"
     implementation "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
-    kapt("evovetech.sourcerer:app-processor:${app.sourcererVersion}")
 }
 
 // ADD THIS AT THE BOTTOM

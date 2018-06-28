@@ -16,41 +16,36 @@
 
 package dagger.internal.codegen
 
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import sourcerer.Env
-import sourcerer.processor.Env.Options
 import sourcerer.processor.ProcessingEnv
+import sourcerer.processor.ProcessingEnv.Options
+import sourcerer.processor.log
 import javax.annotation.processing.Filer
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 
-@Module(includes = [EnvModule2::class])
+@Module
 class EnvModule {
     @Provides
-    fun providesTypes(env: Env): Types {
+    fun providesTypes(env: ProcessingEnv): Types {
         return env.typeUtils
     }
 
     @Provides
-    fun providesElements(env: Env): Elements {
+    fun providesElements(env: ProcessingEnv): Elements {
         return env.elementUtils
     }
 
     @Provides
-    fun providesOptions(env: Env): Options {
-        return env.options
+    fun providesOptions(env: ProcessingEnv): Options {
+        return env.options.apply {
+            env.parent.messager.log("options = $this")
+        }
     }
 
     @Provides
-    fun providesFiler(env: Env): Filer {
+    fun providesFiler(env: ProcessingEnv): Filer {
         return env.filer
     }
-}
-
-@Module
-interface EnvModule2 {
-    @Binds fun bindsEnv(env: sourcerer.Env): sourcerer.processor.Env
-    @Binds fun bindsEnv2(env: sourcerer.processor.Env): ProcessingEnv
 }
