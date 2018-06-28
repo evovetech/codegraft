@@ -22,6 +22,7 @@ import com.crashlytics.android.Crashlytics
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
 import io.fabric.sdk.android.Fabric
+import io.realm.RealmConfiguration
 import sourcerer.inject.android.BootApplication
 import javax.inject.Inject
 
@@ -32,15 +33,8 @@ class App : DaggerApplication(), BootApplication<AndroidAppComponent> {
 
     override
     val bootstrap = bootstrap {
-        builderFabricFunction1 {
-            it.kits(Crashlytics())
-            it.build()
-        }
-        builderRealmConfigurationFunction1 {
-            it.name("app.realm")
-            it.schemaVersion(1)
-            it.build()
-        }
+        builderFabricFunction1(Fabric.Builder::bootstrap)
+        builderRealmConfigurationFunction1(RealmConfiguration.Builder::bootstrap)
         this@App
     }
 
@@ -74,4 +68,15 @@ class App : DaggerApplication(), BootApplication<AndroidAppComponent> {
             Log.d(tag, "app -- fabric kit=$it")
         }
     }
+}
+
+fun Fabric.Builder.bootstrap(): Fabric {
+    return kits(Crashlytics())
+            .build()
+}
+
+fun RealmConfiguration.Builder.bootstrap(): RealmConfiguration {
+    return name("app.realm")
+            .schemaVersion(1)
+            .build()
 }
