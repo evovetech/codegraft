@@ -42,6 +42,7 @@ import com.android.build.gradle.api.AnnotationProcessorOptions
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.BaseVariantOutput
 import com.android.build.gradle.api.TestVariant
+import com.android.build.gradle.api.UnitTestVariant
 import com.android.build.gradle.tasks.ManifestProcessorTask
 import com.android.manifmerger.PlaceholderHandler
 import com.android.utils.FileUtils
@@ -105,6 +106,9 @@ class ProjectWrapper(
         kapt.arguments {
             val v = variant
             when (v) {
+                is UnitTestVariant -> {
+                    v.initTask()
+                }
                 is BaseVariant -> {
                     v.initTask()
                 }
@@ -185,20 +189,38 @@ class ProjectWrapper(
     }
 
     private
-    fun <T : BaseVariant> T.initTask() = initTasks.findWithTransform { func ->
-        val task = func(javaCompileOptions.annotationProcessorOptions)
+    fun <T : BaseVariant> T.initTask(
+        options: AnnotationProcessorOptions = javaCompileOptions.annotationProcessorOptions
+    ) = initTasks().findWithTransform { func ->
+        val task = func(options)
         Pair(task != null, task)
     }
 
     private
-    val <T : BaseVariant> T.initTasks: List<(AnnotationProcessorOptions) -> ManifestProcessorTask?>
-        get() {
-            val tasks = outputs.mapNotNull(::initialize)
-            return when (this) {
-                is TestVariant -> tasks + testedVariant.initTasks
-                else -> tasks
-            }
+    fun UnitTestVariant.initTask(): ManifestProcessorTask? {
+        val options = javaCompileOptions.annotationProcessorOptions
+        val tested = testedVariant
+        return initTask(options) ?: when (tested) {
+            is BaseVariant -> tested.initTask(options)
+            else -> null
         }
+    }
+
+    private
+    fun <T : BaseVariant> T.initTasks(): List<(AnnotationProcessorOptions) -> ManifestProcessorTask?> {
+        val tasks = outputs.mapNotNull(::initialize)
+        return tasks + when (this) {
+            is TestVariant -> testedVariant.initTasks()
+            is UnitTestVariant -> {
+                val tested = testedVariant
+                when (tested) {
+                    is BaseVariant -> tested.initTasks()
+                    else -> emptyList()
+                }
+            }
+            else -> emptyList()
+        }
+    }
 }
 
 val ManifestProcessorTask.manifestFile
@@ -214,11 +236,8 @@ fun initialize(
 ) = { options: AnnotationProcessorOptions ->
     task.manifestFile?.run {
         options.apply {
-            Package.value?.let {
-                arguments["evovetech.processor.package"] = it
-            }
-            InstTargetPkg.value?.let {
-                arguments["evovetech.processor.package"] = it
+            (Package.value ?: InstTargetPkg.value)?.let { pkg ->
+                arguments["evovetech.processor.package"] = pkg
             }
             ApplicationName.value?.let {
                 arguments["evovetech.processor.application"] = it
