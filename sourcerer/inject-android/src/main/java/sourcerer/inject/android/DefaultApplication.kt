@@ -20,3 +20,4 @@ open
 class DefaultApplication : AndroidApplication() {
 
 }
+

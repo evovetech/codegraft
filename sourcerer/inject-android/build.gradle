@@ -23,9 +23,12 @@ plugins {
 
 apply from: "${configDir}/android/base.gradle"
 apply from: "${configDir}/android-library.gradle"
+apply from: "${configDir}/versions/dagger.gradle"
 
 dependencies {
+    api dagger.android
     api project(':annotations')
     api project(':inject')
     kapt project(':lib-processor')
+    kapt dagger.androidCompiler
 }

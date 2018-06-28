@@ -16,18 +16,21 @@
 
 package evovetech.sample
 
-import android.content.ContentProvider
+import android.app.Activity
+import android.app.Application
 import android.util.Log
 import com.crashlytics.android.Crashlytics
 import dagger.android.AndroidInjector
-import dagger.android.DaggerApplication
+import dagger.android.HasActivityInjector
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
 import sourcerer.inject.android.BootApplication
 import javax.inject.Inject
 
 //@AndroidApplication(AppBoot::class)
-class App : DaggerApplication(), BootApplication<AndroidAppComponent> {
+class App : Application(),
+    BootApplication<AndroidAppComponent>,
+    HasActivityInjector {
     @Inject lateinit
     var fabric: Fabric
 
@@ -51,16 +54,8 @@ class App : DaggerApplication(), BootApplication<AndroidAppComponent> {
     }
 
     override
-    fun contentProviderInjector(): AndroidInjector<ContentProvider> {
-        return super.contentProviderInjector().also {
-            logStartup("contentProviderInjector")
-        }
-    }
-
-    override
-    fun applicationInjector(): AndroidInjector<out DaggerApplication> {
-        throw IllegalStateException("shouldn't be called")
-    }
+    fun activityInjector(): AndroidInjector<Activity> =
+        bootstrap.component.injectActivityComponent.activityInjector
 
     fun logStartup(tag: String) {
         Log.d(tag, "startup")
