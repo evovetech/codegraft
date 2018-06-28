@@ -25,6 +25,7 @@ import dagger.android.HasActivityInjector
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
 import sourcerer.inject.android.BootApplication
+import sourcerer.inject.android.component
 import javax.inject.Inject
 
 //@AndroidApplication(AppBoot::class)
@@ -55,7 +56,7 @@ class App : Application(),
 
     override
     fun activityInjector(): AndroidInjector<Activity> =
-        bootstrap.component.injectActivityComponent.activityInjector
+        component.injectActivityComponent.activityInjector
 
     fun logStartup(tag: String) {
         Log.d(tag, "startup")

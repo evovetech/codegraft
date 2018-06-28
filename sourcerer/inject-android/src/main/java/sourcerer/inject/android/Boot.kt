@@ -54,21 +54,15 @@ class Bootstrap<out Component : AppComponent<*>>(
     data
     class Builder<Application : AndroidApplication, out Component : AppComponent<Application>>(
         val application: Application,
-        val builder: sourcerer.inject.android.BootComponent.Builder<BootComponent<Component>>
+        val buildFunc: () -> BootComponent<Component>
     ) {
         constructor(
             application: Application,
-            buildFunc: () -> BootComponent<Component>
-        ) : this(
-            application,
-            object : sourcerer.inject.android.BootComponent.Builder<BootComponent<Component>> {
-                override
-                fun build() = buildFunc()
-            }
-        )
+            builder: sourcerer.inject.android.BootComponent.Builder<BootComponent<Component>>
+        ) : this(application, builder::build)
 
         internal
-        fun build(): Component = builder.build().component.apply {
+        fun build(): Component = buildFunc().component.apply {
             inject(application)
         }
     }
