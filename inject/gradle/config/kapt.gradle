@@ -33,3 +33,11 @@ configurations.all { Configuration c ->
         }
     }
 }
+
+
+configurations {
+    anno
+}
+
+configurations.compileOnly.extendsFrom(configurations.anno)
+configurations.kapt.extendsFrom(configurations.anno)
