@@ -3,7 +3,7 @@
 
     <application>
         <provider
-            android:authorities="sourcerer.inject.android.bootstrapProvider"
+            android:authorities="${applicationId}.BootstrapProvider"
             android:name=".BootstrapProvider"
             android:exported="false"
             android:initOrder="0x7fffffff" />

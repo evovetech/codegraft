@@ -14,23 +14,6 @@
  * limitations under the License.
  */
 
-plugins {
-    id("kotlin")
-    id("kotlin-kapt")
-    id("com.jfrog.bintray")
-    id("com.jfrog.artifactory")
-    id("org.jetbrains.dokka")
-}
+package sourcerer.inject.android
 
-apply from: "${configDir}/kotlin-library.gradle"
-apply from: "${configDir}/versions/dagger.gradle"
-
-dependencies {
-    compileOnly(dagger.androidJar)
-    compileOnly(dagger.androidSupportJar)
-    compileOnly(group: 'com.google.android', name: 'android', version: '+')
-    compileOnly(group: 'com.google.android', name: 'support-v4', version: '+')
-    api project(':annotations')
-    kapt project(':lib-processor')
-    kapt(dagger.androidCompiler)
-}
+typealias AndroidApplication = android.app.Application

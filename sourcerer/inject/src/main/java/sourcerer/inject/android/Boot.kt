@@ -16,8 +16,6 @@
 
 package sourcerer.inject.android
 
-typealias AndroidApplication = android.app.Application
-
 interface AppComponent<in Application : AndroidApplication> {
     fun inject(application: Application)
 }
@@ -25,10 +23,8 @@ interface AppComponent<in Application : AndroidApplication> {
 interface BootComponent<out Component : AppComponent<*>> {
     val component: Component
 
-    interface Builder<out Boot : BootComponent<*>> : sourcerer.inject.android.Builder<Boot> {
-        override
-        fun build(): Boot
-    }
+    interface Builder<out Boot : BootComponent<*>> :
+        sourcerer.inject.android.Builder<Boot>
 }
 
 interface BootApplication<out Component : AppComponent<*>> {
