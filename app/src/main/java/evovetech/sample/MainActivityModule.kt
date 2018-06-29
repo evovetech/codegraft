@@ -16,19 +16,37 @@
 
 package evovetech.sample
 
+import android.app.Application
+import dagger.Binds
 import dagger.Module
-import dagger.android.AndroidInjectionModule
+import dagger.Subcomponent
+import dagger.android.AndroidInjector
 import dagger.android.ContributesAndroidInjector
+import dagger.multibindings.IntoMap
+import evovetech.sample.MainApplicationModule.MainApplicationSubcomponent
 import sourcerer.inject.ActivityScope
+import sourcerer.inject.android.AndroidInjectActivityModule
 
 // TODO:
-@Module(
-    includes = [
-        AndroidInjectionModule::class
-    ]
-)
+@Module(includes = [AndroidInjectActivityModule::class])
 interface MainActivityModule {
     @ActivityScope
     @ContributesAndroidInjector
     fun contributeMainActivity(): MainActivity
+}
+
+@Module(subcomponents = [MainApplicationSubcomponent::class])
+interface MainApplicationModule {
+    @Binds
+    @IntoMap
+    @ApplicationKey(App::class)
+    fun bindAndroidInjectorFactory(
+        builder: MainApplicationSubcomponent.Builder
+    ): AndroidInjector.Factory<out Application>
+
+    @Subcomponent
+    interface MainApplicationSubcomponent : AndroidInjector<App> {
+        @Subcomponent.Builder
+        abstract class Builder : AndroidInjector.Builder<App>()
+    }
 }

@@ -27,11 +27,12 @@ import sourcerer.inject.BootstrapComponent
         AndroidBootModule::class
     ],
     applicationModules = [
-        MainActivityModule::class
+        MainActivityModule::class,
+        MainApplicationModule::class
     ]
 )
 interface MainAppComponent {
-    fun inject(application: App)
+//    fun inject(application: App)
 }
 
 class AndroidAppComponent(
@@ -39,8 +40,8 @@ class AndroidAppComponent(
 ) : sourcerer.inject.android.AppComponent<App>,
     AppComponent by delegate {
     override
-    fun inject(application: App) =
-        mainAppComponent.inject(application)
+    fun inject(application: App) {}
+//        mainAppComponent.inject(application)
 }
 
 class AndroidBootComponent(

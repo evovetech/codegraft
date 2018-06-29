@@ -16,16 +16,27 @@
 
 package sourcerer.inject.android
 
-interface AppComponent<in Application : AndroidApplication> {
-    fun inject(application: Application)
-}
+interface ApplicationBootComponent<out ApplicationComponent : Any> {
+    val component: ApplicationComponent
 
-interface BootComponent<out Component : AppComponent<*>> {
-    val component: Component
-
-    interface Builder<out Boot : BootComponent<*>> :
+    interface Builder<out Boot : ApplicationBootComponent<*>> :
         sourcerer.inject.android.Builder<Boot>
 }
+
+interface ApplicationInjector<in Application : AndroidApplication> {
+    fun inject(application: Application)
+
+    interface BootComponent<out ApplicationComponent : ApplicationInjector<*>> :
+        ApplicationBootComponent<ApplicationComponent> {
+
+        interface Builder<out Boot : BootComponent<*>>
+            : ApplicationBootComponent.Builder<Boot>
+    }
+}
+
+typealias AppComponent<T> = ApplicationInjector<T>
+typealias BootComponent<T> = ApplicationInjector.BootComponent<T>
+typealias BootComponentBuilder<T> = ApplicationInjector.BootComponent.Builder<T>
 
 interface BootApplication<out Component : AppComponent<*>> {
     val bootstrap: Bootstrap<Component>
@@ -54,7 +65,7 @@ class Bootstrap<out Component : AppComponent<*>>(
     ) {
         constructor(
             application: Application,
-            builder: sourcerer.inject.android.BootComponent.Builder<BootComponent<Component>>
+            builder: BootComponentBuilder<BootComponent<Component>>
         ) : this(application, builder::build)
 
         internal

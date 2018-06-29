@@ -33,6 +33,10 @@ public
 
     Class<?>[] applicationModules() default {};
 
+    boolean include() default true;
+
+    boolean expose() default false;
+
     @Documented
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)

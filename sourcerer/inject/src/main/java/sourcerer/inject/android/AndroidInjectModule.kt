@@ -27,11 +27,8 @@ import dagger.android.AndroidInjector
 import dagger.android.AndroidInjector.Factory
 import dagger.android.DispatchingAndroidInjector
 import dagger.multibindings.Multibinds
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.reflect.KClass
 
-typealias AndroidInjectorMap<T> = Map<KClass<out T>, Factory<out T>>
+typealias AndroidInjectorMap<T> = Map<Class<out T>, Factory<out T>>
 
 @Module
 interface AndroidInjectModule<T : Any> {
@@ -39,26 +36,20 @@ interface AndroidInjectModule<T : Any> {
     fun bindInjectorFactories(): AndroidInjectorMap<T>
 
     @Binds
-    fun bindInjector(injector: AndroidComponentInjector<T>): AndroidInjector<T>
+    fun bindInjector(injector: DispatchingAndroidInjector<T>): AndroidInjector<T>
 }
-
-@Singleton
-class AndroidComponentInjector<T>
-@Inject constructor(
-    private val injector: DispatchingAndroidInjector<T>
-) : AndroidInjector<T> by injector
 
 @Module
 interface AndroidInjectActivityModule :
     AndroidInjectModule<Activity>
 
-@Module
+@Module(includes = [AndroidInjectActivityModule::class])
 interface AndroidInjectFragmentModule :
     AndroidInjectModule<Fragment>
 
 @Module(includes = [AndroidInjectFragmentModule::class])
 interface AndroidInjectSupportFragmentModule :
-    AndroidInjectModule<android.support.v4.app.Fragment>
+    AndroidInjectModule<SupportFragment>
 
 @Module
 interface AndroidInjectServiceModule :
@@ -71,3 +62,7 @@ interface AndroidInjectBroadcastReceiverModule :
 @Module
 interface AndroidInjectContentProviderModule :
     AndroidInjectModule<ContentProvider>
+
+@Module
+interface AndroidInjectApplicationModule :
+    AndroidInjectModule<AndroidApplication>
