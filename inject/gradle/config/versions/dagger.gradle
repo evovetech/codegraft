@@ -24,6 +24,8 @@ static def loadDagger(String version) {
     dagger.coreSpi = "com.google.dagger:dagger-spi:${version}"
     dagger.coreCompiler = "com.google.dagger:dagger-compiler:${version}"
     dagger.android = "com.google.dagger:dagger-android-support:${version}"
+    dagger.androidJar = "com.google.dagger:dagger-android-jarimpl:${version}"
+    dagger.androidSupportJar = "com.google.dagger:dagger-android-support-jarimpl:${version}"
     dagger.androidCompiler = "com.google.dagger:dagger-android-processor:${version}"
     dagger.applyCore = { config ->
         return { DependencyHandler dep ->

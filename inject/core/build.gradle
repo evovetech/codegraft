@@ -23,8 +23,11 @@ plugins {
 }
 
 apply from: "${configDir}/kotlin-library.gradle"
+apply from: "${configDir}/versions/dagger.gradle"
 
 dependencies {
+    compileOnly(dagger.androidJar)
+    compileOnly(dagger.androidSupportJar)
     compileOnly(group: 'com.google.android', name: 'android', version: '4.1.1.4')
     compileOnly(group: 'com.google.android', name: 'support-v4', version: 'r7')
     implementation "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
