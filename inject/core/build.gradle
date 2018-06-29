@@ -15,8 +15,6 @@
  */
 
 plugins {
-    id("com.android.library").apply(false)
-    id("kotlin-android").apply(false)
     id("kotlin")
     id("kotlin-kapt")
     id("com.jfrog.bintray")
@@ -28,5 +26,7 @@ apply from: "${configDir}/kotlin-library.gradle"
 
 dependencies {
     compileOnly(group: 'com.google.android', name: 'android', version: '4.1.1.4')
+    compileOnly(group: 'com.google.android', name: 'support-v4', version: 'r7')
     implementation "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
+    implementation "evovetech.sourcerer:inject:0.5.0-SNAPSHOT"
 }
