@@ -18,22 +18,9 @@ package sourcerer.inject.android
 
 import android.app.Activity
 import dagger.android.AndroidInjector
-import dagger.android.AndroidInjector.Factory
-import dagger.android.DispatchingAndroidInjector
 import sourcerer.inject.BootstrapComponent
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.reflect.KClass
 
-typealias AndroidInjectorMap<T> = Map<KClass<out T>, Factory<out T>>
-
-@Singleton
-class AndroidComponentInjector<T>
-@Inject constructor(
-    private val injector: DispatchingAndroidInjector<T>
-) : AndroidInjector<T> by injector
-
-typealias AndroidActivityInjector = AndroidComponentInjector<Activity>
+typealias AndroidActivityInjector = AndroidInjector<Activity>
 
 @BootstrapComponent(
     applicationModules = [AndroidInjectActivityModule::class]

@@ -21,14 +21,32 @@ import android.app.Fragment
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.ContentProvider
+import dagger.Binds
 import dagger.Module
+import dagger.android.AndroidInjector
+import dagger.android.AndroidInjector.Factory
+import dagger.android.DispatchingAndroidInjector
 import dagger.multibindings.Multibinds
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.reflect.KClass
+
+typealias AndroidInjectorMap<T> = Map<KClass<out T>, Factory<out T>>
 
 @Module
 interface AndroidInjectModule<T : Any> {
     @Multibinds
-    fun injectorFactories(): AndroidInjectorMap<T>
+    fun bindInjectorFactories(): AndroidInjectorMap<T>
+
+    @Binds
+    fun bindInjector(injector: AndroidComponentInjector<T>): AndroidInjector<T>
 }
+
+@Singleton
+class AndroidComponentInjector<T>
+@Inject constructor(
+    private val injector: DispatchingAndroidInjector<T>
+) : AndroidInjector<T> by injector
 
 @Module
 interface AndroidInjectActivityModule :
