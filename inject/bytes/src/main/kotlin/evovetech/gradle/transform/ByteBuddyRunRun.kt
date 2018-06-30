@@ -16,60 +16,46 @@
 
 package evovetech.gradle.transform
 
-import android.app.Application
 import com.android.build.api.transform.TransformInvocation
-import evovetech.codegen.OnCreate
 import evovetech.gradle.transform.content.Output
 import evovetech.gradle.transform.content.allFiles
 import evovetech.gradle.transform.content.classFileLocator
-import net.bytebuddy.ByteBuddy
-import net.bytebuddy.ClassFileVersion
-import net.bytebuddy.build.EntryPoint
-import net.bytebuddy.build.EntryPoint.Default.REBASE
-import net.bytebuddy.description.type.TypeDescription
+import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator.Compound
-import net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer.Suffixing
-import net.bytebuddy.implementation.MethodDelegation
-import net.bytebuddy.matcher.ElementMatchers.named
 import net.bytebuddy.pool.TypePool
-import net.bytebuddy.pool.TypePool.CacheProvider.Simple
-import net.bytebuddy.pool.TypePool.ClassLoading
-import net.bytebuddy.pool.TypePool.Default.ReaderMode.FAST
-import net.bytebuddy.pool.TypePool.Default.WithLazyResolution
 import java.io.File
-import kotlin.reflect.KClass
 
 class ByteBuddyRunRun(
     bootClasspath: () -> List<File>,
-    delegate: TransformInvocation
+    delegate: TransformInvocation,
+    vararg writers: OutputWriter
 ) : RunRun(delegate) {
+    constructor(
+        bootClasspath: () -> List<File>,
+        delegate: TransformInvocation
+    ) : this(
+        bootClasspath, delegate,
+        ApplicationOutputWriter()
+    )
+
     private
     val bootClassFileLocator by lazy {
         Compound(bootClasspath().map { it.classFileLocator })
     }
-    val classFileLocator by lazy {
+
+    private
+    val classFileLocator: ClassFileLocator by lazy {
         (refInputs + primaryInputs).map {
             it.classFileLocator
         }.let {
             Compound(it + bootClassFileLocator)
         }
     }
-    val typePool: TypePool by lazy {
-        WithLazyResolution(
-            Simple(),
-            classFileLocator,
-            FAST,
-            ClassLoading.ofBootPath()
-        )
-    }
-    val classFileVersion = ClassFileVersion.JAVA_V7
-    val entryPoint: EntryPoint = REBASE
-    val androidApplication by lazy {
-        typePool.resolve<Application>()
-    }
 
-    fun newByteBuddy(): ByteBuddy =
-        entryPoint.byteBuddy(classFileVersion)
+    private val outputWriters = writers.toSet()
+    private val transformData: TransformData by lazy { TransformData(classFileLocator) }
+    private val typePool: TypePool
+        get() = transformData.typePool
 
     override
     fun run() {
@@ -83,48 +69,33 @@ class ByteBuddyRunRun(
     }
 
     private
-    fun write(output: Output) {
-        val src = output.input.rel.path
-//        val path = output.rel.path
+    fun write(output: Output): Unit = transformData.run {
         val copy: () -> Unit = {
             output.copyToDest()
         }
-        if (!src.endsWith(CLASS_FILE_EXTENSION)) {
-            println("src=$src")
-            return copy()
-        }
 
-        val typeName = src.replace('/', '.')
-                .substring(0, src.length - CLASS_FILE_EXTENSION.length)
-        val typeDescription = typePool.describe(typeName).resolve()
-        if (!typeDescription.isAssignableTo(androidApplication)) {
-            println("type=$typeDescription")
-            return copy()
-        }
-        val byteBuddy = newByteBuddy()
-        val methodTransformer = Suffixing("original")
         try {
-            val maps = entryPoint.transform(typeDescription, byteBuddy, classFileLocator, methodTransformer)
-                    .defineProperty("defined", String::class.java)
-                    .field(named("defined")).value("one")
-                    .method(named("onCreate")).intercept(methodDelegation<OnCreate>())
-                    .make()
-                    .saveIn(output.base)
-            println("maps=$maps")
+            val type = output.typeDescription
+                       ?: return copy()
+            outputWriters.find { writer -> writer.canTransform(type) }
+                    ?.transform(type)
+                    ?.saveIn(output.base)
+                    ?.also { maps -> println("maps=$maps") }
+            ?: return copy()
         } catch (exception: Throwable) {
             exception.printStackTrace()
             return copy()
         }
     }
+
+    private val Output.src: String
+        get() = input.rel.path
+
+    private val Output.typeName: String?
+        get() = if (src.endsWith(CLASS_FILE_EXTENSION)) {
+            src.replace('/', '.')
+                    .substring(0, src.length - CLASS_FILE_EXTENSION.length)
+        } else {
+            null
+        }
 }
-
-inline
-fun <reified T> TypePool.resolve() =
-    resolve(T::class)
-
-fun TypePool.resolve(type: KClass<*>): TypeDescription = describe(type.java.canonicalName)
-        .resolve()
-
-inline
-fun <reified T> methodDelegation() =
-    MethodDelegation.to(T::class.java)

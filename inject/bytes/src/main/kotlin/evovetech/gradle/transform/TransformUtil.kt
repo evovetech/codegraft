@@ -16,10 +16,15 @@
 
 package evovetech.gradle.transform
 
+import android.app.Application
 import com.android.build.api.transform.TransformInput
 import com.android.build.api.transform.TransformInvocation
 import evovetech.gradle.transform.content.DirInput
 import evovetech.gradle.transform.content.JarFileInput
+import net.bytebuddy.description.type.TypeDescription
+import net.bytebuddy.implementation.MethodDelegation
+import net.bytebuddy.pool.TypePool
+import kotlin.reflect.KClass
 
 internal const
 val CLASS_FILE_EXTENSION = ".class"
@@ -46,3 +51,19 @@ val TransformInvocation.directoryInputs
 
 val TransformInvocation.jarInputs
     get() = inputs.jarInputs
+
+inline
+fun <reified T> TypePool.resolve(): TypeDescription =
+    resolve(T::class)
+
+val TypePool.androidApplication: TypeDescription
+    get() = resolve<Application>()
+
+fun TypePool.resolve(
+    type: KClass<*>
+): TypeDescription = describe(type.java.canonicalName)
+        .resolve()
+
+inline
+fun <reified T> methodDelegation(): MethodDelegation =
+    MethodDelegation.to(T::class.java)
