@@ -40,7 +40,9 @@ class AndroidAppComponent(
 ) : sourcerer.inject.android.AppComponent<App>,
     AppComponent by delegate {
     override
-    fun inject(application: App) {}
+    fun inject(application: App) {
+        injectApplicationComponent.applicationInjector.inject(application)
+    }
 //        mainAppComponent.inject(application)
 }
 
