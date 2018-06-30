@@ -6,6 +6,7 @@ import net.bytebuddy.ClassFileVersion
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.ClassFileLocator
+import net.bytebuddy.dynamic.DynamicType.Builder
 import net.bytebuddy.dynamic.DynamicType.Unloaded
 import net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer.Suffixing
 import net.bytebuddy.pool.TypePool
@@ -45,14 +46,16 @@ class TransformData(
 
     fun EntryPoint.transform(
         typeDescription: TypeDescription
-    ) = transform(
+    ): Builder<*> = transform(
         typeDescription,
         newByteBuddy(),
         classFileLocator,
         methodTransformer
     )
 
-    fun OutputWriter.canTransform(typeDescription: TypeDescription): Boolean {
+    fun OutputWriter.canTransform(
+        typeDescription: TypeDescription
+    ): Boolean {
         return this@TransformData.canTransform(typeDescription)
     }
 

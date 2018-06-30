@@ -22,7 +22,6 @@ import evovetech.gradle.transform.content.allFiles
 import evovetech.gradle.transform.content.classFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator.Compound
-import net.bytebuddy.pool.TypePool
 import java.io.File
 
 class ByteBuddyRunRun(
@@ -54,8 +53,6 @@ class ByteBuddyRunRun(
 
     private val outputWriters = writers.toSet()
     private val transformData: TransformData by lazy { TransformData(classFileLocator) }
-    private val typePool: TypePool
-        get() = transformData.typePool
 
     override
     fun run() {
@@ -87,15 +84,4 @@ class ByteBuddyRunRun(
             return copy()
         }
     }
-
-    private val Output.src: String
-        get() = input.rel.path
-
-    private val Output.typeName: String?
-        get() = if (src.endsWith(CLASS_FILE_EXTENSION)) {
-            src.replace('/', '.')
-                    .substring(0, src.length - CLASS_FILE_EXTENSION.length)
-        } else {
-            null
-        }
 }

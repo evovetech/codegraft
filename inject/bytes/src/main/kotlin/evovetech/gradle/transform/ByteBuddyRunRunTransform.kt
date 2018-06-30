@@ -24,6 +24,9 @@ class ByteBuddyRunRunTransform(
 ) : AbstractTransform("EvoveTechByteBuddyTransform") {
     override
     fun TransformInvocation.runRun(): RunRun {
-        return ByteBuddyRunRun(bootClasspath, this)
+        return ByteBuddyRunRun(
+            bootClasspath, this,
+            ApplicationOutputWriter()
+        )
     }
 }
