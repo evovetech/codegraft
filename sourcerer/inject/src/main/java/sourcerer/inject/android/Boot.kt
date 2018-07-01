@@ -30,41 +30,9 @@ interface BootApplication<out Component : Any> {
 val <Component : Any> BootApplication<Component>.component: Component
     get() = bootstrap.component
 
-open
 class Bootstrap<out Component : Any>(
-    builder: BootBuilder<Component>
+    buildFunc: () -> Component
 ) : BootComponent<Component> {
-    final override
-    val component by lazy(builder::build)
-
-    internal
-    fun initialize() {
-        val comp = component
-        println("component=$comp")
-    }
-
-    data
-    class Builder<out Component : Any>(
-        val application: AndroidApplication,
-        val buildFunc: () -> Component
-    ) {
-        constructor(
-            application: AndroidApplication,
-            builder: BootComponent.Builder<BootComponent<Component>>
-        ) : this(application, {
-            builder.build().component
-        })
-
-        internal
-        fun build(): Component = buildFunc().apply {
-            when (this) {
-                is HasApplicationInjector -> applicationInjector.inject(application)
-            }
-        }
-    }
+    override
+    val component by lazy(buildFunc)
 }
-
-typealias BootBuilder<Component> = () -> Bootstrap.Builder<Component>
-
-fun <Component : Any> BootBuilder<Component>.build(): Component = invoke()
-        .build()

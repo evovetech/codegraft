@@ -25,23 +25,19 @@ import sourcerer.inject.android.Bootstrap
 // package component
 // application generated
 
-fun bootstrap(boot: BootstrapInit) = Bootstrap(builder = {
+fun bootstrap(boot: BootstrapInit) = Bootstrap {
     DaggerBootComponent.builder()
             .bootstrap(boot)
-})
+            .appComponent
+}
 
 private
 typealias BootstrapInit = BootComponent.Builder.() -> App
 
 private
-typealias BootstrapBuilder = Bootstrap.Builder<AppComponent>
-
-private
-fun BootComponent.Builder.bootstrap(init: BootstrapInit): BootstrapBuilder {
+fun BootComponent.Builder.bootstrap(init: BootstrapInit): BootComponent {
     val app = init()
     app(app)
     application(app)
-    return BootstrapBuilder(app) {
-        build().appComponent
-    }
+    return build()
 }

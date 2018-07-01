@@ -28,7 +28,10 @@ class BootstrapProvider : EmptyContentProvider() {
         when (app) {
             is BootApplication<*> -> {
                 Log.d(TAG, "Bootstrapping!!")
-                app.bootstrap.initialize()
+                val component = app.bootstrap.component
+                if (component is HasApplicationInjector) {
+                    component.applicationInjector.inject(app)
+                }
             }
             else -> {
                 Log.d(TAG, "NO Bootstraps :(")

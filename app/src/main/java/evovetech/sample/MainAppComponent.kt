@@ -29,7 +29,8 @@ import sourcerer.inject.BootstrapComponent
     applicationModules = [
         MainActivityModule::class,
         MainApplicationModule::class
-    ]
+    ],
+    flatten = true
 )
 interface MainAppComponent {
 //    fun inject(application: App)
