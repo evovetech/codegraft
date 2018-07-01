@@ -40,6 +40,10 @@ class BootstrapProcessor(
     val processingEnv: ProcessingEnv
         get() = env
 
+    fun isProcessed(): Boolean {
+        return processed
+    }
+
     override
     fun processSteps(): List<ProcessStep> {
         val component = DaggerBootstrapProcessor_Component.builder().run {

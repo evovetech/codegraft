@@ -24,7 +24,7 @@ import javax.lang.model.element.TypeElement
 
 open
 class MainProcessor(
-    private val bootstrap: BootstrapProcessor
+    protected val bootstrap: BootstrapProcessor
 ) : Processor by bootstrap {
     constructor(
         isApplication: Boolean

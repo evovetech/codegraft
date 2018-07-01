@@ -16,31 +16,24 @@
 
 package evovetech.sample
 
+import android.app.Application
 import android.content.Context
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import sourcerer.inject.BootScope
 import sourcerer.inject.BootstrapComponent
 
 @BootstrapComponent(
-    bootstrapModules = [
-        AndroidBootModule::class
-    ],
     applicationModules = [
+        AndroidBootModule::class,
         MainActivityModule::class,
         MainApplicationModule::class
     ],
     flatten = true
 )
-interface MainAppComponent {
-//    fun inject(application: App)
-}
+interface MainAppComponent
 
 @Module
-class AndroidBootModule {
-    // TODO: @Binds
-    @Provides @BootScope
-    fun provideContext(@BootScope app: App): Context {
-        return app
-    }
+interface AndroidBootModule {
+    @Binds
+    fun provideContext(app: Application): Context
 }
