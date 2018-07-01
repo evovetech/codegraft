@@ -32,6 +32,8 @@ import javax.lang.model.util.ElementFilter.constructorsIn
 const val BOOTSTRAP_DEPENDENCIES_ATTRIBUTE = "bootstrapDependencies"
 const val BOOTSTRAP_MODULES_ATTRIBUTE = "bootstrapModules"
 const val APPLICATION_MODULES_ATTRIBUTE = "applicationModules"
+const val AUTO_INCLUDE_ATTRIBUTE = "autoInclude"
+const val FLATTEN_ATTRIBUTE = "flatten"
 const val DEPENDENCIES_ATTRIBUTE = "dependencies"
 const val MODULES_ATTRIBUTE = "modules"
 

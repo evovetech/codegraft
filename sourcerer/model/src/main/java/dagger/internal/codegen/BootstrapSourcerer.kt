@@ -41,9 +41,9 @@ class BootstrapSourcerer
     val file = ClassName.get(BootstrapComponent::class.java).metaFile
 
     internal
-    fun output(outputs: List<ComponentOutput>): Output {
-        return componentOutput(outputs.map {
-            it.descriptor
+    fun output(components: Collection<BootstrapComponentDescriptor>): Output {
+        return Output(this, components.map {
+            ClassName.get(it.componentDefinitionType)
         })
     }
 
@@ -51,13 +51,6 @@ class BootstrapSourcerer
     fun storedOutputs() = env.getResources(file.extFilePath())
             .map(this::load)
             .readAll()
-
-    private
-    fun componentOutput(components: List<BootstrapComponentDescriptor>): Output {
-        return Output(this, components.map {
-            ClassName.get(it.componentDefinitionType)
-        })
-    }
 
     private
     fun load(url: URL) = Okio.buffer(Okio.source(url.openStream())).use { source ->

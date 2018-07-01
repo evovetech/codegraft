@@ -45,7 +45,7 @@ constructor(
     var processed: Boolean = true
 
     internal
-    val generatedComponents = ArrayList<ComponentOutput>()
+    val generatedComponents = LinkedHashSet<BootstrapComponentDescriptor>()
 
     override
     fun Env.annotations(): Set<AnnotationType> = Kind.values()
@@ -63,11 +63,14 @@ constructor(
         val map = HashMap<AnnotationType, List<Output>>()
         val bootstrapComponents = annotationElements.typeInputs<BootstrapComponent>()
         try {
-            generatedComponents += bootstrapComponents
+            val genComponents = bootstrapComponents
                     .map(componentFactory::forComponent)
+                    .toImmutableSet()
+            val generatedOutputs = genComponents
                     .map(componentOutputFactory::create)
-            val generatedOutputs = generatedComponents.flatMap(ComponentOutput::outputs)
-            val sourcererOutput = sourcerer.output(generatedComponents)
+                    .flatMap(ComponentOutput::outputs)
+            val sourcererOutput = sourcerer.output(genComponents)
+            generatedComponents += genComponents
 
             // outputs
             map[BootstrapComponent::class] = generatedOutputs + sourcererOutput
@@ -87,9 +90,11 @@ constructor(
             return emptyList()
         }
 
+        val generatedComponents = this@ComponentStep.generatedComponents
+                .toImmutableSet()
         val storedComponents = sourcerer.storedOutputs()
                 .map(componentFactory::forStoredComponent)
-                .map(componentOutputFactory::create)
+                .toImmutableSet()
         log("storedComponents = $storedComponents")
         val appComponent = appComponentStep.process(generatedComponents, storedComponents)
         return appComponent.flatMap(AppComponentStep.Output::outputs)

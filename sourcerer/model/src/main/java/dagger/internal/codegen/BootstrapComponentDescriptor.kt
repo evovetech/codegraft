@@ -16,6 +16,7 @@
 
 package dagger.internal.codegen
 
+import com.google.auto.common.AnnotationMirrors
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.auto.common.MoreTypes
 import com.google.auto.value.AutoValue
@@ -62,9 +63,53 @@ import kotlin.reflect.KClass
 /**
  * The logical representation of a [Component] or [ProductionComponent] definition.
  */
-@AutoValue
-internal abstract
-class BootstrapComponentDescriptor {
+internal
+class BootstrapComponentDescriptor(
+    val kind: Kind,
+
+    val componentAnnotation: AnnotationMirror,
+
+    /**
+     * The type (interface or abstract class) that defines the component. This is the element to which
+     * the [Component] annotation was applied.
+     */
+    val componentDefinitionType: TypeElement,
+
+    val dependencies: ImmutableSet<BootstrapComponentDescriptor>,
+
+    /**
+     * The set of [modules][ModuleDescriptor] declared directly in [Component.modules].
+     * Use [.transitiveModules] to get the full set of modules available upon traversing
+     * [Module.includes].
+     */
+    val modules: Modules,
+
+    val applicationModules: Modules,
+
+    val autoInclude: Boolean,
+
+    val flatten: Boolean,
+
+    /**
+     * The scopes of the component.
+     */
+    val scopes: ImmutableSet<Scope>,
+
+    val componentMethods: ImmutableSet<ComponentMethodDescriptor>,
+
+    // TODO(gak): Consider making this non-optional and revising the
+    // interaction between the spec & generation
+    val builderSpec: Optional<BuilderSpec>
+) {
+
+    /**
+     * The entry point methods on the component type.
+     */
+    val entryPointMethods: ImmutableSet<ComponentMethodDescriptor>
+        get() = componentMethods
+                .filter { method -> method.dependencyRequest.isPresent }
+                .toImmutableSet()
+
     internal enum
     class Kind(
         val annotationType: KClass<out Annotation>,
@@ -128,52 +173,6 @@ class BootstrapComponentDescriptor {
             }
         }
     }
-
-    abstract
-    val kind: Kind
-
-    abstract
-    val componentAnnotation: AnnotationMirror
-
-    /**
-     * The type (interface or abstract class) that defines the component. This is the element to which
-     * the [Component] annotation was applied.
-     */
-    abstract
-    val componentDefinitionType: TypeElement
-
-    /**
-     * The set of [modules][ModuleDescriptor] declared directly in [Component.modules].
-     * Use [.transitiveModules] to get the full set of modules available upon traversing
-     * [Module.includes].
-     */
-    abstract
-    val modules: Modules
-
-    abstract
-    val applicationModules: Modules
-
-    /**
-     * The scopes of the component.
-     */
-    abstract
-    val scopes: ImmutableSet<Scope>
-
-    abstract
-    val componentMethods: ImmutableSet<ComponentMethodDescriptor>
-
-    /**
-     * The entry point methods on the component type.
-     */
-    val entryPointMethods: ImmutableSet<ComponentMethodDescriptor>
-        get() = componentMethods
-                .filter { method -> method.dependencyRequest.isPresent }
-                .toImmutableSet()
-
-    // TODO(gak): Consider making this non-optional and revising the
-    // interaction between the spec & generation
-    abstract
-    val builderSpec: Optional<BuilderSpec>
 
     /**
      * A function that returns all [.scopes] of its input.
@@ -276,8 +275,16 @@ class BootstrapComponentDescriptor {
             parentKind: Optional<Kind>
         ): BootstrapComponentDescriptor {
             val componentMirror = getAnnotationMirror(componentDefinitionType, kind.annotationType.java).get()
+            val dependencies = getTypeListValue(componentMirror, BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
+                    .map(MoreTypes::asTypeElement)
+                    .map(this::forComponent)
+                    .toImmutableSet()
             val modules = modulesFactory.create(componentMirror, kind.modulesAttribute)
             val applicationModules = modulesFactory.create(componentMirror, APPLICATION_MODULES_ATTRIBUTE)
+            val autoInclude = AnnotationMirrors.getAnnotationValue(componentMirror, AUTO_INCLUDE_ATTRIBUTE)
+                    .value as Boolean
+            val flatten = AnnotationMirrors.getAnnotationValue(componentMirror, FLATTEN_ATTRIBUTE)
+                    .value as Boolean
             val unimplementedMethods = elements.getUnimplementedMethods(componentDefinitionType)
             val componentMethods = unimplementedMethods.map { componentMethod ->
                 getDescriptorForComponentMethod(componentDefinitionType, kind, componentMethod)
@@ -286,15 +293,18 @@ class BootstrapComponentDescriptor {
             val builderType = Optional.ofNullable(getOnlyElement(enclosedBuilders, null))
             val builderSpec = createBuilderSpec(builderType)
             val scopes = scopesOf(componentDefinitionType)
-            return AutoValue_BootstrapComponentDescriptor(
-                kind,
-                componentMirror,
-                componentDefinitionType,
-                modules,
-                applicationModules,
-                scopes,
-                componentMethods,
-                builderSpec
+            return BootstrapComponentDescriptor(
+                kind = kind,
+                componentAnnotation = componentMirror,
+                componentDefinitionType = componentDefinitionType,
+                dependencies = dependencies,
+                modules = modules,
+                applicationModules = applicationModules,
+                autoInclude = autoInclude,
+                flatten = flatten,
+                scopes = scopes,
+                componentMethods = componentMethods,
+                builderSpec = builderSpec
             )
         }
 

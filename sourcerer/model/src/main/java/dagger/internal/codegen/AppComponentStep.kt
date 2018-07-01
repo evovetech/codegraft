@@ -16,6 +16,7 @@
 
 package dagger.internal.codegen
 
+import com.google.common.collect.ImmutableSet
 import javax.inject.Inject
 
 internal
@@ -24,8 +25,8 @@ class AppComponentStep
     val factory: AppComponentGenerator.Factory
 ) {
     fun process(
-        generatedComponents: List<ComponentOutput>,
-        storedComponents: List<ComponentOutput>
+        generatedComponents: ImmutableSet<BootstrapComponentDescriptor>,
+        storedComponents: ImmutableSet<BootstrapComponentDescriptor>
     ) = listOf(
         Output(
             factory.create(

@@ -375,19 +375,22 @@ class AppComponentGenerator(
 
     class Factory
     @Inject constructor(
-        private val options: ProcessingEnv.Options
+        private val options: ProcessingEnv.Options,
+        private val componentOutputFactory: ComponentOutput.Factory
     ) {
         init {
             println("\npkg=${options.Package}\n")
         }
 
         fun create(
-            generatedComponents: List<ComponentOutput>,
-            storedComponents: List<ComponentOutput>
-        ) = AppComponentGenerator(
-            generatedComponents = generatedComponents,
-            storedComponents = storedComponents,
-            pkg = options.Package
-        )
+            generatedComponents: ImmutableSet<BootstrapComponentDescriptor>,
+            storedComponents: ImmutableSet<BootstrapComponentDescriptor>
+        ): AppComponentGenerator {
+            return AppComponentGenerator(
+                generatedComponents = generatedComponents.map(componentOutputFactory::create),
+                storedComponents = storedComponents.map(componentOutputFactory::create),
+                pkg = options.Package
+            )
+        }
     }
 }
