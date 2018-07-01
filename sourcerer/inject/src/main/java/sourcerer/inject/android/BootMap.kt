@@ -17,9 +17,25 @@
 package sourcerer.inject.android
 
 import java.util.WeakHashMap
-import javax.inject.Provider
 
-class BootMap<Component : AppComponent<*>> {
+open
+class BootMap<out Component : Any>(
+    private val build: (AndroidApplication) -> ApplicationBootComponent<Component>
+) {
     private
-    val map: WeakHashMap<AndroidApplication, Provider<Component>> = WeakHashMap()
+    val map: WeakHashMap<AndroidApplication, ApplicationBootComponent<Component>> = WeakHashMap()
+
+    operator
+    fun get(
+        key: AndroidApplication
+    ): Component = getBoot(key).component
+
+    private
+    fun getBoot(
+        key: AndroidApplication
+    ) = synchronized(map) {
+        map.getOrPut(key) {
+            build(key)
+        }
+    }
 }

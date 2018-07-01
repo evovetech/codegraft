@@ -41,9 +41,8 @@ class AndroidAppComponent(
     AppComponent by delegate {
     override
     fun inject(application: App) {
-        injectApplicationComponent.applicationInjector.inject(application)
+        hasApplicationInjector.applicationInjector.inject(application)
     }
-//        mainAppComponent.inject(application)
 }
 
 class AndroidBootComponent(

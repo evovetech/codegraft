@@ -77,7 +77,9 @@ fun ClassName.getFieldName(): String {
 }
 
 fun ParameterizedTypeName.getFieldName(): String {
-    val fieldName = typeArguments.joinToString(separator = "") {
+    val types = typeArguments.toMutableList()
+    types.reverse()
+    val fieldName = types.joinToString(separator = "") {
         it.getFieldName().capitalize()
     } + rawType.getFieldName().capitalize()
     return fieldName.decapitalize()

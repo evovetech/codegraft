@@ -21,25 +21,41 @@ import android.app.Fragment
 import dagger.android.AndroidInjector
 import sourcerer.inject.BootstrapComponent
 
-typealias SupportFragment = android.support.v4.app.Fragment
-
-@BootstrapComponent(applicationModules = [AndroidInjectApplicationModule::class])
-interface InjectApplicationComponent {
+@BootstrapComponent(
+    applicationModules = [AndroidInjectApplicationModule::class],
+    autoInclude = false,
+    flatten = true
+)
+interface HasApplicationInjector {
     val applicationInjector: AndroidInjector<AndroidApplication>
 }
 
-@BootstrapComponent(applicationModules = [AndroidInjectActivityModule::class])
-interface InjectActivityComponent {
+@BootstrapComponent(
+    applicationModules = [AndroidInjectActivityModule::class],
+    autoInclude = false,
+    flatten = true
+)
+interface HasActivityInjector {
     val activityInjector: AndroidInjector<Activity>
 }
 
-@BootstrapComponent(applicationModules = [AndroidInjectFragmentModule::class])
-interface InjectFragmentComponent {
+@BootstrapComponent(
+    applicationModules = [AndroidInjectFragmentModule::class],
+    autoInclude = false,
+    flatten = true
+)
+interface HasFragmentInjector {
     val fragmentInjector: AndroidInjector<Fragment>
 }
 
-@BootstrapComponent(applicationModules = [AndroidInjectSupportFragmentModule::class])
-interface InjectSupportFragmentComponent {
+typealias SupportFragment = android.support.v4.app.Fragment
+
+@BootstrapComponent(
+    applicationModules = [AndroidInjectSupportFragmentModule::class],
+    autoInclude = false,
+    flatten = true
+)
+interface HasSupportFragmentInjector {
     val supportFragmentInjector: AndroidInjector<SupportFragment>
 }
 

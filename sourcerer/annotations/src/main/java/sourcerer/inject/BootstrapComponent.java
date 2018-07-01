@@ -33,9 +33,9 @@ public
 
     Class<?>[] applicationModules() default {};
 
-    boolean include() default true;
+    boolean autoInclude() default true;
 
-    boolean expose() default false;
+    boolean flatten() default false;
 
     @Documented
     @Target(ElementType.TYPE)

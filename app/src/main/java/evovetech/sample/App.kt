@@ -37,8 +37,8 @@ class App : Application(),
 
     override
     val bootstrap = bootstrap {
-        builderFabricFunction1(Fabric.Builder::bootstrap)
-        builderRealmConfigurationFunction1(RealmConfiguration.Builder::bootstrap)
+        fabricBuilderFunction1(Fabric.Builder::bootstrap)
+        realmConfigurationBuilderFunction1(RealmConfiguration.Builder::bootstrap)
         this@App
     }
 
@@ -56,7 +56,7 @@ class App : Application(),
 
     override
     fun activityInjector(): AndroidInjector<Activity> =
-        component.injectActivityComponent.activityInjector
+        component.hasActivityInjector.activityInjector
 
     fun logStartup(tag: String) {
         Log.d(tag, "startup")
