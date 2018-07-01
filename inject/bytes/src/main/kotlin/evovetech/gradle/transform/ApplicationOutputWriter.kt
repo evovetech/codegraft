@@ -16,7 +16,7 @@
 
 package evovetech.gradle.transform
 
-import evovetech.codegen.OnCreate
+import evovetech.codegen.LogMethod
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.build.EntryPoint.Default.REBASE
 import net.bytebuddy.description.type.TypeDescription
@@ -35,8 +35,7 @@ class ApplicationOutputWriter : OutputWriter {
     fun TransformData.transform(
         typeDescription: TypeDescription
     ): Unloaded<out Any> = entryPoint.transform(typeDescription)
-            .defineProperty("defined", String::class.java)
-            .field(ElementMatchers.named("defined")).value("one")
-            .method(ElementMatchers.named("onCreate")).intercept(methodDelegation<OnCreate>())
+            .defineField("defined", String::class.java).value("one")
+            .method(ElementMatchers.named("onCreate")).intercept(methodDelegation<LogMethod>())
             .make()
 }

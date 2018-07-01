@@ -51,11 +51,9 @@ fun TypeMirror.getFieldName(): String = TypeName.get(this)
         .getFieldName()
 
 fun TypeName.getFieldName(): String {
-    var boxedPrimitive: TypeName? = null
-    if (isPrimitive) {
-        boxedPrimitive = box()
-    } else if (isBoxedPrimitive) {
-        boxedPrimitive = this
+    val boxedPrimitive: ClassName? = when {
+        isPrimitive -> box() as? ClassName
+        else -> null
     }
     boxedPrimitive?.let {
         return it.getFieldName()

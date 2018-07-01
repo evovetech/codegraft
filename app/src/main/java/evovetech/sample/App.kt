@@ -46,10 +46,10 @@ class App : Application(),
     fun onCreate() {
         super.onCreate()
         logStartup("onCreate")
-        this::class.java.methods.find {
-            it.name == "getDefined" && it.parameterTypes.isEmpty()
+        this::class.java.fields.find {
+            it.name == "defined"
         }?.let {
-            val value = it.invoke(this) as? String
+            val value = it.get(this) as? String
             Log.d("onCreate", "defined=$value")
         } ?: Log.d("onCreate", "no method getDefined() is defined :(")
     }
