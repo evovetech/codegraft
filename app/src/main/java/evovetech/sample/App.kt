@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 //@AndroidApplication(AppBoot::class)
 class App : Application(),
-    BootApplication<AndroidAppComponent>,
+    BootApplication<AppComponent>,
     HasActivityInjector {
     @Inject lateinit
     var fabric: Fabric

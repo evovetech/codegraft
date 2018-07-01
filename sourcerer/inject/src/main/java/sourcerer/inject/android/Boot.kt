@@ -16,38 +16,23 @@
 
 package sourcerer.inject.android
 
-interface ApplicationBootComponent<out ApplicationComponent : Any> {
-    val component: ApplicationComponent
+interface BootComponent<out Component : Any> {
+    val component: Component
 
-    interface Builder<out Boot : ApplicationBootComponent<*>> :
+    interface Builder<out Boot : BootComponent<*>> :
         sourcerer.inject.android.Builder<Boot>
 }
 
-interface ApplicationInjector<in Application : AndroidApplication> {
-    fun inject(application: Application)
-
-    interface BootComponent<out ApplicationComponent : ApplicationInjector<*>> :
-        ApplicationBootComponent<ApplicationComponent> {
-
-        interface Builder<out Boot : BootComponent<*>>
-            : ApplicationBootComponent.Builder<Boot>
-    }
-}
-
-typealias AppComponent<T> = ApplicationInjector<T>
-typealias BootComponent<T> = ApplicationInjector.BootComponent<T>
-typealias BootComponentBuilder<T> = ApplicationInjector.BootComponent.Builder<T>
-
-interface BootApplication<out Component : AppComponent<*>> {
+interface BootApplication<out Component : Any> {
     val bootstrap: Bootstrap<Component>
 }
 
-val <Component : AppComponent<*>> BootApplication<Component>.component: Component
+val <Component : Any> BootApplication<Component>.component: Component
     get() = bootstrap.component
 
 open
-class Bootstrap<out Component : AppComponent<*>>(
-    builder: () -> Builder<*, Component>
+class Bootstrap<out Component : Any>(
+    builder: BootBuilder<Component>
 ) : BootComponent<Component> {
     final override
     val component by lazy(builder::build)
@@ -59,23 +44,27 @@ class Bootstrap<out Component : AppComponent<*>>(
     }
 
     data
-    class Builder<Application : AndroidApplication, out Component : AppComponent<Application>>(
-        val application: Application,
-        val buildFunc: () -> BootComponent<Component>
+    class Builder<out Component : Any>(
+        val application: AndroidApplication,
+        val buildFunc: () -> Component
     ) {
         constructor(
-            application: Application,
-            builder: BootComponentBuilder<BootComponent<Component>>
-        ) : this(application, builder::build)
+            application: AndroidApplication,
+            builder: BootComponent.Builder<BootComponent<Component>>
+        ) : this(application, {
+            builder.build().component
+        })
 
         internal
-        fun build(): Component = buildFunc().component.apply {
-            inject(application)
+        fun build(): Component = buildFunc().apply {
+            when (this) {
+                is HasApplicationInjector -> applicationInjector.inject(application)
+            }
         }
     }
 }
 
-typealias BootBuilder<Component> = () -> Bootstrap.Builder<*, Component>
+typealias BootBuilder<Component> = () -> Bootstrap.Builder<Component>
 
-fun <Component : AppComponent<*>> BootBuilder<Component>.build(): Component = invoke()
+fun <Component : Any> BootBuilder<Component>.build(): Component = invoke()
         .build()

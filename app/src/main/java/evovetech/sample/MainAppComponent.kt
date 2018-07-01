@@ -35,26 +35,6 @@ interface MainAppComponent {
 //    fun inject(application: App)
 }
 
-class AndroidAppComponent(
-    delegate: AppComponent
-) : sourcerer.inject.android.AppComponent<App>,
-    AppComponent by delegate {
-    override
-    fun inject(application: App) {
-        applicationInjector.inject(application)
-    }
-}
-
-class AndroidBootComponent(
-    delegate: BootComponent
-) : sourcerer.inject.android.BootComponent<AndroidAppComponent>,
-    BootComponent by delegate {
-    override
-    val component = AndroidAppComponent(
-        delegate.appComponent
-    )
-}
-
 @Module
 class AndroidBootModule {
     // TODO: @Binds

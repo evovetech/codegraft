@@ -20,10 +20,10 @@ import java.util.WeakHashMap
 
 open
 class BootMap<out Component : Any>(
-    private val build: (AndroidApplication) -> ApplicationBootComponent<Component>
+    private val build: (AndroidApplication) -> BootComponent<Component>
 ) {
     private
-    val map: WeakHashMap<AndroidApplication, ApplicationBootComponent<Component>> = WeakHashMap()
+    val map: WeakHashMap<AndroidApplication, BootComponent<Component>> = WeakHashMap()
 
     operator
     fun get(

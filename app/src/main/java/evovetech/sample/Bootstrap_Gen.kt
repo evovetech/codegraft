@@ -34,15 +34,14 @@ private
 typealias BootstrapInit = BootComponent.Builder.() -> App
 
 private
-typealias BootstrapBuilder = Bootstrap.Builder<App, AndroidAppComponent>
+typealias BootstrapBuilder = Bootstrap.Builder<AppComponent>
 
 private
 fun BootComponent.Builder.bootstrap(init: BootstrapInit): BootstrapBuilder {
     val app = init()
     app(app)
     application(app)
-    val buildMethod = this::build
     return BootstrapBuilder(app) {
-        AndroidBootComponent(buildMethod())
+        build().appComponent
     }
 }
