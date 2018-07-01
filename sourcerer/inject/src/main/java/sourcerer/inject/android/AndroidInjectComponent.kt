@@ -23,7 +23,7 @@ import sourcerer.inject.BootstrapComponent
 
 @BootstrapComponent(
     applicationModules = [AndroidInjectApplicationModule::class],
-    autoInclude = false,
+    autoInclude = true,
     flatten = true
 )
 interface HasApplicationInjector {
@@ -32,7 +32,8 @@ interface HasApplicationInjector {
 
 @BootstrapComponent(
     applicationModules = [AndroidInjectActivityModule::class],
-    autoInclude = false,
+    // TODO
+    autoInclude = true,
     flatten = true
 )
 interface HasActivityInjector {

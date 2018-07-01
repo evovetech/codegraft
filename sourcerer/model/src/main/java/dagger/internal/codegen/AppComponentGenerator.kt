@@ -52,12 +52,15 @@ import javax.lang.model.element.TypeElement
 
 internal
 class AppComponentGenerator(
-    generatedComponents: List<ComponentOutput>,
-    storedComponents: List<ComponentOutput>,
+    val componentDescriptors: ImmutableSet<BootstrapComponentDescriptor>,
+    val components: ImmutableSet<ComponentOutput>,
     private val pkg: String
 ) {
     val name = "AppComponent"
-    val components = generatedComponents + storedComponents
+    val nestedComponents = components.filterNot { it.descriptor.flatten }
+            .toImmutableSet()
+    val flatComponents = components.filter { it.descriptor.flatten }
+            .toImmutableSet()
 
     fun process(): List<sourcerer.Output> {
         val bootData = BootData()
@@ -158,7 +161,15 @@ class AppComponentGenerator(
                 val add = addTo("modules")
                 add(bootData.outKlass.rawType)
             }
-            descriptors.forEach {
+            descriptors.filter { it.flatten }.forEach {
+                addSuperinterface(TypeName.get(it.componentDefinitionType.asType()))
+                it.componentMethods.map {
+                    MethodSpec.overriding(it.methodElement)
+                            .addModifiers(ABSTRACT)
+                            .build()
+                }.map(this::addMethod)
+            }
+            descriptors.filterNot { it.flatten }.forEach {
                 val type = it.componentDefinitionType
                 val name = type.asType().getFieldName()
                 val getter = MethodSpec.methodBuilder("get${name.capitalize()}")
@@ -386,9 +397,16 @@ class AppComponentGenerator(
             generatedComponents: ImmutableSet<BootstrapComponentDescriptor>,
             storedComponents: ImmutableSet<BootstrapComponentDescriptor>
         ): AppComponentGenerator {
+            val allComponents = (generatedComponents + storedComponents)
+            val componentDescriptors = allComponents.filter { it.autoInclude }
+                    .flatMap { it.dependencies + it }
+                    .toImmutableSet()
+            val components = componentDescriptors
+                    .map(componentOutputFactory::create)
+                    .toImmutableSet()
             return AppComponentGenerator(
-                generatedComponents = generatedComponents.map(componentOutputFactory::create),
-                storedComponents = storedComponents.map(componentOutputFactory::create),
+                componentDescriptors = componentDescriptors,
+                components = components,
                 pkg = options.Package
             )
         }

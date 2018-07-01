@@ -56,7 +56,7 @@ class App : Application(),
 
     override
     fun activityInjector(): AndroidInjector<Activity> =
-        component.hasActivityInjector.activityInjector
+        component.activityInjector
 
     fun logStartup(tag: String) {
         Log.d(tag, "startup")

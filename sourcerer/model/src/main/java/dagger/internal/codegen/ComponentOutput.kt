@@ -20,7 +20,7 @@ import sourcerer.Output
 import javax.annotation.processing.FilerException
 import javax.inject.Inject
 
-internal data
+internal
 class ComponentOutput(
     val descriptor: BootstrapComponentDescriptor,
     val implementation: ComponentImplementationGenerator,
@@ -60,4 +60,17 @@ class ComponentOutput(
         module,
         bootData
     )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ComponentOutput
+
+        return descriptor == other.descriptor
+    }
+
+    override fun hashCode(): Int {
+        return descriptor.hashCode()
+    }
 }

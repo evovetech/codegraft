@@ -20,6 +20,7 @@ import com.google.auto.common.AnnotationMirrors
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.auto.common.MoreTypes
 import com.google.auto.value.AutoValue
+import com.google.common.base.Equivalence
 import com.google.common.base.Preconditions.checkArgument
 import com.google.common.base.Verify.verify
 import com.google.common.collect.FluentIterable
@@ -101,6 +102,8 @@ class BootstrapComponentDescriptor(
     // interaction between the spec & generation
     val builderSpec: Optional<BuilderSpec>
 ) {
+    val componentDefinitionTypeWrapper: Equivalence.Wrapper<TypeMirror> =
+        MoreTypes.equivalence().wrap(componentDefinitionType.asType())
 
     /**
      * The entry point methods on the component type.
@@ -481,5 +484,20 @@ class BootstrapComponentDescriptor(
                     && elements.getTypeElement(Any::class.java) != method.enclosingElement
                     && !NON_CONTRIBUTING_OBJECT_METHOD_NAMES.contains(method.simpleName.toString()))
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as BootstrapComponentDescriptor
+
+        if (componentDefinitionTypeWrapper != other.componentDefinitionTypeWrapper) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return componentDefinitionTypeWrapper.hashCode()
     }
 }
