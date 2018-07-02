@@ -28,8 +28,8 @@ apply from: "${configDir}/versions/dagger.gradle"
 dependencies {
     compileOnly(dagger.androidJar)
     compileOnly(dagger.androidSupportJar)
-    compileOnly(group: 'com.google.android', name: 'android', version: '4.1.1.4')
-    compileOnly(group: 'com.google.android', name: 'support-v4', version: 'r7')
-    api "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
+    compileOnly("com.google.android:android:4.1.1.4")
+    compileOnly("com.google.android:support-v4:r7")
+    implementation "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
     api "evovetech.sourcerer:inject:0.5.0-SNAPSHOT"
 }

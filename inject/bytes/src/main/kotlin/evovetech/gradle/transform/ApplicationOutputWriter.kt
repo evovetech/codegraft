@@ -16,15 +16,23 @@
 
 package evovetech.gradle.transform
 
+import evovetech.codegen.BootstrapMethods
 import evovetech.codegen.LogMethod
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.build.EntryPoint.Default.REBASE
 import net.bytebuddy.description.modifier.Visibility
 import net.bytebuddy.description.type.TypeDescription
+import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.dynamic.DynamicType.Unloaded
 import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.matcher.ElementMatchers
-import net.bytebuddy.pool.TypePool
+import sourcerer.inject.android.AndroidApplication
+import sourcerer.inject.android.BootApplication
+import sourcerer.inject.android.HasActivityInjector
+import sourcerer.inject.android.HasApplicationInjector
+import sourcerer.inject.android.HasBroadcastReceiverInjector
+import sourcerer.inject.android.HasContentProviderInjector
+import sourcerer.inject.android.HasServiceInjector
 
 class ApplicationOutputWriter : OutputWriter {
     private val entryPoint: EntryPoint = REBASE
@@ -32,56 +40,49 @@ class ApplicationOutputWriter : OutputWriter {
     override
     fun TransformData.canTransform(
         typeDescription: TypeDescription
-    ): Boolean = typeDescription.isAssignableTo(typePool.BootApplication)
+    ): Boolean = typeDescription.isAssignableTo(resolve<BootApplication<*>>())
+                 && typeDescription.isAssignableTo(resolve<AndroidApplication>())
 
     override
     fun TransformData.transform(
         typeDescription: TypeDescription
     ): Unloaded<out Any> {
-        val rawBootType = typePool.BootApplication.asGenericType().asRawType()
-        println("rawBootType = $rawBootType")
+        val rawBootType = resolve<BootApplication<*>>().asGenericType().asRawType()
         val bootType = typeDescription.interfaces.filter {
             it.asRawType() == rawBootType
-        }.first()!!
-        println("bootType = $bootType")
-        val componentType = bootType.typeArguments.first()!!
-        println("componentType = $componentType")
-
+        }.first()
+        val componentType = bootType.typeArguments.first()
         var transform = entryPoint.transform(typeDescription)
 
         transform = transform
                 .defineMethod("getComponent", componentType, Visibility.PUBLIC)
                 .intercept(MethodDelegation.toField("bootstrap"))
+        transform = addInjector<HasApplicationInjector>(componentType, transform)
+        transform = addInjector<HasActivityInjector>(componentType, transform)
+        transform = addInjector<HasServiceInjector>(componentType, transform)
+        transform = addInjector<HasContentProviderInjector>(componentType, transform)
+        transform = addInjector<HasBroadcastReceiverInjector>(componentType, transform)
 
-//        transform.method(ElementMatchers.named("getBootstrap")).in
-
-        val hasApplicationInjector = typePool.HasApplicationInjector
-        if (componentType.asErasure().isAssignableTo(hasApplicationInjector)) {
-            println("$componentType is assignable to $hasApplicationInjector")
-//            transform = transform.implement(hasApplicationInjector)
-//                    .intercept(MethodDelegation.toField("bootstrap"))
-//                    .intercept(object: Implementation{
-//
-//                    })
-        }
-
-        val hasActivityInjector = typePool.HasActivityInjector
-        if (componentType.asErasure().isAssignableTo(hasActivityInjector)) {
-
-        }
-
-//        va
-
-//            .implement()
         return transform.defineField("defined", String::class.java).value("one")
                 .method(ElementMatchers.named("onCreate")).intercept(methodDelegation<LogMethod>())
                 .make()
     }
 }
 
-val TypePool.BootApplication: TypeDescription
-    get() = resolve<sourcerer.inject.android.BootApplication<*>>()
-val TypePool.HasApplicationInjector: TypeDescription
-    get() = resolve<sourcerer.inject.android.HasApplicationInjector>()
-val TypePool.HasActivityInjector: TypeDescription
-    get() = resolve<sourcerer.inject.android.HasActivityInjector>()
+inline
+fun <reified T> TransformData.resolve(): TypeDescription =
+    typePool.resolve<T>()
+
+inline
+fun <reified T> TransformData.addInjector(
+    componentType: TypeDescription.Generic,
+    transform: DynamicType.Builder<*>
+): DynamicType.Builder<*> {
+    val hasInjectorType = resolve<T>()
+    if (componentType.asErasure().isAssignableTo(hasInjectorType)) {
+        println("$componentType is assignable to $hasInjectorType")
+        return transform.implement(hasInjectorType)
+                .intercept(methodDelegation<BootstrapMethods>())
+    }
+    return transform
+}

@@ -18,6 +18,9 @@ package sourcerer.inject.android
 
 import android.app.Activity
 import android.app.Fragment
+import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.ContentProvider
 import dagger.android.AndroidInjector
 import sourcerer.inject.BootstrapComponent
 
@@ -58,5 +61,35 @@ typealias SupportFragment = android.support.v4.app.Fragment
 )
 interface HasSupportFragmentInjector {
     val supportFragmentInjector: AndroidInjector<SupportFragment>
+}
+
+@BootstrapComponent(
+    applicationModules = [AndroidInjectServiceModule::class],
+    // TODO
+    autoInclude = true,
+    flatten = true
+)
+interface HasServiceInjector {
+    val serviceInjector: AndroidInjector<Service>
+}
+
+@BootstrapComponent(
+    applicationModules = [AndroidInjectBroadcastReceiverModule::class],
+    // TODO
+    autoInclude = true,
+    flatten = true
+)
+interface HasBroadcastReceiverInjector {
+    val broadcastReceiverInjector: AndroidInjector<BroadcastReceiver>
+}
+
+@BootstrapComponent(
+    applicationModules = [AndroidInjectContentProviderModule::class],
+    // TODO
+    autoInclude = true,
+    flatten = true
+)
+interface HasContentProviderInjector {
+    val contentProviderInjector: AndroidInjector<ContentProvider>
 }
 
