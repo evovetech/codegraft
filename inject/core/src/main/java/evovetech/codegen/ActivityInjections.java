@@ -19,19 +19,15 @@ package evovetech.codegen;
 import android.app.Activity;
 import android.app.Application;
 import dagger.android.AndroidInjector;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.asm.Advice.This;
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.implementation.bind.annotation.AllArguments;
-import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
+import net.bytebuddy.implementation.bind.annotation.This;
 import sourcerer.inject.android.HasActivityInjector;
 
 /**
  * Injects core Android types.
  */
 public
-class ActivityInjections<A extends Activity> {
+class ActivityInjections {
     private static final String TAG = "evovetech.codegen";
 
 //    public static <A extends Activity> ActivityInjections<A> asType(TypeDescription typeDescription, ByteBuddy byteBuddy) {
@@ -46,11 +42,10 @@ class ActivityInjections<A extends Activity> {
      * @throws RuntimeException if the {@link Application} doesn't implement {@link
      *                          HasActivityInjector}.
      */
-    public
+    public static
     void onCreate(
-            @This @RuntimeType A activity,
-            @SuperCall Runnable super$call,
-            @AllArguments Object[] arguments
+            @This Activity activity,
+            @SuperCall Runnable super$call
     ) {
         Application application = activity.getApplication();
         if (!(application instanceof HasActivityInjector)) {

@@ -16,14 +16,17 @@
 
 package evovetech.gradle.transform
 
-import android.app.Activity
+import android.os.Bundle
 import evovetech.codegen.ActivityInjections
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.build.EntryPoint.Default.REBASE
+import net.bytebuddy.description.method.MethodDescription
+import net.bytebuddy.description.modifier.Visibility
 import net.bytebuddy.description.type.TypeDescription
-import net.bytebuddy.description.type.TypeVariableToken
 import net.bytebuddy.dynamic.DynamicType.Unloaded
 import net.bytebuddy.dynamic.Transformer
+import net.bytebuddy.matcher.ElementMatcher
+import net.bytebuddy.matcher.ElementMatchers
 import sourcerer.inject.InjectActivity
 
 class InjectActivityWriter : OutputWriter {
@@ -40,28 +43,25 @@ class InjectActivityWriter : OutputWriter {
     ): Unloaded<out Any> {
         var transform = entryPoint.transform(typeDescription)
 
-        val rawInjectType = typePool.describe(ActivityInjections::class.java.simpleName).resolve()
-        entryPoint.newByteBuddy()
-                .subclass(rawInjectType)
-                .transform({
-                    it.represents(Activity::class.java)
-                }, Transformer.Compound.)
+//        val rawInjectType = typePool.describe(ActivityInjections::class.java.simpleName).resolve()
+//        entryPoint.newByteBuddy()
+//                .subclass(rawInjectType)
+//                .transform({
+//                    it.represents(Activity::class.java)
+//                }, Transformer.Compound.)
 
 //        val wrap = entryPoint.newByteBuddy()
 //                .subclass(ActivityInjections::class.java)
 //                .
-        typeDescription.asGenericType()
+//        typeDescription.asGenericType()
+        val matcher: ElementMatcher<MethodDescription> = ElementMatchers.named<MethodDescription>("onCreate")
+                .and<MethodDescription>(ElementMatchers.takesArguments(Bundle::class.java))
+                .and<MethodDescription>(ElementMatchers.returns(TypeDescription.VOID))
 
         // TODO: add @Inject field for fragment provider
         return transform
-//                .method(definedMethod {
-//                    it.name == "onCreate"
-//                    && it.declaringType == typeDescription
-//                    && it.parameters.size == 1
-//                    && it.parameters.first().type.represents(Bundle::class.java)
-//                })
-//                .method(ElementMatchers.named("onCreate")).intercept(MethodDelegation.to())
-//                .transform(Transformer.ForMethod.withModifiers(Visibility.PUBLIC))
+                .method(matcher)
+                .intercept(methodDelegation<ActivityInjections>())
                 .make()
     }
 }
