@@ -19,9 +19,12 @@ package evovetech.gradle.transform
 import evovetech.codegen.LogMethod
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.build.EntryPoint.Default.REBASE
+import net.bytebuddy.description.modifier.Visibility
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType.Unloaded
+import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.matcher.ElementMatchers
+import net.bytebuddy.pool.TypePool
 
 class ApplicationOutputWriter : OutputWriter {
     private val entryPoint: EntryPoint = REBASE
@@ -29,13 +32,56 @@ class ApplicationOutputWriter : OutputWriter {
     override
     fun TransformData.canTransform(
         typeDescription: TypeDescription
-    ): Boolean = typeDescription.isAssignableTo(typePool.androidApplication)
+    ): Boolean = typeDescription.isAssignableTo(typePool.BootApplication)
 
     override
     fun TransformData.transform(
         typeDescription: TypeDescription
-    ): Unloaded<out Any> = entryPoint.transform(typeDescription)
-            .defineField("defined", String::class.java).value("one")
-            .method(ElementMatchers.named("onCreate")).intercept(methodDelegation<LogMethod>())
-            .make()
+    ): Unloaded<out Any> {
+        val rawBootType = typePool.BootApplication.asGenericType().asRawType()
+        println("rawBootType = $rawBootType")
+        val bootType = typeDescription.interfaces.filter {
+            it.asRawType() == rawBootType
+        }.first()!!
+        println("bootType = $bootType")
+        val componentType = bootType.typeArguments.first()!!
+        println("componentType = $componentType")
+
+        var transform = entryPoint.transform(typeDescription)
+
+        transform = transform
+                .defineMethod("getComponent", componentType, Visibility.PUBLIC)
+                .intercept(MethodDelegation.toField("bootstrap"))
+
+//        transform.method(ElementMatchers.named("getBootstrap")).in
+
+        val hasApplicationInjector = typePool.HasApplicationInjector
+        if (componentType.asErasure().isAssignableTo(hasApplicationInjector)) {
+            println("$componentType is assignable to $hasApplicationInjector")
+//            transform = transform.implement(hasApplicationInjector)
+//                    .intercept(MethodDelegation.toField("bootstrap"))
+//                    .intercept(object: Implementation{
+//
+//                    })
+        }
+
+        val hasActivityInjector = typePool.HasActivityInjector
+        if (componentType.asErasure().isAssignableTo(hasActivityInjector)) {
+
+        }
+
+//        va
+
+//            .implement()
+        return transform.defineField("defined", String::class.java).value("one")
+                .method(ElementMatchers.named("onCreate")).intercept(methodDelegation<LogMethod>())
+                .make()
+    }
 }
+
+val TypePool.BootApplication: TypeDescription
+    get() = resolve<sourcerer.inject.android.BootApplication<*>>()
+val TypePool.HasApplicationInjector: TypeDescription
+    get() = resolve<sourcerer.inject.android.HasApplicationInjector>()
+val TypePool.HasActivityInjector: TypeDescription
+    get() = resolve<sourcerer.inject.android.HasActivityInjector>()

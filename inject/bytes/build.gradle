@@ -35,14 +35,12 @@ configurations.compileOnly.extendsFrom(configurations.anno)
 configurations.kapt.extendsFrom(configurations.anno)
 
 dependencies {
-    api "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
+    api project(':core')
+    compileOnly(group: 'com.google.android', name: 'android', version: '4.1.1.4')
     api "com.android.tools.build:gradle-api:${androidVersion}"
     api "com.google.auto:auto-common:${app.autoCommonVersion}"
     kapt "com.google.auto.value:auto-value:${app.autoValueVersion}"
     api "com.google.auto.value:auto-value-annotations:${app.autoValueVersion}"
     anno "com.google.auto.service:auto-service:${app.autoServiceVersion}"
     anno "com.google.auto.factory:auto-factory:${app.autoFactoryVersion}"
-
-    implementation project(':core')
-    compileOnly(group: 'com.google.android', name: 'android', version: '4.1.1.4')
 }
