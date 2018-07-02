@@ -16,7 +16,7 @@
 
 package sourcerer.inject
 
-import kotlin.annotation.AnnotationRetention.SOURCE
+import kotlin.annotation.AnnotationRetention.BINARY
 import kotlin.annotation.AnnotationTarget.CLASS
 import kotlin.annotation.AnnotationTarget.FILE
 import kotlin.reflect.KClass
@@ -32,7 +32,7 @@ import kotlin.reflect.KClass
     FILE
 )
 @Retention(
-    SOURCE
+    BINARY
 )
 annotation
 class InjectActivity(

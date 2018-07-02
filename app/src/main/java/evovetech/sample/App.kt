@@ -16,22 +16,15 @@
 
 package evovetech.sample
 
-import android.app.Activity
 import android.app.Application
 import android.util.Log
 import com.crashlytics.android.Crashlytics
-import dagger.android.AndroidInjector
-import dagger.android.HasActivityInjector
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
 import sourcerer.inject.android.BootApplication
-import sourcerer.inject.android.component
 import javax.inject.Inject
 
-//@AndroidApplication(AppBoot::class)
-class App : Application(),
-    BootApplication<AppComponent>,
-    HasActivityInjector {
+class App : Application(), BootApplication<AppComponent> {
     @Inject lateinit
     var fabric: Fabric
 
@@ -53,10 +46,6 @@ class App : Application(),
             Log.d("onCreate", "defined=$value")
         } ?: Log.d("onCreate", "no method getDefined() is defined :(")
     }
-
-    override
-    fun activityInjector(): AndroidInjector<Activity> =
-        component.activityInjector
 
     fun logStartup(tag: String) {
         Log.d(tag, "startup")

@@ -21,7 +21,6 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
-import dagger.android.AndroidInjection
 import evovetech.sample.network.Client
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.message
@@ -44,7 +43,6 @@ class MainActivity : AppCompatActivity() {
 
     override
     fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)

@@ -16,13 +16,11 @@
 
 package evovetech.gradle.transform
 
-import evovetech.codegen.BootstrapMethods
 import evovetech.codegen.LogMethod
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.build.EntryPoint.Default.REBASE
 import net.bytebuddy.description.modifier.Visibility
 import net.bytebuddy.description.type.TypeDescription
-import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.dynamic.DynamicType.Unloaded
 import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.matcher.ElementMatchers
@@ -67,22 +65,4 @@ class ApplicationOutputWriter : OutputWriter {
                 .method(ElementMatchers.named("onCreate")).intercept(methodDelegation<LogMethod>())
                 .make()
     }
-}
-
-inline
-fun <reified T> TransformData.resolve(): TypeDescription =
-    typePool.resolve<T>()
-
-inline
-fun <reified T> TransformData.addInjector(
-    componentType: TypeDescription.Generic,
-    transform: DynamicType.Builder<*>
-): DynamicType.Builder<*> {
-    val hasInjectorType = resolve<T>()
-    if (componentType.asErasure().isAssignableTo(hasInjectorType)) {
-        println("$componentType is assignable to $hasInjectorType")
-        return transform.implement(hasInjectorType)
-                .intercept(methodDelegation<BootstrapMethods>())
-    }
-    return transform
 }

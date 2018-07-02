@@ -26,7 +26,8 @@ class ByteBuddyRunRunTransform(
     fun TransformInvocation.runRun(): RunRun {
         return ByteBuddyRunRun(
             bootClasspath, this,
-            ApplicationOutputWriter()
+            ApplicationOutputWriter(),
+            InjectActivityWriter()
         )
     }
 }

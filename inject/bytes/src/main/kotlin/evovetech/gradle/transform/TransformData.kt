@@ -1,11 +1,13 @@
 package evovetech.gradle.transform
 
+import evovetech.codegen.BootstrapMethods
 import evovetech.gradle.transform.content.Output
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.ClassFileVersion
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.ClassFileLocator
+import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.dynamic.DynamicType.Builder
 import net.bytebuddy.dynamic.DynamicType.Unloaded
 import net.bytebuddy.dynamic.scaffold.inline.MethodNameTransformer.Suffixing
@@ -64,4 +66,23 @@ class TransformData(
     ): Unloaded<*> {
         return this@TransformData.transform(typeDescription)
     }
+}
+
+
+inline
+fun <reified T> TransformData.resolve(): TypeDescription =
+    typePool.resolve<T>()
+
+inline
+fun <reified T> TransformData.addInjector(
+    componentType: TypeDescription.Generic,
+    transform: DynamicType.Builder<*>
+): DynamicType.Builder<*> {
+    val hasInjectorType = resolve<T>()
+    if (componentType.asErasure().isAssignableTo(hasInjectorType)) {
+        println("$componentType is assignable to $hasInjectorType")
+        return transform.implement(hasInjectorType)
+                .intercept(methodDelegation<BootstrapMethods>())
+    }
+    return transform
 }
