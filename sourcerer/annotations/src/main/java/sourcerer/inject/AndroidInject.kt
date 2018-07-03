@@ -36,10 +36,6 @@ import kotlin.reflect.KClass
 annotation
 class AndroidInject(
     /**
-     * The generated `@Module` class name.
-     */
-    val generatedName: String = "",
-    /**
      * Additional `@Module`-annotated classes from which this activity is
      * composed.
      */

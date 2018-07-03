@@ -33,8 +33,6 @@ class AndroidInjectModuleDescriptor(
 
     val annotationMirror: AnnotationMirror,
 
-    val generatedName: String,
-
     val includes: ImmutableList<TypeMirror>
 ) {
     val type: TypeMirror = element.asType()
@@ -61,13 +59,10 @@ class AndroidInjectModuleDescriptor(
     @Inject constructor() {
         fun create(element: TypeElement): AndroidInjectModuleDescriptor {
             val annotationMirror = element.getAnnotationMirror<AndroidInject>()!!
-            val generatedName = annotationMirror.getValue<String>("generatedName")
-                    .orEmpty()
             val includes = annotationMirror.getTypeListValue("includes")
             return AndroidInjectModuleDescriptor(
                 element = element,
                 annotationMirror = annotationMirror,
-                generatedName = generatedName,
                 includes = includes
             )
         }
