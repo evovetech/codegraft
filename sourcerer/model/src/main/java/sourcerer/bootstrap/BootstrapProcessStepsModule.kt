@@ -26,4 +26,7 @@ internal
 interface BootstrapProcessStepsModule {
     @Binds @IntoSet
     fun provideComponentStep(step: ComponentStep): ProcessStep
+
+    @Binds @IntoSet
+    fun provideAndroidInjectStep(step: AndroidInjectStep): ProcessStep
 }

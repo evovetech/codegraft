@@ -16,20 +16,8 @@
 
 package evovetech.sample.github
 
-import android.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import dagger.android.AndroidInjector
-import dagger.android.HasFragmentInjector
-import sourcerer.inject.InjectActivity
-import javax.inject.Inject
-import javax.inject.Provider
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
+import sourcerer.inject.AndroidInject
 
-@InjectActivity
-class MainActivity : AppCompatActivity(), HasFragmentInjector {
-    override
-    fun fragmentInjector(): AndroidInjector<Fragment> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-}
+@AndroidInject
+class MainActivity : AppCompatActivity()

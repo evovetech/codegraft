@@ -32,15 +32,14 @@ import dagger.Lazy
 import dagger.Module
 import dagger.internal.codegen.BootstrapComponentDescriptor.Kind.BOOTSTRAP_COMPONENT
 import dagger.internal.codegen.ConfigurationAnnotations.enclosedBuilders
-import dagger.internal.codegen.DaggerElements.getAnnotationMirror
 import dagger.internal.codegen.ModuleDescriptor.Kind.MODULE
-import dagger.internal.codegen.MoreAnnotationMirrors.getTypeListValue
 import dagger.internal.codegen.Scopes.scopesOf
 import dagger.model.DependencyRequest
 import dagger.model.Scope
 import dagger.producers.ProductionComponent
 import sourcerer.AnnotatedTypeElement
 import sourcerer.bootstrap.toImmutableSet
+import sourcerer.getAnnotationMirror
 import sourcerer.getValue
 import sourcerer.inject.BootstrapComponent
 import sourcerer.qualifiedName
@@ -284,7 +283,7 @@ class BootstrapComponentDescriptor(
             kind: Kind,
             parentKind: Optional<Kind>
         ): BootstrapComponentDescriptor {
-            val componentMirror = getAnnotationMirror(componentDefinitionType, kind.annotationType.java).get()
+            val componentMirror = componentDefinitionType.getAnnotationMirror(kind.annotationType)!!
             val dependencies = componentMirror.getTypeListValue(BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
                     .map(MoreTypes::asTypeElement)
                     .map(this::forComponent)
@@ -447,7 +446,7 @@ class BootstrapComponentDescriptor(
                 componentMirror: AnnotationMirror,
                 modulesAttribute: String
             ) = Modules(
-                getTypeListValue(componentMirror, modulesAttribute)
+                componentMirror.getTypeListValue(modulesAttribute)
                         .map(MoreTypes::asTypeElement)
                         .map(moduleDescriptorFactory::create)
                         .toImmutableSet()

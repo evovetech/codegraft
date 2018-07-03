@@ -21,7 +21,7 @@ import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.build.EntryPoint.Default.REBASE
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType.Unloaded
-import sourcerer.inject.InjectActivity
+import sourcerer.inject.AndroidInject
 
 class InjectActivityWriter : OutputWriter {
     private val entryPoint: EntryPoint = REBASE
@@ -29,7 +29,7 @@ class InjectActivityWriter : OutputWriter {
     override
     fun TransformData.canTransform(
         typeDescription: TypeDescription
-    ): Boolean = typeDescription.declaredAnnotations.isAnnotationPresent(InjectActivity::class.java)
+    ): Boolean = typeDescription.declaredAnnotations.isAnnotationPresent(AndroidInject::class.java)
 
     override
     fun TransformData.transform(

@@ -16,16 +16,16 @@
 
 package sourcerer
 
-import sourcerer.processor.Env
-import sourcerer.processor.ProcessingEnv.Option
+import com.google.auto.common.MoreElements
+import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.Element
+import kotlin.reflect.KClass
 
-interface ProcessStep {
-    fun Env.annotations(): Set<AnnotationType>
+fun Element.getAnnotationMirror(
+    mirrorType: KClass<out Annotation>
+): AnnotationMirror? = MoreElements.getAnnotationMirror(this, mirrorType.java)
+        .orNull()
 
-    fun Env.process(
-        annotationElements: AnnotationElements
-    ): Map<AnnotationType, List<Output>>
-
-    fun supportedOptions(): Iterable<Option> =
-        emptySet()
-}
+inline
+fun <reified T : Annotation> Element.getAnnotationMirror(): AnnotationMirror? =
+    getAnnotationMirror(T::class)

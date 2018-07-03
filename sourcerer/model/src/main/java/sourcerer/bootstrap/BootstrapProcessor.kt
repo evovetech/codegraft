@@ -33,7 +33,13 @@ class BootstrapProcessor(
 ) : BaseProcessor() {
     @Inject lateinit var types: Types
     @Inject lateinit var options: Options
-    @Inject lateinit var componentStep: ComponentStep
+
+    @Inject lateinit
+    var androidInjectStep: AndroidInjectStep
+
+    @Inject lateinit
+    var componentStep: ComponentStep
+
     private
     var processed = false
 

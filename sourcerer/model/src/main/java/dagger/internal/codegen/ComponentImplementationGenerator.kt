@@ -28,7 +28,6 @@ import dagger.MembersInjector
 import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodDescriptor
 import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodKind.MEMBERS_INJECTION
 import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodKind.PROVISION
-import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.bootstrap.getFieldName
 import sourcerer.bootstrap.key
@@ -47,9 +46,7 @@ import javax.lang.model.type.TypeMirror
 
 internal
 class ComponentImplementationGenerator(
-    private val env: Env,
     private val types: SourcererTypes,
-    private val elements: SourcererElements,
     private val descriptor: BootstrapComponentDescriptor
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.componentDefinitionType),
@@ -137,16 +134,12 @@ class ComponentImplementationGenerator(
 
     class Factory
     @Inject constructor(
-        private val env: Env,
-        private val types: SourcererTypes,
-        private val elements: SourcererElements
+        private val types: SourcererTypes
     ) {
         fun create(
             descriptor: BootstrapComponentDescriptor
         ) = ComponentImplementationGenerator(
-            env = env,
             types = types,
-            elements = elements,
             descriptor = descriptor
         )
     }

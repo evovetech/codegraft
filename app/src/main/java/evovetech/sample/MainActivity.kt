@@ -25,12 +25,12 @@ import evovetech.sample.network.Client
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.message
 import kotlinx.android.synthetic.main.activity_main.navigation
-import sourcerer.inject.InjectActivity
+import sourcerer.inject.AndroidInject
 import sourcerer.inject.Plugins
 import sourcerer.inject.get
 import javax.inject.Inject
 
-@InjectActivity
+@AndroidInject
 class MainActivity : AppCompatActivity() {
     @Inject lateinit
     var plugins: Plugins

@@ -14,18 +14,34 @@
  * limitations under the License.
  */
 
-package sourcerer
+package sourcerer.inject
 
-import sourcerer.processor.Env
-import sourcerer.processor.ProcessingEnv.Option
+import kotlin.annotation.AnnotationRetention.BINARY
+import kotlin.annotation.AnnotationTarget.CLASS
+import kotlin.annotation.AnnotationTarget.FILE
+import kotlin.reflect.KClass
 
-interface ProcessStep {
-    fun Env.annotations(): Set<AnnotationType>
+/**
+ * Created by layne on 2/26/18.
+ */
 
-    fun Env.process(
-        annotationElements: AnnotationElements
-    ): Map<AnnotationType, List<Output>>
-
-    fun supportedOptions(): Iterable<Option> =
-        emptySet()
-}
+@MustBeDocumented
+@Target(
+    CLASS,
+    FILE
+)
+@Retention(
+    BINARY
+)
+annotation
+class AndroidInject(
+    /**
+     * The generated `@Module` class name.
+     */
+    val generatedName: String = "",
+    /**
+     * Additional `@Module`-annotated classes from which this activity is
+     * composed.
+     */
+    val includes: Array<KClass<*>> = []
+)
