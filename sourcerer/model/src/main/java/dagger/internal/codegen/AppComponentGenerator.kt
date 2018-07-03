@@ -399,7 +399,7 @@ class AppComponentGenerator(
         ): AppComponentGenerator {
             val allComponents = (generatedComponents + storedComponents)
             val componentDescriptors = allComponents.filter { it.autoInclude }
-                    .flatMap { it.dependencies + it }
+                    .flatMap { it.allDependencies + it }
                     .toImmutableSet()
             val components = componentDescriptors
                     .map(componentOutputFactory::create)

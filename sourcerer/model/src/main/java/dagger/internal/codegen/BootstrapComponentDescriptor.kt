@@ -108,10 +108,17 @@ class BootstrapComponentDescriptor(
     /**
      * The entry point methods on the component type.
      */
-    val entryPointMethods: ImmutableSet<ComponentMethodDescriptor>
-        get() = componentMethods
+    val entryPointMethods: ImmutableSet<ComponentMethodDescriptor> by lazy {
+        componentMethods
                 .filter { method -> method.dependencyRequest.isPresent }
                 .toImmutableSet()
+    }
+
+    val allDependencies: ImmutableSet<BootstrapComponentDescriptor> by lazy {
+        dependencies
+                .flatMap { it.allDependencies }
+                .toImmutableSet()
+    }
 
     internal enum
     class Kind(
