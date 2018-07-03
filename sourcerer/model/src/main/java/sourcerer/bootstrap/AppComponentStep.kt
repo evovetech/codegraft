@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.bootstrap
 
 import com.google.common.collect.ImmutableSet
+import dagger.internal.codegen.AppComponentGenerator
+import dagger.internal.codegen.AppComponentGenerator.Factory
+import dagger.internal.codegen.BootstrapComponentDescriptor
 import javax.inject.Inject
 
 internal
 class AppComponentStep
 @Inject constructor(
-    val factory: AppComponentGenerator.Factory
+    val factory: Factory
 ) {
     fun process(
         generatedComponents: ImmutableSet<BootstrapComponentDescriptor>,

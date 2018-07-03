@@ -39,6 +39,7 @@ class MainProcessor(
     override
     fun process(annotations: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
         bootstrap.processingEnv.log("MainProcessor process($annotations)")
-        return bootstrap.process(annotations, roundEnv)
+        bootstrap.process(annotations, roundEnv)
+        return false
     }
 }

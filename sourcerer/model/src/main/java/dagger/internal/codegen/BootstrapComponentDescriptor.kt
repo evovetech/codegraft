@@ -19,7 +19,6 @@ package dagger.internal.codegen
 import com.google.auto.common.AnnotationMirrors
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.auto.common.MoreTypes
-import com.google.auto.value.AutoValue
 import com.google.common.base.Equivalence
 import com.google.common.base.Preconditions.checkArgument
 import com.google.common.base.Verify.verify
@@ -188,19 +187,18 @@ class BootstrapComponentDescriptor(
     /**
      * A function that returns all [.scopes] of its input.
      */
-    @AutoValue
-    abstract
-    class ComponentMethodDescriptor {
-        abstract val kind: ComponentMethodKind
-        abstract val dependencyRequest: Optional<DependencyRequest>
-        abstract val methodElement: ExecutableElement
-
+    data
+    class ComponentMethodDescriptor(
+        val kind: ComponentMethodKind,
+        val dependencyRequest: Optional<DependencyRequest>,
+        val methodElement: ExecutableElement
+    ) {
         companion object {
             fun create(
                 kind: ComponentMethodKind,
                 dependencyRequest: Optional<DependencyRequest>,
                 methodElement: ExecutableElement
-            ): ComponentMethodDescriptor = AutoValue_BootstrapComponentDescriptor_ComponentMethodDescriptor(
+            ) = ComponentMethodDescriptor(
                 kind,
                 dependencyRequest,
                 methodElement
@@ -226,24 +224,25 @@ class BootstrapComponentDescriptor(
         }
     }
 
-    internal enum class ComponentMethodKind {
+    internal enum
+    class ComponentMethodKind {
         PROVISION,
         MEMBERS_INJECTION;
     }
 
-    @AutoValue
-    internal abstract class BuilderRequirementMethod {
-        internal abstract fun method(): ExecutableElement
-        internal abstract fun requirement(): ComponentRequirement
-    }
+    internal data
+    class BuilderRequirementMethod(
+        val method: ExecutableElement,
+        val requirement: ComponentRequirement
+    )
 
-    @AutoValue
-    internal abstract class BuilderSpec {
-        internal abstract fun builderDefinitionType(): TypeElement
-        internal abstract fun requirementMethods(): ImmutableSet<BuilderRequirementMethod>
-        internal abstract fun buildMethod(): ExecutableElement
-        internal abstract fun componentType(): TypeMirror
-    }
+    internal data
+    class BuilderSpec(
+        val builderDefinitionType: TypeElement,
+        val requirementMethods: ImmutableSet<BuilderRequirementMethod>,
+        val buildMethod: ExecutableElement,
+        val componentType: TypeMirror
+    )
 
     internal class Factory
     @Inject constructor(
@@ -387,7 +386,7 @@ class BootstrapComponentDescriptor(
                 } else {
                     val resolved = MoreTypes.asExecutable(types.asMemberOf(builderType.get(), method))
                     requirementMethods.add(
-                        AutoValue_BootstrapComponentDescriptor_BuilderRequirementMethod(
+                        BuilderRequirementMethod(
                             method,
                             requirementForBuilderMethod(method, resolved)
                         )
@@ -396,7 +395,7 @@ class BootstrapComponentDescriptor(
             }
             verify(buildMethod != null) // validation should have ensured this.
             return Optional.of(
-                AutoValue_BootstrapComponentDescriptor_BuilderSpec(
+                BuilderSpec(
                     element,
                     requirementMethods.build(),
                     buildMethod!!,

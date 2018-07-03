@@ -34,7 +34,7 @@ class ComponentOutput(
 
     class Factory
     @Inject constructor(
-        private val componentImplementationFactory: dagger.internal.codegen.ComponentImplementationGenerator.Factory,
+        private val componentImplementationFactory: ComponentImplementationGenerator.Factory,
         private val componentModuleFactory: ComponentModuleGenerator.Factory,
         private val componentBootDataFactory: ComponentBootDataGenerator.Factory
     ) {
