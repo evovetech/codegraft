@@ -31,6 +31,6 @@ fun AnnotationMirror?.wrap(): Equivalence.Wrapper<AnnotationMirror>? =
 fun AnnotationMirror.getAnnotationValue(name: String): AnnotationValue =
     AnnotationMirrors.getAnnotationValue(this, name)
 
-@Suppress("UNCHECKED_CAST")
-fun <T> AnnotationMirror.getValue(name: String): T? =
+inline
+fun <reified T : Any> AnnotationMirror.getValue(name: String): T? =
     getAnnotationValue(name).value as? T
