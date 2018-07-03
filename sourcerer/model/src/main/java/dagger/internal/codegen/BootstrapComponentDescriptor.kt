@@ -16,7 +16,6 @@
 
 package dagger.internal.codegen
 
-import com.google.auto.common.AnnotationMirrors
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.auto.common.MoreTypes
 import com.google.common.base.Equivalence
@@ -42,6 +41,7 @@ import dagger.model.Scope
 import dagger.producers.ProductionComponent
 import sourcerer.AnnotatedTypeElement
 import sourcerer.bootstrap.toImmutableSet
+import sourcerer.getValue
 import sourcerer.inject.BootstrapComponent
 import sourcerer.qualifiedName
 import java.util.EnumSet
@@ -285,16 +285,14 @@ class BootstrapComponentDescriptor(
             parentKind: Optional<Kind>
         ): BootstrapComponentDescriptor {
             val componentMirror = getAnnotationMirror(componentDefinitionType, kind.annotationType.java).get()
-            val dependencies = getTypeListValue(componentMirror, BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
+            val dependencies = componentMirror.getTypeListValue(BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
                     .map(MoreTypes::asTypeElement)
                     .map(this::forComponent)
                     .toImmutableSet()
             val modules = modulesFactory.create(componentMirror, kind.modulesAttribute)
             val applicationModules = modulesFactory.create(componentMirror, APPLICATION_MODULES_ATTRIBUTE)
-            val autoInclude = AnnotationMirrors.getAnnotationValue(componentMirror, AUTO_INCLUDE_ATTRIBUTE)
-                    .value as Boolean
-            val flatten = AnnotationMirrors.getAnnotationValue(componentMirror, FLATTEN_ATTRIBUTE)
-                    .value as Boolean
+            val autoInclude = componentMirror.getValue<Boolean>(AUTO_INCLUDE_ATTRIBUTE)!!
+            val flatten = componentMirror.getValue<Boolean>(FLATTEN_ATTRIBUTE)!!
             val unimplementedMethods = elements.getUnimplementedMethods(componentDefinitionType)
             val componentMethods = unimplementedMethods.map { componentMethod ->
                 getDescriptorForComponentMethod(componentDefinitionType, kind, componentMethod)
