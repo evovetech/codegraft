@@ -20,6 +20,11 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
 import dagger.model.Key
 import sourcerer.JavaOutput
+import sourcerer.bootstrap.Dependency
+import sourcerer.bootstrap.fieldName
+import sourcerer.bootstrap.getterMethod
+import sourcerer.bootstrap.qualifier
+import sourcerer.bootstrap.type
 import sourcerer.classBuilder
 import sourcerer.inject.BootScope
 import sourcerer.typeSpec

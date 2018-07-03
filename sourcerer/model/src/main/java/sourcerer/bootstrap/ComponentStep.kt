@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.bootstrap
 
+import dagger.internal.codegen.AppComponentStep
+import dagger.internal.codegen.BootstrapComponentDescriptor
 import dagger.internal.codegen.BootstrapComponentDescriptor.Factory
 import dagger.internal.codegen.BootstrapComponentDescriptor.Kind
-import dagger.internal.codegen.ComponentStep.Option
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
 import sourcerer.DeferredOutput
 import sourcerer.Output
 import sourcerer.ProcessStep
+import sourcerer.bootstrap.ComponentStep.Option
 import sourcerer.inject.BootstrapComponent
 import sourcerer.processor.Env
 import sourcerer.processor.ProcessingEnv

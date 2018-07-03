@@ -34,6 +34,13 @@ import org.jetbrains.annotations.Nullable
 import sourcerer.JavaOutput
 import sourcerer.addAnnotation
 import sourcerer.addTo
+import sourcerer.bootstrap.ComponentOutput
+import sourcerer.bootstrap.Package
+import sourcerer.bootstrap.getFieldName
+import sourcerer.bootstrap.getterMethod
+import sourcerer.bootstrap.getterMethodName
+import sourcerer.bootstrap.key
+import sourcerer.bootstrap.toImmutableSet
 import sourcerer.classBuilder
 import sourcerer.inject.BootScope
 import sourcerer.interfaceBuilder

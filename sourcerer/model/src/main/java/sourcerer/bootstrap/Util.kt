@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.bootstrap
 
 import com.google.auto.common.MoreElements
 import com.google.common.collect.ImmutableList
@@ -24,17 +24,7 @@ import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.TypeElement
 import javax.lang.model.util.ElementFilter
-
-fun simpleVariableName(typeElement: TypeElement): String =
-    SourceFiles.simpleVariableName(typeElement)
-
-fun componentCanMakeNewInstances(typeElement: TypeElement): Boolean =
-    Util.componentCanMakeNewInstances(typeElement)
-
-internal
-fun SourcererElements.isComponentContributionMethod(method: ExecutableElement): Boolean {
-    return BootstrapComponentDescriptor.isComponentContributionMethod(this, method)
-}
+import javax.lang.model.util.Elements
 
 fun <T> Collection<T>.toImmutableList(): ImmutableList<T> {
     return ImmutableList.copyOf(this)
@@ -56,7 +46,7 @@ fun <reified E> immutableSet(init: ImmutableSet.Builder<E>.() -> Unit): Immutabl
 }
 
 internal
-fun SourcererElements.abstractMethods(
+fun Elements.abstractMethods(
     typeElement: TypeElement
 ) = ElementFilter.methodsIn(getAllMembers(typeElement))
         .filter(MoreElements.hasModifiers<ExecutableElement>(ABSTRACT)::apply)

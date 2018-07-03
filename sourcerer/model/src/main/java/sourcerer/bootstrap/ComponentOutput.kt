@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.bootstrap
 
+import dagger.internal.codegen.BootstrapComponentDescriptor
+import dagger.internal.codegen.ComponentBootDataGenerator
+import dagger.internal.codegen.ComponentImplementationGenerator
+import dagger.internal.codegen.ComponentModuleGenerator
 import sourcerer.Output
 import javax.annotation.processing.FilerException
 import javax.inject.Inject
@@ -30,7 +34,7 @@ class ComponentOutput(
 
     class Factory
     @Inject constructor(
-        private val componentImplementationFactory: ComponentImplementationGenerator.Factory,
+        private val componentImplementationFactory: dagger.internal.codegen.ComponentImplementationGenerator.Factory,
         private val componentModuleFactory: ComponentModuleGenerator.Factory,
         private val componentBootDataFactory: ComponentBootDataGenerator.Factory
     ) {

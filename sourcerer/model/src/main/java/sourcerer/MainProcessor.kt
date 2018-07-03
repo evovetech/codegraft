@@ -16,7 +16,7 @@
 
 package sourcerer
 
-import dagger.internal.codegen.BootstrapProcessor
+import sourcerer.bootstrap.BootstrapProcessor
 import sourcerer.processor.ProcessingEnv
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment

@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.bootstrap
 
-import dagger.model.DependencyRequest
-import dagger.model.Key
+import com.google.common.base.Equivalence
 
-typealias Dependency = DependencyRequest
-
-val Dependency.key: Key
-    get() = key()
+fun <T> Equivalence.Wrapper<T>?.unwrap(): T? =
+    this?.get()
 

@@ -23,6 +23,10 @@ import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import dagger.model.DependencyRequest
+import sourcerer.bootstrap.getFieldName
+import sourcerer.bootstrap.key
+import sourcerer.bootstrap.qualifier
+import sourcerer.bootstrap.type
 import sourcerer.join
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType

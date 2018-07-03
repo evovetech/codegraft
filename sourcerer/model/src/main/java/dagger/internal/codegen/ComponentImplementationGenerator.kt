@@ -30,6 +30,9 @@ import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodKind.
 import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodKind.PROVISION
 import sourcerer.Env
 import sourcerer.JavaOutput
+import sourcerer.bootstrap.getFieldName
+import sourcerer.bootstrap.key
+import sourcerer.bootstrap.type
 import sourcerer.classBuilder
 import sourcerer.typeSpec
 import javax.inject.Inject

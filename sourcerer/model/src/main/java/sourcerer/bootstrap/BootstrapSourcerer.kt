@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.bootstrap
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
+import dagger.internal.codegen.BootstrapComponentDescriptor
 import okio.Okio
 import sourcerer.SourcererOutput
 import sourcerer.StoredFile
@@ -33,9 +34,7 @@ import javax.inject.Inject
 internal
 class BootstrapSourcerer
 @Inject constructor(
-    val env: ProcessingEnv,
-    val types: SourcererTypes,
-    val elements: SourcererElements
+    val env: ProcessingEnv
 ) {
     internal
     val file = ClassName.get(BootstrapComponent::class.java).metaFile

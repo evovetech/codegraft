@@ -42,6 +42,7 @@ import dagger.model.DependencyRequest
 import dagger.model.Scope
 import dagger.producers.ProductionComponent
 import sourcerer.AnnotatedTypeElement
+import sourcerer.bootstrap.toImmutableSet
 import sourcerer.inject.BootstrapComponent
 import sourcerer.qualifiedName
 import java.util.EnumSet

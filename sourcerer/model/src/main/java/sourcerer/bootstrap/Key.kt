@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.bootstrap
 
 import com.google.auto.common.MoreTypes
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
+import dagger.internal.codegen.MethodBuilder
 import dagger.model.Key
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element

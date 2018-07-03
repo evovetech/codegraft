@@ -17,7 +17,7 @@
 package sourcerer
 
 import com.google.auto.service.AutoService
-import dagger.internal.codegen.Package
+import sourcerer.bootstrap.Package
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.TypeElement

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.bootstrap
 
 import dagger.BindsInstance
 import sourcerer.BaseProcessor
