@@ -33,4 +33,4 @@ fun AnnotationMirror.getAnnotationValue(name: String): AnnotationValue =
 
 @Suppress("UNCHECKED_CAST")
 fun <T> AnnotationMirror.getValue(name: String): T? =
-    getAnnotationValue(name) as? T
+    getAnnotationValue(name).value as? T
