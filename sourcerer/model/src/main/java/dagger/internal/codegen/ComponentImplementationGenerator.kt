@@ -62,7 +62,7 @@ class ComponentImplementationGenerator(
         addSuperinterface(TypeName.get(descriptor.componentDefinitionType.asType()))
         val constructorBuilder = MethodSpec.constructorBuilder()
                 .addAnnotation(Inject::class.java)
-        descriptor?.componentMethods.orEmpty()
+        descriptor.componentMethods
                 .map { method -> Method(types, method) }
                 .map { method -> method.apply { write(constructorBuilder) } }
         addMethod(constructorBuilder.build())
