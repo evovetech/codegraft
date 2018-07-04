@@ -24,6 +24,7 @@ import dagger.Component
 import dagger.Module
 import dagger.multibindings.IntoSet
 import sourcerer.Output
+import sourcerer.mapOutput
 import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Option
 import sourcerer.processor.newEnv
@@ -128,6 +129,9 @@ class RoundProcessor2(
             && !finished) {
 
             val outputs = data.complete()
+            outputs.map {
+                env.mapOutput(it)
+            }
             env.log("outputs=$outputs")
 
             finished = true

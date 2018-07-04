@@ -71,16 +71,16 @@ interface ProcessingEnv {
     fun filer() = filer
 
     fun log(element: Element, message: String, vararg args: Any) =
-        Unit//  messager.log(element, message, args)
+        messager.log(element, message, args)
 
     fun log(message: String, vararg args: Any) =
-        Unit//messager.log(message, args)
+        messager.log(message, args)
 
     fun error(element: Element, message: String, vararg args: Any) =
-        Unit// messager.error(element, message, args)
+        messager.error(element, message, args)
 
     fun error(message: String, vararg args: Any) =
-        Unit// messager.error(message, args)
+        messager.error(message, args)
 
     companion object {
         const val ALL_ANNOTATIONS = "*"
