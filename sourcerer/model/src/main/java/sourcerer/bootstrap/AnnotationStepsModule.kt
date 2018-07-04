@@ -27,7 +27,7 @@ typealias AnnotationSteps = Set<@JvmSuppressWildcards AnnotationStep>
 internal
 interface AnnotationStepsModule {
     @Binds @IntoSet
-    fun provideComponentStep(step: ComponentStep): AnnotationStep
+    fun provideComponentStep(step: BootstrapComponentStep): AnnotationStep
 
     @Binds @IntoSet
     fun provideAndroidInjectStep(step: AndroidInjectStep): AnnotationStep

@@ -121,12 +121,12 @@ class RoundProcessor2(
 
         env.log("roundOutputs = $outputs")
 
-        if (deferredElements.isEmpty()
-            && outputs.isEmpty()
+        if (!finished
             && !roundEnv.processingOver()
-            && !finished) {
+            && deferredElements.isEmpty()
+            && outputs.isEmpty()) {
 
-            val outputs = data.complete()
+            val outputs = data.finish()
             outputs.map {
                 env.mapOutput(it)
             }
@@ -139,7 +139,7 @@ class RoundProcessor2(
     }
 
     private
-    fun ProcessData.complete(): List<Output> =
+    fun ProcessData.finish(): List<Output> =
         if (isApplication) {
             val generatedComponents = bootstrapComponentStep.generatedComponents
             val storedComponents = bootstrapComponentStep.storedComponents(sourcerer)

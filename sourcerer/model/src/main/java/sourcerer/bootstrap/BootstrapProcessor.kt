@@ -40,7 +40,7 @@ class BootstrapProcessor(
     var androidInjectStep: AndroidInjectStep
 
     @Inject lateinit
-    var componentStep: ComponentStep
+    var componentStep: BootstrapComponentStep
 
     private
     var processed = false

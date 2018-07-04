@@ -21,7 +21,7 @@ import dagger.internal.codegen.BootstrapComponentDescriptor
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
 import sourcerer.DeferredOutput
-import sourcerer.bootstrap.ComponentStep.Option
+import sourcerer.bootstrap.BootstrapComponentStep.Option
 import sourcerer.inject.BootstrapComponent
 import sourcerer.processor.Env
 import sourcerer.processor.ProcessingEnv
@@ -31,7 +31,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ComponentStep
+class BootstrapComponentStep
 @Inject internal
 constructor(
     val componentFactory: BootstrapComponentDescriptor.Factory,

@@ -37,7 +37,7 @@ constructor(
 //            return emptyList()
 //        }
 //
-//        val generatedComponents = this@ComponentStep.generatedComponents
+//        val generatedComponents = this@BootstrapComponentStep.generatedComponents
 //                .toImmutableSet()
 //        val storedComponents = sourcerer.storedOutputs()
 //                .map(componentFactory::forStoredComponent)

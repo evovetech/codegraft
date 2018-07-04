@@ -27,7 +27,7 @@ class ProcessData
     val env: ProcessingEnv,
     processors: ExactSet<Processor>,
     val steps: RoundSteps,
-    val bootstrapComponentStep: ComponentStep,
+    val bootstrapComponentStep: BootstrapComponentStep,
     val androidInjectStep: AndroidInjectStep,
     val appComponentStep: AppComponentStep,
     val sourcerer: BootstrapSourcerer
