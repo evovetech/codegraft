@@ -23,6 +23,7 @@ import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.IntoMap
 import evovetech.sample.MainApplicationModule.MainApplicationSubcomponent
+import sourcerer.inject.android.ApplicationKey
 
 @Module(
     subcomponents = [MainApplicationSubcomponent::class]

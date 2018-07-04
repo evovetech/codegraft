@@ -48,7 +48,7 @@ class JavaOutput(
         outExt: String
     ) : this(ClassName.get(element), outExt)
 
-    abstract inner
+    abstract
     class Builder : SourceWriter {
         override
         val outKlass: Klass = "Builder".toKlass()

@@ -23,7 +23,9 @@ import com.squareup.javapoet.ClassName
 import dagger.internal.codegen.getTypeListValue
 import sourcerer.getAnnotationMirror
 import sourcerer.inject.AndroidInject
+import sourcerer.inject.android.AndroidApplication
 import sourcerer.inject.android.AndroidInjectActivityModule
+import sourcerer.inject.android.AndroidInjectApplicationModule
 import sourcerer.inject.android.AndroidInjectBroadcastReceiverModule
 import sourcerer.inject.android.AndroidInjectContentProviderModule
 import sourcerer.inject.android.AndroidInjectModule
@@ -72,6 +74,10 @@ class AndroidInjectModuleDescriptor(
         val componentType: KClass<out Any>,
         val moduleType: KClass<out AndroidInjectModule<*>>
     ) {
+        Application(
+            AndroidApplication::class,
+            AndroidInjectApplicationModule::class
+        ),
         Activity(
             android.app.Activity::class,
             AndroidInjectActivityModule::class

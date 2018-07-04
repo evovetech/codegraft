@@ -21,9 +21,11 @@ import android.util.Log
 import com.crashlytics.android.Crashlytics
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
+import sourcerer.inject.AndroidInject
 import sourcerer.inject.android.BootApplication
 import javax.inject.Inject
 
+@AndroidInject
 class App : Application(), BootApplication<AppComponent> {
     @Inject lateinit
     var fabric: Fabric

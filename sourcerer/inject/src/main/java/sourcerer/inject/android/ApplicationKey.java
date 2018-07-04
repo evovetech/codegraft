@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package evovetech.sample;
+package sourcerer.inject.android;
 
 import android.app.Activity;
 import android.app.Application;
 import dagger.MapKey;
-import dagger.internal.Beta;
 
 import java.lang.annotation.Target;
 
@@ -28,7 +27,6 @@ import static java.lang.annotation.ElementType.METHOD;
 /**
  * {@link MapKey} annotation to key bindings by a type of an {@link Activity}.
  */
-@Beta
 @MapKey
 @Target(METHOD)
 public
