@@ -39,9 +39,6 @@ android {
     defaultConfig {
         applicationId = "evovetech.sample"
     }
-    packagingOptions {
-        exclude "**/*.srcr"
-    }
 }
 
 apply from: "${configDir}/versions/dagger.gradle"

@@ -142,6 +142,9 @@ class ProjectWrapper(
         applicationVariants.all {
             kapt { add("app") }
         }
+        packagingOptions {
+            exclude("**/*.srcr")
+        }
     }
 
     private
