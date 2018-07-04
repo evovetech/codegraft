@@ -31,11 +31,36 @@ data
 class ParentRound(
     val number: Int = 0,
     val prev: ParentRound? = null,
-    val roundEnv: RoundEnvironment? = null,
     val elements: ImmutableSet<TypeElement> = ImmutableSet.of(),
-    val rounds: ImmutableList<Round> = ImmutableList.of()
+    val roundEnv: RoundEnvironment? = null,
+    val outputs: ImmutableList<Round> = ImmutableList.of()
 ) {
+    fun process(
+        elements: Set<TypeElement>,
+        roundEnv: RoundEnvironment,
+        steps: RoundSteps,
+        processFunc: () -> Boolean
+    ): ParentRound {
+        val round = ParentRound(
+            number + 1,
+            this,
+            elements.toImmutableSet(),
+            roundEnv
+        )
+        steps.preRound(round)
 
+        processFunc()
+
+        if (!roundEnv.processingOver()) {
+            steps.postRound(roundEnv)
+        }
+
+        val outputs = steps.map { step ->
+            step.currentRound.catchupTo(round)
+        }.toImmutableList()
+
+        return round.copy(outputs = outputs)
+    }
 }
 
 data

@@ -17,6 +17,7 @@
 package sourcerer.bootstrap
 
 import com.google.auto.common.BasicAnnotationProcessor.ProcessingStep
+import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import dagger.MembersInjector
 import sourcerer.AnnotationElements
@@ -29,8 +30,8 @@ import javax.lang.model.element.Element
 
 @Singleton
 class RoundSteps(
-    steps: ImmutableSet<RoundStep>
-) : Set<RoundStep> by steps {
+    steps: ImmutableList<RoundStep> = ImmutableList.of()
+) : List<RoundStep> by steps {
     @Inject constructor(
         env: ProcessingEnv,
         steps: AnnotationSteps,
@@ -38,21 +39,27 @@ class RoundSteps(
     ) : this(steps.map { step ->
         injector.injectMembers(step)
         RoundStep(env, step)
-    }.toImmutableSet())
+    }.toImmutableList())
 
-    fun preProcess(parentRound: ParentRound) {
+    fun preRound(parent: ParentRound) {
         forEach { step ->
-            step.preProcess(parentRound)
+            step.preRound(parent)
+        }
+    }
+
+    fun postRound(roundEnv: RoundEnvironment) {
+        forEach { step ->
+            step.postRound(roundEnv)
         }
     }
 }
 
 fun Collection<RoundStep>.toRoundSteps(): RoundSteps =
-    RoundSteps(toImmutableSet())
+    RoundSteps(toImmutableList())
 
 class RoundStep(
     private val env: ProcessingEnv,
-    private val step: AnnotationStep
+    internal val step: AnnotationStep
 ) : ProcessingStep {
     private
     var _currentRound = Round()
@@ -71,7 +78,7 @@ class RoundStep(
             .map { it.java }
             .toSet()
 
-    fun preProcess(parentRound: ParentRound) {
+    fun preRound(parentRound: ParentRound) {
         this._parentRound = parentRound
     }
 

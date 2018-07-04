@@ -16,14 +16,21 @@
 
 package sourcerer.bootstrap
 
+import com.google.common.collect.ImmutableList
 import sourcerer.processor.ProcessingEnv
+import javax.annotation.processing.Processor
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ProcessData
-@Inject constructor(
+class ProcessData(
     val env: ProcessingEnv,
+    val processors: ImmutableList<Processor>,
     val steps: RoundSteps
 ) {
+    @Inject constructor(
+        env: ProcessingEnv,
+        processors: ExactSet<Processor>,
+        steps: RoundSteps
+    ) : this(env, processors.toImmutableList(), steps)
 }

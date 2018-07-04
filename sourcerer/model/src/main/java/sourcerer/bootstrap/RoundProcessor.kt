@@ -17,8 +17,12 @@
 package sourcerer.bootstrap
 
 import com.google.auto.common.BasicAnnotationProcessor
+import com.google.common.collect.ImmutableList
+import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
+import dagger.Module
+import dagger.multibindings.IntoSet
 import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Option
 import sourcerer.processor.newEnv
@@ -29,6 +33,9 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 import javax.lang.model.SourceVersion
+import javax.lang.model.element.TypeElement
+
+typealias ExactSet<T> = Set<@JvmSuppressWildcards T>
 
 open
 class RoundProcessor2(
@@ -42,8 +49,30 @@ class RoundProcessor2(
         this.data = data
     }
 
+    private
+    var processed = false
+
+    fun isProcessed(): Boolean {
+        return processed
+    }
+
+    val env: ProcessingEnv
+        get() = data.env
+
+    val processingEnv: ProcessingEnv
+        get() = data.env
+
+    val processors: ImmutableList<Processor>
+        get() = data.processors
+
     val steps: RoundSteps
         get() = data.steps
+
+    val options: ProcessingEnv.Options
+        get() = data.env.options
+
+    private
+    var round: ParentRound = ParentRound()
 
     override
     fun initProcessors(
@@ -55,14 +84,61 @@ class RoundProcessor2(
             build()
         }
         component.inject(this)
-//        return data.steps
+        return data.processors
+    }
+
+    override
+    fun process(elements: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
+        val round = this.round.process(elements, roundEnv, steps) {
+            super.process(elements, roundEnv)
+        }
+
         // TODO:
-        return emptyList()
+        val outputs = round.outputs
+                .flatMap(Round::outputs)
+        env.log("outputs = $outputs")
+        this.processed = outputs.isEmpty()
+
+        this.round = round
+        return false
     }
 }
 
+class ProcessStepsDelegate
+@Inject constructor(
+    private val steps: RoundSteps
+) : BasicAnnotationProcessor() {
+    override
+    fun initSteps(): Iterable<ProcessingStep> {
+        return steps
+    }
+
+    override
+    fun postRound(roundEnv: RoundEnvironment) {
+        steps.forEach { step ->
+            step.postRound(roundEnv)
+        }
+    }
+
+    override
+    fun getSupportedSourceVersion() =
+        SourceVersion.latestSupported()!!
+
+    override
+    fun getSupportedOptions(): Set<String> = steps
+            .flatMap(RoundStep::supportedOptions)
+            .map(Option::key)
+            .toSet()
+}
+
+@Module(includes = [AnnotationStepsModule::class])
+interface RoundProcessorsModule {
+    @Binds @IntoSet
+    fun bindProcessSteps(processStepsDelegate: ProcessStepsDelegate): Processor
+}
+
 @Singleton
-@Component(modules = [AnnotationStepsModule::class])
+@Component(modules = [RoundProcessorsModule::class])
 interface RoundProcessor2Component {
     val processData: ProcessData
 

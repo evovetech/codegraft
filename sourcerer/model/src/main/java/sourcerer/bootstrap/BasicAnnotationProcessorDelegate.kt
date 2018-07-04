@@ -21,6 +21,7 @@ import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 
+open
 class BasicAnnotationProcessorDelegate(
     private val steps: (ProcessingEnvironment) -> Iterable<ProcessingStep>,
     private val supportedOptions: (ProcessingEnvironment) -> Set<String> = { emptySet() },
