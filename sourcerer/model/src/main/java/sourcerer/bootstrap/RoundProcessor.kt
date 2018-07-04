@@ -115,17 +115,15 @@ class RoundProcessor2(
             "isApplication=$isApplication, " +
             "processingOver=${roundEnv.processingOver()}, " +
             "finished=$finished, " +
-            "outputs=$outputs" +
+            "rounds=$rounds" +
             " }"
         )
 
-        val roundOutputs = round.outputs
-                .flatMap(Round::outputs)
-        env.log("roundOutputs = $roundOutputs")
+        env.log("roundOutputs = $outputs")
 
-        if (isApplication
-            && !roundEnv.processingOver()
+        if (deferredElements.isEmpty()
             && outputs.isEmpty()
+            && !roundEnv.processingOver()
             && !finished) {
 
             val outputs = data.complete()
@@ -140,15 +138,21 @@ class RoundProcessor2(
         }
     }
 
-    fun ProcessData.complete(): List<Output> {
-        val generatedComponents = bootstrapComponentStep.generatedComponents
-                .toImmutableSet()
-        val storedComponents = bootstrapComponentStep.storedComponents(sourcerer)
+    private
+    fun ProcessData.complete(): List<Output> =
+        if (isApplication) {
+            val generatedComponents = bootstrapComponentStep.generatedComponents
+            val storedComponents = bootstrapComponentStep.storedComponents(sourcerer)
 
-        env.log("storedComponents = $storedComponents")
-        val appComponent = appComponentStep.process(generatedComponents, storedComponents)
-        return appComponent.flatMap(AppComponentStep.Output::outputs)
-    }
+            env.log("storedComponents = $storedComponents")
+            val appComponent = appComponentStep.process(generatedComponents, storedComponents)
+            appComponent.flatMap(AppComponentStep.Output::outputs)
+        } else {
+            // just sourcerer things
+            listOf(
+                sourcerer.output(bootstrapComponentStep.generatedComponents)
+            )
+        }
 }
 
 class ProcessStepsDelegate

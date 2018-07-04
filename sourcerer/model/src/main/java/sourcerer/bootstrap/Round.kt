@@ -33,8 +33,17 @@ class ParentRound(
     val prev: ParentRound? = null,
     val elements: ImmutableSet<TypeElement> = ImmutableSet.of(),
     val rootElements: ImmutableSet<Element> = ImmutableSet.of(),
-    val outputs: ImmutableList<Round> = ImmutableList.of()
+    val rounds: ImmutableList<Round> = ImmutableList.of()
 ) {
+    val outputs: ImmutableList<Output> by lazy {
+        rounds.flatMap(Round::outputs)
+                .toImmutableList()
+    }
+    val deferredElements: ImmutableSet<Element> by lazy {
+        rounds.flatMap(Round::deferredElements)
+                .toImmutableSet()
+    }
+
     fun process(
         elements: Set<TypeElement>,
         roundEnv: RoundEnvironment,
@@ -55,11 +64,12 @@ class ParentRound(
             steps.postRound(roundEnv)
         }
 
-        val outputs = steps.map { step ->
+        val rounds = steps.map { step ->
             step.currentRound.catchupTo(round)
         }.toImmutableList()
-
-        return round.copy(outputs = outputs)
+        return round.copy(
+            rounds = rounds
+        )
     }
 }
 
@@ -72,6 +82,7 @@ class Round(
     val outputs: RoundOutputs = RoundOutputs(),
     val deferredElements: ImmutableSet<Element> = ImmutableSet.of()
 ) {
+
     fun process(
         parent: ParentRound,
         env: ProcessingEnv,
@@ -112,6 +123,10 @@ class Round(
             .onEach { env.log("output=$it") }
             .mapNotNull(env::mapOutput)
             .toImmutableSet()
+
+    override fun toString(): String {
+        return "Round(number=$number, outputs=$outputs, deferredElements=$deferredElements)"
+    }
 }
 
 class RoundInputs(
