@@ -16,7 +16,15 @@
 
 package sourcerer.bootstrap
 
+import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.ParameterSpec
+import com.squareup.javapoet.ParameterizedTypeName
+import com.squareup.javapoet.TypeName
+import com.squareup.javapoet.WildcardTypeName
+import dagger.Binds
+import dagger.android.AndroidInjector
+import dagger.multibindings.IntoMap
 import sourcerer.Codegen
 import sourcerer.Dagger
 import sourcerer.JavaOutput
@@ -26,6 +34,10 @@ import sourcerer.addAnnotation
 import sourcerer.addMethod
 import sourcerer.addTo
 import sourcerer.bootstrap.AndroidInjectModuleDescriptor.Kind.Application
+import sourcerer.classBuilder
+import sourcerer.className
+import sourcerer.inject.android.AndroidApplication
+import sourcerer.inject.android.ApplicationKey
 import sourcerer.interfaceBuilder
 import sourcerer.name
 import sourcerer.toKlass
@@ -34,6 +46,7 @@ import javax.inject.Inject
 import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
+import kotlin.reflect.KClass
 
 class AndroidInjectModuleGenerator(
     private val descriptor: AndroidInjectModuleDescriptor
@@ -41,6 +54,8 @@ class AndroidInjectModuleGenerator(
     rawType = ClassName.get(descriptor.element),
     outExt = "Module"
 ) {
+    val applicationType = rawType
+
     override
     fun newBuilder() = outKlass.interfaceBuilder()
 
@@ -48,48 +63,6 @@ class AndroidInjectModuleGenerator(
     fun typeSpec() = when (descriptor.kind) {
         Application -> applicationTypeSpec()
         else -> normalTypeSpec()
-    }
-
-    /*
-
-@Module(
-    subcomponents = [MainApplicationSubcomponent::class]
-)
-interface MainApplicationModule {
-    @Binds
-    @IntoMap
-    @ApplicationKey(App::class)
-    fun bindAndroidInjectorFactory(
-        builder: MainApplicationSubcomponent.Builder
-    ): AndroidInjector.Factory<out Application>
-
-    @Subcomponent
-    interface MainApplicationSubcomponent : AndroidInjector<App> {
-        @Subcomponent.Builder
-        abstract class Builder : AndroidInjector.Builder<App>()
-    }
-}
-
-     */
-    private
-    fun applicationTypeSpec() = typeSpec {
-        addModifiers(PUBLIC, STATIC)
-
-        val subcomponent = Subcomponent(this@AndroidInjectModuleGenerator)
-
-        addAnnotation(Dagger.Module) {
-            subcomponent.fullType
-                    .let(addTo("subcomponents"))
-            val addToIncludes = addTo("includes")
-            descriptor.includes
-                    .map(ClassName::get)
-                    .map(addToIncludes)
-            descriptor.kind.moduleType.java
-                    .let(ClassName::get)
-                    .let(addToIncludes)
-        }
-
-        addType(subcomponent.typeSpec())
     }
 
     private fun normalTypeSpec() = typeSpec {
@@ -111,12 +84,71 @@ interface MainApplicationModule {
         }
     }
 
+    private
+    fun applicationTypeSpec() = typeSpec {
+        addModifiers(PUBLIC, STATIC)
+
+        val subcomponent = Subcomponent(this@AndroidInjectModuleGenerator)
+
+        addAnnotation(Dagger.Module) {
+            subcomponent.fullType
+                    .let(addTo("subcomponents"))
+            val addToIncludes = addTo("includes")
+            descriptor.includes
+                    .map(ClassName::get)
+                    .map(addToIncludes)
+            descriptor.kind.moduleType.java
+                    .let(ClassName::get)
+                    .let(addToIncludes)
+        }
+
+        addMethod("bind${applicationType.name}InjectorFactory") {
+            addModifiers(PUBLIC, ABSTRACT)
+            addAnnotation(Binds::class.java)
+            addAnnotation(IntoMap::class.java)
+            addAnnotation(AnnotationSpec.builder(ApplicationKey::class.java).run {
+                applicationType.let(addTo("value"))
+                build()
+            })
+
+            val param = ParameterSpec.builder(subcomponent.builder.fullType, "builder")
+                    .build()
+            addParameter(param)
+            returns(androidApplicationInjectoryFactory())
+        }
+
+        addType(subcomponent.typeSpec())
+    }
+    /*
+
+@Module(
+    subcomponents = [MainApplicationSubcomponent::class]
+)
+interface MainApplicationModule {
+    @Binds
+    @IntoMap
+    @ApplicationKey(App::class)
+    fun bindAndroidInjectorFactory(
+        builder: MainApplicationSubcomponent.Builder
+    ): AndroidInjector.Factory<out Application>
+
+    @Subcomponent
+    interface MainApplicationSubcomponent : AndroidInjector<App> {
+        @Subcomponent.Builder
+        abstract class Builder : AndroidInjector.Builder<App>()
+    }
+}
+
+     */
+
     class Subcomponent(
-        val parent: AndroidInjectModuleGenerator
+        private val parent: AndroidInjectModuleGenerator
     ) : SourceWriter {
         override
         val outKlass: Klass = "Subcomponent".toKlass()
         val fullType = parent.outKlass.rawType.nestedClass(outKlass.name)
+        val applicationType
+            get() = parent.applicationType
         val builder = SubcomponentBuilder(this)
 
         override
@@ -126,19 +158,24 @@ interface MainApplicationModule {
         fun typeSpec() = typeSpec {
             addModifiers(PUBLIC, STATIC)
             addAnnotation(dagger.Subcomponent::class.java)
+            addSuperinterface(androidInjectorType(parent.applicationType))
             addType(builder.typeSpec())
         }
     }
 
     class SubcomponentBuilder(
-        val parent: Subcomponent
+        private val parent: Subcomponent
     ) : sourcerer.JavaOutput.Builder() {
         val fullType = parent.fullType.nestedClass(outKlass.name)
 
         override
+        fun newBuilder() = outKlass.classBuilder()
+
+        override
         fun typeSpec() = typeSpec {
-            addModifiers(PUBLIC, STATIC)
+            addModifiers(PUBLIC, STATIC, ABSTRACT)
             addAnnotation(dagger.Subcomponent.Builder::class.java)
+            superclass(androidInjectorBuilderType(parent.applicationType))
 
             addMethod("build") {
                 addModifiers(PUBLIC, ABSTRACT)
@@ -157,4 +194,24 @@ interface MainApplicationModule {
             return AndroidInjectModuleGenerator(descriptor)
         }
     }
+}
+
+fun androidApplicationInjectoryFactory(): ParameterizedTypeName {
+    return androidInjectorFactoryType(AndroidApplication::class)
+}
+
+fun androidInjectorFactoryType(klass: KClass<*>): ParameterizedTypeName {
+    val rawType = AndroidInjector.Factory::class.className
+    val wildcard = WildcardTypeName.subtypeOf(klass.className)
+    return ParameterizedTypeName.get(rawType, wildcard)
+}
+
+fun androidInjectorType(appType: TypeName): ParameterizedTypeName {
+    val rawType = AndroidInjector::class.className
+    return ParameterizedTypeName.get(rawType, appType)
+}
+
+fun androidInjectorBuilderType(appType: TypeName): ParameterizedTypeName {
+    val rawType = AndroidInjector.Builder::class.className
+    return ParameterizedTypeName.get(rawType, appType)
 }
