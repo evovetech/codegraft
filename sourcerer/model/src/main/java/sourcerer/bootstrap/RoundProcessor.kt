@@ -23,6 +23,7 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.multibindings.IntoSet
+import sourcerer.Output
 import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Option
 import sourcerer.processor.newEnv
@@ -45,15 +46,21 @@ class RoundProcessor2(
     var data: ProcessData
 
     @Inject
-    fun inject(data: ProcessData) {
+    fun inject(
+        data: ProcessData
+    ) {
         this.data = data
     }
 
     private
-    var processed = false
+    var finished = false
+
+    fun isFinished(): Boolean {
+        return finished
+    }
 
     fun isProcessed(): Boolean {
-        return processed
+        return isFinished()
     }
 
     val env: ProcessingEnv
@@ -89,18 +96,54 @@ class RoundProcessor2(
 
     override
     fun process(elements: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
+        env.log("elements = $elements")
         val round = this.round.process(elements, roundEnv, steps) {
             super.process(elements, roundEnv)
         }
 
-        // TODO:
-        val outputs = round.outputs
-                .flatMap(Round::outputs)
-        env.log("outputs = $outputs")
-        this.processed = outputs.isEmpty()
+        round.postRound(roundEnv)
 
         this.round = round
         return false
+    }
+
+    fun ParentRound.postRound(roundEnv: RoundEnvironment) {
+        env.log(
+            "postRound($roundEnv) " +
+            "{ " +
+            "isApplication=$isApplication, " +
+            "processingOver=${roundEnv.processingOver()}, " +
+            "finished=$finished, " +
+            "outputs=$outputs" +
+            " }"
+        )
+
+        val roundOutputs = round.outputs
+                .flatMap(Round::outputs)
+        env.log("roundOutputs = $roundOutputs")
+
+        if (isApplication
+            && !roundEnv.processingOver()
+            && outputs.isEmpty()
+            && !finished) {
+
+            val outputs = data.complete()
+            env.log("outputs=$outputs")
+
+            finished = true
+        } else {
+            env.log("postRound: no outputs")
+        }
+    }
+
+    fun ProcessData.complete(): List<Output> {
+        val generatedComponents = bootstrapComponentStep.generatedComponents
+                .toImmutableSet()
+        val storedComponents = bootstrapComponentStep.storedComponents(sourcerer)
+
+        env.log("storedComponents = $storedComponents")
+        val appComponent = appComponentStep.process(generatedComponents, storedComponents)
+        return appComponent.flatMap(AppComponentStep.Output::outputs)
     }
 }
 
@@ -188,6 +231,7 @@ class RoundProcessor : BasicAnnotationProcessor() {
             step.postRound(roundEnv)
         }
     }
+}
 
 //
 //    final override
@@ -253,4 +297,4 @@ class RoundProcessor : BasicAnnotationProcessor() {
 //            fun build(): Component
 //        }
 //    }
-}
+//    }

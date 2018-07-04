@@ -32,7 +32,7 @@ class ParentRound(
     val number: Int = 0,
     val prev: ParentRound? = null,
     val elements: ImmutableSet<TypeElement> = ImmutableSet.of(),
-    val roundEnv: RoundEnvironment? = null,
+    val rootElements: ImmutableSet<Element> = ImmutableSet.of(),
     val outputs: ImmutableList<Round> = ImmutableList.of()
 ) {
     fun process(
@@ -45,7 +45,7 @@ class ParentRound(
             number + 1,
             this,
             elements.toImmutableSet(),
-            roundEnv
+            roundEnv.rootElements.toImmutableSet()
         )
         steps.preRound(round)
 

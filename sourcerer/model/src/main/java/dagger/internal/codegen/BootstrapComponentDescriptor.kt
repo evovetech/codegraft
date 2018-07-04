@@ -243,8 +243,9 @@ class BootstrapComponentDescriptor(
         val componentType: TypeMirror
     )
 
-    internal class Factory
-    @Inject constructor(
+    class Factory
+    @Inject internal
+    constructor(
         private val elements: DaggerElements,
         private val types: Types,
         private val dependencyRequestFactory: DependencyRequestFactory,

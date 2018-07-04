@@ -31,9 +31,9 @@ import sourcerer.processor.ProcessingEnv
 import java.net.URL
 import javax.inject.Inject
 
-internal
 class BootstrapSourcerer
-@Inject constructor(
+@Inject internal
+constructor(
     val env: ProcessingEnv
 ) {
     internal

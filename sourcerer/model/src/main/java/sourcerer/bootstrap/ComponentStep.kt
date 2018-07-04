@@ -48,6 +48,13 @@ constructor(
         get() = _generatedComponents
                 .toImmutableSet()
 
+    internal
+    fun storedComponents(
+        sourcerer: BootstrapSourcerer
+    ): ImmutableSet<BootstrapComponentDescriptor> = sourcerer.storedOutputs()
+            .map(componentFactory::forStoredComponent)
+            .toImmutableSet()
+
     override
     fun Env.annotations(): Set<AnnotationType> = setOf(
         BootstrapComponent::class

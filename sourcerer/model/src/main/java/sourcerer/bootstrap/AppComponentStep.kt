@@ -21,11 +21,12 @@ import dagger.internal.codegen.AppComponentGenerator
 import dagger.internal.codegen.BootstrapComponentDescriptor
 import javax.inject.Inject
 
-internal
 class AppComponentStep
-@Inject constructor(
+@Inject internal
+constructor(
     val factory: AppComponentGenerator.Factory
 ) {
+    internal
     fun process(
         generatedComponents: ImmutableSet<BootstrapComponentDescriptor>,
         storedComponents: ImmutableSet<BootstrapComponentDescriptor>
@@ -39,7 +40,8 @@ class AppComponentStep
     )
 
     data
-    class Output(
+    class Output
+    internal constructor(
         val appComponentGenerator: AppComponentGenerator
     ) {
         val outputs: List<sourcerer.Output> = listOf(
