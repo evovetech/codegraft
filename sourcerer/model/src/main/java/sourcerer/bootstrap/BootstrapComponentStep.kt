@@ -22,6 +22,7 @@ import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
 import sourcerer.DeferredOutput
 import sourcerer.bootstrap.BootstrapComponentStep.Option
+import sourcerer.bootstrap.BootstrapSourcerer.Output
 import sourcerer.inject.BootstrapComponent
 import sourcerer.processor.Env
 import sourcerer.processor.ProcessingEnv
@@ -35,7 +36,8 @@ class BootstrapComponentStep
 @Inject internal
 constructor(
     val componentFactory: BootstrapComponentDescriptor.Factory,
-    val componentOutputFactory: ComponentOutput.Factory
+    val componentOutputFactory: ComponentOutput.Factory,
+    val sourcerer: BootstrapSourcerer
 ) : AnnotationStep() {
     internal
     var processed: Boolean = true
@@ -49,11 +51,14 @@ constructor(
                 .toImmutableSet()
 
     internal
-    fun storedComponents(
-        sourcerer: BootstrapSourcerer
-    ): ImmutableSet<BootstrapComponentDescriptor> = sourcerer.storedOutputs()
+    fun storedComponents(): ImmutableSet<BootstrapComponentDescriptor> = sourcerer.storedOutputs()
             .map(componentFactory::forStoredComponent)
             .toImmutableSet()
+
+    internal
+    fun sourcererOutput(): Output {
+        return sourcerer.output(_generatedComponents)
+    }
 
     override
     fun Env.annotations(): Set<AnnotationType> = setOf(

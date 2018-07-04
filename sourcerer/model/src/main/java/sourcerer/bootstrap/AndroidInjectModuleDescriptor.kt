@@ -19,14 +19,16 @@ package sourcerer.bootstrap
 import com.google.auto.common.MoreTypes
 import com.google.common.base.Equivalence
 import com.google.common.collect.ImmutableList
+import com.squareup.javapoet.ClassName
 import dagger.internal.codegen.getTypeListValue
 import sourcerer.getAnnotationMirror
-import sourcerer.getValue
 import sourcerer.inject.AndroidInject
+import sourcerer.qualifiedName
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
+import javax.lang.model.util.Elements
 
 class AndroidInjectModuleDescriptor(
     val element: TypeElement,
@@ -56,7 +58,16 @@ class AndroidInjectModuleDescriptor(
     }
 
     class Factory
-    @Inject constructor() {
+    @Inject constructor(
+        val elements: Elements
+    ) {
+        fun forStoredModule(
+            className: ClassName
+        ): AndroidInjectModuleDescriptor {
+            val typeElement = elements.getTypeElement(className.qualifiedName)
+            return create(typeElement)
+        }
+
         fun create(element: TypeElement): AndroidInjectModuleDescriptor {
             val annotationMirror = element.getAnnotationMirror<AndroidInject>()!!
             val includes = annotationMirror.getTypeListValue("includes")

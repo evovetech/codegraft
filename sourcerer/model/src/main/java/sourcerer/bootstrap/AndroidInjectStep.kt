@@ -16,8 +16,10 @@
 
 package sourcerer.bootstrap
 
+import com.google.common.collect.ImmutableSet
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
+import sourcerer.Output
 import sourcerer.inject.AndroidInject
 import sourcerer.processor.ProcessingEnv
 import sourcerer.typeInputs
@@ -28,8 +30,24 @@ import javax.inject.Singleton
 class AndroidInjectStep
 @Inject constructor(
     val descriptorFactory: AndroidInjectModuleDescriptor.Factory,
-    val outputFactory: AndroidInjectModuleGenerator.Factory
+    val outputFactory: AndroidInjectModuleGenerator.Factory,
+    val sourcerer: AndroidInjectSourcerer
 ) : AnnotationStep() {
+    private
+    var _modules: Set<AndroidInjectModuleDescriptor> = LinkedHashSet()
+
+    val modules: ImmutableSet<AndroidInjectModuleDescriptor>
+        get() = _modules.toImmutableSet()
+
+    fun storedModules(): ImmutableSet<AndroidInjectModuleDescriptor> = sourcerer
+            .storedOutputs()
+            .map(descriptorFactory::forStoredModule)
+            .toImmutableSet()
+
+    fun sourcererOutput(): Output {
+        return sourcerer.output(modules)
+    }
+
     override
     fun ProcessingEnv.annotations(): Set<AnnotationType> = setOf(
         AndroidInject::class
@@ -42,6 +60,7 @@ class AndroidInjectStep
         val descriptors = injections
                 .map(descriptorFactory::create)
                 .toImmutableSet()
+        _modules += descriptors
         return descriptors
                 .map(outputFactory::create)
     }

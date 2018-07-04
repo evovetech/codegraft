@@ -141,16 +141,24 @@ class RoundProcessor2(
     private
     fun ProcessData.finish(): List<Output> =
         if (isApplication) {
+            val generatedModules = androidInjectStep.modules
+            val storedModules = androidInjectStep.storedModules()
             val generatedComponents = bootstrapComponentStep.generatedComponents
-            val storedComponents = bootstrapComponentStep.storedComponents(sourcerer)
+            val storedComponents = bootstrapComponentStep.storedComponents()
 
             env.log("storedComponents = $storedComponents")
-            val appComponent = appComponentStep.process(generatedComponents, storedComponents)
+            val appComponent = appComponentStep.process(
+                generatedModules,
+                storedModules,
+                generatedComponents,
+                storedComponents
+            )
             appComponent.flatMap(AppComponentStep.Output::outputs)
         } else {
             // just sourcerer things
             listOf(
-                sourcerer.output(bootstrapComponentStep.generatedComponents)
+                bootstrapComponentStep.sourcererOutput(),
+                androidInjectStep.sourcererOutput()
             )
         }
 }
@@ -202,107 +210,3 @@ interface RoundProcessor2Component {
         fun build(): RoundProcessor2Component
     }
 }
-
-class RoundProcessor : BasicAnnotationProcessor() {
-    private lateinit
-    var data: ProcessData
-
-    @Inject
-    fun inject(data: ProcessData) {
-        this.data = data
-    }
-
-    val env: ProcessingEnv by lazy {
-        newEnv(processingEnv)
-    }
-    val steps: RoundSteps
-        get() = data.steps
-
-    override
-    fun getSupportedSourceVersion() =
-        SourceVersion.latestSupported()!!
-
-    override
-    fun getSupportedOptions(): Set<String> = steps
-            .flatMap(RoundStep::supportedOptions)
-            .map(Option::key)
-            .toSet()
-
-    override
-    fun initSteps(): Iterable<ProcessingStep> {
-        return steps
-    }
-
-    override
-    fun postRound(roundEnv: RoundEnvironment) {
-        steps.forEach { step ->
-            step.postRound(roundEnv)
-        }
-    }
-}
-
-//
-//    final override
-//    fun initSteps(): Iterable<ProcessingStep> = steps
-//            .map { Step(env, it) }
-//            .toList()
-//
-//
-//    fun postProcess(outputs: List<Output>) {
-//        outputs.map {
-//            env.mapOutput(it)
-//        }
-//        @Inject lateinit var types: Types
-//        @Inject lateinit var options: Options
-//    }
-//
-//    override
-//    fun processSteps(): List<ProcessStep> {
-//        val component = DaggerBootstrapProcessor_Component.builder().run {
-//            env(env)
-//            build()
-//        }
-//        component.inject(this)
-//        return component.processSteps
-//                .toList()
-//    }
-//
-//    override
-//    fun postRound(roundEnv: RoundEnvironment) {
-//        env.log(
-//            "postRound($roundEnv) " +
-//            "{ " +
-//            "isApplication=$isApplication, " +
-//            "processingOver=${roundEnv.processingOver()}, " +
-//            "processed=$processed, " +
-//            "componentStep.processed=${componentStep.processed}" +
-//            " }"
-//        )
-//        if (isApplication
-//            && !roundEnv.processingOver()
-//            && !processed
-//            && componentStep.processed) {
-//            val outputs = componentStep.run {
-//                env.postProcess()
-//            }
-//            env.log("postRound: outputs=$outputs")
-//            postProcess(outputs)
-//            processed = true
-//        } else {
-//            env.log("postRound: no outputs")
-//        }
-//    }
-//
-//    @Singleton
-//    @dagger.Component(modules = [AnnotationStepsModule::class])
-//    interface Component {
-//        fun inject(processor: RoundProcessor)
-//        val processSteps: Set<ProcessStep>
-//
-//        @dagger.Component.Builder
-//        interface Builder {
-//            @BindsInstance fun env(env: Env)
-//            fun build(): Component
-//        }
-//    }
-//    }

@@ -25,7 +25,6 @@ import sourcerer.inject.BootstrapComponent
 @BootstrapComponent(
     applicationModules = [
         AndroidBootModule::class,
-        MainActivityModule::class,
         MainApplicationModule::class
     ],
     flatten = true

@@ -21,21 +21,15 @@ import dagger.Binds
 import dagger.Module
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
-import dagger.android.ContributesAndroidInjector
 import dagger.multibindings.IntoMap
 import evovetech.sample.MainApplicationModule.MainApplicationSubcomponent
-import sourcerer.inject.ActivityScope
 import sourcerer.inject.android.AndroidInjectActivityModule
 
-// TODO:
-@Module(includes = [AndroidInjectActivityModule::class])
-interface MainActivityModule {
-    @ActivityScope
-    @ContributesAndroidInjector
-    fun contributeMainActivity(): MainActivity
-}
-
-@Module(subcomponents = [MainApplicationSubcomponent::class])
+@Module(
+    // TODO:
+    includes = [AndroidInjectActivityModule::class],
+    subcomponents = [MainApplicationSubcomponent::class]
+)
 interface MainApplicationModule {
     @Binds
     @IntoMap

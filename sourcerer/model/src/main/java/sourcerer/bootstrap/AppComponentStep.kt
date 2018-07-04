@@ -28,11 +28,15 @@ constructor(
 ) {
     internal
     fun process(
+        generatedModules: ImmutableSet<AndroidInjectModuleDescriptor>,
+        storedModules: ImmutableSet<AndroidInjectModuleDescriptor>,
         generatedComponents: ImmutableSet<BootstrapComponentDescriptor>,
         storedComponents: ImmutableSet<BootstrapComponentDescriptor>
     ) = listOf(
         Output(
             factory.create(
+                generatedModules,
+                storedModules,
                 generatedComponents,
                 storedComponents
             )

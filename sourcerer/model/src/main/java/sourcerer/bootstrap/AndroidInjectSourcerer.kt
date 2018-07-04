@@ -18,32 +18,30 @@ package sourcerer.bootstrap
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
-import dagger.internal.codegen.BootstrapComponentDescriptor
 import okio.Okio
 import sourcerer.SourcererOutput
 import sourcerer.StoredFile
 import sourcerer.getResources
-import sourcerer.inject.BootstrapComponent
+import sourcerer.inject.AndroidInject
 import sourcerer.io.Reader
 import sourcerer.io.Writer
 import sourcerer.metaFile
 import sourcerer.processor.ProcessingEnv
 import java.net.URL
 import javax.inject.Inject
-import kotlin.reflect.KClass
 
-class BootstrapSourcerer
+class AndroidInjectSourcerer
 @Inject internal
 constructor(
     val env: ProcessingEnv
 ) {
     internal
-    val file = ClassName.get(BootstrapComponent::class.java).metaFile
+    val file = ClassName.get(AndroidInject::class.java).metaFile
 
     internal
-    fun output(components: Collection<BootstrapComponentDescriptor>): Output {
-        return Output(this, components.map {
-            ClassName.get(it.componentDefinitionType)
+    fun output(modules: Collection<AndroidInjectModuleDescriptor>): Output {
+        return Output(this, modules.map {
+            ClassName.get(it.element)
         })
     }
 
@@ -68,7 +66,7 @@ constructor(
             .mapNotNull { it as? ClassName }
 
     class Output(
-        private val bootstrap: BootstrapSourcerer,
+        private val bootstrap: AndroidInjectSourcerer,
         private val typeNames: List<TypeName>
     ) : SourcererOutput() {
         override

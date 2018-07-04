@@ -29,8 +29,7 @@ class ProcessData
     val steps: RoundSteps,
     val bootstrapComponentStep: BootstrapComponentStep,
     val androidInjectStep: AndroidInjectStep,
-    val appComponentStep: AppComponentStep,
-    val sourcerer: BootstrapSourcerer
+    val appComponentStep: AppComponentStep
 ) {
     val processors = processors
             .toImmutableList()

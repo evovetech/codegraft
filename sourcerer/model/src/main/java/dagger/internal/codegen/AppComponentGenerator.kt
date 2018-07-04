@@ -34,6 +34,8 @@ import org.jetbrains.annotations.Nullable
 import sourcerer.JavaOutput
 import sourcerer.addAnnotation
 import sourcerer.addTo
+import sourcerer.bootstrap.AndroidInjectModuleDescriptor
+import sourcerer.bootstrap.AndroidInjectModuleGenerator
 import sourcerer.bootstrap.ComponentOutput
 import sourcerer.bootstrap.Package
 import sourcerer.bootstrap.getFieldName
@@ -59,6 +61,8 @@ import javax.lang.model.element.TypeElement
 
 internal
 class AppComponentGenerator(
+    val injectModuleDescriptors: ImmutableSet<AndroidInjectModuleDescriptor>,
+    val injectModules: ImmutableSet<AndroidInjectModuleGenerator>,
     val componentDescriptors: ImmutableSet<BootstrapComponentDescriptor>,
     val components: ImmutableSet<ComponentOutput>,
     private val pkg: String
@@ -167,6 +171,9 @@ class AppComponentGenerator(
             addAnnotation(ClassName.get(Component::class.java).toKlass()) {
                 val add = addTo("modules")
                 add(bootData.outKlass.rawType)
+                
+                injectModules.map { it.outKlass.rawType }
+                        .map(add)
             }
             descriptors.filter { it.flatten }.forEach {
                 addSuperinterface(TypeName.get(it.componentDefinitionType.asType()))
@@ -394,16 +401,24 @@ class AppComponentGenerator(
     class Factory
     @Inject constructor(
         private val options: ProcessingEnv.Options,
-        private val componentOutputFactory: ComponentOutput.Factory
+        private val componentOutputFactory: ComponentOutput.Factory,
+        private val moduleOutputFactory: AndroidInjectModuleGenerator.Factory
     ) {
         init {
             println("\npkg=${options.Package}\n")
         }
 
         fun create(
+            generatedModules: ImmutableSet<AndroidInjectModuleDescriptor>,
+            storedModules: ImmutableSet<AndroidInjectModuleDescriptor>,
             generatedComponents: ImmutableSet<BootstrapComponentDescriptor>,
             storedComponents: ImmutableSet<BootstrapComponentDescriptor>
         ): AppComponentGenerator {
+            val injectModuleDescriptors = (generatedModules + storedModules)
+                    .toImmutableSet()
+            val injectModules = injectModuleDescriptors
+                    .map(moduleOutputFactory::create)
+                    .toImmutableSet()
             val allComponents = (generatedComponents + storedComponents)
             val componentDescriptors = allComponents.filter { it.autoInclude }
                     .flatMap { it.allDependencies + it }
@@ -412,6 +427,8 @@ class AppComponentGenerator(
                     .map(componentOutputFactory::create)
                     .toImmutableSet()
             return AppComponentGenerator(
+                injectModuleDescriptors = injectModuleDescriptors,
+                injectModules = injectModules,
                 componentDescriptors = componentDescriptors,
                 components = components,
                 pkg = options.Package
