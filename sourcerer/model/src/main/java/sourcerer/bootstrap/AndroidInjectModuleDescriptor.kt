@@ -23,15 +23,25 @@ import com.squareup.javapoet.ClassName
 import dagger.internal.codegen.getTypeListValue
 import sourcerer.getAnnotationMirror
 import sourcerer.inject.AndroidInject
+import sourcerer.inject.android.AndroidInjectActivityModule
+import sourcerer.inject.android.AndroidInjectBroadcastReceiverModule
+import sourcerer.inject.android.AndroidInjectContentProviderModule
+import sourcerer.inject.android.AndroidInjectModule
+import sourcerer.inject.android.AndroidInjectServiceModule
+import sourcerer.inject.android.AndroidInjectSupportFragmentModule
 import sourcerer.qualifiedName
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
+import javax.lang.model.util.Types
+import kotlin.reflect.KClass
 
 class AndroidInjectModuleDescriptor(
     val element: TypeElement,
+
+    val kind: Kind,
 
     val annotationMirror: AnnotationMirror,
 
@@ -57,9 +67,70 @@ class AndroidInjectModuleDescriptor(
         return typeWrapper.hashCode()
     }
 
+    enum
+    class Kind(
+        val componentType: KClass<out Any>,
+        val moduleType: KClass<out AndroidInjectModule<*>>
+    ) {
+        Activity(
+            android.app.Activity::class,
+            AndroidInjectActivityModule::class
+        ),
+        Fragment(
+            android.app.Fragment::class,
+            AndroidInjectActivityModule::class
+        ),
+        SupportFragment(
+            sourcerer.inject.android.SupportFragment::class,
+            AndroidInjectSupportFragmentModule::class
+        ),
+        Service(
+            android.app.Service::class,
+            AndroidInjectServiceModule::class
+        ),
+        BroadcastReceiver(
+            android.content.BroadcastReceiver::class,
+            AndroidInjectBroadcastReceiverModule::class
+        ),
+        ContentProvider(
+            android.content.ContentProvider::class,
+            AndroidInjectContentProviderModule::class
+        );
+
+        fun getType(elements: Elements): TypeMirror {
+            return elements.getTypeElement(componentType.java.canonicalName)
+                    .asType()
+        }
+
+        class Factory
+        @Inject constructor(
+            val elements: Elements,
+            val types: Types
+        ) {
+            private
+            val allTypes = Kind.values().map {
+                it.componentType
+            }.toImmutableList()
+
+            fun forElement(
+                typeElement: TypeElement
+            ): Kind {
+                val testType = typeElement.asType()
+                values().forEach { kind ->
+                    if (types.isSubtype(testType, kind.getType(elements))) {
+                        return kind
+                    }
+                }
+                throw IllegalArgumentException("$typeElement does not extend from $allTypes")
+            }
+        }
+    }
+
     class Factory
     @Inject constructor(
-        val elements: Elements
+        val elements: Elements,
+        val types: Types,
+        val kindFactory: Kind.Factory
     ) {
         fun forStoredModule(
             className: ClassName
@@ -69,10 +140,12 @@ class AndroidInjectModuleDescriptor(
         }
 
         fun create(element: TypeElement): AndroidInjectModuleDescriptor {
+            val kind = kindFactory.forElement(element)
             val annotationMirror = element.getAnnotationMirror<AndroidInject>()!!
             val includes = annotationMirror.getTypeListValue("includes")
             return AndroidInjectModuleDescriptor(
                 element = element,
+                kind = kind,
                 annotationMirror = annotationMirror,
                 includes = includes
             )

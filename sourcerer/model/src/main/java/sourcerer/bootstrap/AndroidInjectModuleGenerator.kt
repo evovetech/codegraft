@@ -42,9 +42,13 @@ class AndroidInjectModuleGenerator(
     fun typeSpec() = typeSpec {
         addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
         addAnnotation(Dagger.Module) {
+            val add = addTo("includes")
             descriptor.includes
                     .map(ClassName::get)
-                    .map(addTo("includes"))
+                    .map(add)
+            descriptor.kind.moduleType.java
+                    .let(ClassName::get)
+                    .let(add)
         }
         addMethod("contribute${rawType.name}") {
             addAnnotation(Codegen.Inject.ActivityScope.rawType)
