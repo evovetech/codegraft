@@ -95,7 +95,7 @@ class BootstrapProcessor(
     @dagger.Component(modules = [AnnotationStepsModule::class])
     interface Component {
         fun inject(processor: BootstrapProcessor)
-        val processSteps: Set<AnnotationStep>
+        val processSteps: AnnotationSteps
 
         @dagger.Component.Builder
         interface Builder {

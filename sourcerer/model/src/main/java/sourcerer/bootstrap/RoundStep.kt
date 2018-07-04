@@ -18,15 +18,28 @@ package sourcerer.bootstrap
 
 import com.google.auto.common.BasicAnnotationProcessor.ProcessingStep
 import com.google.common.collect.ImmutableSet
+import dagger.MembersInjector
 import sourcerer.AnnotationElements
 import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Option
 import javax.annotation.processing.RoundEnvironment
+import javax.inject.Inject
+import javax.inject.Singleton
 import javax.lang.model.element.Element
 
+@Singleton
 class RoundSteps(
     steps: ImmutableSet<RoundStep>
 ) : Set<RoundStep> by steps {
+    @Inject constructor(
+        env: ProcessingEnv,
+        steps: AnnotationSteps,
+        injector: MembersInjector<AnnotationStep>
+    ) : this(steps.map { step ->
+        injector.injectMembers(step)
+        RoundStep(env, step)
+    }.toImmutableSet())
+
     fun preProcess(parentRound: ParentRound) {
         forEach { step ->
             step.preProcess(parentRound)

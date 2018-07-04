@@ -32,23 +32,41 @@ import javax.lang.model.SourceVersion
 
 open
 class RoundProcessor2(
-    isApplication: Boolean
+    private val isApplication: Boolean
 ) : DelegatingProcessor() {
+    private lateinit
+    var data: ProcessData
+
+    @Inject
+    fun inject(data: ProcessData) {
+        this.data = data
+    }
+
+    val steps: RoundSteps
+        get() = data.steps
 
     override
     fun initProcessors(
         env: ProcessingEnvironment
     ): List<Processor> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val component = DaggerRoundProcessor2Component.builder().run {
+            env(newEnv(env))
+            isApplication(isApplication)
+            build()
+        }
+        component.inject(this)
+//        return data.steps
+        // TODO:
+        return emptyList()
     }
 }
 
 @Singleton
 @Component(modules = [AnnotationStepsModule::class])
 interface RoundProcessor2Component {
-    fun inject(processor: RoundProcessor2)
+    val processData: ProcessData
 
-//    val processData: ProcessData
+    fun inject(processor: RoundProcessor2)
 
     @Component.Builder
     interface Builder {

@@ -16,7 +16,6 @@
 
 package sourcerer.bootstrap
 
-import dagger.MembersInjector
 import sourcerer.processor.ProcessingEnv
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,11 +24,6 @@ import javax.inject.Singleton
 class ProcessData
 @Inject constructor(
     val env: ProcessingEnv,
-    steps: Set<AnnotationStep>,
-    injector: MembersInjector<AnnotationStep>
+    val steps: RoundSteps
 ) {
-    val steps: RoundSteps = steps.map { step ->
-        injector.injectMembers(step)
-        RoundStep(env, step)
-    }.toRoundSteps()
 }

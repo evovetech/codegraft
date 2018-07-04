@@ -19,6 +19,9 @@ package sourcerer.bootstrap
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
+import dagger.multibindings.Multibinds
+
+typealias AnnotationSteps = Set<@JvmSuppressWildcards AnnotationStep>
 
 @Module(includes = [EnvModule::class])
 internal
@@ -28,6 +31,9 @@ interface AnnotationStepsModule {
 
     @Binds @IntoSet
     fun provideAndroidInjectStep(step: AndroidInjectStep): AnnotationStep
+
+    @Multibinds
+    fun bindAnnotationSteps(): AnnotationSteps
 }
 
 
