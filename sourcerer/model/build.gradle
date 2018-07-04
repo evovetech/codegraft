@@ -32,6 +32,7 @@ dependencies {
     kapt(dagger.coreCompiler)
     api(dagger.androidCompiler)
     api project(':meta:utils')
+    compileOnly project(':inject')
     kapt "com.google.auto.value:auto-value:${app.autoValueVersion}"
     api "com.google.auto.value:auto-value-annotations:${app.autoValueVersion}"
     anno "com.google.auto.service:auto-service:${app.autoServiceVersion}"

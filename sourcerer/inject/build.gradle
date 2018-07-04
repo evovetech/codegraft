@@ -31,6 +31,5 @@ dependencies {
     compileOnly("com.google.android:android:4.1.1.4")
     compileOnly("com.google.android:support-v4:r7")
     api project(':annotations')
-    kapt project(':lib-processor')
     kapt(dagger.androidCompiler)
 }
