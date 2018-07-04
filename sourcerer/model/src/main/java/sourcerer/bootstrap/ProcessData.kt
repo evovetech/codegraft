@@ -16,17 +16,20 @@
 
 package sourcerer.bootstrap
 
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoSet
-import sourcerer.ProcessStep
+import dagger.MembersInjector
+import sourcerer.processor.ProcessingEnv
+import javax.inject.Inject
+import javax.inject.Singleton
 
-@Module(includes = [EnvModule::class])
-internal
-interface BootstrapProcessStepsModule {
-    @Binds @IntoSet
-    fun provideComponentStep(step: ComponentStep): ProcessStep
-
-    @Binds @IntoSet
-    fun provideAndroidInjectStep(step: AndroidInjectStep): ProcessStep
+@Singleton
+class ProcessData
+@Inject constructor(
+    val env: ProcessingEnv,
+    steps: Set<AnnotationStep>,
+    injector: MembersInjector<AnnotationStep>
+) {
+    val steps: RoundSteps = steps.map { step ->
+        injector.injectMembers(step)
+        RoundStep(env, step)
+    }.toRoundSteps()
 }

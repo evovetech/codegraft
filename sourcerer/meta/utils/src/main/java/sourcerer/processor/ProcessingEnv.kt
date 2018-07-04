@@ -80,7 +80,7 @@ interface ProcessingEnv {
         Unit// messager.error(element, message, args)
 
     fun error(message: String, vararg args: Any) =
-       Unit// messager.error(message, args)
+        Unit// messager.error(message, args)
 
     companion object {
         const val ALL_ANNOTATIONS = "*"
@@ -111,10 +111,9 @@ interface ProcessingEnv {
     }
 }
 
-fun newEnv(
-    processor: Processor,
+fun Processor.newEnv(
     processingEnvironment: ProcessingEnvironment
-): ProcessingEnv = BaseProcessingEnv(processor, processingEnvironment)
+): ProcessingEnv = BaseProcessingEnv(this, processingEnvironment)
 
 fun Messager.log(element: Element, message: String, vararg args: Any) {
     val msg = msg(message, args)

@@ -18,10 +18,8 @@ package sourcerer.bootstrap
 
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
-import sourcerer.Output
-import sourcerer.ProcessStep
 import sourcerer.inject.AndroidInject
-import sourcerer.processor.Env
+import sourcerer.processor.ProcessingEnv
 import sourcerer.typeInputs
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,23 +29,20 @@ class AndroidInjectStep
 @Inject constructor(
     val descriptorFactory: AndroidInjectModuleDescriptor.Factory,
     val outputFactory: AndroidInjectModuleGenerator.Factory
-) : ProcessStep {
+) : AnnotationStep() {
     override
-    fun Env.annotations(): Set<AnnotationType> = setOf(
+    fun ProcessingEnv.annotations(): Set<AnnotationType> = setOf(
         AndroidInject::class
     )
 
     override
-    fun Env.process(annotationElements: AnnotationElements): Map<AnnotationType, List<Output>> {
+    fun ProcessingEnv.process(annotationElements: AnnotationElements): Outputs {
         val injections = annotationElements.typeInputs<AndroidInject>()
-        val descriptors = injections
                 .map { it.element }
+        val descriptors = injections
                 .map(descriptorFactory::create)
                 .toImmutableSet()
-        val outputs = descriptors
+        return descriptors
                 .map(outputFactory::create)
-        return outputs.groupBy {
-            AndroidInject::class
-        }
     }
 }

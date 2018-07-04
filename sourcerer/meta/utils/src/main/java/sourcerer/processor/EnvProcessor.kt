@@ -30,7 +30,7 @@ class EnvProcessor<E : Env> : AbstractProcessor() {
     @Synchronized override
     fun init(processingEnvironment: ProcessingEnvironment) {
         super.init(processingEnvironment)
-        env.compareAndSet(null, createEnv(newEnv(this, processingEnvironment)))
+        env.compareAndSet(null, createEnv(newEnv(processingEnvironment)))
         init(env.get())
     }
 

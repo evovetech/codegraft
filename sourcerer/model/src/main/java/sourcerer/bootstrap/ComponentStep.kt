@@ -16,13 +16,11 @@
 
 package sourcerer.bootstrap
 
+import com.google.common.collect.ImmutableSet
 import dagger.internal.codegen.BootstrapComponentDescriptor
-import dagger.internal.codegen.BootstrapComponentDescriptor.Kind
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationType
 import sourcerer.DeferredOutput
-import sourcerer.Output
-import sourcerer.ProcessStep
 import sourcerer.bootstrap.ComponentStep.Option
 import sourcerer.inject.BootstrapComponent
 import sourcerer.processor.Env
@@ -37,67 +35,52 @@ class ComponentStep
 @Inject internal
 constructor(
     val componentFactory: BootstrapComponentDescriptor.Factory,
-    val componentOutputFactory: ComponentOutput.Factory,
-    val appComponentStep: AppComponentStep,
-    val sourcerer: BootstrapSourcerer
-) : ProcessStep {
+    val componentOutputFactory: ComponentOutput.Factory
+) : AnnotationStep() {
     internal
     var processed: Boolean = true
 
+    private
+    val _generatedComponents = LinkedHashSet<BootstrapComponentDescriptor>()
+
     internal
-    val generatedComponents = LinkedHashSet<BootstrapComponentDescriptor>()
+    val generatedComponents: ImmutableSet<BootstrapComponentDescriptor>
+        get() = _generatedComponents
+                .toImmutableSet()
 
     override
-    fun Env.annotations(): Set<AnnotationType> = Kind.values()
-            .map(Kind::annotationType)
-            .toSet()
+    fun Env.annotations(): Set<AnnotationType> = setOf(
+        BootstrapComponent::class
+    )
 
     override
     fun supportedOptions(): Iterable<Option> = Option.values()
             .toSet()
 
     override
-    fun Env.process(
+    fun ProcessingEnv.process(
         annotationElements: AnnotationElements
-    ): Map<AnnotationType, List<Output>> {
-        val map = HashMap<AnnotationType, List<Output>>()
+    ): Outputs {
         val bootstrapComponents = annotationElements.typeInputs<BootstrapComponent>()
-        try {
+        return try {
             val genComponents = bootstrapComponents
                     .map(componentFactory::forComponent)
                     .toImmutableSet()
             val generatedOutputs = genComponents
                     .map(componentOutputFactory::create)
                     .flatMap(ComponentOutput::outputs)
-            val sourcererOutput = sourcerer.output(genComponents)
-            generatedComponents += genComponents
-
-            // outputs
-            map[BootstrapComponent::class] = generatedOutputs + sourcererOutput
+            _generatedComponents += genComponents
 
             processed = true
+
+            // outputs
+            generatedOutputs
         } catch (e: TypeNotPresentException) {
-            map[BootstrapComponent::class] = bootstrapComponents.map {
+            processed = false
+            bootstrapComponents.map {
                 DeferredOutput(it.element)
             }
-            processed = false
         }
-        return map
-    }
-
-    fun Env.postProcess(): List<Output> {
-        if (!processed) {
-            return emptyList()
-        }
-
-        val generatedComponents = this@ComponentStep.generatedComponents
-                .toImmutableSet()
-        val storedComponents = sourcerer.storedOutputs()
-                .map(componentFactory::forStoredComponent)
-                .toImmutableSet()
-        log("storedComponents = $storedComponents")
-        val appComponent = appComponentStep.process(generatedComponents, storedComponents)
-        return appComponent.flatMap(AppComponentStep.Output::outputs)
     }
 
     enum

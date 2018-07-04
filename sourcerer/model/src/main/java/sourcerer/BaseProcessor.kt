@@ -32,7 +32,7 @@ abstract
 class BaseProcessor : BasicAnnotationProcessor() {
     protected
     val env: Env by lazy {
-        newEnv(this, processingEnv)
+        newEnv(processingEnv)
     }
     private
     val steps by lazy {
@@ -47,9 +47,9 @@ class BaseProcessor : BasicAnnotationProcessor() {
             .flatMap { it.supportedOptions() }
 
     final override
-    fun initSteps(): MutableIterable<ProcessingStep> = steps
+    fun initSteps(): Iterable<ProcessingStep> = steps
             .map { Step(env, it) }
-            .toMutableList()
+            .toList()
 
     override
     fun getSupportedSourceVersion() =

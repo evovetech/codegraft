@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-package sourcerer.processor
+package sourcerer.bootstrap
 
-abstract
-class BaseProcessor : EnvProcessor<Env>() {
-    override fun createEnv(env: Env): Env {
-        return newEnv(env.processingEnv())
-    }
+import dagger.Binds
+import dagger.Module
+import dagger.multibindings.IntoSet
+
+@Module(includes = [EnvModule::class])
+internal
+interface AnnotationStepsModule {
+    @Binds @IntoSet
+    fun provideComponentStep(step: ComponentStep): AnnotationStep
+
+    @Binds @IntoSet
+    fun provideAndroidInjectStep(step: AndroidInjectStep): AnnotationStep
 }
+
+

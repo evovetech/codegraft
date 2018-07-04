@@ -16,6 +16,7 @@
 
 package sourcerer
 
+import sourcerer.bootstrap.AnnotationStep
 import sourcerer.processor.Env
 import sourcerer.processor.ProcessingEnv.Option
 
@@ -28,4 +29,21 @@ interface ProcessStep {
 
     fun supportedOptions(): Iterable<Option> =
         emptySet()
+}
+
+fun AnnotationStep.toProcessStep(): ProcessStep = object : ProcessStep {
+    override
+    fun Env.annotations(): Set<AnnotationType> {
+        return this@toProcessStep.annotations()
+    }
+
+    override
+    fun Env.process(
+        annotationElements: AnnotationElements
+    ): Map<AnnotationType, List<Output>> {
+        val outputs = this@toProcessStep.process(annotationElements)
+        return outputs.groupBy {
+            Annotation::class
+        }
+    }
 }

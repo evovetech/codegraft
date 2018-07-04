@@ -18,19 +18,21 @@ package sourcerer.bootstrap
 
 import dagger.BindsInstance
 import sourcerer.BaseProcessor
+import sourcerer.Output
 import sourcerer.ProcessStep
 import sourcerer.processor.Env
 import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Options
+import sourcerer.toProcessStep
 import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject
 import javax.inject.Singleton
 import javax.lang.model.util.Types
 
-open
 class BootstrapProcessor(
     val isApplication: Boolean
 ) : BaseProcessor() {
+
     @Inject lateinit var types: Types
     @Inject lateinit var options: Options
 
@@ -52,12 +54,13 @@ class BootstrapProcessor(
 
     override
     fun processSteps(): List<ProcessStep> {
-        val component = DaggerBootstrapProcessor_Component.builder().run {
+        val component: Component = DaggerBootstrapProcessor_Component.builder().run {
             env(env)
             build()
         }
         component.inject(this)
         return component.processSteps
+                .map(AnnotationStep::toProcessStep)
                 .toList()
     }
 
@@ -77,7 +80,8 @@ class BootstrapProcessor(
             && !processed
             && componentStep.processed) {
             val outputs = componentStep.run {
-                env.postProcess()
+                //                env.postProcess()
+                emptyList<Output>()
             }
             env.log("postRound: outputs=$outputs")
             postProcess(outputs)
@@ -88,10 +92,10 @@ class BootstrapProcessor(
     }
 
     @Singleton
-    @dagger.Component(modules = [BootstrapProcessStepsModule::class])
+    @dagger.Component(modules = [AnnotationStepsModule::class])
     interface Component {
         fun inject(processor: BootstrapProcessor)
-        val processSteps: Set<ProcessStep>
+        val processSteps: Set<AnnotationStep>
 
         @dagger.Component.Builder
         interface Builder {

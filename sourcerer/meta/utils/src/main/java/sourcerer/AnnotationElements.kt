@@ -16,10 +16,12 @@
 
 package sourcerer
 
+import com.google.common.collect.ImmutableSetMultimap
 import com.google.common.collect.SetMultimap
 import javax.lang.model.element.Element
 
 typealias AnnotationElements = SetMultimap<Class<out Annotation>, Element>
+typealias ImmutableAnnotationElements = ImmutableSetMultimap<Class<out Annotation>, Element>
 
 fun <A : Annotation> AnnotationElements.inputs(type: Class<A>) = get(type).map {
     val anno: A = it.getAnnotation(type)
