@@ -76,7 +76,7 @@ import java.util.EnumMap
 import javax.xml.parsers.SAXParserFactory
 
 private
-const val sourcererVersion = "0.5.0"
+const val sourcererVersion = "0.5.1"
 
 class InjectPlugin : Plugin<Project> {
     override
@@ -85,7 +85,7 @@ class InjectPlugin : Plugin<Project> {
 
         project.plugins.withType(BasePlugin::class.java) {
             project.dependencies {
-                add("runtimeOnly", "evovetech.android.inject:core:0.5.0")
+                add("runtimeOnly", "evovetech.android.inject:core:0.5.1")
                 add("kapt", "evovetech.sourcerer:model:$sourcererVersion")
             }
 

@@ -19,13 +19,14 @@ if (!project.plugins.hasPlugin('com.jfrog.bintray')) {
 }
 
 def pubName = ext.pubName
+def pomGroupId = pom.groupId
 def pomArtifactId = ext.pomArtifactId
 def pomVersion = pom.version
 bintray {
     publications = [pubName]
     pkg {
         repo = app.bintrayRepo
-        name = pomArtifactId()
+        name = "${pomGroupId}.${pomArtifactId()}"
         userOrg = app.bintrayOrg
         licenses = project.LICENSES
         labels =  project.LABELS
@@ -33,6 +34,7 @@ bintray {
         issueTrackerUrl = pom.issueTrackerUrl
         vcsUrl = pom.scmUrl
         publicDownloadNumbers = true
+        publish = true //[Default: false] Whether version should be auto published after an upload
         version {
             released = new Date()
             name = pomVersion
