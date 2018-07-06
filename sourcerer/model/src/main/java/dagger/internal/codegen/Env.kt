@@ -16,6 +16,18 @@
 
 package dagger.internal.codegen
 
+import com.google.auto.common.MoreTypes
+import com.squareup.javapoet.ParameterSpec
+import sourcerer.bootstrap.buildParameter
 import sourcerer.processor.ProcessingEnv
 
 typealias Env = ProcessingEnv
+
+internal
+fun ContributionBinding.buildParameter(
+    init: ParameterSpec.Builder.() -> Unit = {}
+): ParameterSpec {
+    val type = contributedType()
+    val name = MoreTypes.asElement(type).simpleName.toString().decapitalize()
+    return type.buildParameter(name, init)
+}

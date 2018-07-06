@@ -21,6 +21,9 @@ import com.squareup.javapoet.MethodSpec
 import dagger.model.Key
 import sourcerer.JavaOutput
 import sourcerer.bootstrap.Dependency
+import sourcerer.bootstrap.addFieldSpec
+import sourcerer.bootstrap.addToConstructor
+import sourcerer.bootstrap.buildUnique
 import sourcerer.bootstrap.fieldName
 import sourcerer.bootstrap.getterMethod
 import sourcerer.bootstrap.qualifier
@@ -39,9 +42,6 @@ val Collection<BindingDeclaration>.keys: Set<Key>
 
 internal
 class ComponentBootDataGenerator(
-    private val env: Env,
-    private val types: SourcererTypes,
-    private val elements: SourcererElements,
     private val descriptor: BootstrapComponentDescriptor
 ) : JavaOutput(
     rawType = ClassName.get(descriptor.componentDefinitionType),
@@ -96,17 +96,10 @@ class ComponentBootDataGenerator(
     }
 
     class Factory
-    @Inject constructor(
-        private val env: Env,
-        private val types: SourcererTypes,
-        private val elements: SourcererElements
-    ) {
+    @Inject constructor() {
         fun create(
             descriptor: BootstrapComponentDescriptor
         ) = ComponentBootDataGenerator(
-            env = env,
-            types = types,
-            elements = elements,
             descriptor = descriptor
         )
     }

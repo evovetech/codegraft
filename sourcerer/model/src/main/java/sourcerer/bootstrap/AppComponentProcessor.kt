@@ -16,11 +16,6 @@
 
 package sourcerer.bootstrap
 
-import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableSet
-import com.google.common.collect.ImmutableSetMultimap
-import sourcerer.AnnotationElements
-import sourcerer.Output
 import javax.inject.Inject
 import javax.inject.Singleton
 

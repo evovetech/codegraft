@@ -20,7 +20,7 @@ interface BootComponent<out Component : Any> {
     val component: Component
 
     interface Builder<out Boot : BootComponent<*>> :
-        sourcerer.inject.android.Builder<Boot>
+        sourcerer.inject.Builder<Boot>
 }
 
 interface BootApplication<out Component : Any> {

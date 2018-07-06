@@ -16,7 +16,7 @@
 
 package sourcerer
 
-import sourcerer.bootstrap.RoundProcessor2
+import sourcerer.bootstrap.BootstrapProcessor
 import sourcerer.processor.ProcessingEnv
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -24,12 +24,12 @@ import javax.lang.model.element.TypeElement
 
 open
 class MainProcessor(
-    protected val bootstrap: RoundProcessor2
+    protected val bootstrap: BootstrapProcessor
 ) : Processor by bootstrap {
     constructor(
         isApplication: Boolean
     ) : this(
-        RoundProcessor2(isApplication)
+        BootstrapProcessor(isApplication)
     )
 
     override

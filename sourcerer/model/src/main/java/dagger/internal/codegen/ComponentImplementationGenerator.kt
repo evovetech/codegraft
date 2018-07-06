@@ -21,7 +21,6 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
 import dagger.MembersInjector
@@ -29,18 +28,19 @@ import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodDescr
 import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodKind.MEMBERS_INJECTION
 import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodKind.PROVISION
 import sourcerer.JavaOutput
+import sourcerer.bootstrap.addFieldSpec
+import sourcerer.bootstrap.addToConstructor
 import sourcerer.bootstrap.getFieldName
 import sourcerer.bootstrap.key
 import sourcerer.bootstrap.type
 import sourcerer.classBuilder
+import sourcerer.qualifier
 import sourcerer.typeSpec
 import javax.inject.Inject
 import javax.inject.Provider
 import javax.inject.Singleton
-import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier.FINAL
-import javax.lang.model.element.Modifier.PRIVATE
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.type.TypeMirror
 
@@ -70,14 +70,14 @@ class ComponentImplementationGenerator(
 
     class Method
     internal constructor(
-        val types: SourcererTypes,
-        val method: ComponentMethodDescriptor
+        types: SourcererTypes,
+        private val method: ComponentMethodDescriptor
     ) : ExecutableElement by method.methodElement {
         val kind = method.kind
-        val dependency = method.dependencyRequest.get()
+        private val dependency = method.dependencyRequest.get()
         val key = dependency.key
         val type: TypeMirror = key.type
-        val providedType: TypeMirror = when (kind) {
+        private val providedType: TypeMirror = when (kind) {
             PROVISION -> {
                 type
             }
@@ -85,8 +85,8 @@ class ComponentImplementationGenerator(
                 types.wrapType<MembersInjector<*>>(type)
             }
         }
-        val fieldType = types.wrapType<Provider<*>>(providedType)
-        val fieldName = fieldType.getFieldName()
+        private val fieldType = types.wrapType<Provider<*>>(providedType)
+        private val fieldName = fieldType.getFieldName()
 
         private
         fun TypeSpec.Builder.addFieldSpec(): FieldSpec =
@@ -144,31 +144,3 @@ class ComponentImplementationGenerator(
         )
     }
 }
-
-fun MethodSpec.Builder.addToConstructor(
-    fieldSpec: FieldSpec,
-    qualifier: AnnotationMirror? = null
-): ParameterSpec = ParameterSpec.builder(fieldSpec.type, fieldSpec.name).run {
-    qualifier?.let(AnnotationSpec::get)
-            ?.let(this::addAnnotation)
-    build()
-}.also { paramSpec ->
-    addStatement("this.\$N = \$N", fieldSpec, paramSpec)
-    addParameter(paramSpec)
-}
-
-fun TypeSpec.Builder.addFieldSpec(
-    fieldType: TypeMirror,
-    fieldName: String
-): FieldSpec = addFieldSpec(
-    TypeName.get(fieldType),
-    fieldName
-)
-
-fun TypeSpec.Builder.addFieldSpec(
-    fieldType: TypeName,
-    fieldName: String
-): FieldSpec = FieldSpec.builder(fieldType, fieldName)
-        .addModifiers(PRIVATE, FINAL)
-        .build()
-        .apply { addField(this) }

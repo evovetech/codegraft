@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer.bootstrap
 
 import com.google.auto.common.MoreTypes
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
+import com.squareup.javapoet.TypeSpec
 import dagger.model.DependencyRequest
-import sourcerer.bootstrap.getFieldName
-import sourcerer.bootstrap.key
-import sourcerer.bootstrap.qualifier
-import sourcerer.bootstrap.type
 import sourcerer.join
+import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.Modifier.FINAL
+import javax.lang.model.element.Modifier.PRIVATE
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
@@ -99,15 +100,6 @@ class ParamBuilder(
     }
 }
 
-internal
-fun ContributionBinding.buildParameter(
-    init: ParameterSpec.Builder.() -> Unit = {}
-): ParameterSpec {
-    val type = contributedType()
-    val name = MoreTypes.asElement(type).simpleName.toString().decapitalize()
-    return type.buildParameter(name, init)
-}
-
 fun ClassName.buildParameter(
     init: ParameterSpec.Builder.() -> Unit = {}
 ): ParameterSpec {
@@ -148,3 +140,31 @@ fun DependencyRequest.buildParameter(
         init()
     }
 }
+
+fun MethodSpec.Builder.addToConstructor(
+    fieldSpec: FieldSpec,
+    qualifier: AnnotationMirror? = null
+): ParameterSpec = ParameterSpec.builder(fieldSpec.type, fieldSpec.name).run {
+    qualifier?.let(AnnotationSpec::get)
+            ?.let(this::addAnnotation)
+    build()
+}.also { paramSpec ->
+    addStatement("this.\$N = \$N", fieldSpec, paramSpec)
+    addParameter(paramSpec)
+}
+
+fun TypeSpec.Builder.addFieldSpec(
+    fieldType: TypeMirror,
+    fieldName: String
+): FieldSpec = addFieldSpec(
+    TypeName.get(fieldType),
+    fieldName
+)
+
+fun TypeSpec.Builder.addFieldSpec(
+    fieldType: TypeName,
+    fieldName: String
+): FieldSpec = FieldSpec.builder(fieldType, fieldName)
+        .addModifiers(PRIVATE, FINAL)
+        .build()
+        .apply { addField(this) }

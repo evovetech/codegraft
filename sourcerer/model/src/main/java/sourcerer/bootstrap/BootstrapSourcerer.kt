@@ -30,7 +30,6 @@ import sourcerer.metaFile
 import sourcerer.processor.ProcessingEnv
 import java.net.URL
 import javax.inject.Inject
-import kotlin.reflect.KClass
 
 class BootstrapSourcerer
 @Inject internal

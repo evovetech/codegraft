@@ -20,7 +20,6 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
 import dagger.Binds
 import dagger.Module
-import sourcerer.Env
 import sourcerer.JavaOutput
 import sourcerer.addAnnotation
 import sourcerer.addTo
@@ -34,9 +33,6 @@ import javax.lang.model.element.TypeElement
 
 internal
 class ComponentModuleGenerator(
-    private val env: Env,
-    private val types: SourcererTypes,
-    private val elements: SourcererElements,
     private val descriptor: BootstrapComponentDescriptor,
     private val implGenerator: ComponentImplementationGenerator,
     private val definitionType: TypeElement = descriptor.componentDefinitionType
@@ -69,18 +65,11 @@ class ComponentModuleGenerator(
     }
 
     class Factory
-    @Inject constructor(
-        private val env: Env,
-        private val types: SourcererTypes,
-        private val elements: SourcererElements
-    ) {
+    @Inject constructor() {
         fun create(
             descriptor: BootstrapComponentDescriptor,
             implGenerator: ComponentImplementationGenerator
         ) = ComponentModuleGenerator(
-            env = env,
-            types = types,
-            elements = elements,
             descriptor = descriptor,
             implGenerator = implGenerator
         )

@@ -37,7 +37,13 @@ import sourcerer.addTo
 import sourcerer.bootstrap.AndroidInjectModuleDescriptor
 import sourcerer.bootstrap.AndroidInjectModuleGenerator
 import sourcerer.bootstrap.ComponentOutput
+import sourcerer.bootstrap.MethodBuilder
 import sourcerer.bootstrap.Package
+import sourcerer.bootstrap.addFieldSpec
+import sourcerer.bootstrap.addToConstructor
+import sourcerer.bootstrap.buildParameter
+import sourcerer.bootstrap.buildUnique
+import sourcerer.bootstrap.buildUniquePairs
 import sourcerer.bootstrap.getFieldName
 import sourcerer.bootstrap.getterMethod
 import sourcerer.bootstrap.getterMethodName
@@ -171,7 +177,7 @@ class AppComponentGenerator(
             addAnnotation(ClassName.get(Component::class.java).toKlass()) {
                 val add = addTo("modules")
                 add(bootData.outKlass.rawType)
-                
+
                 injectModules.map { it.outKlass.rawType }
                         .map(add)
             }

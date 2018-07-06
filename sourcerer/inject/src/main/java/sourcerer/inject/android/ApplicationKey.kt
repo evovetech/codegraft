@@ -16,10 +16,23 @@
 
 package sourcerer.inject.android
 
-interface Builder<out T> {
-    fun build(): T
-}
+import android.app.Activity
+import android.app.Application
+import dagger.MapKey
+import kotlin.annotation.AnnotationRetention.RUNTIME
+import kotlin.annotation.AnnotationTarget.FUNCTION
+import kotlin.annotation.AnnotationTarget.PROPERTY_GETTER
+import kotlin.annotation.AnnotationTarget.PROPERTY_SETTER
+import kotlin.reflect.KClass
 
-fun <T> Builder<T>.build(
-    init: T.() -> Unit
-): T = build().apply(init)
+/**
+ * [MapKey] annotation to key bindings by a type of an [Activity].
+ */
+@MapKey
+@Retention(RUNTIME)
+@MustBeDocumented
+@Target(FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
+annotation
+class ApplicationKey(
+    val value: KClass<out Application>
+)

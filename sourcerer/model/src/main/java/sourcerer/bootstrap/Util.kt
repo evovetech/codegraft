@@ -26,6 +26,8 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.util.ElementFilter
 import javax.lang.model.util.Elements
 
+typealias ExactSet<T> = Set<@JvmSuppressWildcards T>
+
 fun <T> Collection<T>.toImmutableList(): ImmutableList<T> {
     return ImmutableList.copyOf(this)
 }

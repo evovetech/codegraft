@@ -14,28 +14,12 @@
  * limitations under the License.
  */
 
-package sourcerer.inject.android
+package sourcerer.inject
 
-import java.util.WeakHashMap
-
-open
-class BootMap<out Component : Any>(
-    private val build: (AndroidApplication) -> Bootstrap<Component>
-) {
-    private
-    val map: WeakHashMap<AndroidApplication, Bootstrap<Component>> = WeakHashMap()
-
-    operator
-    fun get(
-        key: AndroidApplication
-    ): Component = getBoot(key).component
-
-    private
-    fun getBoot(
-        key: AndroidApplication
-    ) = synchronized(map) {
-        map.getOrPut(key) {
-            build(key)
-        }
-    }
+interface Builder<out T> {
+    fun build(): T
 }
+
+fun <T> Builder<T>.build(
+    init: T.() -> Unit
+): T = build().apply(init)

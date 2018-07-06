@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package dagger.internal.codegen
+package sourcerer
 
 import com.google.auto.common.AnnotationMirrors.getAnnotatedAnnotations
 import com.google.auto.common.MoreElements.isAnnotationPresent
-import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import sourcerer.bootstrap.toImmutableSet
 import javax.inject.Inject
@@ -27,7 +26,6 @@ import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
-import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.ElementFilter.constructorsIn
 
 const val BOOTSTRAP_DEPENDENCIES_ATTRIBUTE = "bootstrapDependencies"
@@ -37,9 +35,6 @@ const val AUTO_INCLUDE_ATTRIBUTE = "autoInclude"
 const val FLATTEN_ATTRIBUTE = "flatten"
 const val DEPENDENCIES_ATTRIBUTE = "dependencies"
 const val MODULES_ATTRIBUTE = "modules"
-
-val AnnotationMirror.bootstrapComponentDependencies: ImmutableList<TypeMirror>
-    get() = getTypeListValue(BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
 
 val Element.qualifier: AnnotationMirror?
     get() {

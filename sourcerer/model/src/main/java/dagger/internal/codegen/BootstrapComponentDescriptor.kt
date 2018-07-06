@@ -21,7 +21,6 @@ import com.google.auto.common.MoreTypes
 import com.google.common.base.Equivalence
 import com.google.common.base.Preconditions.checkArgument
 import com.google.common.base.Verify.verify
-import com.google.common.collect.FluentIterable
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Iterables.getOnlyElement
 import com.google.common.collect.Sets.immutableEnumSet
@@ -129,7 +128,7 @@ class BootstrapComponentDescriptor(
         BOOTSTRAP_COMPONENT(
             BootstrapComponent::class,
             BootstrapComponent.Builder::class,
-            BOOTSTRAP_MODULES_ATTRIBUTE,
+            sourcerer.BOOTSTRAP_MODULES_ATTRIBUTE,
             true
         );
 
@@ -285,14 +284,14 @@ class BootstrapComponentDescriptor(
             parentKind: Optional<Kind>
         ): BootstrapComponentDescriptor {
             val componentMirror = componentDefinitionType.getAnnotationMirror(kind.annotationType)!!
-            val dependencies = componentMirror.getTypeListValue(BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
+            val dependencies = componentMirror.getTypeListValue(sourcerer.BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
                     .map(MoreTypes::asTypeElement)
                     .map(this::forComponent)
                     .toImmutableSet()
             val modules = modulesFactory.create(componentMirror, kind.modulesAttribute)
-            val applicationModules = modulesFactory.create(componentMirror, APPLICATION_MODULES_ATTRIBUTE)
-            val autoInclude = componentMirror.getValue<Boolean>(AUTO_INCLUDE_ATTRIBUTE)!!
-            val flatten = componentMirror.getValue<Boolean>(FLATTEN_ATTRIBUTE)!!
+            val applicationModules = modulesFactory.create(componentMirror, sourcerer.APPLICATION_MODULES_ATTRIBUTE)
+            val autoInclude = componentMirror.getValue<Boolean>(sourcerer.AUTO_INCLUDE_ATTRIBUTE)!!
+            val flatten = componentMirror.getValue<Boolean>(sourcerer.FLATTEN_ATTRIBUTE)!!
             val unimplementedMethods = elements.getUnimplementedMethods(componentDefinitionType)
             val componentMethods = unimplementedMethods.map { componentMethod ->
                 getDescriptorForComponentMethod(componentDefinitionType, kind, componentMethod)
@@ -434,10 +433,6 @@ class BootstrapComponentDescriptor(
         val modules: ImmutableSet<ModuleDescriptor>
     ) : Set<ModuleDescriptor> by modules {
         val transitiveModules = transitiveModules(modules)
-        val transitiveModuleTypes: ImmutableSet<TypeElement>
-            get() = FluentIterable.from(transitiveModules)
-                    .transform { it?.moduleElement() }
-                    .toSet()
 
         class Factory
         @Inject constructor(
@@ -475,19 +470,6 @@ class BootstrapComponentDescriptor(
                     addTransitiveModules(transitiveModules, includedModule)
                 }
             }
-        }
-
-        /**
-         * No-argument methods defined on [Object] that are ignored for contribution.
-         */
-        private val NON_CONTRIBUTING_OBJECT_METHOD_NAMES =
-            ImmutableSet.of("toString", "hashCode", "clone", "getClass")
-
-        fun isComponentContributionMethod(elements: DaggerElements, method: ExecutableElement): Boolean {
-            return (method.parameters.isEmpty()
-                    && method.returnType.kind != VOID
-                    && elements.getTypeElement(Any::class.java) != method.enclosingElement
-                    && !NON_CONTRIBUTING_OBJECT_METHOD_NAMES.contains(method.simpleName.toString()))
         }
     }
 

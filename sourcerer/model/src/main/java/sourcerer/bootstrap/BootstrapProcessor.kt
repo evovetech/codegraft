@@ -16,90 +16,155 @@
 
 package sourcerer.bootstrap
 
+import com.google.common.collect.ImmutableList
 import dagger.BindsInstance
-import sourcerer.BaseProcessor
 import sourcerer.Output
-import sourcerer.ProcessStep
-import sourcerer.processor.Env
+import sourcerer.mapOutput
 import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Options
-import sourcerer.toProcessStep
+import sourcerer.processor.newEnv
+import javax.annotation.processing.ProcessingEnvironment
+import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
-import javax.lang.model.util.Types
+import javax.lang.model.element.TypeElement
 
+open
 class BootstrapProcessor(
-    val isApplication: Boolean
-) : BaseProcessor() {
+    private val isApplication: Boolean
+) : DelegatingProcessor() {
+    private lateinit
+    var data: ProcessData
 
-    @Inject lateinit var types: Types
-    @Inject lateinit var options: Options
-
-    @Inject lateinit
-    var androidInjectStep: AndroidInjectStep
-
-    @Inject lateinit
-    var componentStep: BootstrapComponentStep
-
-    private
-    var processed = false
-
-    val processingEnv: ProcessingEnv
-        get() = env
-
-    fun isProcessed(): Boolean {
-        return processed
+    @Inject
+    fun inject(
+        data: ProcessData
+    ) {
+        this.data = data
     }
 
+    private
+    var finished = false
+
+    fun isFinished(): Boolean {
+        return finished
+    }
+
+    fun isProcessed(): Boolean {
+        return isFinished()
+    }
+
+    val env: ProcessingEnv
+        get() = data.env
+
+    val processingEnv: ProcessingEnv
+        get() = data.env
+
+    val processors: ImmutableList<Processor>
+        get() = data.processors
+
+    val steps: RoundSteps
+        get() = data.steps
+
+    val options: Options
+        get() = data.env.options
+
+    private
+    var round: ParentRound = ParentRound()
+
     override
-    fun processSteps(): List<ProcessStep> {
-        val component: Component = DaggerBootstrapProcessor_Component.builder().run {
-            env(env)
+    fun initProcessors(
+        env: ProcessingEnvironment
+    ): List<Processor> {
+        val component = DaggerBootstrapProcessor_Component.builder().run {
+            env(newEnv(env))
+            isApplication(isApplication)
             build()
         }
         component.inject(this)
-        return component.processSteps
-                .map(AnnotationStep::toProcessStep)
-                .toList()
+        return data.processors
     }
 
     override
-    fun postRound(roundEnv: RoundEnvironment) {
+    fun process(elements: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
+        env.log("elements = $elements")
+        val round = this.round.process(elements, roundEnv, steps) {
+            super.process(elements, roundEnv)
+        }
+
+        round.postRound(roundEnv)
+
+        this.round = round
+        return false
+    }
+
+    fun ParentRound.postRound(roundEnv: RoundEnvironment) {
         env.log(
             "postRound($roundEnv) " +
             "{ " +
             "isApplication=$isApplication, " +
             "processingOver=${roundEnv.processingOver()}, " +
-            "processed=$processed, " +
-            "componentStep.processed=${componentStep.processed}" +
+            "finished=$finished, " +
+            "rounds=$rounds" +
             " }"
         )
-        if (isApplication
+
+        env.log("roundOutputs = $outputs")
+
+        if (!finished
             && !roundEnv.processingOver()
-            && !processed
-            && componentStep.processed) {
-            val outputs = componentStep.run {
-                //                env.postProcess()
-                emptyList<Output>()
+            && deferredElements.isEmpty()
+            && outputs.isEmpty()) {
+
+            val outputs = data.finish()
+            outputs.map {
+                env.mapOutput(it)
             }
-            env.log("postRound: outputs=$outputs")
-            postProcess(outputs)
-            processed = true
+            env.log("outputs=$outputs")
+
+            finished = true
         } else {
             env.log("postRound: no outputs")
         }
     }
 
+    private
+    fun ProcessData.finish(): List<Output> =
+        if (isApplication) {
+            val generatedModules = androidInjectStep.modules
+            val storedModules = androidInjectStep.storedModules()
+            val generatedComponents = bootstrapComponentStep.generatedComponents
+            val storedComponents = bootstrapComponentStep.storedComponents()
+
+            env.log("storedComponents = $storedComponents")
+            val appComponent = appComponentStep.process(
+                generatedModules,
+                storedModules,
+                generatedComponents,
+                storedComponents
+            )
+            appComponent.flatMap(AppComponentStep.Output::outputs)
+        } else {
+            // just sourcerer things
+            listOf(
+                bootstrapComponentStep.sourcererOutput(),
+                androidInjectStep.sourcererOutput()
+            )
+        }
+
     @Singleton
-    @dagger.Component(modules = [AnnotationStepsModule::class])
+    @dagger.Component(modules = [RoundProcessorsModule::class])
     interface Component {
+        val processData: ProcessData
+
         fun inject(processor: BootstrapProcessor)
-        val processSteps: AnnotationSteps
 
         @dagger.Component.Builder
         interface Builder {
             @BindsInstance fun env(env: Env)
+            @BindsInstance fun isApplication(@Named("isApplication") isApplication: Boolean)
             fun build(): Component
         }
     }

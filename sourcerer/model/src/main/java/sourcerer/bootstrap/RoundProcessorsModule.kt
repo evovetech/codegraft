@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package sourcerer.inject.android;
+package sourcerer.bootstrap
 
-import android.app.Activity;
-import android.app.Application;
-import dagger.MapKey;
+import dagger.Binds
+import dagger.Module
+import dagger.multibindings.IntoSet
+import javax.annotation.processing.Processor
 
-import java.lang.annotation.Target;
-
-import static java.lang.annotation.ElementType.METHOD;
-
-/**
- * {@link MapKey} annotation to key bindings by a type of an {@link Activity}.
- */
-@MapKey
-@Target(METHOD)
-public
-@interface ApplicationKey {
-    Class<? extends Application> value();
+@Module(includes = [AnnotationStepsModule::class])
+interface RoundProcessorsModule {
+    @Binds @IntoSet
+    fun bindProcessSteps(processStepsDelegate: ProcessStepsDelegate): Processor
 }
