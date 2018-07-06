@@ -16,32 +16,12 @@
 
 package sourcerer
 
-object Codegen : DefaultPackage("sourcerer") {
-    val LibComponents = klass("LibComponents")
-    val LibModules = klass("LibModules")
-
-    object Inject : Package.SubPackage(this, "inject") {
-        val Generated = klass("Generated")
-        val ActivityScope = klass("ActivityScope")
-        val IntoCollection = klass("IntoCollection")
-    }
-}
+import com.squareup.javapoet.ClassName
+import kotlin.reflect.KClass
 
 object Dagger : DefaultPackage("dagger") {
-    val Component = klass("Component")
     val Module = klass("Module")
-    val MapKey = klass("MapKey")
-    val BindsInstance = klass("BindsInstance")
-
-    object Android : Package.SubPackage(this, "android") {
-        val InjectionModule = klass("AndroidInjectionModule")
-        val Injector = klass("AndroidInjector")
-        val ContributesInjector = klass("ContributesAndroidInjector")
-    }
 }
 
-object JavaX : DefaultPackage("javax") {
-    object Inject : Package.SubPackage(this, "inject") {
-        val Singleton = klass("Singleton")
-    }
-}
+val KClass<*>.className: ClassName
+    get() = ClassName.get(java)

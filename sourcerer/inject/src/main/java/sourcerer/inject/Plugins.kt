@@ -43,9 +43,6 @@ class PluginKey(
     val value: KClass<out Plugin>
 )
 
-@LibComponent(modules = [PluginModule::class])
-/* TODO: temp */
-@LibModule(includes = [PluginModule::class])
 interface PluginComponent {
     val plugins: Plugins
 }

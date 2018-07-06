@@ -14,28 +14,13 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package sourcerer
 
-import kotlin.annotation.AnnotationRetention.SOURCE
-import kotlin.annotation.AnnotationTarget.ANNOTATION_CLASS
-import kotlin.annotation.AnnotationTarget.CLASS
-import kotlin.annotation.AnnotationTarget.PROPERTY_GETTER
-import kotlin.reflect.KClass
+import sourcerer.io.Reader
 
-@MustBeDocumented
-@Target(
-    // TODO: take out class
-    CLASS,
-    ANNOTATION_CLASS,
-    PROPERTY_GETTER
-)
-@Retention(
-    SOURCE
-)
-annotation
-class IntoCollection(
-    val value: KClass<out Annotation>
-)
-
-annotation
-class CollectionType
+class StoredFile(
+    private val contents: ByteArray
+) {
+    fun <T> read(func: (Reader) -> T) = Reader.newReader(contents.inputStream())
+            .use(func)
+}

@@ -25,9 +25,7 @@ apply plugin: 'evovetech.settings'
 apply from: "${configDir}/evovetech/settings.gradle"
 
 include(
-        ':meta:annotations',
-        ':meta:processor',
-        ':meta:utils',
+        ':utils',
         ':io',
         ':annotations',
         ':model',

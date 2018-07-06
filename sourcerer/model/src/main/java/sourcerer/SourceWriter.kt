@@ -17,7 +17,6 @@
 package sourcerer
 
 import com.squareup.javapoet.AnnotationSpec
-import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
@@ -80,10 +79,3 @@ inline fun TypeSpec.Builder.addMethod(
 fun TypeSpec.Builder.addSuperinterfaces(
     vararg types: TypeName
 ) = addSuperinterfaces(types.asList())!!
-
-inline
-fun <reified A : Annotation> TypeSpec.Builder.intoCollection() {
-    addAnnotation(Codegen.Inject.IntoCollection) {
-        addTo("value")(ClassName.get(A::class.java))
-    }
-}

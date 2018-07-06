@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package sourcerer.inject.android
 
-import kotlin.annotation.AnnotationRetention.RUNTIME
-import kotlin.annotation.AnnotationTarget.ANNOTATION_CLASS
-import kotlin.reflect.KClass
+import javax.inject.Scope
 
+/**
+ * Created by layne on 2/26/18.
+ */
+
+@Scope
+@Retention(AnnotationRetention.RUNTIME)
 @MustBeDocumented
-@Retention(RUNTIME)
-@Target(ANNOTATION_CLASS)
-annotation
-class Wraps(
-    val value: KClass<out Annotation>
-)
+annotation class ActivityScope

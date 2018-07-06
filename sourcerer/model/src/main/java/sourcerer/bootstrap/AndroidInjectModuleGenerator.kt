@@ -24,8 +24,8 @@ import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.WildcardTypeName
 import dagger.Binds
 import dagger.android.AndroidInjector
+import dagger.android.ContributesAndroidInjector
 import dagger.multibindings.IntoMap
-import sourcerer.Codegen
 import sourcerer.Dagger
 import sourcerer.JavaOutput
 import sourcerer.Klass
@@ -36,6 +36,7 @@ import sourcerer.addTo
 import sourcerer.bootstrap.AndroidInjectModuleDescriptor.Kind.Application
 import sourcerer.classBuilder
 import sourcerer.className
+import sourcerer.inject.android.ActivityScope
 import sourcerer.inject.android.AndroidApplication
 import sourcerer.inject.android.ApplicationKey
 import sourcerer.interfaceBuilder
@@ -77,8 +78,8 @@ class AndroidInjectModuleGenerator(
                     .let(addToIncludes)
         }
         addMethod("contribute${rawType.name}") {
-            addAnnotation(Codegen.Inject.ActivityScope.rawType)
-            addAnnotation(Dagger.Android.ContributesInjector.rawType)
+            addAnnotation(ContributesAndroidInjector::class.java)
+            addAnnotation(ActivityScope::class.java)
             addModifiers(PUBLIC, ABSTRACT)
             returns(rawType)
         }
@@ -119,27 +120,6 @@ class AndroidInjectModuleGenerator(
 
         addType(subcomponent.typeSpec())
     }
-    /*
-
-@Module(
-    subcomponents = [MainApplicationSubcomponent::class]
-)
-interface MainApplicationModule {
-    @Binds
-    @IntoMap
-    @ApplicationKey(App::class)
-    fun bindAndroidInjectorFactory(
-        builder: MainApplicationSubcomponent.Builder
-    ): AndroidInjector.Factory<out Application>
-
-    @Subcomponent
-    interface MainApplicationSubcomponent : AndroidInjector<App> {
-        @Subcomponent.Builder
-        abstract class Builder : AndroidInjector.Builder<App>()
-    }
-}
-
-     */
 
     class Subcomponent(
         private val parent: AndroidInjectModuleGenerator

@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package sourcerer.inject;
+plugins {
+    id("kotlin")
+    id("kotlin-kapt")
+    id("com.jfrog.bintray")
+//    id("com.jfrog.artifactory")
+    id("org.jetbrains.dokka")
+}
 
-import dagger.Module;
-import dagger.multibindings.Multibinds;
+apply from: "${configDir}/kotlin-library.gradle"
 
-import javax.inject.Singleton;
-import java.util.Map;
-
-/**
- * Created by layne on 2/26/18.
- */
-
-@Module
-public abstract
-class LibraryModule2 {
-    @Multibinds
-    @Singleton
-    public abstract
-    Map<Class<? extends Library>, Library> bindLibraryMap();
+dependencies {
+    api "com.google.auto:auto-common:${app.autoCommonVersion}"
+    api project(':io')
 }

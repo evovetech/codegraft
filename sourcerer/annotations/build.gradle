@@ -27,6 +27,4 @@ apply from: "${configDir}/versions/dagger.gradle"
 
 dependencies {
     api dagger.core
-    implementation project(':meta:annotations')
-    kapt project(':meta:processor')
 }
