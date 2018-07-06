@@ -28,7 +28,7 @@ evove {
         }
         update("com.android") {
             it.module = "com.android.tools.build:gradle"
-            it.version = "3.2.0-beta01"
+            it.version = "3.2.0-beta02"
         }
         update("realm") {
             it.module = "io.realm:realm-gradle-plugin"
@@ -36,7 +36,7 @@ evove {
         }
         update("io.fabric") {
             it.module = "io.fabric.tools:gradle"
-            it.version = "1.25.3"
+            it.version = "1.25.4"
         }
         update("com.google.firebase") {
             it.module = "com.google.firebase:firebase-plugins"

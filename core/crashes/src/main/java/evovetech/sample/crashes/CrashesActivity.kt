@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id('base')
-}
+package evovetech.sample.crashes
 
-ext {
-    LICENSES = ['Apache-2.0']
-    LABELS = ['androdi', 'java', 'kotlin', 'inject', 'annotations', 'bytebuddy']
-    byteBuddyVersion = '1.8.10'
-    androidVersion = '3.2.0-beta02'
+import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+import sourcerer.inject.AndroidInject
+
+@AndroidInject
+class CrashesActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_crashes)
+    }
 }

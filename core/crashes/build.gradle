@@ -34,3 +34,7 @@ dependencies {
     api project(':core:annotations')
     implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"
 }
+
+dependencies {
+    implementation 'com.android.support.constraint:constraint-layout:+'
+}
