@@ -37,6 +37,7 @@ import sourcerer.addTo
 import sourcerer.bootstrap.AndroidInjectModuleDescriptor
 import sourcerer.bootstrap.AndroidInjectModuleGenerator
 import sourcerer.bootstrap.ComponentOutput
+import sourcerer.bootstrap.Includable
 import sourcerer.bootstrap.MethodBuilder
 import sourcerer.bootstrap.Package
 import sourcerer.bootstrap.addFieldSpec
@@ -102,26 +103,35 @@ class AppComponentGenerator(
 
         override
         fun typeSpec() = typeSpec {
-            val modules = components.map { it.module }
+            val modules = components.flatMap { output ->
+                val module = output.module
+                if (module.include) {
+                    listOf(module.outKlass.rawType)
+                } else {
+                    output.descriptor.applicationModules
+                            .map(ModuleDescriptor::moduleElement)
+                            .map(ClassName::get)
+                }
+            }
             addAnnotation(ClassName.get(Module::class.java).toKlass()) {
-                modules.map { it.outKlass.rawType }
-                        .forEach(addTo("includes"))
+                modules.forEach(addTo("includes"))
             }
 
             val constructor = MethodSpec.constructorBuilder()
                     .addAnnotation(Inject::class.java)
             val bootMethods = components
                     .map { it.bootData }
+                    .filter(Includable::include)
                     .map { boot ->
                         val type = boot.outKlass.rawType
                         val fieldSpec = addFieldSpec(type, type.name.decapitalize())
-                        val getter = MethodSpec.methodBuilder("get${fieldSpec.name.capitalize()}").run {
-                            addAnnotation(Provides::class.java)
-                            addStatement("return \$N", fieldSpec)
-                            returns(type)
-                            build()
-                        }
-                        addMethod(getter)
+//                        val getter = MethodSpec.methodBuilder("get${fieldSpec.name.capitalize()}").run {
+//                            addAnnotation(Provides::class.java)
+//                            addStatement("return \$N", fieldSpec)
+//                            returns(type)
+//                            build()
+//                        }
+//                        addMethod(getter)
                         constructor.addToConstructor(fieldSpec)
                         boot.scopedKeys.map { key ->
                             BootMethod(key, fieldSpec)
@@ -157,7 +167,7 @@ class AppComponentGenerator(
         rawType = ClassName.get(pkg, name)
     ) {
         private
-        val descriptors = components.map { it.descriptor }
+        val descriptors = components.map(ComponentOutput::descriptor)
         private
         val modules = descriptors
                 .map(BootstrapComponentDescriptor::applicationModules)

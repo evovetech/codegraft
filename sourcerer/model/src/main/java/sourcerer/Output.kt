@@ -17,6 +17,7 @@
 package sourcerer
 
 import com.squareup.javapoet.ClassName
+import sourcerer.bootstrap.Includable
 import sourcerer.io.Writer
 import javax.annotation.processing.Filer
 import javax.lang.model.element.Element
@@ -32,7 +33,12 @@ class DeferredOutput(
 ) : Output()
 
 abstract
-class BaseOutput : Output() {
+class BaseOutput : Output(),
+    Includable {
+    override
+    val include: Boolean
+        get() = true
+
     abstract
     fun writeTo(filer: Filer)
 }

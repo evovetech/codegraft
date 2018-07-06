@@ -72,6 +72,11 @@ class ComponentBootDataGenerator(
     }
 
     override
+    val include: Boolean by lazy {
+        scopedKeys.isNotEmpty()
+    }
+
+    override
     fun newBuilder() = outKlass.classBuilder()
 
     override

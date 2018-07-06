@@ -53,6 +53,10 @@ class ComponentImplementationGenerator(
     outExt = "Implementation"
 ) {
     override
+    val include: Boolean = !descriptor.flatten
+                           && descriptor.componentMethods.isNotEmpty()
+
+    override
     fun newBuilder() = outKlass.classBuilder()
 
     override

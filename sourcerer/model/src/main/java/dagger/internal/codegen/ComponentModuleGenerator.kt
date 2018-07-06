@@ -18,6 +18,7 @@ package dagger.internal.codegen
 
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.TypeSpec
 import dagger.Binds
 import dagger.Module
 import sourcerer.JavaOutput
@@ -41,6 +42,9 @@ class ComponentModuleGenerator(
     outExt = "Module"
 ) {
     override
+    val include: Boolean = implGenerator.include
+
+    override
     fun newBuilder() = outKlass.interfaceBuilder()
 
     override
@@ -52,7 +56,13 @@ class ComponentModuleGenerator(
                     .mapNotNull(ClassName::get)
                     .forEach(addTo("includes"))
         }
+        if (implGenerator.include) {
+            addMethod()
+        }
+    }
 
+    private
+    fun TypeSpec.Builder.addMethod() {
         val returnType = ClassName.get(definitionType)
         val implType = implGenerator.outKlass.rawType
         addMethod(MethodSpec.methodBuilder("bind${definitionType.simpleName}").run {

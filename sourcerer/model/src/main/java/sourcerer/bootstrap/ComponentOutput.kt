@@ -63,7 +63,7 @@ class ComponentOutput(
         implementation,
         module,
         bootData
-    )
+    ).filter(Includable::include)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
