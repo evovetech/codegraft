@@ -48,6 +48,7 @@ import com.android.manifmerger.PlaceholderHandler
 import com.android.utils.FileUtils
 import com.android.utils.XmlUtils
 import com.google.common.collect.Maps
+import evovetech.gradle.transform.*
 import evovetech.gradle.transform.plugin.ManifestFile.Attribute.ApplicationName
 import evovetech.gradle.transform.plugin.ManifestFile.Attribute.InstFunctionalTest
 import evovetech.gradle.transform.plugin.ManifestFile.Attribute.InstHandleProp
@@ -76,8 +77,6 @@ import javax.xml.parsers.SAXParserFactory
 
 private
 const val sourcererVersion = "0.5.0-SNAPSHOT"
-private
-const val javaPoetVersion = "1.11.1"
 
 class InjectPlugin : Plugin<Project> {
     override
@@ -86,9 +85,14 @@ class InjectPlugin : Plugin<Project> {
 
         project.plugins.withType(BasePlugin::class.java) {
             project.dependencies {
+                add("runtimeOnly", "evovetech.android.inject:core:0.5.0")
                 add("kapt", "evovetech.sourcerer:model:$sourcererVersion")
             }
+
             wrapper.setup(extension)
+            extension.registerTransform(InjectRunRunTransform {
+                extension.bootClasspath
+            })
         }
 
         project.plugins.withType(KotlinAndroidPluginWrapper::class.java) {

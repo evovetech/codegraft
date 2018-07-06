@@ -17,11 +17,17 @@
 package evovetech.gradle.transform
 
 import com.android.build.api.transform.TransformInvocation
+import java.io.File
 
-class CopyRunRunTransform :
-    AbstractTransform("EvoveTechCopyTransform") {
+class InjectRunRunTransform(
+    private val bootClasspath: () -> List<File>
+) : AbstractTransform("evovetechInjectTransform") {
     override
     fun TransformInvocation.runRun(): RunRun {
-        return CopyRunRun(this)
+        return InjectRunRun(
+            bootClasspath, this,
+            ApplicationOutputWriter(),
+            InjectActivityWriter()
+        )
     }
 }

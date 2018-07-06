@@ -20,7 +20,7 @@ plugins {
     id("kotlin-android-extensions")
     id("kotlin-kapt")
     id("realm-android")
-    id("evovetech.android.transform.inject")
+    id("evovetech.android.plugin.inject")
 }
 
 apply from: "${configDir}/android/base.gradle"

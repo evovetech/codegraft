@@ -41,8 +41,5 @@ dependencies {
     compileOnly("com.google.android:support-v4:r7")
     api "com.android.tools.build:gradle-api:${androidVersion}"
     api "com.google.auto:auto-common:${app.autoCommonVersion}"
-    kapt "com.google.auto.value:auto-value:${app.autoValueVersion}"
-    api "com.google.auto.value:auto-value-annotations:${app.autoValueVersion}"
     anno "com.google.auto.service:auto-service:${app.autoServiceVersion}"
-    anno "com.google.auto.factory:auto-factory:${app.autoFactoryVersion}"
 }

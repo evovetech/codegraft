@@ -28,9 +28,7 @@ plugins {
     id("io.fabric")
     id("com.google.firebase.firebase-perf")
     id("realm-android")
-    id("evovetech.android.transform.bytes")
-//    id("evovetech.android.transform.graph")
-    id("evovetech.android.transform.inject")
+    id("evovetech.android.plugin.inject")
 }
 
 apply from: "${configDir}/android/application.gradle"
@@ -54,7 +52,7 @@ dependencies {
     implementation project(':core:network')
     implementation project(':core:db')
     implementation("com.android.support:design:${app.androidSupportVersion}")
-    implementation("com.android.support.constraint:constraint-layout:1.0.2")
+    implementation("com.android.support.constraint:constraint-layout:1.1.2")
 //    kapt("evovetech.sourcerer:app-processor:${app.sourcererVersion}")
     implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"
     implementation "com.google.firebase:firebase-perf:${app.firebaseVersion}"

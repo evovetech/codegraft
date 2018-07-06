@@ -24,7 +24,7 @@ import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator.Compound
 import java.io.File
 
-class ByteBuddyRunRun(
+class InjectRunRun(
     bootClasspath: () -> List<File>,
     delegate: TransformInvocation,
     vararg writers: OutputWriter
@@ -56,12 +56,12 @@ class ByteBuddyRunRun(
 
     override
     fun run() {
-        println("bytebuddy runrun! start")
+        println("inject runrun! start")
         try {
             transforms.flatMap { it.output.allFiles() }
                     .forEach(this::write)
         } finally {
-            println("bytebuddy runrun! complete")
+            println("inject runrun! complete")
         }
     }
 

@@ -28,7 +28,7 @@ apply from: "${configDir}/kotlin-library.gradle"
 apply from: "${configDir}/versions/dagger.gradle"
 
 dependencies {
-    implementation project(':bytes')
+    implementation project(':transform')
     implementation "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
     compileOnly 'org.jetbrains.kotlin:kotlin-gradle-plugin'
     compileOnly "com.android.tools.build:gradle:${androidVersion}"
@@ -44,20 +44,8 @@ def prefix = "evovetech.android"
 gradlePlugin {
     automatedPublishing = true
     plugins {
-        "transform.copy" {
-            id = "${prefix}.transform.copy"
-            implementationClass = "evovetech.gradle.transform.plugin.CopyPlugin"
-        }
-        "transform.bytes" {
-            id = "${prefix}.transform.bytes"
-            implementationClass = "evovetech.gradle.transform.plugin.ByteBuddyPlugin"
-        }
-        "transform.graph" {
-            id = "${prefix}.transform.graph"
-            implementationClass = "evovetech.gradle.transform.plugin.GraphPlugin"
-        }
-        "transform.inject" {
-            id = "${prefix}.transform.inject"
+        "plugin.inject" {
+            id = "${prefix}.plugin.inject"
             implementationClass = "evovetech.gradle.transform.plugin.InjectPlugin"
         }
     }
