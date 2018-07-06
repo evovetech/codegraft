@@ -20,15 +20,14 @@ import sourcerer.inject.BootstrapComponent
 
 @BootstrapComponent(
     applicationModules = [AndroidInjectApplicationModule::class],
-    autoInclude = true,
+    autoInclude = false,
     flatten = true
 )
 interface ApplicationInjectorComponent : HasApplicationInjector
 
 @BootstrapComponent(
     applicationModules = [AndroidInjectActivityModule::class],
-    // TODO
-    autoInclude = true,
+    autoInclude = false,
     flatten = true
 )
 interface ActivityInjectorComponent : HasActivityInjector
@@ -51,24 +50,21 @@ interface SupportFragmentInjectorComponent : HasSupportFragmentInjector
 
 @BootstrapComponent(
     applicationModules = [AndroidInjectServiceModule::class],
-    // TODO
-    autoInclude = true,
+    autoInclude = false,
     flatten = true
 )
 interface ServiceInjectorComponent : HasServiceInjector
 
 @BootstrapComponent(
     applicationModules = [AndroidInjectBroadcastReceiverModule::class],
-    // TODO
-    autoInclude = true,
+    autoInclude = false,
     flatten = true
 )
 interface BroadcastReceiverInjectorComponent : HasBroadcastReceiverInjector
 
 @BootstrapComponent(
     applicationModules = [AndroidInjectContentProviderModule::class],
-    // TODO
-    autoInclude = true,
+    autoInclude = false,
     flatten = true
 )
 interface ContentProviderInjectorComponent : HasContentProviderInjector

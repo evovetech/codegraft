@@ -35,6 +35,7 @@ import sourcerer.JavaOutput
 import sourcerer.addAnnotation
 import sourcerer.addTo
 import sourcerer.bootstrap.AndroidInjectModuleDescriptor
+import sourcerer.bootstrap.AndroidInjectModuleDescriptor.Kind
 import sourcerer.bootstrap.AndroidInjectModuleGenerator
 import sourcerer.bootstrap.ComponentOutput
 import sourcerer.bootstrap.Includable
@@ -65,6 +66,7 @@ import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
 import javax.lang.model.element.TypeElement
+import kotlin.reflect.KClass
 
 internal
 class AppComponentGenerator(
@@ -432,11 +434,30 @@ class AppComponentGenerator(
         ): AppComponentGenerator {
             val injectModuleDescriptors = (generatedModules + storedModules)
                     .toImmutableSet()
+            val injectModuleKinds = injectModuleDescriptors
+                    .groupBy(AndroidInjectModuleDescriptor::kind)
+                    .keys
+                    .map(Kind::moduleType)
+                    .map(KClass<*>::java)
+                    .map(ClassName::get)
+                    .toImmutableSet()
             val injectModules = injectModuleDescriptors
                     .map(moduleOutputFactory::create)
                     .toImmutableSet()
             val allComponents = (generatedComponents + storedComponents)
-            val componentDescriptors = allComponents.filter { it.autoInclude }
+            val componentDescriptors = allComponents
+                    .filter { descriptor ->
+                        if (descriptor.autoInclude) {
+                            true
+                        } else {
+                            val moduleTypes = descriptor.applicationModules.modules
+                                    .map(ModuleDescriptor::moduleElement)
+                                    .map(ClassName::get)
+                            moduleTypes.any { type ->
+                                injectModuleKinds.contains(type)
+                            }
+                        }
+                    }
                     .flatMap { it.allDependencies + it }
                     .toImmutableSet()
             val components = componentDescriptors
