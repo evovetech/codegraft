@@ -27,22 +27,23 @@ import com.android.build.api.transform.TransformInvocation
 
 abstract
 class AbstractTransform(
-    private val name: String
+    private val name: String,
+    private val isLibrary: Boolean
 ) : Transform() {
 
     override
     fun getName() = name
 
     override
-    fun getInputTypes(): MutableSet<ContentType> {
-        return mutableSetOf(
+    fun getInputTypes(): Set<ContentType> {
+        return setOf(
             CLASSES
         )
     }
 
     override
-    fun getOutputTypes(): MutableSet<ContentType> {
-        return inputTypes.toMutableSet()
+    fun getOutputTypes(): Set<ContentType> {
+        return inputTypes
     }
 
     override
@@ -51,9 +52,13 @@ class AbstractTransform(
     }
 
     override
-    fun getScopes(): MutableSet<in Scope> = mutableSetOf(
-        PROJECT
-    )
+    fun getScopes(): MutableSet<in Scope> =
+        mutableSetOf(PROJECT).apply {
+            if (!isLibrary) {
+//                add(SUB_PROJECTS)
+                add(EXTERNAL_LIBRARIES)
+            }
+        }
 
     override
     fun getReferencedScopes(): MutableSet<in Scope> = mutableSetOf(

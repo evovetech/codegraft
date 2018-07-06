@@ -20,8 +20,9 @@ import com.android.build.api.transform.TransformInvocation
 import java.io.File
 
 class InjectRunRunTransform(
+    isLibrary: Boolean,
     private val bootClasspath: () -> List<File>
-) : AbstractTransform("evovetechInjectTransform") {
+) : AbstractTransform("evovetechInjectTransform", isLibrary) {
     override
     fun TransformInvocation.runRun(): RunRun {
         return InjectRunRun(

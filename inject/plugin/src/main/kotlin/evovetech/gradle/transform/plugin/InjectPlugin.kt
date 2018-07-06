@@ -90,9 +90,6 @@ class InjectPlugin : Plugin<Project> {
             }
 
             wrapper.setup(extension)
-            extension.registerTransform(InjectRunRunTransform {
-                extension.bootClasspath
-            })
         }
 
         project.plugins.withType(KotlinAndroidPluginWrapper::class.java) {
@@ -120,7 +117,23 @@ class ProjectWrapper(
         }
     }
 
-    fun setup(android: BaseExtension): Unit = when (android) {
+    fun setup(android: BaseExtension) {
+        addTransform(android)
+        addDependencies(android)
+    }
+
+    private
+    fun addTransform(android: BaseExtension) {
+        val isLibrary = when (android) {
+            is LibraryExtension -> true
+            else -> false
+        }
+        val transform = InjectRunRunTransform(isLibrary, android::getBootClasspath)
+        android.registerTransform(transform)
+    }
+
+    private
+    fun addDependencies(android: BaseExtension): Unit = when (android) {
         is AppExtension -> {
             android.setup()
         }
