@@ -47,7 +47,7 @@ evove {
             it.version = "1.8.0"
         }
         update("com.jfrog.artifactory") {
-            it.version = "4.7.1"
+            it.version = "4.7.5"
         }
         update('org.jetbrains.dokka') {
             it.module = "org.jetbrains.dokka:dokka-gradle-plugin"

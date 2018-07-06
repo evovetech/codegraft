@@ -25,7 +25,7 @@ buildscript {
 apply plugin: 'evovetech.settings'
 apply from: "${configDir}/evovetech/settings.gradle"
 
-//includeBuild 'sourcerer'
+includeBuild 'sourcerer'
 includeBuild 'inject'
 
 include(

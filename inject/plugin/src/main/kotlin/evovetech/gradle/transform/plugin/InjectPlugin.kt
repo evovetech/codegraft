@@ -48,7 +48,7 @@ import com.android.manifmerger.PlaceholderHandler
 import com.android.utils.FileUtils
 import com.android.utils.XmlUtils
 import com.google.common.collect.Maps
-import evovetech.gradle.transform.*
+import evovetech.gradle.transform.InjectRunRunTransform
 import evovetech.gradle.transform.plugin.ManifestFile.Attribute.ApplicationName
 import evovetech.gradle.transform.plugin.ManifestFile.Attribute.InstFunctionalTest
 import evovetech.gradle.transform.plugin.ManifestFile.Attribute.InstHandleProp
@@ -76,7 +76,7 @@ import java.util.EnumMap
 import javax.xml.parsers.SAXParserFactory
 
 private
-const val sourcererVersion = "0.5.0-SNAPSHOT"
+const val sourcererVersion = "0.5.0"
 
 class InjectPlugin : Plugin<Project> {
     override
