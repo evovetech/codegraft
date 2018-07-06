@@ -40,12 +40,12 @@ dependencies {
     runtimeOnly(dagger.androidSupportJar)
 }
 
-def prefix = "evovetech.android"
+def prefix = "evovetech.plugin"
 gradlePlugin {
     automatedPublishing = true
     plugins {
-        "plugin.inject" {
-            id = "${prefix}.plugin.inject"
+        "android.inject" {
+            id = "${prefix}.android.inject"
             implementationClass = "evovetech.gradle.transform.plugin.InjectPlugin"
         }
     }

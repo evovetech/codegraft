@@ -28,7 +28,7 @@ plugins {
     id("io.fabric")
     id("com.google.firebase.firebase-perf")
     id("realm-android")
-    id("evovetech.android.plugin.inject")
+    id("evovetech.plugin.android.inject")
 }
 
 apply from: "${configDir}/android/application.gradle"
