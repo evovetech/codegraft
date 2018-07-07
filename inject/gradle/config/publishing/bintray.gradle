@@ -42,6 +42,7 @@ bintray {
     }
 }
 
+
 if (project.hasProperty('bintrayUser')
         && project.hasProperty('bintrayKey')
 ) {
