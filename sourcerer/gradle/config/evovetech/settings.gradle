@@ -57,7 +57,7 @@ evove {
             it.module = "evovetech.gradle:gradle-plugin"
             it.version = "0.4.2"
         }
-        update('evovetech.android') {
+        update('evovetech') {
             it.module = "evovetech.android.inject:plugin"
             it.version = "0.5.0"
         }

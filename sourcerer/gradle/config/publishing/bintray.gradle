@@ -29,7 +29,7 @@ bintray {
         name = "${pomGroupId}.${pomArtifactId()}"
         userOrg = app.bintrayOrg
         licenses = project.LICENSES
-        labels = project.LABELS
+        labels =  project.LABELS
         websiteUrl = pom.url
         issueTrackerUrl = pom.issueTrackerUrl
         vcsUrl = pom.scmUrl

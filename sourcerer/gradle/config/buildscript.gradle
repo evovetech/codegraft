@@ -26,6 +26,7 @@ if (!gp.hasProperty('buildscriptRepos')) {
         mavenLocal()
         google()
         jcenter()
+        maven { url "https://dl.bintray.com/evove-tech/maven" }
         maven { url "https://oss.jfrog.org/oss-snapshot-local" }
         maven { url 'https://maven.fabric.io/public' }
     }
@@ -51,6 +52,7 @@ if (!gp.hasProperty('defaultRepos')) {
         mavenLocal()
         google()
         jcenter()
+        maven { url "https://dl.bintray.com/evove-tech/maven" }
         maven { url "https://oss.jfrog.org/oss-snapshot-local" }
         maven { url 'https://maven.fabric.io/public' }
     }
