@@ -29,7 +29,6 @@ import sourcerer.bootstrap.getterMethod
 import sourcerer.bootstrap.qualifier
 import sourcerer.bootstrap.type
 import sourcerer.classBuilder
-import sourcerer.inject.BootScope
 import sourcerer.typeSpec
 import javax.inject.Inject
 import javax.lang.model.element.Modifier.FINAL
@@ -82,7 +81,6 @@ class ComponentBootDataGenerator(
     override
     fun typeSpec() = typeSpec {
         addModifiers(PUBLIC, FINAL)
-        addAnnotation(BootScope::class.java)
         val constructor = MethodSpec.constructorBuilder()
                 .addAnnotation(Inject::class.java)
         val methods = scopedKeys.map { key ->
