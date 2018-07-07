@@ -87,7 +87,8 @@ class AndroidInjectModuleDescriptor(
             AndroidInjectActivityModule::class
         ),
         SupportFragment(
-            sourcerer.inject.android.SupportFragment::class,
+            Any::class,
+//            sourcerer.inject.android.SupportFragment::class,
             AndroidInjectSupportFragmentModule::class
         ),
         Service(

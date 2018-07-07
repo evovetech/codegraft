@@ -17,7 +17,7 @@
 apply from: "${rootDir}/gradle/base.gradle"
 
 dependencies {
-    implementation project(':model')
+    api project(':model')
     compileOnly "com.google.auto.service:auto-service:${app.autoServiceVersion}"
     kapt "com.google.auto.service:auto-service:${app.autoServiceVersion}"
 }
