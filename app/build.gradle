@@ -53,7 +53,6 @@ dependencies {
     implementation project(':core:db')
     implementation("com.android.support:design:${app.androidSupportVersion}")
     implementation("com.android.support.constraint:constraint-layout:1.1.2")
-//    kapt("evovetech.sourcerer:app-processor:${app.sourcererVersion}")
     implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"
     implementation "com.google.firebase:firebase-perf:${app.firebaseVersion}"
     implementation "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
