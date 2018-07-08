@@ -17,6 +17,7 @@
 package sourcerer.bootstrap
 
 import com.google.auto.common.MoreTypes
+import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
 import dagger.model.Key
@@ -42,5 +43,7 @@ val Key.qualifier: AnnotationMirror?
 fun Key.getterMethod(init: MethodSpec.Builder.() -> Unit) =
     MethodBuilder(getterMethodName) {
         init()
+        qualifier?.let(AnnotationSpec::get)
+                ?.let(this::addAnnotation)
         returns(typeName)
     }

@@ -21,7 +21,9 @@ import android.util.Log
 import com.crashlytics.android.Crashlytics
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
+import okhttp3.OkHttpClient
 import sourcerer.inject.AndroidInject
+import sourcerer.inject.android.AndroidApplication
 import sourcerer.inject.android.BootApplication
 import javax.inject.Inject
 
@@ -34,6 +36,7 @@ class App : Application(), BootApplication<AppComponent> {
     val bootstrap = bootstrap {
         fabricBuilderFunction1(Fabric.Builder::bootstrap)
         realmConfigurationBuilderFunction1(RealmConfiguration.Builder::bootstrap)
+        okHttpClientApplicationBuilderFunction2(OkHttpClient.Builder::bootstrap)
         this@App
     }
 
@@ -66,4 +69,9 @@ fun RealmConfiguration.Builder.bootstrap(): RealmConfiguration {
     return name("app.realm")
             .schemaVersion(1)
             .build()
+}
+
+fun OkHttpClient.Builder.bootstrap(app: AndroidApplication): OkHttpClient {
+    // TODO
+    return build()
 }

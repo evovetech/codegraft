@@ -16,6 +16,7 @@
 
 package evovetech.sample.network
 
+import android.app.Application
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -28,15 +29,17 @@ import sourcerer.inject.PluginKey
 import sourcerer.inject.Plugins
 import sourcerer.inject.android.AndroidApplication
 import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
 import javax.inject.Singleton
 
-@BootstrapComponent(applicationModules = [ClientPlugin::class])
-interface ClientComponent {
-    val plugins: Plugins
-}
+typealias OkHttpInit = OkHttpClient.Builder.(app: Application) -> OkHttpClient
 
-@BootstrapComponent(applicationModules = [ClientPlugin::class])
-interface ClientComponent2 {
+@BootstrapComponent(
+    applicationModules = [ClientPlugin::class],
+    bootstrapModules = [OkHttpBuilderModule::class]
+)
+interface ClientComponent {
     val plugins: Plugins
     val client: Client
 }
@@ -44,8 +47,15 @@ interface ClientComponent2 {
 @Singleton
 class Client
 @Inject constructor(
+    private val okhttpProvider: Provider<OkHttpClient>,
+    private val okhttpBuilderProvider: Provider<OkHttpClient.Builder>
+) : Plugin {
     val okhttp: OkHttpClient
-) : Plugin
+        get() = okhttpProvider.get()
+
+    val okhttpBuilder: OkHttpClient.Builder
+        get() = okhttpBuilderProvider.get()
+}
 
 @Module(includes = [ClientModule::class])
 abstract
@@ -57,11 +67,25 @@ class ClientPlugin {
 
 @Module
 class ClientModule {
-    @Provides @Singleton
-    fun provideOkhttp(
-        @BootScope app: AndroidApplication
+    @Provides
+    fun provideDefaultOkhttpBuilder(
+        okhttp: OkHttpClient
+    ): OkHttpClient.Builder {
+        return okhttp.newBuilder()
+    }
+}
+
+@Module
+class OkHttpBuilderModule {
+    @Provides
+    @BootScope
+    fun provideDefaultOkhttp(
+        @BootScope app: AndroidApplication,
+        @Named("okhttp") init: OkHttpInit
     ): OkHttpClient {
-        return OkHttpClient()
+        val builder = OkHttpClient.Builder()
+        builder.init(app)
+        return builder.build()
     }
 }
 
