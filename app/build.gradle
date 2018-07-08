@@ -37,6 +37,7 @@ android {
     defaultConfig {
         applicationId = "evovetech.sample"
     }
+    dynamicFeatures = [":feature:dynamic"]
 }
 
 apply from: "${configDir}/versions/dagger.gradle"

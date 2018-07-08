@@ -29,7 +29,17 @@ includeBuild 'sourcerer'
 includeBuild 'inject'
 
 include(
+        // app
         ':app',
+        ':instantapp',
+
+        // features
+        ':feature:instant',
+
+        // dynamic features
+        ':feature:dynamic',
+
+        // libs
         ':core:annotations',
         ':core:db',
         ':core:crashes',
