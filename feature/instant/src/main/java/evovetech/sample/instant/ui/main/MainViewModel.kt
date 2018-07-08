@@ -16,7 +16,7 @@
 
 package evovetech.sample.instant.ui.main
 
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
     // TODO: Implement the ViewModel
