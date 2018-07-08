@@ -39,6 +39,9 @@ include(
         // dynamic features
         ':feature:dynamic',
 
+        // finance
+        ':finance:plaid',
+
         // libs
         ':core:annotations',
         ':core:db',
