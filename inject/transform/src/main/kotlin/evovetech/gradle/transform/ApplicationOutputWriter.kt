@@ -24,13 +24,7 @@ import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType.Unloaded
 import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.matcher.ElementMatchers
-import sourcerer.inject.android.AndroidApplication
-import sourcerer.inject.android.BootApplication
-import sourcerer.inject.android.HasActivityInjector
-import sourcerer.inject.android.HasApplicationInjector
-import sourcerer.inject.android.HasBroadcastReceiverInjector
-import sourcerer.inject.android.HasContentProviderInjector
-import sourcerer.inject.android.HasServiceInjector
+import sourcerer.inject.android.*
 
 class ApplicationOutputWriter : OutputWriter {
     private val entryPoint: EntryPoint = REBASE
@@ -50,18 +44,16 @@ class ApplicationOutputWriter : OutputWriter {
             it.asRawType() == rawBootType
         }.first()
         val componentType = bootType.typeArguments.first()
-        var transform = entryPoint.transform(typeDescription)
-
-        transform = transform
+        return entryPoint.transform(typeDescription)
                 .defineMethod("getComponent", componentType, Visibility.PUBLIC)
                 .intercept(MethodDelegation.toField("bootstrap"))
-        transform = addInjector<HasApplicationInjector>(componentType, transform)
-        transform = addInjector<HasActivityInjector>(componentType, transform)
-        transform = addInjector<HasServiceInjector>(componentType, transform)
-        transform = addInjector<HasContentProviderInjector>(componentType, transform)
-        transform = addInjector<HasBroadcastReceiverInjector>(componentType, transform)
-
-        return transform
+                .addInjector<HasApplicationInjector>(this, componentType)
+                .addInjector<HasActivityInjector>(this, componentType)
+                .addInjector<HasFragmentInjector>(this, componentType)
+                .addInjector<HasSupportFragmentInjector>(this, componentType)
+                .addInjector<HasServiceInjector>(this, componentType)
+                .addInjector<HasContentProviderInjector>(this, componentType)
+                .addInjector<HasBroadcastReceiverInjector>(this, componentType)
                 .method(ElementMatchers.named("onCreate")).intercept(methodDelegation<LogMethod>())
                 .make()
     }

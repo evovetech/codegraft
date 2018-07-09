@@ -75,15 +75,15 @@ fun <reified T> TransformData.resolve(): TypeDescription =
     typePool.resolve<T>()
 
 inline
-fun <reified T> TransformData.addInjector(
-    componentType: TypeDescription.Generic,
-    transform: DynamicType.Builder<*>
+fun <reified T> DynamicType.Builder<*>.addInjector(
+    transformData: TransformData,
+    componentType: TypeDescription.Generic
 ): DynamicType.Builder<*> {
-    val hasInjectorType = resolve<T>()
+    val hasInjectorType = transformData.resolve<T>()
     if (componentType.asErasure().isAssignableTo(hasInjectorType)) {
         println("$componentType is assignable to $hasInjectorType")
-        return transform.implement(hasInjectorType)
+        return implement(hasInjectorType)
                 .intercept(methodDelegation<BootstrapMethods>())
     }
-    return transform
+    return this
 }
