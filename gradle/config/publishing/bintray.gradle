@@ -35,6 +35,7 @@ bintray {
         vcsUrl = pom.scmUrl
         publicDownloadNumbers = true
         publish = true //[Default: false] Whether version should be auto published after an upload
+        override = true //[Default: false] Whether to override version artifacts already published
         version {
             released = new Date()
             name = pomVersion

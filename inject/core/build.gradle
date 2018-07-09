@@ -31,5 +31,5 @@ dependencies {
     compileOnly("com.google.android:android:4.1.1.4")
     compileOnly("com.google.android:support-v4:r7")
     implementation "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
-    api "evovetech.sourcerer:inject:${app.sourcererVersion}"
+    api "evovetech.sourcerer:inject:${app.codegenVersion}"
 }

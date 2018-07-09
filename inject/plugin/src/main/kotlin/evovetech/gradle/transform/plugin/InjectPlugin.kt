@@ -76,7 +76,7 @@ import java.util.EnumMap
 import javax.xml.parsers.SAXParserFactory
 
 private
-const val sourcererVersion = "0.5.2"
+const val codegenVersion = "0.6.0"
 
 class InjectPlugin : Plugin<Project> {
     override
@@ -85,11 +85,11 @@ class InjectPlugin : Plugin<Project> {
 
         project.plugins.withType(BasePlugin::class.java) {
             project.dependencies {
-                add("implementation", "evovetech.sourcerer:annotations:${sourcererVersion}")
-                add("implementation", "evovetech.sourcerer:inject:${sourcererVersion}")
-                add("implementation", "evovetech.sourcerer:inject-android:${sourcererVersion}")
-                add("runtimeOnly", "evovetech.android.inject:core:$sourcererVersion")
-                add("kapt", "evovetech.sourcerer:model:$sourcererVersion")
+                add("implementation", "evovetech.sourcerer:annotations:$codegenVersion")
+                add("implementation", "evovetech.sourcerer:inject:$codegenVersion")
+                add("implementation", "evovetech.sourcerer:inject-android:$codegenVersion")
+                add("runtimeOnly", "evovetech.android.inject:core:$codegenVersion")
+                add("kapt", "evovetech.sourcerer:model:$codegenVersion")
             }
 
             wrapper.setup(extension)
@@ -145,9 +145,9 @@ class ProjectWrapper(
         }
         is LibraryExtension -> {
             project.dependencies {
-                add("kapt", "evovetech.sourcerer:lib-processor:$sourcererVersion")
-                add("kaptAndroidTest", "evovetech.sourcerer:app-processor:$sourcererVersion")
-                add("kaptTest", "evovetech.sourcerer:app-processor:$sourcererVersion")
+                add("kapt", "evovetech.sourcerer:lib-processor:$codegenVersion")
+                add("kaptAndroidTest", "evovetech.sourcerer:app-processor:$codegenVersion")
+                add("kaptTest", "evovetech.sourcerer:app-processor:$codegenVersion")
             }
             android.setup()
         }
@@ -156,7 +156,7 @@ class ProjectWrapper(
 
     private
     fun Configuration.add(depName: String) {
-        project.dependencies.add(name, "evovetech.sourcerer:$depName-processor:$sourcererVersion")
+        project.dependencies.add(name, "evovetech.sourcerer:$depName-processor:$codegenVersion")
     }
 
     private
