@@ -23,3 +23,8 @@ plugins {
 }
 
 apply from: "${configDir}/android/base.gradle"
+apply from: "${configDir}/versions/dagger.gradle"
+
+dependencies {
+    api dagger.android
+}
