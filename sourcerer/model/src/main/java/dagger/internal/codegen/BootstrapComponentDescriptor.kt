@@ -114,7 +114,7 @@ class BootstrapComponentDescriptor(
 
     val allDependencies: ImmutableSet<BootstrapComponentDescriptor> by lazy {
         dependencies
-                .flatMap { it.allDependencies }
+                .flatMap { it.allDependencies + it }
                 .toImmutableSet()
     }
 

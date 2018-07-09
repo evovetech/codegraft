@@ -16,19 +16,25 @@
 
 package evovetech.finance.plaid.ui.plaid
 
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import evovetech.finance.plaid.R
 import sourcerer.inject.AndroidInject
+import sourcerer.inject.android.ViewModelInstanceProvider
+import javax.inject.Inject
 
 @AndroidInject
 class PlaidFragment : Fragment() {
-    private lateinit
-    var viewModel: PlaidViewModel
+    @Inject lateinit
+    var viewModelProvider: ViewModelInstanceProvider<PlaidFragment>
+
+    private
+    val viewModel: PlaidViewModel
+        get() = viewModelProvider.get()
 
     override
     fun onCreateView(
@@ -42,7 +48,9 @@ class PlaidFragment : Fragment() {
     override
     fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(PlaidViewModel::class.java)
+        viewModel.apply {
+            Log.d("PlaidFragment", "plaid view model = $this, plaid client = $client}")
+        }
         // TODO: Use the ViewModel
     }
 

@@ -18,6 +18,9 @@ package sourcerer.inject
 
 import javax.inject.Provider
 
+typealias ClassMap<T> = Map<Class<out T>, @JvmSuppressWildcards T>
+typealias ClassProviderMap<T> = Map<Class<out T>, @JvmSuppressWildcards Provider<T>>
+
 interface ClassKeyProviderMap<T : Any> : ProviderMap<Class<out T>, T> {
     operator
     fun <R : T> get(key: Class<R>): R? {

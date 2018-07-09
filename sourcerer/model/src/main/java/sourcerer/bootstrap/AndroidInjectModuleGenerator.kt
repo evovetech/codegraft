@@ -69,16 +69,17 @@ class AndroidInjectModuleGenerator(
     private fun normalTypeSpec() = typeSpec {
         addModifiers(PUBLIC, STATIC)
         addAnnotation(Dagger.Module) {
-            val addToIncludes = addTo("includes")
-            descriptor.includes
-                    .map(ClassName::get)
-                    .map(addToIncludes)
             descriptor.kind.moduleType.java
                     .let(ClassName::get)
-                    .let(addToIncludes)
+                    .let(addTo("includes"))
         }
         addMethod("contribute${rawType.name}") {
-            addAnnotation(ContributesAndroidInjector::class.java)
+            addAnnotation(AnnotationSpec.builder(ContributesAndroidInjector::class.java).run {
+                descriptor.includes
+                        .map(ClassName::get)
+                        .map(addTo("modules"))
+                build()
+            })
             addAnnotation(ActivityScope::class.java)
             addModifiers(PUBLIC, ABSTRACT)
             returns(rawType)

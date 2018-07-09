@@ -18,6 +18,7 @@ package evovetech.finance.plaid
 
 import dagger.Module
 import dagger.Provides
+import evovetech.finance.plaid.ui.plaid.PlaidViewModel
 import evovetech.sample.network.ClientComponent
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -45,7 +46,7 @@ class PlaidClient
     private val service: PlaidService
 ) : PlaidService by service
 
-@Module
+@Module(includes = [PlaidViewModel.DaggerModule::class])
 class PlaidModule {
     @Provides
     @Singleton

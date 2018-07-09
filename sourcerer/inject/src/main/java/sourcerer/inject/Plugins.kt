@@ -20,14 +20,13 @@ import dagger.MapKey
 import dagger.Module
 import dagger.multibindings.Multibinds
 import javax.inject.Inject
-import javax.inject.Provider
 import javax.inject.Singleton
+import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.reflect.KClass
 
 interface Plugin
-typealias PluginClass = Class<out Plugin>
-typealias PluginMap = Map<PluginClass, @JvmSuppressWildcards Plugin>
-typealias PluginProviderMap = Map<PluginClass, @JvmSuppressWildcards Provider<Plugin>>
+typealias PluginMap = ClassMap<Plugin>
+typealias PluginProviderMap = ClassProviderMap<Plugin>
 
 @Singleton
 class Plugins
@@ -37,7 +36,7 @@ class Plugins
 
 @MapKey
 @MustBeDocumented
-@Retention(AnnotationRetention.RUNTIME)
+@Retention(RUNTIME)
 annotation
 class PluginKey(
     val value: KClass<out Plugin>

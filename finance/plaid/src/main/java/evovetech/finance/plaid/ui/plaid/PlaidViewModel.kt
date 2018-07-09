@@ -17,7 +17,24 @@
 package evovetech.finance.plaid.ui.plaid
 
 import android.arch.lifecycle.ViewModel
+import dagger.Binds
+import dagger.Module
+import dagger.multibindings.IntoMap
+import evovetech.finance.plaid.PlaidClient
+import sourcerer.inject.android.ViewModelKey
+import javax.inject.Inject
 
-class PlaidViewModel : ViewModel() {
+class PlaidViewModel
+@Inject constructor(
+    val client: PlaidClient
+) : ViewModel() {
     // TODO: Implement the ViewModel
+
+    @Module
+    interface DaggerModule {
+        @Binds
+        @IntoMap
+        @ViewModelKey(PlaidViewModel::class)
+        fun bindViewModel(viewModel: PlaidViewModel): ViewModel
+    }
 }

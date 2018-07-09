@@ -26,6 +26,7 @@ import sourcerer.inject.BootstrapComponent
 interface ApplicationInjectorComponent : HasApplicationInjector
 
 @BootstrapComponent(
+    bootstrapDependencies = [ViewModelComponent::class],
     applicationModules = [AndroidInjectActivityModule::class],
     autoInclude = false,
     flatten = true
@@ -33,6 +34,7 @@ interface ApplicationInjectorComponent : HasApplicationInjector
 interface ActivityInjectorComponent : HasActivityInjector
 
 @BootstrapComponent(
+    bootstrapDependencies = [ViewModelComponent::class],
     applicationModules = [AndroidInjectFragmentModule::class],
     autoInclude = false,
     flatten = true
@@ -42,6 +44,7 @@ interface FragmentInjectorComponent : HasFragmentInjector
 typealias SupportFragment = android.support.v4.app.Fragment
 
 @BootstrapComponent(
+    bootstrapDependencies = [ViewModelComponent::class],
     applicationModules = [AndroidInjectSupportFragmentModule::class],
     autoInclude = false,
     flatten = true
