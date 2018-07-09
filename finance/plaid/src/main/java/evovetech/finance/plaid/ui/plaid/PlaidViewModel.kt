@@ -14,21 +14,10 @@
  * limitations under the License.
  */
 
-plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    id("kotlin-android-extensions")
-    id("kotlin-kapt")
-    id("evovetech.plugin.android.inject")
-}
+package evovetech.finance.plaid.ui.plaid
 
-apply from: "${configDir}/android/base.gradle"
+import android.arch.lifecycle.ViewModel
 
-apply from: "${configDir}/versions/crashlytics.gradle"
-dependencies(crashlytics.apply('implementation'))
-
-dependencies {
-    api project(':core:annotations')
-    implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"
-    implementation "com.android.support.constraint:constraint-layout:1.1.2"
+class PlaidViewModel : ViewModel() {
+    // TODO: Implement the ViewModel
 }

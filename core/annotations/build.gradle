@@ -19,15 +19,7 @@ plugins {
     id("kotlin-android")
     id("kotlin-android-extensions")
     id("kotlin-kapt")
+    id("evovetech.plugin.android.inject")
 }
 
 apply from: "${configDir}/android/base.gradle"
-
-dependencies {
-    api("evovetech.sourcerer:annotations:${app.sourcererVersion}")
-    api("evovetech.sourcerer:inject:${app.sourcererVersion}")
-    api("evovetech.sourcerer:inject-android:${app.sourcererVersion}")
-}
-
-apply from: "${configDir}/versions/dagger.gradle"
-dependencies(dagger.applyAndroid('implementation'))

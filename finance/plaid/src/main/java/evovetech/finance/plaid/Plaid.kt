@@ -47,7 +47,8 @@ class PlaidClient
 
 @Module
 class PlaidModule {
-    @Provides @Singleton
+    @Provides
+    @Singleton
     @Named("plaid")
     fun provideOkhttp(
         app: AndroidApplication,
@@ -57,17 +58,21 @@ class PlaidModule {
         return okhttpBuilder.build()
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     @Named("plaid")
     fun provideRetrofit(
         app: AndroidApplication,
-        @Named("plaid") okhttp: OkHttpClient
+        @Named("plaid") client: OkHttpClient
     ): Retrofit {
         return Retrofit.Builder()
+                .client(client)
+                .baseUrl("https://sandbox.plaid.com/")
                 .build()
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     fun providePlaidService(
         @Named("plaid") retrofit: Retrofit
     ): PlaidService {

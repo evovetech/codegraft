@@ -31,13 +31,13 @@ includeBuild 'inject'
 include(
         // app
         ':app',
-        ':instantapp',
-
-        // features
-        ':feature:instant',
-
-        // dynamic features
-        ':feature:dynamic',
+//        ':instantapp',
+//
+//        // features
+//        ':feature:instant',
+//
+//        // dynamic features
+//        ':feature:dynamic',
 
         // finance
         ':finance:plaid',

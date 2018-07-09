@@ -34,6 +34,8 @@ dependencies {
     implementation project(':core:network')
     implementation project(':core:db')
 
+    api 'android.arch.lifecycle:extensions:1.1.1'
+
     // TODO:
     api retrofit2.core
 }

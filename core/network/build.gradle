@@ -26,9 +26,6 @@ apply from: "${configDir}/android/base.gradle"
 apply from: "${configDir}/versions/okhttp3.gradle"
 apply from: "${configDir}/versions/retrofit2.gradle"
 
-apply from: "${configDir}/versions/dagger.gradle"
-dependencies(dagger.applyAndroid('implementation'))
-
 apply from: "${configDir}/versions/rx2.gradle"
 dependencies(rx2.android.apply('api'))
 

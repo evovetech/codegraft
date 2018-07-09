@@ -37,11 +37,8 @@ android {
     defaultConfig {
         applicationId = "evovetech.sample"
     }
-    dynamicFeatures = [":feature:dynamic"]
+//    dynamicFeatures = [":feature:dynamic"]
 }
-
-apply from: "${configDir}/versions/dagger.gradle"
-dependencies(dagger.applyAndroid('implementation'))
 
 apply from: "${configDir}/versions/crashlytics.gradle"
 dependencies(crashlytics.apply('implementation'))

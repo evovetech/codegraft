@@ -85,6 +85,9 @@ class InjectPlugin : Plugin<Project> {
 
         project.plugins.withType(BasePlugin::class.java) {
             project.dependencies {
+                add("implementation", "evovetech.sourcerer:annotations:${sourcererVersion}")
+                add("implementation", "evovetech.sourcerer:inject:${sourcererVersion}")
+                add("implementation", "evovetech.sourcerer:inject-android:${sourcererVersion}")
                 add("runtimeOnly", "evovetech.android.inject:core:$sourcererVersion")
                 add("kapt", "evovetech.sourcerer:model:$sourcererVersion")
             }

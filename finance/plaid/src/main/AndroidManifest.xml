@@ -1,2 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="evovetech.finance.plaid" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="evovetech.finance.plaid">
+
+    <application>
+        <activity android:name=".PlaidActivity" />
+    </application>
+
+</manifest>
