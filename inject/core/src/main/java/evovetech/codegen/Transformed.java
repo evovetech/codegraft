@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package evovetech.gradle.transform
+package evovetech.codegen;
 
-import com.android.build.api.transform.TransformInvocation
-import java.io.File
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-class InjectRunRunTransform(
-    isLibrary: Boolean,
-    private val bootClasspath: () -> List<File>
-) : AbstractTransform("evovetechInjectTransform", isLibrary) {
-    override
-    fun TransformInvocation.runRun(): RunRun {
-        return InjectRunRun(
-            bootClasspath, this,
-            ApplicationOutputWriter(),
-            AndroidInjectWriter()
-        )
-    }
-}
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.CLASS;
+
+@Documented
+@Retention(CLASS)
+@Target(TYPE)
+public
+@interface Transformed {}

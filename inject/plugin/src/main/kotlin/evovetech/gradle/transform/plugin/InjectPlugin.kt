@@ -140,6 +140,9 @@ class ProjectWrapper(
         is AppExtension -> {
             android.setup()
         }
+        is FeatureExtension -> {
+            android.setup()
+        }
         is LibraryExtension -> {
             project.dependencies {
                 add("kapt", "evovetech.sourcerer:lib-processor:$sourcererVersion")
@@ -148,7 +151,6 @@ class ProjectWrapper(
             }
             android.setup()
         }
-        is FeatureExtension -> android.setup()
         else -> Unit
     }
 

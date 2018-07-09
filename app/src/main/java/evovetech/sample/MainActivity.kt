@@ -16,11 +16,13 @@
 
 package evovetech.sample
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
+import evovetech.finance.plaid.PlaidActivity
 import evovetech.sample.network.Client
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.message
@@ -51,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("tag", "client = $client")
         Toast.makeText(this, "client = $client", Toast.LENGTH_LONG)
                 .show()
+        startActivity(Intent(this, PlaidActivity::class.java))
     }
 
     override fun onDestroy() {

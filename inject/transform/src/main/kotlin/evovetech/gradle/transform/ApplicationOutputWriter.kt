@@ -61,7 +61,7 @@ class ApplicationOutputWriter : OutputWriter {
         transform = addInjector<HasContentProviderInjector>(componentType, transform)
         transform = addInjector<HasBroadcastReceiverInjector>(componentType, transform)
 
-        return transform.defineField("defined", String::class.java).value("one")
+        return transform
                 .method(ElementMatchers.named("onCreate")).intercept(methodDelegation<LogMethod>())
                 .make()
     }

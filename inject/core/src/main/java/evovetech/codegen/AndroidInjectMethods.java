@@ -42,7 +42,7 @@ class AndroidInjectMethods {
     }
 
     public static
-    void onCreate(
+    void onActivityCreated(
             @This Fragment fragment,
             @SuperCall Runnable super$call
     ) {
@@ -51,7 +51,7 @@ class AndroidInjectMethods {
     }
 
     public static
-    void onCreate(
+    void onActivityCreated(
             @This android.support.v4.app.Fragment fragment,
             @SuperCall Runnable super$call
     ) {

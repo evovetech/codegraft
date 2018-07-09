@@ -27,3 +27,7 @@ import net.bytebuddy.matcher.ElementMatchers.takesArguments
 fun activityOnCreate(): Junction<MethodDescription> = named<MethodDescription>("onCreate")
         .and<MethodDescription>(takesArguments(Bundle::class.java))
         .and<MethodDescription>(returns(TypeDescription.VOID))
+fun fragmentOnActivityCreated(): Junction<MethodDescription> = named<MethodDescription>("onActivityCreated")
+        .and<MethodDescription>(takesArguments(Bundle::class.java))
+        .and<MethodDescription>(returns(TypeDescription.VOID))
+

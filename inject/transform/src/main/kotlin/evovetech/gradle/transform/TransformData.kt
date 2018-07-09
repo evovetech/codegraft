@@ -57,8 +57,10 @@ class TransformData(
 
     fun OutputWriter.canTransform(
         typeDescription: TypeDescription
-    ): Boolean {
-        return this@TransformData.canTransform(typeDescription)
+    ): Boolean = try {
+        this@TransformData.canTransform(typeDescription)
+    } catch (_: Throwable) {
+        false
     }
 
     fun OutputWriter.transform(
@@ -67,7 +69,6 @@ class TransformData(
         return this@TransformData.transform(typeDescription)
     }
 }
-
 
 inline
 fun <reified T> TransformData.resolve(): TypeDescription =

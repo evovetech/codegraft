@@ -55,7 +55,7 @@ class AbstractTransform(
     fun getScopes(): MutableSet<in Scope> =
         mutableSetOf(PROJECT).apply {
             if (!isLibrary) {
-//                add(SUB_PROJECTS)
+                add(SUB_PROJECTS)
                 add(EXTERNAL_LIBRARIES)
             }
         }
