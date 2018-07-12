@@ -38,9 +38,7 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.BasePlugin
 import com.android.build.gradle.FeatureExtension
 import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.api.AnnotationProcessorOptions
 import com.android.build.gradle.api.BaseVariant
-import com.android.build.gradle.api.BaseVariantOutput
 import com.android.build.gradle.api.TestVariant
 import com.android.build.gradle.api.UnitTestVariant
 import com.android.build.gradle.tasks.ManifestProcessorTask
@@ -66,7 +64,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.kotlin.dsl.dependencies
-import org.jetbrains.kotlin.daemon.common.findWithTransform
+import org.jetbrains.kotlin.gradle.plugin.KaptAnnotationProcessorOptions
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
 import org.xml.sax.Attributes
@@ -111,10 +109,10 @@ class ProjectWrapper(
             val v = variant
             when (v) {
                 is UnitTestVariant -> {
-                    v.initTask()
+                    v.initUnitTestVariantTask(this)
                 }
                 is BaseVariant -> {
-                    v.initTask()
+                    v.initBaseVariantTask(this)
                 }
             }
         }
@@ -214,36 +212,37 @@ class ProjectWrapper(
     }
 
     private
-    fun <T : BaseVariant> T.initTask(
-        options: AnnotationProcessorOptions = javaCompileOptions.annotationProcessorOptions
-    ) = initTasks().findWithTransform { func ->
-        val task = func(options)
-        Pair(task != null, task)
-    }
-
-    private
-    fun UnitTestVariant.initTask(): ManifestProcessorTask? {
-        val options = javaCompileOptions.annotationProcessorOptions
-        val tested = testedVariant
-        return initTask(options) ?: when (tested) {
-            is BaseVariant -> tested.initTask(options)
-            else -> null
-        }
-    }
-
-    private
-    fun <T : BaseVariant> T.initTasks(): List<(AnnotationProcessorOptions) -> ManifestProcessorTask?> {
-        val tasks = outputs.mapNotNull(::initialize)
-        return tasks + when (this) {
-            is TestVariant -> testedVariant.initTasks()
-            is UnitTestVariant -> {
-                val tested = testedVariant
-                when (tested) {
-                    is BaseVariant -> tested.initTasks()
-                    else -> emptyList()
-                }
+    fun <T : BaseVariant> T.initBaseVariantTask(
+        options: KaptAnnotationProcessorOptions
+    ): ManifestFile? {
+        val buildConfig = generateBuildConfig
+        buildConfig?.apply {
+            val arguments = mutableMapOf<String, Any>().apply {
+                this["evovetech.processor.package"] = buildConfig.appPackageName
             }
-            else -> emptyList()
+            println("\nbuildConfig processor arguments {")
+            arguments.forEach { (k, v) ->
+                println("  $k=$v")
+                options.arg(k, v)
+            }
+            println("}\n")
+        }
+
+        val manifestTask = outputs
+                .mapNotNull { it.processManifest?.manifestFile }
+                .firstOrNull()
+        manifestTask?.initialize(options)
+        return manifestTask
+    }
+
+    private
+    fun UnitTestVariant.initUnitTestVariantTask(
+        options: KaptAnnotationProcessorOptions
+    ): ManifestFile? {
+        val tested = testedVariant
+        return initBaseVariantTask(options) ?: when (tested) {
+            is BaseVariant -> tested.initBaseVariantTask(options)
+            else -> null
         }
     }
 }
@@ -252,30 +251,23 @@ val ManifestProcessorTask.manifestFile
     get() = FileUtils.join(manifestOutputDirectory, SdkConstants.ANDROID_MANIFEST_XML)
             .toManifestFile()
 
-fun initialize(
-    output: BaseVariantOutput
-): (AnnotationProcessorOptions) -> ManifestProcessorTask? = initialize(output.processManifest)
-
-fun initialize(
-    task: ManifestProcessorTask
-) = { options: AnnotationProcessorOptions ->
-    task.manifestFile?.run {
-        options.apply {
-            (Package.value ?: InstTargetPkg.value)?.let { pkg ->
-                arguments["evovetech.processor.package"] = pkg
-            }
-            ApplicationName.value?.let {
-                arguments["evovetech.processor.application"] = it
-            }
-
-            println("\nprocessor arguments {")
-            arguments.forEach { (k, v) ->
-                println("  $k=$v")
-            }
-            println("}\n")
+fun ManifestFile.initialize(
+    options: KaptAnnotationProcessorOptions
+) {
+    val arguments = mutableMapOf<String, Any>().apply {
+        (Package.value ?: InstTargetPkg.value)?.let { pkg ->
+            this["evovetech.processor.package"] = pkg
         }
-        task
+        ApplicationName.value?.let {
+            this["evovetech.processor.application"] = it
+        }
     }
+    println("\nprocessor arguments {")
+    arguments.forEach { (k, v) ->
+        println("  $k=$v")
+        options.arg(k, v)
+    }
+    println("}\n")
 }
 
 private

@@ -23,7 +23,8 @@ static def loadDagger(String version) {
     dagger.core = "com.google.dagger:dagger:${version}"
     dagger.coreSpi = "com.google.dagger:dagger-spi:${version}"
     dagger.coreCompiler = "com.google.dagger:dagger-compiler:${version}"
-    dagger.android = "com.google.dagger:dagger-android-support:${version}"
+    dagger.android = "com.google.dagger:dagger-android:${version}"
+    dagger.androidSupport = "com.google.dagger:dagger-android-support:${version}"
     dagger.androidJar = "com.google.dagger:dagger-android-jarimpl:${version}"
     dagger.androidSupportJar = "com.google.dagger:dagger-android-support-jarimpl:${version}"
     dagger.androidCompiler = "com.google.dagger:dagger-android-processor:${version}"
@@ -36,7 +37,9 @@ static def loadDagger(String version) {
     dagger.applyAndroid = { config ->
         return { DependencyHandler dep ->
             dagger.applyCore(config)(dep)
+            dep.add(config, dagger.core)
             dep.add(config, dagger.android)
+            dep.add(config, dagger.androidSupport)
             dep.add('kapt', dagger.androidCompiler)
         }
     }
