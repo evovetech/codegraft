@@ -18,11 +18,18 @@ package evovetech.finance.plaid
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import dagger.android.AndroidInjector
 import evovetech.finance.plaid.ui.plaid.PlaidFragment
 import sourcerer.inject.AndroidInject
+import sourcerer.inject.android.HasSupportFragmentInjector
+import sourcerer.inject.android.SupportFragment
+import javax.inject.Inject
 
 @AndroidInject
-class PlaidActivity : AppCompatActivity() {
+class PlaidActivity : AppCompatActivity(), HasSupportFragmentInjector {
+    @Inject override lateinit
+    var supportFragmentInjector: AndroidInjector<SupportFragment>
+
     override
     fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
