@@ -25,7 +25,7 @@ plugins {
 apply from: "${configDir}/android/base.gradle"
 
 apply from: "${configDir}/versions/crashlytics.gradle"
-dependencies(crashlytics.apply('implementation'))
+dependencies(crashlytics.apply('api'))
 
 dependencies {
     api project(':core:annotations')

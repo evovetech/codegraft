@@ -74,6 +74,9 @@ class BootstrapProcessor(
     private
     var round: ParentRound = ParentRound()
 
+    val currentRound: ParentRound
+        get() = round
+
     override
     fun initProcessors(
         env: ProcessingEnvironment

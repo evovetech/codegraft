@@ -44,6 +44,12 @@ class ParentRound(
                 .toImmutableSet()
     }
 
+    fun allOutputs(): ImmutableList<Output> {
+        val prevOutputs = prev?.allOutputs().orEmpty()
+        return (outputs + prevOutputs)
+                .toImmutableList()
+    }
+
     fun process(
         elements: Set<TypeElement>,
         roundEnv: RoundEnvironment,

@@ -33,20 +33,32 @@ class AppProcessor : MainProcessor(true) {
         if (!roundEnv.processingOver() && bootstrap.isProcessed()) {
             if (!written) {
                 written = true
-                val packageName = bootstrap.options.Package
-                val file = bootstrap.processingEnv.filer.createResource(
-                    StandardLocation.SOURCE_OUTPUT,
-                    packageName,
-                    "Bootstrap_Gen.kt"
-                )
-                val src = src(packageName)
-                file.openWriter().use {
-                    it.write(src)
-                    it.flush()
+
+                // TODO: better logic
+                val allOutputs = bootstrap.currentRound.allOutputs()
+                if (allOutputs.isNotEmpty()) {
+                    write()
+                } else {
+                    bootstrap.env.log("no outputs")
                 }
             }
         }
         return returnVal
+    }
+
+    private
+    fun write() {
+        val packageName = bootstrap.options.Package
+        val file = bootstrap.processingEnv.filer.createResource(
+            StandardLocation.SOURCE_OUTPUT,
+            packageName,
+            "Bootstrap_Gen.kt"
+        )
+        val src = src(packageName)
+        file.openWriter().use {
+            it.write(src)
+            it.flush()
+        }
     }
 }
 

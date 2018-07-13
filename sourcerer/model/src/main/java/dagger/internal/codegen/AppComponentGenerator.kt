@@ -83,6 +83,10 @@ class AppComponentGenerator(
             .toImmutableSet()
 
     fun process(): List<sourcerer.Output> {
+        // TODO: verify correct logic
+        if (components.isEmpty()) {
+            return emptyList()
+        }
         val bootData = BootData()
         val app = App(bootData)
         val bootModule = BootModule(app, bootData)
