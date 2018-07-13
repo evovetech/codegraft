@@ -59,7 +59,7 @@ evove {
         }
         update('evovetech') {
             it.module = "evovetech.android.inject:plugin"
-            it.version = "0.6.1"
+            it.version = "0.6.2"
         }
     }
 }
