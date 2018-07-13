@@ -33,8 +33,8 @@ include(
         ':app',
 //        ':instantapp',
 //
-//        // features
-//        ':feature:instant',
+        // features
+        ':feature:instant',
 //
 //        // dynamic features
 //        ':feature:dynamic',
