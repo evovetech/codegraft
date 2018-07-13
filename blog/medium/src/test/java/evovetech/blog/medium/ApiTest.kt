@@ -103,15 +103,24 @@ class ApiTest : BaseTest() {
         val response = user.publications(client).execute()
         assertNotNull(response, "response must not be null")
         println("response=$response")
-        println("publications=")
+        val msg: String = response.fold(success = { body ->
+            "publications=${body?.data}"
+        }, failure = { body ->
+            "errors=${body?.string()}"
+        })
+        println(msg)
     }
 
     private
     fun me(): User {
         val client = component.mediumComponent.client
         assertNotNull(client, "client must not be null!")
-        val response = client.me().execute()
+        val response = client.user().execute()
         assertNotNull(response, "response must not be null")
-        return response.data()!!
+        return response.fold(success = {
+            it?.data!!
+        }, failure = {
+            throw IllegalArgumentException("error = ${it?.string()}")
+        })
     }
 }

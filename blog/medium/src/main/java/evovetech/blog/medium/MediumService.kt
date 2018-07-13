@@ -16,6 +16,7 @@
 
 package evovetech.blog.medium
 
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.GET
@@ -24,8 +25,8 @@ import retrofit2.http.Path
 typealias MediumCall<T> = Call<MediumResponse<T>>
 
 interface MediumService {
-    @GET("me")
-    fun me(): MediumCall<User>
+    @GET("{userId}")
+    fun user(@Path("userId") userId: String = "me"): MediumCall<User>
 
     @GET("users/{username}/publications")
     fun publications(
@@ -33,8 +34,21 @@ interface MediumService {
     ): MediumCall<List<Publication>>
 }
 
-fun <T : Any> Response<MediumResponse<T>>.data(): T? {
-    return body()?.data
+fun <T : Any> Response<T>.onSuccess(success: (body: T?) -> Unit): Unit =
+    fold(success = success, failure = {})
+
+fun Response<*>.onFailure(failure: (error: ResponseBody?) -> Unit): Unit =
+    fold(success = {}, failure = failure)
+
+fun <T : Any, R> Response<T>.fold(
+    success: (body: T?) -> R,
+    failure: (error: ResponseBody?) -> R
+): R {
+    return if (isSuccessful) {
+        success(body())
+    } else {
+        failure(errorBody())
+    }
 }
 
 fun User.publications(service: MediumService): MediumCall<List<Publication>> {
