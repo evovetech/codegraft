@@ -25,6 +25,19 @@ plugins {
 apply from: "${configDir}/android/base.gradle"
 apply from: "${configDir}/versions/retrofit2.gradle"
 
+String getApiToken() {
+    if (project.hasProperty('mediumApiToken')) {
+        return project.mediumApiToken
+    }
+    return ""
+}
+
+android {
+    defaultConfig {
+        buildConfigField "String", "API_KEY", "\"${apiToken}\""
+    }
+}
+
 dependencies {
     implementation project(':core:annotations')
     implementation project(':core:crashes')

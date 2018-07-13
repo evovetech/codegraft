@@ -18,8 +18,17 @@ package evovetech.blog.medium
 
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Header
 
 interface MediumService {
     @GET("me")
-    fun me(): Call<User.Response>
+    fun me(
+        @Header("Authorization") token: String
+    ): Call<User.Response>
 }
+
+fun MediumService.me(): Call<User.Response> {
+    val auth = "Bearer ${BuildConfig.API_KEY}"
+    return me(auth)
+}
+

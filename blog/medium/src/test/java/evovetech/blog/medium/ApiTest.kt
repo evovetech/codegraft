@@ -95,6 +95,6 @@ class ApiTest : BaseTest() {
         assertNotNull(client, "client must not be null!")
         val response = client.me().execute()
         assertNotNull(response, "response must not be null")
-        println("response=$response")
+        println("user=${response.body()?.user}")
     }
 }
