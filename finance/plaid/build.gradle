@@ -25,9 +25,6 @@ plugins {
 apply from: "${configDir}/android/base.gradle"
 apply from: "${configDir}/versions/retrofit2.gradle"
 
-apply from: "${configDir}/versions/dagger.gradle"
-dependencies(dagger.applyAndroid('implementation'))
-
 dependencies {
     implementation project(':core:annotations')
     implementation project(':core:crashes')
