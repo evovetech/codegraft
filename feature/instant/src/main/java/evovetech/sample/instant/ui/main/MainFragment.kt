@@ -17,32 +17,42 @@
 package evovetech.sample.instant.ui.main
 
 import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
 import evovetech.sample.instant.R
+import sourcerer.inject.AndroidInject
+import sourcerer.inject.android.ViewModelInstanceProvider
+import sourcerer.inject.android.viewModelDelegate
+import javax.inject.Inject
 
+@AndroidInject
 class MainFragment : Fragment() {
+    @Inject lateinit
+    var viewModelProvider: ViewModelInstanceProvider<MainFragment>
 
-    companion object {
-        fun newInstance() = MainFragment()
-    }
+    private
+    val viewModel: MainViewModel by viewModelDelegate(::viewModelProvider)
 
-    private lateinit var viewModel: MainViewModel
-
-    override fun onCreateView(
+    override
+    fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         return inflater.inflate(R.layout.main_fragment, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    override
+    fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
-        // TODO: Use the ViewModel
+        viewModel.apply {
+            Log.d("MainFragment", "viewModel=$this")
+        }
     }
 
+    companion object {
+        fun newInstance() = MainFragment()
+    }
 }

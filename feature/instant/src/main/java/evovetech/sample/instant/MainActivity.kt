@@ -17,13 +17,12 @@
 package evovetech.sample.instant
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.support.v7.app.AppCompatActivity
 import evovetech.sample.instant.ui.main.MainFragment
 import sourcerer.inject.AndroidInject
 
 @AndroidInject
 class MainActivity : AppCompatActivity() {
-
     override
     fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
