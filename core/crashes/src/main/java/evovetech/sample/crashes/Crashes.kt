@@ -66,6 +66,6 @@ class Crashes {
     @Provides
     @Singleton
     fun provideCrashlytics(kits: Kits): Crashlytics {
-        return kits[Crashlytics::class]
+        return kits.get()
     }
 }

@@ -18,7 +18,6 @@ package evovetech.sample.crashes
 
 import io.fabric.sdk.android.Fabric
 import io.fabric.sdk.android.Kit
-import sourcerer.inject.castNotNull
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.reflect.KClass
@@ -35,6 +34,11 @@ class Kits
     operator
     fun <T : Kit<*>> get(clazz: KClass<T>): T {
         val kit = map[clazz]
-        return kit.castNotNull()
+        return clazz.java.cast(kit)
+    }
+
+    inline
+    fun <reified T : Kit<*>> get(): T {
+        return get(T::class)
     }
 }
