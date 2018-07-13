@@ -16,8 +16,14 @@
 
 package sourcerer.inject
 
-@Suppress("UNCHECKED_CAST")
-fun <T : Any> Any?.castOrNull(): T? = this as? T
+inline
+fun <reified T : Any> Any?.castOrNull(): T? = this as? T
 
-@Suppress("UNCHECKED_CAST")
-fun <T : Any> Any?.castNotNull(): T = this as T
+inline
+fun <reified T : Any> Any?.castNotNull(): T = this as T
+
+fun <T : Any> Class<T>.castOrNull(obj: Any?): T? = try {
+    obj?.let(this::cast)
+} catch (_: ClassCastException) {
+    null
+}

@@ -24,13 +24,15 @@ typealias ClassProviderMap<T> = Map<Class<out T>, @JvmSuppressWildcards Provider
 interface ClassKeyProviderMap<T : Any> : ProviderMap<Class<out T>, T> {
     operator
     fun <R : T> get(key: Class<R>): R? {
-        return providers[key]?.get().castOrNull()
+        return providers[key]?.get()?.let {
+            key.castOrNull(it)
+        }
     }
 }
 
 inline
 fun <reified T : Any> ClassKeyProviderMap<in T>.get(): T? =
-    provider()?.get()
+    get(T::class.java)
 
 inline
 fun <reified T : Any> ClassKeyProviderMap<in T>.with(
