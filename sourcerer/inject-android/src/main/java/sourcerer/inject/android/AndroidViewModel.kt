@@ -34,6 +34,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
 
 typealias ViewModelMap = ClassMap<ViewModel>
 typealias ViewModelProviderMap = ClassProviderMap<ViewModel>
@@ -64,9 +65,36 @@ class ViewModelInstanceProvider<T : Any>
         ViewModelProvider(store, factory)
     }
 
+    operator
+    fun <VM : ViewModel> get(type: KClass<VM>): VM {
+        return provider.get(type.java)
+    }
+
     inline
     fun <reified VM : ViewModel> get(): VM {
-        return provider.get(VM::class.java)
+        return this[VM::class]
+    }
+}
+
+inline
+fun <reified VM : ViewModel> viewModelDelegate(
+    noinline provider: () -> ViewModelInstanceProvider<*>
+): ViewModelDelegate<VM> {
+    return ViewModelDelegate(VM::class, provider)
+}
+
+class ViewModelDelegate<VM : ViewModel>(
+    private val viewModelType: KClass<VM>,
+    private val providerFunc: () -> ViewModelInstanceProvider<*>
+) {
+    private
+    val viewModel: VM by lazy {
+        providerFunc()[viewModelType]
+    }
+
+    operator
+    fun getValue(thisRef: Any?, property: KProperty<*>): VM {
+        return viewModel
     }
 }
 

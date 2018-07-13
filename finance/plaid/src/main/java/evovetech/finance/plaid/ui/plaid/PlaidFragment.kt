@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import evovetech.finance.plaid.R
 import sourcerer.inject.AndroidInject
 import sourcerer.inject.android.ViewModelInstanceProvider
+import sourcerer.inject.android.viewModelDelegate
 import javax.inject.Inject
 
 @AndroidInject
@@ -33,8 +34,7 @@ class PlaidFragment : Fragment() {
     var viewModelProvider: ViewModelInstanceProvider<PlaidFragment>
 
     private
-    val viewModel: PlaidViewModel
-        get() = viewModelProvider.get()
+    val viewModel: PlaidViewModel by viewModelDelegate(::viewModelProvider)
 
     override
     fun onCreateView(
