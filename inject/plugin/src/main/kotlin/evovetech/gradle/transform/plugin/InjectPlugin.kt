@@ -74,7 +74,7 @@ import java.util.EnumMap
 import javax.xml.parsers.SAXParserFactory
 
 private
-const val codegenVersion = "0.6.0"
+const val codegenVersion = "0.6.1"
 
 class InjectPlugin : Plugin<Project> {
     override
