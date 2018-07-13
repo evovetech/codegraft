@@ -34,12 +34,15 @@ interface MediumService {
     ): MediumCall<List<Publication>>
 }
 
+inline
 fun <T : Any> Response<T>.onSuccess(success: (body: T?) -> Unit): Unit =
     fold(success = success, failure = {})
 
+inline
 fun Response<*>.onFailure(failure: (error: ResponseBody?) -> Unit): Unit =
     fold(success = {}, failure = failure)
 
+inline
 fun <T : Any, R> Response<T>.fold(
     success: (body: T?) -> R,
     failure: (error: ResponseBody?) -> R
