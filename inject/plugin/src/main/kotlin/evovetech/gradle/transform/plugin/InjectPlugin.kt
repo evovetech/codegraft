@@ -38,7 +38,9 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.BasePlugin
 import com.android.build.gradle.FeatureExtension
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.api.ApkVariant
 import com.android.build.gradle.api.BaseVariant
+import com.android.build.gradle.api.LibraryVariant
 import com.android.build.gradle.api.TestVariant
 import com.android.build.gradle.api.UnitTestVariant
 import com.android.build.gradle.tasks.ManifestProcessorTask
@@ -142,11 +144,6 @@ class ProjectWrapper(
             android.setup()
         }
         is LibraryExtension -> {
-            project.dependencies {
-                add("kapt", "evovetech.sourcerer:lib-processor:$codegenVersion")
-                add("kaptAndroidTest", "evovetech.sourcerer:app-processor:$codegenVersion")
-                add("kaptTest", "evovetech.sourcerer:app-processor:$codegenVersion")
-            }
             android.setup()
         }
         else -> Unit
@@ -159,9 +156,7 @@ class ProjectWrapper(
 
     private
     fun AppExtension.setup() {
-        applicationVariants.all {
-            kapt { add("app") }
-        }
+        applicationVariants.apkSetup()
         packagingOptions {
             exclude("**/*.srcr")
         }
@@ -169,23 +164,59 @@ class ProjectWrapper(
 
     private
     fun LibraryExtension.setup() {
-        libraryVariants.setup {
-            testVariants.setup()
-            unitTestVariants.setup()
-        }
+        libraryVariants.libSetup()
     }
 
     private
     fun FeatureExtension.setup() {
-        featureVariants.setup {
-            testVariants.setup()
-            unitTestVariants.setup()
+        libraryVariants.libSetup()
+        featureVariants.apkSetup()
+        packagingOptions {
+            exclude("**/*.srcr")
         }
     }
 
     private
+    fun DomainObjectSet<out ApkVariant>.apkSetup() = all {
+        this.setup()
+    }
+
+    private
+    fun DomainObjectSet<out LibraryVariant>.libSetup() = all {
+        this.setup()
+        testVariant?.setup()
+        unitTestVariant?.setup()
+    }
+
+    private
+    fun BaseVariant.setup() {
+        val variant = this
+        val adder: Configuration.() -> Unit = {
+            when (variant) {
+                is TestVariant,
+                is UnitTestVariant,
+                is ApkVariant -> add("app")
+                is LibraryVariant -> add("lib")
+            }
+        }
+        annotationProcessorConfiguration.apply(adder)
+        kapt(adder)
+    }
+
+    private
     fun <T : BaseVariant> T.kapt(config: Configuration.() -> Unit) {
-        val kaptName = "kapt${name.capitalize()}"
+        val suffix = when {
+            name.contains("UnitTest") -> {
+                val index = name.indexOf("UnitTest")
+                "test${name.substring(0, index).capitalize()}"
+            }
+            name.contains("AndroidTest") -> {
+                val index = name.indexOf("AndroidTest")
+                "androidTest${name.substring(0, index).capitalize()}"
+            }
+            else -> name
+        }
+        val kaptName = "kapt${suffix.capitalize()}"
         project.configurations
                 .matching {
                     val matches = it.name == kaptName
@@ -193,22 +224,6 @@ class ProjectWrapper(
                     matches
                 }
                 .all(config)
-    }
-
-    private
-    fun <T : BaseVariant> DomainObjectSet<T>.setup(
-        block: T.() -> Unit = {}
-    ) = all {
-        val variant = this
-        val adder: Configuration.() -> Unit = {
-            when (variant) {
-                is TestVariant -> add("app")
-                else -> add("lib")
-            }
-        }
-        annotationProcessorConfiguration.apply(adder)
-        kapt(adder)
-        block()
     }
 
     private
