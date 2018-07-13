@@ -27,13 +27,25 @@ android {
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
+
+apply from: "${configDir}/versions/testing.gradle"
 
 dependencies {
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${app.kotlinVersion}")
     api "com.android.support:appcompat-v7:${app.androidSupportVersion}"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${app.kotlinVersion}"
-    testImplementation 'junit:junit:4.12'
+    testImplementation junitCore
+    testImplementation mockitoCore
+    testImplementation mockitoInline
+//    testImplementation powermockJunit
+//    testImplementation powermockJunitRule
+//    testImplementation powermockClassloading
+//    testImplementation powermockMockito
+    androidTestImplementation mockitoAndroid
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }

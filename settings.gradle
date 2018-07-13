@@ -42,6 +42,9 @@ include(
         // finance
         ':finance:plaid',
 
+        // blog
+        ':blog:medium',
+
         // libs
         ':core:annotations',
         ':core:db',

@@ -34,9 +34,8 @@ class AppProcessor : MainProcessor(true) {
             if (!written) {
                 written = true
 
-                // TODO: better logic
-                val allOutputs = bootstrap.currentRound.allOutputs()
-                if (allOutputs.isNotEmpty()) {
+                val applicationOutputs = bootstrap.currentRound.applicationOutputs
+                if (applicationOutputs.isNotEmpty()) {
                     write()
                 } else {
                     bootstrap.env.log("no outputs")

@@ -97,13 +97,11 @@ class BootstrapProcessor(
             super.process(elements, roundEnv)
         }
 
-        round.postRound(roundEnv)
-
-        this.round = round
+        this.round = round.postRound(roundEnv)
         return false
     }
 
-    fun ParentRound.postRound(roundEnv: RoundEnvironment) {
+    fun ParentRound.postRound(roundEnv: RoundEnvironment): ParentRound {
         env.log(
             "postRound($roundEnv) " +
             "{ " +
@@ -128,8 +126,10 @@ class BootstrapProcessor(
             env.log("outputs=$outputs")
 
             finished = true
+            return copy(applicationOutputs = outputs.toImmutableList())
         } else {
             env.log("postRound: no outputs")
+            return this
         }
     }
 

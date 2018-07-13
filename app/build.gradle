@@ -50,6 +50,7 @@ dependencies {
     implementation project(':core:network')
     implementation project(':core:db')
     implementation project(':finance:plaid')
+    implementation project(':blog:medium')
     implementation project(':feature:instant')
     implementation("com.android.support:design:${app.androidSupportVersion}")
     implementation("com.android.support.constraint:constraint-layout:1.1.2")

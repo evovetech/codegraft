@@ -33,7 +33,8 @@ class ParentRound(
     val prev: ParentRound? = null,
     val elements: ImmutableSet<TypeElement> = ImmutableSet.of(),
     val rootElements: ImmutableSet<Element> = ImmutableSet.of(),
-    val rounds: ImmutableList<Round> = ImmutableList.of()
+    val rounds: ImmutableList<Round> = ImmutableList.of(),
+    val applicationOutputs: ImmutableList<Output> = ImmutableList.of()
 ) {
     val outputs: ImmutableList<Output> by lazy {
         rounds.flatMap(Round::outputs)
@@ -42,12 +43,6 @@ class ParentRound(
     val deferredElements: ImmutableSet<Element> by lazy {
         rounds.flatMap(Round::deferredElements)
                 .toImmutableSet()
-    }
-
-    fun allOutputs(): ImmutableList<Output> {
-        val prevOutputs = prev?.allOutputs().orEmpty()
-        return (outputs + prevOutputs)
-                .toImmutableList()
     }
 
     fun process(
