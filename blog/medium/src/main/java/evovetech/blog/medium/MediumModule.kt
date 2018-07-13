@@ -16,12 +16,15 @@
 
 package evovetech.blog.medium
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import evovetech.blog.medium.ui.medium.MediumModule.DaggerModule
 import okhttp3.OkHttpClient
 import okhttp3.OkHttpClient.Builder
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import sourcerer.inject.android.AndroidApplication
 import javax.inject.Named
 import javax.inject.Singleton
@@ -40,15 +43,25 @@ class MediumModule {
     }
 
     @Provides
+    @Named("medium")
+    fun provideGson(): Gson {
+        return GsonBuilder()
+                // TODO:
+                .create()
+    }
+
+    @Provides
     @Singleton
     @Named("medium")
     fun provideRetrofit(
         app: AndroidApplication,
-        @Named("medium") client: OkHttpClient
+        @Named("medium") client: OkHttpClient,
+        @Named("medium") gson: Gson
     ): Retrofit {
         return Retrofit.Builder()
                 .client(client)
                 .baseUrl("https://api.medium.com/v1/")
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build()
     }
 

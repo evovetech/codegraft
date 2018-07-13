@@ -21,5 +21,5 @@ import retrofit2.http.GET
 
 interface MediumService {
     @GET("me")
-    fun me(): Call<Any>
+    fun me(): Call<User.Response>
 }

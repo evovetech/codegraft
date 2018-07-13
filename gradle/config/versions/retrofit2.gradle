@@ -21,6 +21,7 @@ static def loadRetrofit2(String version) {
     def retrofit2 = new Expando()
     retrofit2.version = version
     retrofit2.core = "com.squareup.retrofit2:retrofit:${version}"
+    retrofit2.gson = "com.squareup.retrofit2:converter-gson:${version}"
     return retrofit2
 }
 

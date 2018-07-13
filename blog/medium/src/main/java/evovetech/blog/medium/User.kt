@@ -14,26 +14,17 @@
  * limitations under the License.
  */
 
-plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    id("kotlin-android-extensions")
-    id("kotlin-kapt")
-    id("evovetech.plugin.android.inject")
-}
+package evovetech.blog.medium
 
-apply from: "${configDir}/android/base.gradle"
-apply from: "${configDir}/versions/retrofit2.gradle"
+import com.google.gson.annotations.SerializedName
 
-dependencies {
-    implementation project(':core:annotations')
-    implementation project(':core:crashes')
-    implementation project(':core:network')
-    implementation project(':core:db')
-
-    api 'android.arch.lifecycle:extensions:1.1.1'
-
-    // TODO:
-    api retrofit2.core
-    api retrofit2.gson
+data
+class User(
+    @SerializedName("id") val id: String,
+    @SerializedName("username") val username: String
+) {
+    data
+    class Response(
+        @SerializedName("data") val user: User
+    )
 }

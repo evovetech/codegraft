@@ -88,4 +88,13 @@ class ApiTest : BaseTest() {
     fun testComponent() {
         assertNotNull(component, "component must not be null!")
     }
+
+    @Test
+    fun testClient() {
+        val client = component.mediumComponent.client
+        assertNotNull(client, "client must not be null!")
+        val response = client.me().execute()
+        assertNotNull(response, "response must not be null")
+        println("response=$response")
+    }
 }
