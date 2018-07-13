@@ -16,16 +16,11 @@
 
 package evovetech.blog.medium
 
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
 import javax.inject.Inject
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
 class MediumClient
 @Inject constructor(
-    @Named("medium") private val okhttp: OkHttpClient,
-    @Named("medium") private val retrofit: Retrofit,
     private val service: MediumService
 ) : MediumService by service

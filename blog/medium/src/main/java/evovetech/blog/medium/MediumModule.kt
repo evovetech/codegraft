@@ -29,6 +29,9 @@ import sourcerer.inject.android.AndroidApplication
 import javax.inject.Named
 import javax.inject.Singleton
 
+private const
+val AuthKey = "Bearer ${BuildConfig.API_KEY}"
+
 @Module(includes = [DaggerModule::class])
 class MediumModule {
     @Provides
@@ -38,8 +41,15 @@ class MediumModule {
         app: AndroidApplication,
         okhttpBuilder: Builder
     ): OkHttpClient {
-        // TODO:
-        return okhttpBuilder.build()
+        return okhttpBuilder
+                .addNetworkInterceptor { chain ->
+                    val request = chain.request()
+                            .newBuilder()
+                            .header("Authorization", AuthKey)
+                            .build()
+                    chain.proceed(request)
+                }
+                .build()
     }
 
     @Provides

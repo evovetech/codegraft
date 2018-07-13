@@ -16,27 +16,13 @@
 
 package evovetech.blog.medium
 
-import retrofit2.Call
-import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Path
+import com.google.gson.annotations.SerializedName
 
-typealias MediumCall<T> = Call<MediumResponse<T>>
-
-interface MediumService {
-    @GET("me")
-    fun me(): MediumCall<User>
-
-    @GET("users/{username}/publications")
-    fun publications(
-        @Path("username") userId: String
-    ): MediumCall<List<Publication>>
-}
-
-fun <T : Any> Response<MediumResponse<T>>.data(): T? {
-    return body()?.data
-}
-
-fun User.publications(service: MediumService): MediumCall<List<Publication>> {
-    return service.publications(id)
+data
+class MediumResponse<out T : Any>(
+    @SerializedName("data") val data: T?,
+    @SerializedName("errors") private val _errors: List<String>?
+) {
+    val errors: List<String>
+        get() = _errors.orEmpty()
 }

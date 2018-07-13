@@ -21,10 +21,8 @@ import com.google.gson.annotations.SerializedName
 data
 class User(
     @SerializedName("id") val id: String,
-    @SerializedName("username") val username: String
-) {
-    data
-    class Response(
-        @SerializedName("data") val user: User
-    )
-}
+    @SerializedName("username") val username: String,
+    @SerializedName("name") val name: String,
+    @SerializedName("url") val url: String,
+    @SerializedName("imageUrl") val imageUrl: String
+)
