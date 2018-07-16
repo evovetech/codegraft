@@ -16,11 +16,14 @@
 
 package sourcerer.inject
 
+import sourcerer.inject.android.AndroidApplication
+
 @BootstrapComponent(
     applicationModules = [PluginModule::class],
     bootstrapModules = [AppModule::class],
     flatten = true
 )
 interface PluginComponent {
+    val application: AndroidApplication
     val plugins: Plugins
 }
