@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-plugins {
-    id("kotlin")
-    id("kotlin-kapt")
-    id("com.jfrog.bintray")
-    id("com.jfrog.artifactory")
-    id("org.jetbrains.dokka")
-}
+package sourcerer.inject
 
-apply from: "${configDir}/kotlin-library.gradle"
-apply from: "${configDir}/versions/dagger.gradle"
-
-dependencies {
-    compileOnly(dagger.androidJar)
-    compileOnly(dagger.androidSupportJar)
-    compileOnly("com.google.android:android:4.1.1.4")
-    compileOnly("com.google.android:support-v4:r7")
-    api project(':inject:annotations')
-    kapt(dagger.coreCompiler)
-    kapt(dagger.androidCompiler)
+@BootstrapComponent(
+    applicationModules = [PluginModule::class],
+    bootstrapModules = [AppModule::class],
+    flatten = true
+)
+interface PluginComponent {
+    val plugins: Plugins
 }

@@ -16,10 +16,14 @@
 
 package sourcerer.inject
 
+import android.content.Context
+import dagger.Binds
 import dagger.MapKey
 import dagger.Module
 import dagger.multibindings.Multibinds
+import sourcerer.inject.android.AndroidApplication
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import kotlin.reflect.KClass
@@ -42,13 +46,16 @@ class PluginKey(
     val value: KClass<out Plugin>
 )
 
-interface PluginComponent {
-    val plugins: Plugins
+@Module
+interface PluginModule {
+    @Multibinds
+    @Singleton
+    fun bindPlugins(): PluginMap
 }
 
 @Module
-abstract class PluginModule {
-    @Multibinds
-    @Singleton
-    abstract fun bindPlugins(): PluginMap
+interface AppModule {
+    @Binds
+    @Named("application")
+    fun bindApplicationContext(@BootScope application: AndroidApplication): Context
 }

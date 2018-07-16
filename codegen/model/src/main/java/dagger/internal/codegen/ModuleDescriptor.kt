@@ -18,6 +18,18 @@ package dagger.internal.codegen
 
 internal
 val ModuleDescriptor.dependencies
-    get() = bindings().flatMap {
+    get() = bindings().dependencies +
+            delegateDeclarations().dependencies
+
+internal
+val <T : ContributionBinding> Collection<T>.dependencies
+    get() = flatMap {
         it.dependencies()
+    }
+
+internal
+val <T : DelegateDeclaration> Collection<T>.dependencies
+    @JvmName("getDelegateDependencies")
+    get() = map {
+        it.delegateRequest()
     }

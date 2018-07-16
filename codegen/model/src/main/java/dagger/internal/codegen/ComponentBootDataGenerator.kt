@@ -16,8 +16,10 @@
 
 package dagger.internal.codegen
 
+import com.google.common.collect.ImmutableSet
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
+import dagger.model.DependencyRequest
 import dagger.model.Key
 import sourcerer.JavaOutput
 import sourcerer.bootstrap.Dependency
@@ -27,6 +29,7 @@ import sourcerer.bootstrap.buildUnique
 import sourcerer.bootstrap.fieldName
 import sourcerer.bootstrap.getterMethod
 import sourcerer.bootstrap.qualifier
+import sourcerer.bootstrap.toImmutableSet
 import sourcerer.bootstrap.type
 import sourcerer.classBuilder
 import sourcerer.typeSpec
@@ -46,28 +49,31 @@ class ComponentBootDataGenerator(
     rawType = ClassName.get(descriptor.componentDefinitionType),
     outExt = "BootData"
 ) {
-    private val allBindings by lazy {
+    private val bindings: ImmutableSet<ContributionBinding> by lazy {
         descriptor.modules.flatMap(ModuleDescriptor::bindings)
+                .toImmutableSet()
     }
-    private val scopedBindings by lazy {
-        allBindings.filter { it.scope().isPresent }
+    private val scopedBindings: ImmutableSet<ContributionBinding> by lazy {
+        bindings.filter { it.scope().isPresent }
+                .toImmutableSet()
     }
-    private val allDependencies by lazy {
+    private val dependencies: ImmutableSet<DependencyRequest> by lazy {
         descriptor.modules.flatMap(ModuleDescriptor::dependencies)
+                .toImmutableSet()
     }
-    private val scopedDependencies by lazy {
-        allDependencies.filter {
+    private val scopedDependencies: ImmutableSet<DependencyRequest> by lazy {
+        dependencies.filter {
             it.requestElement().map {
                 it.uniqueScope
             }.isPresent
-        }
+        }.toImmutableSet()
     }
 
-    val scopedKeys: Set<Key> by lazy {
+    val scopedKeys: ImmutableSet<Key> by lazy {
         val bindingKeys = scopedBindings.keys
         val depKeys = scopedDependencies.map(Dependency::key)
-                .toSet()
-        bindingKeys + depKeys
+        (bindingKeys + depKeys)
+                .toImmutableSet()
     }
 
     override
