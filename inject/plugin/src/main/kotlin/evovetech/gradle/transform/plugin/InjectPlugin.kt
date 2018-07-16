@@ -75,9 +75,6 @@ import java.io.File
 import java.util.EnumMap
 import javax.xml.parsers.SAXParserFactory
 
-private
-const val codegenVersion = "0.6.2"
-
 class InjectPlugin : Plugin<Project> {
     override
     fun apply(project: Project) {
@@ -85,11 +82,11 @@ class InjectPlugin : Plugin<Project> {
 
         project.plugins.withType(BasePlugin::class.java) {
             project.dependencies {
-                add("implementation", "evovetech.sourcerer:annotations:$codegenVersion")
-                add("implementation", "evovetech.sourcerer:inject:$codegenVersion")
-                add("implementation", "evovetech.sourcerer:inject-android:$codegenVersion")
-                add("runtimeOnly", "evovetech.android.inject:core:$codegenVersion")
-                add("kapt", "evovetech.sourcerer:model:$codegenVersion")
+                add("implementation", "evovetech.sourcerer:annotations:$Version")
+                add("implementation", "evovetech.sourcerer:inject:$Version")
+                add("implementation", "evovetech.sourcerer:inject-android:$Version")
+                add("runtimeOnly", "evovetech.android.inject:core:$Version")
+                add("kapt", "evovetech.sourcerer:model:$Version")
             }
 
             wrapper.setup(extension)
@@ -151,7 +148,7 @@ class ProjectWrapper(
 
     private
     fun Configuration.add(depName: String) {
-        project.dependencies.add(name, "evovetech.sourcerer:$depName-processor:$codegenVersion")
+        project.dependencies.add(name, "evovetech.sourcerer:$depName-processor:$Version")
     }
 
     private
