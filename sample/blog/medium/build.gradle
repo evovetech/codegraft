@@ -19,7 +19,7 @@ plugins {
     id("kotlin-android")
     id("kotlin-android-extensions")
     id("kotlin-kapt")
-    id("evovetech.plugin.android.inject")
+    id("codegraft.inject.android")
 }
 
 apply from: "${configDir}/android/base.gradle"

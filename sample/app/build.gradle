@@ -28,7 +28,7 @@ plugins {
     id("io.fabric")
     id("com.google.firebase.firebase-perf")
     id("realm-android")
-    id("evovetech.plugin.android.inject")
+    id("codegraft.inject.android")
 }
 
 apply from: "${configDir}/android/application.gradle"
@@ -37,7 +37,6 @@ android {
     defaultConfig {
         applicationId = "evovetech.sample"
     }
-//    dynamicFeatures = [":feature:dynamic"]
 }
 
 apply from: "${configDir}/versions/crashlytics.gradle"

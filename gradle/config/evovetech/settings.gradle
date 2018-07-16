@@ -17,6 +17,7 @@
 apply plugin: 'evovetech.settings'
 
 def androidVersion = app.androidVersion
+def codegraftVersion = app.codegraftVersion
 
 evove {
     repos(gradle.defaultRepos)
@@ -59,9 +60,9 @@ evove {
             it.module = "evovetech.gradle:gradle-plugin"
             it.version = "0.4.2"
         }
-        update('evovetech') {
-            it.module = "evovetech.android.inject:plugin"
-            it.version = "0.6.2"
+        update('codegraft.inject.android') {
+            it.module = "evovetech.codegraft:inject-plugin"
+            it.version = "${codegraftVersion}"
         }
     }
 }

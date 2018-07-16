@@ -16,6 +16,7 @@
 
 buildscript {
     def configDir = file('../gradle/config').absoluteFile
+    ext.configDir = configDir
     gradle.ext.configDir = configDir
     apply from: "${configDir}/buildscript.gradle"
     repositories(gradle.buildscriptRepos)
