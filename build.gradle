@@ -19,10 +19,15 @@ plugins {
 }
 
 ext {
-   LICENSES = ['Apache-2.0']
-   LABELS = ['codegraft', 'codegen', 'android', 'java', 'kotlin', 'inject', 'annotations', 'bytebuddy']
+    LICENSES = ['Apache-2.0']
+    LABELS = ['codegraft', 'codegen', 'android', 'java', 'kotlin', 'inject', 'annotations', 'bytebuddy']
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
 
-   sourceCompatibility = JavaVersion.VERSION_1_8
-   byteBuddyVersion = '1.8.10'
-   androidVersion = '3.2.0-beta02'
+gradle.beforeProject { p ->
+    if (p.path.startsWith(':inject:')) {
+        p.pom.artifactId = "inject-${p.name}"
+    } else if (p.path.startsWith(':codegen:')) {
+        p.pom.artifactId = "codegen-${p.name}"
+    }
 }

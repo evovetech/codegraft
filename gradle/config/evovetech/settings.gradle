@@ -16,6 +16,8 @@
 
 apply plugin: 'evovetech.settings'
 
+def androidVersion = app.androidVersion
+
 evove {
     repos(gradle.defaultRepos)
     plugins {
@@ -28,7 +30,7 @@ evove {
         }
         update("com.android") {
             it.module = "com.android.tools.build:gradle"
-            it.version = "3.2.0-beta02"
+            it.version = "${androidVersion}"
         }
         update("realm") {
             it.module = "io.realm:realm-gradle-plugin"

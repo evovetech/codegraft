@@ -36,10 +36,10 @@ configurations.kapt.extendsFrom(configurations.anno)
 
 dependencies {
     api project(':inject:runtime')
-    implementation "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
+    implementation "net.bytebuddy:byte-buddy:${app.byteBuddyVersion}"
     compileOnly("com.google.android:android:4.1.1.4")
     compileOnly("com.google.android:support-v4:r7")
-    api "com.android.tools.build:gradle-api:${androidVersion}"
+    api "com.android.tools.build:gradle-api:${app.androidVersion}"
     api "com.google.auto:auto-common:${app.autoCommonVersion}"
     anno "com.google.auto.service:auto-service:${app.autoServiceVersion}"
 }

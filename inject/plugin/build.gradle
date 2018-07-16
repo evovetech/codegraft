@@ -29,10 +29,10 @@ apply from: "${configDir}/versions/dagger.gradle"
 
 dependencies {
     implementation project(':inject:transform')
-    implementation "net.bytebuddy:byte-buddy:${byteBuddyVersion}"
+    implementation "net.bytebuddy:byte-buddy:${app.byteBuddyVersion}"
     compileOnly 'org.jetbrains.kotlin:kotlin-gradle-plugin'
-    compileOnly "com.android.tools.build:gradle:${androidVersion}"
-    compileOnly "com.android.tools.build:builder:${androidVersion}"
+    compileOnly "com.android.tools.build:gradle:${app.androidVersion}"
+    compileOnly "com.android.tools.build:builder:${app.androidVersion}"
 
     runtimeOnly("com.google.android:android:4.1.1.4")
     runtimeOnly("com.google.android:support-v4:r7")
