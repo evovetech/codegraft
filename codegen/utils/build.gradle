@@ -15,12 +15,16 @@
  */
 
 plugins {
-    id('base')
+    id("kotlin")
+    id("kotlin-kapt")
+    id("com.jfrog.bintray")
+    id("com.jfrog.artifactory")
+    id("org.jetbrains.dokka")
 }
 
-ext {
-    LICENSES = ['Apache-2.0']
-    LABELS = ['androdi', 'java', 'kotlin', 'inject', 'annotations', 'bytebuddy']
-    byteBuddyVersion = '1.8.10'
-    androidVersion = '3.2.0-beta02'
+apply from: "${configDir}/kotlin-library.gradle"
+
+dependencies {
+    api "com.google.auto:auto-common:${app.autoCommonVersion}"
+    api project(':codegen:io')
 }

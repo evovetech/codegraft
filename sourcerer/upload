@@ -1,3 +1,0 @@
-#!/bin/bash
-
-./gradlew clean bintrayUpload --no-daemon

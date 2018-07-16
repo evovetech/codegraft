@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-buildscript {
-    def configDir = file("../gradle/config").absoluteFile
-    gradle.ext.configDir = configDir
-    ext.configDir = configDir
-    apply from: "${configDir}/buildscript.gradle"
-    repositories(gradle.buildscriptRepos)
-    dependencies(gradle.buildscriptDependencies)
+plugins {
+    id("com.android.library")
+    id("kotlin-android")
+    id("kotlin-kapt")
+    id("com.jfrog.bintray")
+    id("org.jetbrains.dokka")
 }
 
-apply plugin: 'evovetech.settings'
-apply from: "${configDir}/evovetech/settings.gradle"
+apply from: "${configDir}/android/base.gradle"
+apply from: "${configDir}/android-library.gradle"
 
-include(
-        ':utils',
-        ':io',
-        ':annotations',
-        ':model',
-        ':app-processor',
-        ':lib-processor',
-        ':inject',
-        ':inject-android'
-)
+apply from: "${configDir}/versions/dagger.gradle"
+dependencies(dagger.applyAndroid('api'))
+
+dependencies {
+    api project(':inject:annotations')
+    api project(':inject:core')
+    api 'android.arch.lifecycle:extensions:1.1.1'
+    kapt project(':codegen:lib-processor')
+}

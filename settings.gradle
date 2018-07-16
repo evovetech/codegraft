@@ -25,29 +25,17 @@ buildscript {
 apply plugin: 'evovetech.settings'
 apply from: "${configDir}/evovetech/settings.gradle"
 
-includeBuild 'sourcerer'
-includeBuild 'inject'
-
 include(
-        // app
-        ':app',
-//        ':instantapp',
-//
-        // features
-        ':feature:instant',
-//
-//        // dynamic features
-//        ':feature:dynamic',
+        ':codegen:io',
+        ':codegen:utils',
+        ':codegen:model',
+        ':codegen:lib-processor',
+        ':codegen:app-processor',
 
-        // finance
-        ':finance:plaid',
-
-        // blog
-        ':blog:medium',
-
-        // libs
-        ':core:annotations',
-        ':core:db',
-        ':core:crashes',
-        ':core:network',
+        ':inject:annotations',
+        ':inject:core',
+        ':inject:android',
+        ':inject:runtime',
+        ':inject:transform',
+        ':inject:plugin',
 )

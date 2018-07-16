@@ -14,10 +14,26 @@
  * limitations under the License.
  */
 
+plugins {
+    id("kotlin")
+    id("kotlin-kapt")
+    id("com.jfrog.bintray")
+    id("com.jfrog.artifactory")
+    id("org.jetbrains.dokka")
+}
+
 apply from: "${rootDir}/gradle/base.gradle"
+apply from: "${configDir}/versions/dagger.gradle"
+
+app.autoValueVersion = '1.6'
 
 dependencies {
-    api project(':model')
-    compileOnly "com.google.auto.service:auto-service:${app.autoServiceVersion}"
-    kapt "com.google.auto.service:auto-service:${app.autoServiceVersion}"
+    api(dagger.coreCompiler)
+    kapt(dagger.coreCompiler)
+    api(dagger.androidCompiler)
+    api project(':codegen:utils')
+    compileOnly project(':inject:core')
+    compileOnly("com.google.android:android:4.1.1.4")
+    compileOnly("com.google.android:support-v4:r7")
+    anno "com.google.auto.service:auto-service:${app.autoServiceVersion}"
 }

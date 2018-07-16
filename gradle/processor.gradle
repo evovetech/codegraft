@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-plugins {
-    id("kotlin")
-    id("kotlin-kapt")
-    id("com.jfrog.bintray")
-    id("com.jfrog.artifactory")
-    id("org.jetbrains.dokka")
-}
-
-apply from: "${configDir}/kotlin-library.gradle"
+apply from: "${rootDir}/gradle/base.gradle"
 
 dependencies {
-    api "com.google.auto:auto-common:${app.autoCommonVersion}"
-    api project(':io')
+    api project(':codegen:model')
+    compileOnly "com.google.auto.service:auto-service:${app.autoServiceVersion}"
+    kapt "com.google.auto.service:auto-service:${app.autoServiceVersion}"
 }
