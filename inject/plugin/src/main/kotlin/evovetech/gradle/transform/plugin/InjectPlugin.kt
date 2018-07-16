@@ -82,11 +82,11 @@ class InjectPlugin : Plugin<Project> {
 
         project.plugins.withType(BasePlugin::class.java) {
             project.dependencies {
-                add("implementation", "evovetech.sourcerer:annotations:$Version")
-                add("implementation", "evovetech.sourcerer:inject:$Version")
-                add("implementation", "evovetech.sourcerer:inject-android:$Version")
-                add("runtimeOnly", "evovetech.android.inject:core:$Version")
-                add("kapt", "evovetech.sourcerer:model:$Version")
+                add("implementation", "evovetech.codegraft:inject-annotations:$Version")
+                add("implementation", "evovetech.codegraft:inject-core:$Version")
+                add("implementation", "evovetech.codegraft:inject-android:$Version")
+                add("runtimeOnly", "evovetech.codegraft:inject-runtime:$Version")
+                add("kapt", "evovetech.codegraft:codegen-model:$Version")
             }
 
             wrapper.setup(extension)
@@ -148,7 +148,7 @@ class ProjectWrapper(
 
     private
     fun Configuration.add(depName: String) {
-        project.dependencies.add(name, "evovetech.sourcerer:$depName-processor:$Version")
+        project.dependencies.add(name, "evovetech.codegraft:codegen-$depName-processor:$Version")
     }
 
     private
