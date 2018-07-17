@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package codegraft.inject.android
 
 import javax.inject.Scope
-import kotlin.annotation.AnnotationRetention.BINARY
-import kotlin.annotation.AnnotationTarget.CLASS
-import kotlin.annotation.AnnotationTarget.FUNCTION
-import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
 
-@Target(CLASS, FUNCTION, VALUE_PARAMETER)
-@Retention(BINARY)
-@MustBeDocumented
+/**
+ * Created by layne on 2/26/18.
+ */
+
 @Scope
+@Retention(AnnotationRetention.RUNTIME)
+@MustBeDocumented
 annotation
-class BootScope
+class ActivityScope

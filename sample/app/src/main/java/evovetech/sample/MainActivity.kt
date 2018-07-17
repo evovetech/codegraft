@@ -27,9 +27,9 @@ import evovetech.sample.network.Client
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.message
 import kotlinx.android.synthetic.main.activity_main.navigation
-import sourcerer.inject.AndroidInject
-import sourcerer.inject.Plugins
-import sourcerer.inject.get
+import codegraft.inject.AndroidInject
+import codegraft.inject.Plugins
+import codegraft.inject.get
 import javax.inject.Inject
 
 @AndroidInject

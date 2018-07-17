@@ -17,15 +17,15 @@
 package evovetech.sample.db.realm
 
 import android.app.Application
+import codegraft.inject.BootScope
+import codegraft.inject.BootstrapComponent
+import codegraft.inject.android.AndroidApplication
 import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
 import evovetech.sample.crashes.CrashesComponent
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import sourcerer.inject.BootScope
-import sourcerer.inject.BootstrapComponent
-import sourcerer.inject.android.AndroidApplication
 import javax.inject.Named
 
 typealias RealmInit = RealmConfiguration.Builder.() -> RealmConfiguration

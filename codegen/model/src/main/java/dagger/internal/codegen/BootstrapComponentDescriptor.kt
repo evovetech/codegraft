@@ -44,7 +44,7 @@ import codegraft.bootstrap.BOOTSTRAP_MODULES_ATTRIBUTE
 import codegraft.bootstrap.FLATTEN_ATTRIBUTE
 import sourcerer.getAnnotationMirror
 import sourcerer.getValue
-import sourcerer.inject.BootstrapComponent
+import codegraft.inject.BootstrapComponent
 import sourcerer.qualifiedName
 import sourcerer.toImmutableSet
 import java.util.EnumSet

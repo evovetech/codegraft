@@ -18,13 +18,13 @@ package evovetech.sample
 
 import android.app.Application
 import android.util.Log
+import codegraft.inject.AndroidInject
+import codegraft.inject.android.AndroidApplication
+import codegraft.inject.android.BootApplication
 import com.crashlytics.android.Crashlytics
 import io.fabric.sdk.android.Fabric
 import io.realm.RealmConfiguration
 import okhttp3.OkHttpClient
-import sourcerer.inject.AndroidInject
-import sourcerer.inject.android.AndroidApplication
-import sourcerer.inject.android.BootApplication
 import javax.inject.Inject
 
 @AndroidInject

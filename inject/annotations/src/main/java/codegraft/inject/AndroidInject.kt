@@ -14,16 +14,30 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package codegraft.inject
 
-import sourcerer.inject.android.AndroidApplication
+import kotlin.annotation.AnnotationRetention.BINARY
+import kotlin.annotation.AnnotationTarget.CLASS
+import kotlin.annotation.AnnotationTarget.FILE
+import kotlin.reflect.KClass
 
-@BootstrapComponent(
-    applicationModules = [PluginModule::class],
-    bootstrapModules = [AppModule::class],
-    flatten = true
+/**
+ * Created by layne on 2/26/18.
+ */
+
+@MustBeDocumented
+@Target(
+    CLASS,
+    FILE
 )
-interface PluginComponent {
-    val application: AndroidApplication
-    val plugins: Plugins
-}
+@Retention(
+    BINARY
+)
+annotation
+class AndroidInject(
+    /**
+     * Additional `@Module`-annotated classes from which this activity is
+     * composed.
+     */
+    val includes: Array<KClass<*>> = []
+)

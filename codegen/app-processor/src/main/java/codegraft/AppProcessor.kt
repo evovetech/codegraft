@@ -82,8 +82,8 @@ fun src(packageName: String): String = """/*
 //
 package $packageName
 
-import sourcerer.inject.android.AndroidApplication
-import sourcerer.inject.android.Bootstrap
+import codegraft.inject.android.AndroidApplication
+import codegraft.inject.android.Bootstrap
 
 typealias BootstrapInit = BootComponent.Builder.() -> AndroidApplication
 

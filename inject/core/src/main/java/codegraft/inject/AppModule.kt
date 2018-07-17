@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package codegraft.inject
 
 import android.content.Context
 import dagger.Binds
 import dagger.MapKey
 import dagger.Module
 import dagger.multibindings.Multibinds
-import sourcerer.inject.android.AndroidApplication
+import codegraft.inject.android.AndroidApplication
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton

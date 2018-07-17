@@ -16,13 +16,13 @@
 
 package evovetech.sample.crashes
 
+import codegraft.inject.BootScope
+import codegraft.inject.BootstrapComponent
+import codegraft.inject.android.AndroidApplication
 import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
 import io.fabric.sdk.android.Fabric
-import sourcerer.inject.BootScope
-import sourcerer.inject.BootstrapComponent
-import sourcerer.inject.android.AndroidApplication
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton

@@ -22,7 +22,7 @@ import okio.Okio
 import sourcerer.SourcererOutput
 import sourcerer.StoredFile
 import sourcerer.getResources
-import sourcerer.inject.AndroidInject
+import codegraft.inject.AndroidInject
 import sourcerer.io.Reader
 import sourcerer.io.Writer
 import sourcerer.metaFile

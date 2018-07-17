@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.inject;
+package codegraft.inject;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

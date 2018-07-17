@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-package sourcerer.inject.android
+package codegraft.inject
 
-import android.app.Activity
-import android.app.Application
-import dagger.MapKey
+import javax.inject.Qualifier
 import kotlin.annotation.AnnotationRetention.RUNTIME
-import kotlin.annotation.AnnotationTarget.FUNCTION
-import kotlin.annotation.AnnotationTarget.PROPERTY_GETTER
-import kotlin.annotation.AnnotationTarget.PROPERTY_SETTER
-import kotlin.reflect.KClass
 
-/**
- * [MapKey] annotation to key bindings by a type of an [Activity].
- */
-@MapKey
 @Retention(RUNTIME)
 @MustBeDocumented
-@Target(FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
+@Qualifier
 annotation
-class ApplicationKey(
-    val value: KClass<out Application>
+class Package(
+    val value: String
 )

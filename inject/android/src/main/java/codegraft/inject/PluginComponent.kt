@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 
-package sourcerer.inject.android
+package codegraft.inject
 
-interface BootComponent<out Component : Any> {
-    val component: Component
+import codegraft.inject.android.AndroidApplication
 
-    interface Builder<out Boot : BootComponent<*>> :
-        sourcerer.inject.Builder<Boot>
-}
-
-interface BootApplication<out Component : Any> {
-    val bootstrap: Bootstrap<Component>
-}
-
-val <Component : Any> BootApplication<Component>.component: Component
-    get() = bootstrap.component
-
-class Bootstrap<out Component : Any>(
-    buildFunc: () -> Component
-) : BootComponent<Component> {
-    override
-    val component by lazy(buildFunc)
+@BootstrapComponent(
+    applicationModules = [PluginModule::class],
+    bootstrapModules = [AppModule::class],
+    flatten = true
+)
+interface PluginComponent {
+    val application: AndroidApplication
+    val plugins: Plugins
 }

@@ -16,6 +16,7 @@
 
 package evovetech.blog.medium
 
+import codegraft.inject.android.AndroidApplication
 import evovetech.sample.crashes.CrashesBootstrapModule
 import evovetech.sample.db.realm.RealmBootstrapModule
 import io.fabric.sdk.android.Fabric
@@ -26,7 +27,6 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.notNull
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import sourcerer.inject.android.AndroidApplication
 import kotlin.test.assertNotNull
 
 /**

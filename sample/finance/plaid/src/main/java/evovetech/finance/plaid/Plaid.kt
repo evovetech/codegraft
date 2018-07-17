@@ -16,6 +16,8 @@
 
 package evovetech.finance.plaid
 
+import codegraft.inject.BootstrapComponent
+import codegraft.inject.android.AndroidApplication
 import dagger.Module
 import dagger.Provides
 import evovetech.finance.plaid.ui.plaid.PlaidViewModel
@@ -24,8 +26,6 @@ import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.http.GET
-import sourcerer.inject.BootstrapComponent
-import sourcerer.inject.android.AndroidApplication
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton

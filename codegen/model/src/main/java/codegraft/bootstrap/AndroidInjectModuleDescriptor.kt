@@ -22,15 +22,15 @@ import com.google.common.collect.ImmutableList
 import com.squareup.javapoet.ClassName
 import dagger.internal.codegen.getTypeListValue
 import sourcerer.getAnnotationMirror
-import sourcerer.inject.AndroidInject
-import sourcerer.inject.android.AndroidApplication
-import sourcerer.inject.android.AndroidInjectActivityModule
-import sourcerer.inject.android.AndroidInjectApplicationModule
-import sourcerer.inject.android.AndroidInjectBroadcastReceiverModule
-import sourcerer.inject.android.AndroidInjectContentProviderModule
-import sourcerer.inject.android.AndroidInjectModule
-import sourcerer.inject.android.AndroidInjectServiceModule
-import sourcerer.inject.android.AndroidInjectSupportFragmentModule
+import codegraft.inject.AndroidInject
+import codegraft.inject.android.AndroidApplication
+import codegraft.inject.android.AndroidInjectActivityModule
+import codegraft.inject.android.AndroidInjectApplicationModule
+import codegraft.inject.android.AndroidInjectBroadcastReceiverModule
+import codegraft.inject.android.AndroidInjectContentProviderModule
+import codegraft.inject.android.AndroidInjectModule
+import codegraft.inject.android.AndroidInjectServiceModule
+import codegraft.inject.android.AndroidInjectSupportFragmentModule
 import sourcerer.qualifiedName
 import sourcerer.toImmutableList
 import javax.inject.Inject
@@ -89,7 +89,7 @@ class AndroidInjectModuleDescriptor(
         ),
         SupportFragment(
             Any::class,
-//            sourcerer.inject.android.SupportFragment::class,
+//            codegraft.inject.SupportFragment::class,
             AndroidInjectSupportFragmentModule::class
         ),
         Service(

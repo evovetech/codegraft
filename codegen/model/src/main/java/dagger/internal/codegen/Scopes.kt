@@ -19,7 +19,7 @@ package dagger.internal.codegen
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Iterables.getOnlyElement
 import dagger.model.Scope
-import sourcerer.inject.BootScope
+import codegraft.inject.BootScope
 import javax.inject.Singleton
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement

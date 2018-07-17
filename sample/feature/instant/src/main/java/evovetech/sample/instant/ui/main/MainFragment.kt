@@ -22,10 +22,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import codegraft.inject.AndroidInject
+import codegraft.inject.android.ViewModelInstanceProvider
+import codegraft.inject.android.viewModelDelegate
 import evovetech.sample.instant.R
-import sourcerer.inject.AndroidInject
-import sourcerer.inject.android.ViewModelInstanceProvider
-import sourcerer.inject.android.viewModelDelegate
 import javax.inject.Inject
 
 @AndroidInject

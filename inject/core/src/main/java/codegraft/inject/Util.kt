@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package codegraft.inject
 
-import javax.inject.Provider
+inline
+fun <reified T : Any> Any?.castOrNull(): T? = this as? T
 
-interface ProviderMap<in K : Any, out V : Any> {
-    val providers: Map<in K, @JvmSuppressWildcards Provider<out V>>
+inline
+fun <reified T : Any> Any?.castNotNull(): T = this as T
+
+fun <T : Any> Class<T>.castOrNull(obj: Any?): T? = try {
+    obj?.let(this::cast)
+} catch (_: ClassCastException) {
+    null
 }

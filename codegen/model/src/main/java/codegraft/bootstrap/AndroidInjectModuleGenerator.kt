@@ -36,9 +36,9 @@ import sourcerer.addTo
 import codegraft.bootstrap.AndroidInjectModuleDescriptor.Kind.Application
 import sourcerer.classBuilder
 import sourcerer.className
-import sourcerer.inject.android.ActivityScope
-import sourcerer.inject.android.AndroidApplication
-import sourcerer.inject.android.ApplicationKey
+import codegraft.inject.android.ActivityScope
+import codegraft.inject.android.AndroidApplication
+import codegraft.inject.android.ApplicationKey
 import sourcerer.interfaceBuilder
 import sourcerer.name
 import sourcerer.toKlass

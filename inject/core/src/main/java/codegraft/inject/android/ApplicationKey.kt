@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-package evovetech.sample
+package codegraft.inject.android
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import android.app.Activity
+import android.app.Application
+import dagger.MapKey
+import kotlin.annotation.AnnotationRetention.RUNTIME
+import kotlin.annotation.AnnotationTarget.FUNCTION
+import kotlin.annotation.AnnotationTarget.PROPERTY_GETTER
+import kotlin.annotation.AnnotationTarget.PROPERTY_SETTER
+import kotlin.reflect.KClass
 
 /**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
+ * [MapKey] annotation to key bindings by a type of an [Activity].
  */
-class ExampleUnitTest {
-    @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
-    }
-}
+@MapKey
+@Retention(RUNTIME)
+@MustBeDocumented
+@Target(FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER)
+annotation
+class ApplicationKey(
+    val value: KClass<out Application>
+)

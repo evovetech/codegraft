@@ -17,17 +17,17 @@
 package evovetech.sample.network
 
 import android.app.Application
+import codegraft.inject.BootScope
+import codegraft.inject.BootstrapComponent
+import codegraft.inject.Plugin
+import codegraft.inject.PluginKey
+import codegraft.inject.Plugins
+import codegraft.inject.android.AndroidApplication
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import okhttp3.OkHttpClient
-import sourcerer.inject.BootScope
-import sourcerer.inject.BootstrapComponent
-import sourcerer.inject.Plugin
-import sourcerer.inject.PluginKey
-import sourcerer.inject.Plugins
-import sourcerer.inject.android.AndroidApplication
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider

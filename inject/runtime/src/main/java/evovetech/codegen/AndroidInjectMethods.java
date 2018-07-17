@@ -22,7 +22,7 @@ import android.app.Service;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.implementation.bind.annotation.This;
 
-import static sourcerer.inject.android.AndroidInjections.inject;
+import static codegraft.inject.android.AndroidInjections.inject;
 
 /**
  * Injects core Android types.

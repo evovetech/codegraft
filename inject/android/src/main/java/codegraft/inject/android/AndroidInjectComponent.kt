@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package sourcerer.inject.android
+package codegraft.inject.android
 
-import sourcerer.inject.BootstrapComponent
+import codegraft.inject.BootstrapComponent
 
 @BootstrapComponent(
     applicationModules = [AndroidInjectApplicationModule::class],

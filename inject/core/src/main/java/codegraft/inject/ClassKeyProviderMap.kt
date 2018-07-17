@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package codegraft.inject
 
 import javax.inject.Provider
 

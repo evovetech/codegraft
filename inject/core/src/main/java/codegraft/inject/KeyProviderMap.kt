@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
-package sourcerer.inject.android
+package codegraft.inject
 
-typealias AndroidApplication = android.app.Application
+interface KeyProviderMap<in K : Any, out V : Any> : ProviderMap<K, V> {
+    operator
+    fun get(key: K): V? {
+        return providers[key]?.get()
+    }
+}

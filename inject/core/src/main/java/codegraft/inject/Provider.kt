@@ -14,30 +14,31 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package codegraft.inject
 
-import kotlin.annotation.AnnotationRetention.BINARY
-import kotlin.annotation.AnnotationTarget.CLASS
-import kotlin.annotation.AnnotationTarget.FILE
-import kotlin.reflect.KClass
+import javax.inject.Provider
 
-/**
- * Created by layne on 2/26/18.
- */
+@Deprecated("moved")
+typealias KeyProvider<K, V> = KeyProviderMap<K, V>
 
-@MustBeDocumented
-@Target(
-    CLASS,
-    FILE
-)
-@Retention(
-    BINARY
-)
-annotation
-class AndroidInject(
-    /**
-     * Additional `@Module`-annotated classes from which this activity is
-     * composed.
-     */
-    val includes: Array<KClass<*>> = []
-)
+@Deprecated("moved")
+typealias ClassKeyProvider<T> = ClassKeyProviderMap<T>
+
+inline
+fun <T, R> Provider<T>.map(
+    block: (T) -> R
+) = get().let(block)
+
+inline
+fun <T, P : Provider<T>> P.with(
+    block: T.() -> Unit
+): P {
+    get().apply(block)
+    return this
+}
+
+inline
+fun <T : Any, R> Provider<T>?.fold(
+    success: (T) -> R,
+    failure: () -> R
+) = this?.map(success) ?: failure()

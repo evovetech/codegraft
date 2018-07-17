@@ -28,7 +28,7 @@ import net.bytebuddy.dynamic.DynamicType.Unloaded
 import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.matcher.ElementMatcher.Junction
 import kotlin.reflect.KClass
-import sourcerer.inject.AndroidInject
+import codegraft.inject.AndroidInject
 
 class AndroidInjectWriter : OutputWriter {
     private val entryPoint: EntryPoint = REBASE

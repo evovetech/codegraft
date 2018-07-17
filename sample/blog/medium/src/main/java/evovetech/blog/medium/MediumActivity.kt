@@ -18,11 +18,11 @@ package evovetech.blog.medium
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import codegraft.inject.AndroidInject
+import codegraft.inject.android.HasSupportFragmentInjector
+import codegraft.inject.android.SupportFragment
 import dagger.android.AndroidInjector
 import evovetech.blog.medium.ui.medium.MediumFragment
-import sourcerer.inject.AndroidInject
-import sourcerer.inject.android.HasSupportFragmentInjector
-import sourcerer.inject.android.SupportFragment
 import javax.inject.Inject
 
 @AndroidInject

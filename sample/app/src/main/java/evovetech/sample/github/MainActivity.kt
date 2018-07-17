@@ -17,7 +17,7 @@
 package evovetech.sample.github
 
 import android.support.v7.app.AppCompatActivity
-import sourcerer.inject.AndroidInject
+import codegraft.inject.AndroidInject
 
 @AndroidInject
 class MainActivity : AppCompatActivity()

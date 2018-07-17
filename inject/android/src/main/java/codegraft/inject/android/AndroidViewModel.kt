@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.inject.android
+package codegraft.inject.android
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
@@ -26,10 +26,10 @@ import dagger.Binds
 import dagger.MapKey
 import dagger.Module
 import dagger.multibindings.Multibinds
-import sourcerer.inject.BootstrapComponent
-import sourcerer.inject.ClassKeyProviderMap
-import sourcerer.inject.ClassMap
-import sourcerer.inject.ClassProviderMap
+import codegraft.inject.BootstrapComponent
+import codegraft.inject.ClassKeyProviderMap
+import codegraft.inject.ClassMap
+import codegraft.inject.ClassProviderMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.annotation.AnnotationRetention.RUNTIME

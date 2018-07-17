@@ -16,11 +16,11 @@
 
 package evovetech.blog.medium
 
+import codegraft.inject.android.AndroidApplication
 import org.junit.Rule
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
 import org.mockito.quality.Strictness
-import sourcerer.inject.android.AndroidApplication
 
 abstract
 class BaseTest {

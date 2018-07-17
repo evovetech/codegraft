@@ -16,8 +16,8 @@
 
 package evovetech.blog.medium
 
+import codegraft.inject.BootstrapComponent
 import evovetech.sample.network.ClientComponent
-import sourcerer.inject.BootstrapComponent
 
 @BootstrapComponent(
     bootstrapDependencies = [ClientComponent::class],

@@ -26,7 +26,7 @@ import sourcerer.Output
 import sourcerer.Outputs
 import codegraft.bootstrap.BootstrapComponentStep.Option
 import codegraft.bootstrap.ComponentOutput.Factory
-import sourcerer.inject.BootstrapComponent
+import codegraft.inject.BootstrapComponent
 import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Options
 import sourcerer.toImmutableSet

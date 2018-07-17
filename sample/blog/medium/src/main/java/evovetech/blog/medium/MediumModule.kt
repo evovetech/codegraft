@@ -16,6 +16,7 @@
 
 package evovetech.blog.medium
 
+import codegraft.inject.android.AndroidApplication
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -25,7 +26,6 @@ import okhttp3.OkHttpClient
 import okhttp3.OkHttpClient.Builder
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import sourcerer.inject.android.AndroidApplication
 import javax.inject.Named
 import javax.inject.Singleton
 

@@ -16,7 +16,7 @@
 
 @file:JvmName("AndroidInjections")
 
-package sourcerer.inject.android
+package codegraft.inject.android
 
 import android.app.Activity
 import android.app.Application
@@ -29,7 +29,7 @@ import android.util.Log
 import android.util.Log.DEBUG
 import dagger.android.AndroidInjector
 
-private val TAG = "sourcerer.inject.android"
+private val TAG = "codegraft.inject.android"
 
 /**
  * Injects `activity` if an associated [AndroidInjector] implementation can be found,

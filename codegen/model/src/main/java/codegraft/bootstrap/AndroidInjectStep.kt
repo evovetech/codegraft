@@ -23,7 +23,7 @@ import sourcerer.AnnotationStep
 import sourcerer.AnnotationType
 import sourcerer.Output
 import sourcerer.Outputs
-import sourcerer.inject.AndroidInject
+import codegraft.inject.AndroidInject
 import sourcerer.processor.ProcessingEnv
 import sourcerer.toImmutableSet
 import sourcerer.typeInputs

@@ -17,11 +17,11 @@
 package evovetech.blog.medium.ui.medium
 
 import android.arch.lifecycle.ViewModel
+import codegraft.inject.android.ViewModelKey
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 import evovetech.blog.medium.MediumClient
-import sourcerer.inject.android.ViewModelKey
 import javax.inject.Inject
 
 class MediumModule

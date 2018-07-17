@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package sourcerer.inject.android
+package codegraft.inject
 
-import javax.inject.Scope
+interface Builder<out T> {
+    fun build(): T
+}
 
-/**
- * Created by layne on 2/26/18.
- */
-
-@Scope
-@Retention(AnnotationRetention.RUNTIME)
-@MustBeDocumented
-annotation
-class ActivityScope
+fun <T> Builder<T>.build(
+    init: T.() -> Unit
+): T = build().apply(init)

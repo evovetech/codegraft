@@ -14,15 +14,25 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package codegraft.inject.android
 
-import javax.inject.Qualifier
-import kotlin.annotation.AnnotationRetention.RUNTIME
+interface BootComponent<out Component : Any> {
+    val component: Component
 
-@Retention(RUNTIME)
-@MustBeDocumented
-@Qualifier
-annotation
-class Package(
-    val value: String
-)
+    interface Builder<out Boot : BootComponent<*>> :
+        codegraft.inject.Builder<Boot>
+}
+
+interface BootApplication<out Component : Any> {
+    val bootstrap: Bootstrap<Component>
+}
+
+val <Component : Any> BootApplication<Component>.component: Component
+    get() = bootstrap.component
+
+class Bootstrap<out Component : Any>(
+    buildFunc: () -> Component
+) : BootComponent<Component> {
+    override
+    val component by lazy(buildFunc)
+}

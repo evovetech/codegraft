@@ -14,31 +14,6 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package codegraft.inject.android
 
-import javax.inject.Provider
-
-@Deprecated("moved")
-typealias KeyProvider<K, V> = KeyProviderMap<K, V>
-
-@Deprecated("moved")
-typealias ClassKeyProvider<T> = ClassKeyProviderMap<T>
-
-inline
-fun <T, R> Provider<T>.map(
-    block: (T) -> R
-) = get().let(block)
-
-inline
-fun <T, P : Provider<T>> P.with(
-    block: T.() -> Unit
-): P {
-    get().apply(block)
-    return this
-}
-
-inline
-fun <T : Any, R> Provider<T>?.fold(
-    success: (T) -> R,
-    failure: () -> R
-) = this?.map(success) ?: failure()
+typealias AndroidApplication = android.app.Application

@@ -52,7 +52,7 @@ import sourcerer.buildUnique
 import sourcerer.buildUniquePairs
 import sourcerer.classBuilder
 import sourcerer.getFieldName
-import sourcerer.inject.BootScope
+import codegraft.inject.BootScope
 import sourcerer.interfaceBuilder
 import sourcerer.name
 import sourcerer.nestedBuilder

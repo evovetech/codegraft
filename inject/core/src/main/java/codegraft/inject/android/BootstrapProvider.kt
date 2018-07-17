@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.inject.android
+package codegraft.inject.android
 
 import android.app.Application
 import android.util.Log

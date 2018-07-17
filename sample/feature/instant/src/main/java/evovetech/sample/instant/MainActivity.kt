@@ -18,8 +18,8 @@ package evovetech.sample.instant
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import codegraft.inject.AndroidInject
 import evovetech.sample.instant.ui.main.MainFragment
-import sourcerer.inject.AndroidInject
 
 @AndroidInject
 class MainActivity : AppCompatActivity() {

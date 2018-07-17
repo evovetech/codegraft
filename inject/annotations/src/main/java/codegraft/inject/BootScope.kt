@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package codegraft.inject
 
-inline
-fun <reified T : Any> Any?.castOrNull(): T? = this as? T
+import javax.inject.Scope
+import kotlin.annotation.AnnotationRetention.BINARY
+import kotlin.annotation.AnnotationTarget.CLASS
+import kotlin.annotation.AnnotationTarget.FUNCTION
+import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
 
-inline
-fun <reified T : Any> Any?.castNotNull(): T = this as T
-
-fun <T : Any> Class<T>.castOrNull(obj: Any?): T? = try {
-    obj?.let(this::cast)
-} catch (_: ClassCastException) {
-    null
-}
+@Target(CLASS, FUNCTION, VALUE_PARAMETER)
+@Retention(BINARY)
+@MustBeDocumented
+@Scope
+annotation
+class BootScope

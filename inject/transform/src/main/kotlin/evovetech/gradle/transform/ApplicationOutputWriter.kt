@@ -16,6 +16,15 @@
 
 package evovetech.gradle.transform
 
+import codegraft.inject.android.AndroidApplication
+import codegraft.inject.android.BootApplication
+import codegraft.inject.android.HasActivityInjector
+import codegraft.inject.android.HasApplicationInjector
+import codegraft.inject.android.HasBroadcastReceiverInjector
+import codegraft.inject.android.HasContentProviderInjector
+import codegraft.inject.android.HasFragmentInjector
+import codegraft.inject.android.HasServiceInjector
+import codegraft.inject.android.HasSupportFragmentInjector
 import evovetech.codegen.LogMethod
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.build.EntryPoint.Default.REBASE
@@ -24,7 +33,6 @@ import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType.Unloaded
 import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.matcher.ElementMatchers
-import sourcerer.inject.android.*
 
 class ApplicationOutputWriter : OutputWriter {
     private val entryPoint: EntryPoint = REBASE

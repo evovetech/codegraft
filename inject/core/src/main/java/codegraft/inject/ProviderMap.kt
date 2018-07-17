@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package sourcerer.inject
+package codegraft.inject
 
-interface Builder<out T> {
-    fun build(): T
+import javax.inject.Provider
+
+interface ProviderMap<in K : Any, out V : Any> {
+    val providers: Map<in K, @JvmSuppressWildcards Provider<out V>>
 }
-
-fun <T> Builder<T>.build(
-    init: T.() -> Unit
-): T = build().apply(init)

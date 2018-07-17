@@ -25,14 +25,14 @@ import android.content.ContentProvider;
 import dagger.android.AndroidInjector;
 import net.bytebuddy.implementation.bind.annotation.This;
 import org.jetbrains.annotations.NotNull;
-import sourcerer.inject.android.BootApplication;
-import sourcerer.inject.android.HasActivityInjector;
-import sourcerer.inject.android.HasApplicationInjector;
-import sourcerer.inject.android.HasBroadcastReceiverInjector;
-import sourcerer.inject.android.HasContentProviderInjector;
-import sourcerer.inject.android.HasFragmentInjector;
-import sourcerer.inject.android.HasServiceInjector;
-import sourcerer.inject.android.HasSupportFragmentInjector;
+import codegraft.inject.android.BootApplication;
+import codegraft.inject.android.HasActivityInjector;
+import codegraft.inject.android.HasApplicationInjector;
+import codegraft.inject.android.HasBroadcastReceiverInjector;
+import codegraft.inject.android.HasContentProviderInjector;
+import codegraft.inject.android.HasFragmentInjector;
+import codegraft.inject.android.HasServiceInjector;
+import codegraft.inject.android.HasSupportFragmentInjector;
 
 public final
 class BootstrapMethods {
