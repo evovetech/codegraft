@@ -31,32 +31,33 @@ import dagger.Provides
 import dagger.internal.codegen.BootstrapComponentDescriptor.Modules
 import dagger.model.Key
 import org.jetbrains.annotations.Nullable
+import sourcerer.Includable
 import sourcerer.JavaOutput
+import sourcerer.MethodBuilder
+import sourcerer.Output
 import sourcerer.addAnnotation
+import sourcerer.addFieldSpec
 import sourcerer.addTo
+import sourcerer.addToConstructor
 import sourcerer.bootstrap.AndroidInjectModuleDescriptor
 import sourcerer.bootstrap.AndroidInjectModuleDescriptor.Kind
 import sourcerer.bootstrap.AndroidInjectModuleGenerator
 import sourcerer.bootstrap.ComponentOutput
-import sourcerer.bootstrap.Includable
-import sourcerer.bootstrap.MethodBuilder
 import sourcerer.bootstrap.Package
-import sourcerer.bootstrap.addFieldSpec
-import sourcerer.bootstrap.addToConstructor
 import sourcerer.bootstrap.buildParameter
-import sourcerer.bootstrap.buildUnique
-import sourcerer.bootstrap.buildUniquePairs
-import sourcerer.bootstrap.getFieldName
 import sourcerer.bootstrap.getterMethod
 import sourcerer.bootstrap.getterMethodName
 import sourcerer.bootstrap.key
-import sourcerer.bootstrap.toImmutableSet
+import sourcerer.buildUnique
+import sourcerer.buildUniquePairs
 import sourcerer.classBuilder
+import sourcerer.getFieldName
 import sourcerer.inject.BootScope
 import sourcerer.interfaceBuilder
 import sourcerer.name
 import sourcerer.nestedBuilder
 import sourcerer.processor.ProcessingEnv
+import sourcerer.toImmutableSet
 import sourcerer.toKlass
 import sourcerer.typeSpec
 import javax.inject.Inject
@@ -82,7 +83,7 @@ class AppComponentGenerator(
     val flatComponents = components.filter { it.descriptor.flatten }
             .toImmutableSet()
 
-    fun process(): List<sourcerer.Output> {
+    fun process(): List<Output> {
         // TODO: verify correct logic
         if (components.isEmpty()) {
             return emptyList()
@@ -220,7 +221,7 @@ class AppComponentGenerator(
         inner
         class Builder(
             val modules: ImmutableSet<ModuleDescriptor>
-        ) : sourcerer.JavaOutput.Builder() {
+        ) : JavaOutput.Builder() {
             private
             val bootMethodBuilder = MethodBuilder("bootData") {
                 addModifiers(PUBLIC, ABSTRACT)
@@ -362,7 +363,7 @@ class AppComponentGenerator(
         }
 
         inner
-        class Builder : sourcerer.JavaOutput.Builder() {
+        class Builder : JavaOutput.Builder() {
             override
             fun typeSpec() = typeSpec {
                 addModifiers(PUBLIC, STATIC)

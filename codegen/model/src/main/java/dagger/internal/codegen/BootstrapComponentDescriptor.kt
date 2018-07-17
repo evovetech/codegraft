@@ -36,12 +36,17 @@ import dagger.internal.codegen.Scopes.scopesOf
 import dagger.model.DependencyRequest
 import dagger.model.Scope
 import dagger.producers.ProductionComponent
+import sourcerer.bootstrap.APPLICATION_MODULES_ATTRIBUTE
+import sourcerer.bootstrap.AUTO_INCLUDE_ATTRIBUTE
 import sourcerer.AnnotatedTypeElement
-import sourcerer.bootstrap.toImmutableSet
+import sourcerer.bootstrap.BOOTSTRAP_DEPENDENCIES_ATTRIBUTE
+import sourcerer.bootstrap.BOOTSTRAP_MODULES_ATTRIBUTE
+import sourcerer.bootstrap.FLATTEN_ATTRIBUTE
 import sourcerer.getAnnotationMirror
 import sourcerer.getValue
 import sourcerer.inject.BootstrapComponent
 import sourcerer.qualifiedName
+import sourcerer.toImmutableSet
 import java.util.EnumSet
 import java.util.LinkedHashSet
 import java.util.Optional
@@ -128,7 +133,7 @@ class BootstrapComponentDescriptor(
         BOOTSTRAP_COMPONENT(
             BootstrapComponent::class,
             BootstrapComponent.Builder::class,
-            sourcerer.BOOTSTRAP_MODULES_ATTRIBUTE,
+            BOOTSTRAP_MODULES_ATTRIBUTE,
             true
         );
 
@@ -284,14 +289,16 @@ class BootstrapComponentDescriptor(
             parentKind: Optional<Kind>
         ): BootstrapComponentDescriptor {
             val componentMirror = componentDefinitionType.getAnnotationMirror(kind.annotationType)!!
-            val dependencies = componentMirror.getTypeListValue(sourcerer.BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
+            val dependencies = componentMirror.getTypeListValue(BOOTSTRAP_DEPENDENCIES_ATTRIBUTE)
                     .map(MoreTypes::asTypeElement)
                     .map(this::forComponent)
                     .toImmutableSet()
             val modules = modulesFactory.create(componentMirror, kind.modulesAttribute)
-            val applicationModules = modulesFactory.create(componentMirror, sourcerer.APPLICATION_MODULES_ATTRIBUTE)
-            val autoInclude = componentMirror.getValue<Boolean>(sourcerer.AUTO_INCLUDE_ATTRIBUTE)!!
-            val flatten = componentMirror.getValue<Boolean>(sourcerer.FLATTEN_ATTRIBUTE)!!
+            val applicationModules = modulesFactory.create(componentMirror,
+                APPLICATION_MODULES_ATTRIBUTE
+            )
+            val autoInclude = componentMirror.getValue<Boolean>(AUTO_INCLUDE_ATTRIBUTE)!!
+            val flatten = componentMirror.getValue<Boolean>(FLATTEN_ATTRIBUTE)!!
             val unimplementedMethods = elements.getUnimplementedMethods(componentDefinitionType)
             val componentMethods = unimplementedMethods.map { componentMethod ->
                 getDescriptorForComponentMethod(componentDefinitionType, kind, componentMethod)

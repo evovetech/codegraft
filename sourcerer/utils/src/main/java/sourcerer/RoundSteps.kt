@@ -14,5 +14,26 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package sourcerer
 
+import com.google.common.collect.ImmutableList
+import javax.annotation.processing.RoundEnvironment
+
+abstract
+class RoundSteps(
+    steps: ImmutableList<RoundStep> = ImmutableList.of()
+) : List<RoundStep> by steps {
+    open
+    fun preRound(parent: ParentRound) {
+        forEach { step ->
+            step.preRound(parent)
+        }
+    }
+
+    open
+    fun postRound(roundEnv: RoundEnvironment) {
+        forEach { step ->
+            step.postRound(roundEnv)
+        }
+    }
+}

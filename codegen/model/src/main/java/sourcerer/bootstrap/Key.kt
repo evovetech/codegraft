@@ -21,6 +21,7 @@ import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
 import dagger.model.Key
+import sourcerer.MethodBuilder
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror

@@ -146,7 +146,7 @@ class AndroidInjectModuleGenerator(
 
     class SubcomponentBuilder(
         private val parent: Subcomponent
-    ) : sourcerer.JavaOutput.Builder() {
+    ) : JavaOutput.Builder() {
         val fullType = parent.fullType.nestedClass(outKlass.name)
 
         override

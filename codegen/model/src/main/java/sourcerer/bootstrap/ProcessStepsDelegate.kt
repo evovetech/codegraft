@@ -17,6 +17,7 @@
 package sourcerer.bootstrap
 
 import com.google.auto.common.BasicAnnotationProcessor
+import sourcerer.RoundStep
 import sourcerer.processor.ProcessingEnv.Option
 import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject

@@ -23,8 +23,11 @@ plugins {
 }
 
 apply from: "${configDir}/kotlin-library.gradle"
+apply from: "${configDir}/versions/dagger.gradle"
 
 dependencies {
     api "com.google.auto:auto-common:${app.autoCommonVersion}"
     api project(':sourcerer:io')
+    api(dagger.core)
+    kapt(dagger.coreCompiler)
 }

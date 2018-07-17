@@ -14,48 +14,14 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package sourcerer
 
 import com.google.auto.common.BasicAnnotationProcessor.ProcessingStep
-import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
-import dagger.MembersInjector
-import sourcerer.AnnotationElements
 import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Option
 import javax.annotation.processing.RoundEnvironment
-import javax.inject.Inject
-import javax.inject.Singleton
 import javax.lang.model.element.Element
-
-@Singleton
-class RoundSteps(
-    steps: ImmutableList<RoundStep> = ImmutableList.of()
-) : List<RoundStep> by steps {
-    @Inject constructor(
-        env: ProcessingEnv,
-        steps: AnnotationSteps,
-        injector: MembersInjector<AnnotationStep>
-    ) : this(steps.map { step ->
-        injector.injectMembers(step)
-        RoundStep(env, step)
-    }.toImmutableList())
-
-    fun preRound(parent: ParentRound) {
-        forEach { step ->
-            step.preRound(parent)
-        }
-    }
-
-    fun postRound(roundEnv: RoundEnvironment) {
-        forEach { step ->
-            step.postRound(roundEnv)
-        }
-    }
-}
-
-fun Collection<RoundStep>.toRoundSteps(): RoundSteps =
-    RoundSteps(toImmutableList())
 
 class RoundStep(
     private val env: ProcessingEnv,

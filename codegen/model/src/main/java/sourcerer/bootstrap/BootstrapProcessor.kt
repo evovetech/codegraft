@@ -18,11 +18,14 @@ package sourcerer.bootstrap
 
 import com.google.common.collect.ImmutableList
 import dagger.BindsInstance
+import sourcerer.DelegatingProcessor
 import sourcerer.Output
+import sourcerer.ParentRound
 import sourcerer.mapOutput
 import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Options
 import sourcerer.processor.newEnv
+import sourcerer.toImmutableList
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -126,7 +129,7 @@ class BootstrapProcessor(
             env.log("outputs=$outputs")
 
             finished = true
-            return copy(applicationOutputs = outputs.toImmutableList())
+            return copy(parentOutputs = outputs.toImmutableList())
         } else {
             env.log("postRound: no outputs")
             return this

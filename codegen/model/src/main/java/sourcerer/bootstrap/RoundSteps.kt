@@ -16,23 +16,28 @@
 
 package sourcerer.bootstrap
 
-import sourcerer.ExactSet
+import com.google.common.collect.ImmutableList
+import dagger.MembersInjector
+import sourcerer.AnnotationStep
+import sourcerer.RoundStep
 import sourcerer.processor.ProcessingEnv
 import sourcerer.toImmutableList
-import javax.annotation.processing.Processor
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ProcessData
-@Inject constructor(
-    val env: ProcessingEnv,
-    processors: ExactSet<Processor>,
-    val steps: RoundSteps,
-    val bootstrapComponentStep: BootstrapComponentStep,
-    val androidInjectStep: AndroidInjectStep,
-    val appComponentStep: AppComponentStep
-) {
-    val processors = processors
-            .toImmutableList()
+class RoundSteps(
+    steps: ImmutableList<RoundStep> = ImmutableList.of()
+) : sourcerer.RoundSteps(steps) {
+    @Inject constructor(
+        env: ProcessingEnv,
+        steps: AnnotationSteps,
+        injector: MembersInjector<AnnotationStep>
+    ) : this(steps.map { step ->
+        injector.injectMembers(step)
+        RoundStep(env, step)
+    }.toImmutableList())
 }
+
+fun Collection<RoundStep>.toRoundSteps(): RoundSteps =
+    RoundSteps(toImmutableList())

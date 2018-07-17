@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package sourcerer
 
 interface Includable {
     val include: Boolean

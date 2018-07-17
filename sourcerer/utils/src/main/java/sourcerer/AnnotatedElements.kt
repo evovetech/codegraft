@@ -17,7 +17,6 @@
 package sourcerer
 
 import com.google.auto.common.MoreElements
-import com.google.auto.common.MoreTypes
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
@@ -28,10 +27,6 @@ typealias AnnotationType = KClass<out Annotation>
 interface AnnotatedElement<out A : Annotation, out E : Element> {
     val annotation: A
     val element: E
-}
-
-fun say() {
-//    MoreTypes.equivalence().wrap()
 }
 
 operator

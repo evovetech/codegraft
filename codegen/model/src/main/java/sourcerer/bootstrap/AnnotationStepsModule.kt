@@ -20,6 +20,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
 import dagger.multibindings.Multibinds
+import sourcerer.AnnotationStep
+import sourcerer.EnvModule
 
 typealias AnnotationSteps = Set<@JvmSuppressWildcards AnnotationStep>
 

@@ -18,7 +18,7 @@ package dagger.internal.codegen
 
 import com.google.auto.common.MoreTypes
 import com.squareup.javapoet.ParameterSpec
-import sourcerer.bootstrap.buildParameter
+import sourcerer.buildParameter
 import sourcerer.processor.ProcessingEnv
 
 typealias Env = ProcessingEnv

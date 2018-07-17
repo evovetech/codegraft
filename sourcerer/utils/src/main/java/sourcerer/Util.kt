@@ -16,21 +16,54 @@
 
 package sourcerer
 
+import com.google.auto.common.MoreElements
 import com.google.common.base.Joiner
+import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import com.squareup.javapoet.ClassName
 import sourcerer.processor.Env
 import sourcerer.processor.EnvProcessor
+import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.MirroredTypeException
 import javax.lang.model.type.MirroredTypesException
 import javax.lang.model.type.TypeMirror
+import javax.lang.model.util.ElementFilter
 import javax.lang.model.util.Elements
 import kotlin.reflect.KClass
 
 /**
  * Created by layne on 2/21/18.
  */
+
+typealias ExactSet<T> = Set<@JvmSuppressWildcards T>
+
+fun <T> Collection<T>.toImmutableList(): ImmutableList<T> {
+    return ImmutableList.copyOf(this)
+}
+
+fun <T> Collection<T>.toImmutableSet(): ImmutableSet<T> {
+    return ImmutableSet.copyOf(this)
+}
+
+fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V> {
+    return ImmutableMap.copyOf(this)
+}
+
+inline
+fun <reified E> immutableSet(init: ImmutableSet.Builder<E>.() -> Unit): ImmutableSet<E> {
+    val builder = ImmutableSet.builder<E>()
+    builder.init()
+    return builder.build()
+}
+
+internal
+fun Elements.abstractMethods(
+    typeElement: TypeElement
+) = ElementFilter.methodsIn(getAllMembers(typeElement))
+        .filter(MoreElements.hasModifiers<ExecutableElement>(ABSTRACT)::apply)
 
 fun CharSequence?.ifNotEmpty(block: (CharSequence) -> Unit) {
     if (!isNullOrEmpty()) {

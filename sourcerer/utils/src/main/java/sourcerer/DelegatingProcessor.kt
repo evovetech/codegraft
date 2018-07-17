@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package sourcerer
 
 import com.google.common.collect.ImmutableList
 import javax.annotation.processing.Completion

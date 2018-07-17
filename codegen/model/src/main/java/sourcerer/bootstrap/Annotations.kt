@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package sourcerer
+package sourcerer.bootstrap
 
 import com.google.auto.common.AnnotationMirrors.getAnnotatedAnnotations
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.common.collect.ImmutableSet
-import sourcerer.bootstrap.toImmutableSet
+import sourcerer.toImmutableSet
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.lang.model.element.AnnotationMirror

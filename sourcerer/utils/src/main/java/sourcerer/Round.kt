@@ -14,65 +14,13 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package sourcerer
 
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableSetMultimap
-import sourcerer.AnnotationElements
-import sourcerer.Output
-import sourcerer.mapOutput
 import sourcerer.processor.ProcessingEnv
-import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
-import javax.lang.model.element.TypeElement
-
-data
-class ParentRound(
-    val number: Int = 0,
-    val prev: ParentRound? = null,
-    val elements: ImmutableSet<TypeElement> = ImmutableSet.of(),
-    val rootElements: ImmutableSet<Element> = ImmutableSet.of(),
-    val rounds: ImmutableList<Round> = ImmutableList.of(),
-    val applicationOutputs: ImmutableList<Output> = ImmutableList.of()
-) {
-    val outputs: ImmutableList<Output> by lazy {
-        rounds.flatMap(Round::outputs)
-                .toImmutableList()
-    }
-    val deferredElements: ImmutableSet<Element> by lazy {
-        rounds.flatMap(Round::deferredElements)
-                .toImmutableSet()
-    }
-
-    fun process(
-        elements: Set<TypeElement>,
-        roundEnv: RoundEnvironment,
-        steps: RoundSteps,
-        processFunc: () -> Boolean
-    ): ParentRound {
-        val round = ParentRound(
-            number + 1,
-            this,
-            elements.toImmutableSet(),
-            roundEnv.rootElements.toImmutableSet()
-        )
-        steps.preRound(round)
-
-        processFunc()
-
-        if (!roundEnv.processingOver()) {
-            steps.postRound(roundEnv)
-        }
-
-        val rounds = steps.map { step ->
-            step.currentRound.catchupTo(round)
-        }.toImmutableList()
-        return round.copy(
-            rounds = rounds
-        )
-    }
-}
 
 data
 class Round(

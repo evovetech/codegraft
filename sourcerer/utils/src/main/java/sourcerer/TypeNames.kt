@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package sourcerer
 
 import com.squareup.javapoet.ArrayTypeName
 import com.squareup.javapoet.ClassName

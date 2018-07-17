@@ -16,7 +16,6 @@
 
 package sourcerer
 
-import sourcerer.bootstrap.AnnotationStep
 import sourcerer.processor.Env
 import sourcerer.processor.ProcessingEnv.Option
 

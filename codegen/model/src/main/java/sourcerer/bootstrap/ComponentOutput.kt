@@ -20,6 +20,7 @@ import dagger.internal.codegen.BootstrapComponentDescriptor
 import dagger.internal.codegen.ComponentBootDataGenerator
 import dagger.internal.codegen.ComponentImplementationGenerator
 import dagger.internal.codegen.ComponentModuleGenerator
+import sourcerer.Includable
 import sourcerer.Output
 import javax.annotation.processing.FilerException
 import javax.inject.Inject

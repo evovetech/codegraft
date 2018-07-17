@@ -34,7 +34,7 @@ class AppProcessor : MainProcessor(true) {
             if (!written) {
                 written = true
 
-                val applicationOutputs = bootstrap.currentRound.applicationOutputs
+                val applicationOutputs = bootstrap.currentRound.parentOutputs
                 if (applicationOutputs.isNotEmpty()) {
                     write()
                 } else {

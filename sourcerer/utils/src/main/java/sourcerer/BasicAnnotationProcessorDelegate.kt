@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package sourcerer
 
 import com.google.auto.common.BasicAnnotationProcessor
 import javax.annotation.processing.ProcessingEnvironment

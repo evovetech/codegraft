@@ -18,10 +18,13 @@ package sourcerer.bootstrap
 
 import com.google.common.collect.ImmutableSet
 import sourcerer.AnnotationElements
+import sourcerer.AnnotationStep
 import sourcerer.AnnotationType
 import sourcerer.Output
+import sourcerer.Outputs
 import sourcerer.inject.AndroidInject
 import sourcerer.processor.ProcessingEnv
+import sourcerer.toImmutableSet
 import sourcerer.typeInputs
 import javax.inject.Inject
 import javax.inject.Singleton

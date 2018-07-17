@@ -28,13 +28,13 @@ import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodDescr
 import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodKind.MEMBERS_INJECTION
 import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodKind.PROVISION
 import sourcerer.JavaOutput
-import sourcerer.bootstrap.addFieldSpec
-import sourcerer.bootstrap.addToConstructor
-import sourcerer.bootstrap.getFieldName
+import sourcerer.addFieldSpec
+import sourcerer.addToConstructor
 import sourcerer.bootstrap.key
 import sourcerer.bootstrap.type
 import sourcerer.classBuilder
-import sourcerer.qualifier
+import sourcerer.getFieldName
+import sourcerer.bootstrap.qualifier
 import sourcerer.typeSpec
 import javax.inject.Inject
 import javax.inject.Provider

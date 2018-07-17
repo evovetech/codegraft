@@ -17,7 +17,7 @@
 package sourcerer
 
 import com.squareup.javapoet.ClassName
-import sourcerer.bootstrap.Includable
+import sourcerer.MetaInf.File
 import sourcerer.io.Writer
 import javax.annotation.processing.Filer
 import javax.lang.model.element.Element
@@ -68,7 +68,7 @@ abstract
 class SourcererOutput :
     BaseOutput() {
     abstract
-    fun file(): MetaInf.File
+    fun file(): File
 
     abstract
     fun write(writer: Writer)

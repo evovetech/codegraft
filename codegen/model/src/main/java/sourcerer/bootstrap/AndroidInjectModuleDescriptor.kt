@@ -32,6 +32,7 @@ import sourcerer.inject.android.AndroidInjectModule
 import sourcerer.inject.android.AndroidInjectServiceModule
 import sourcerer.inject.android.AndroidInjectSupportFragmentModule
 import sourcerer.qualifiedName
+import sourcerer.toImmutableList
 import javax.inject.Inject
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
