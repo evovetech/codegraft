@@ -96,7 +96,6 @@ class BootstrapProcessor(
 
     override
     fun process(elements: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        env.log("elements = $elements")
         val round = this.round.process(elements, roundEnv, steps) {
             super.process(elements, roundEnv)
         }

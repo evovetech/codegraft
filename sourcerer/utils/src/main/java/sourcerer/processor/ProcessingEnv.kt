@@ -22,9 +22,12 @@ import javax.annotation.processing.Messager
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
 import javax.lang.model.SourceVersion
+import javax.lang.model.element.AnnotationMirror
+import javax.lang.model.element.AnnotationValue
 import javax.lang.model.element.Element
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
+import javax.tools.Diagnostic.Kind
 import javax.tools.Diagnostic.Kind.ERROR
 import javax.tools.Diagnostic.Kind.NOTE
 import kotlin.reflect.KClass
@@ -44,6 +47,42 @@ class BaseProcessingEnv(
         processor: Processor,
         env: ProcessingEnvironment
     ) : this(processor::class, env)
+
+    private val _messager = super.messager
+
+    override
+    val messager: Messager = object : Messager {
+        override
+        fun printMessage(kind: Kind?, msg: CharSequence?) {
+            // TODO: Log level
+//            _messager.printMessage(kind, msg)
+        }
+
+        override
+        fun printMessage(kind: Kind?, msg: CharSequence?, element: Element?) {
+            // TODO: Log level
+//            _messager.printMessage(kind, msg, element)
+
+        }
+
+        override
+        fun printMessage(kind: Kind?, msg: CharSequence?, element: Element?, annotationMirror: AnnotationMirror) {
+            // TODO: Log level
+//            _messager.printMessage(kind, msg, element, annotationMirror)
+        }
+
+        override
+        fun printMessage(
+            kind: Kind?,
+            msg: CharSequence?,
+            element: Element?,
+            annotationMirror: AnnotationMirror?,
+            annotationValue: AnnotationValue?
+        ) {
+            // TODO: Log level
+//            _messager.printMessage(kind, msg, element, annotationMirror, annotationValue)
+        }
+    }
 }
 
 interface ProcessingEnv {
