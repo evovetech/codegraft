@@ -84,7 +84,8 @@ class BootstrapProcessor(
     fun initProcessors(
         env: ProcessingEnvironment
     ): List<Processor> {
-        val component = DaggerBootstrapProcessor_Component.builder().run {
+        val builder: BootstrapProcessor.Component.Builder = DaggerBootstrapProcessor_Component.builder()
+        val component = builder.run {
             env(newEnv(env))
             isApplication(isApplication)
             build()
