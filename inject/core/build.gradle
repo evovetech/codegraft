@@ -30,7 +30,7 @@ dependencies {
     compileOnly(dagger.androidSupportJar)
     compileOnly("com.google.android:android:4.1.1.4")
     compileOnly("com.google.android:support-v4:r7")
-    api project(':inject:annotations')
+    api project(':inject-annotations')
     kapt(dagger.coreCompiler)
     kapt(dagger.androidCompiler)
 }

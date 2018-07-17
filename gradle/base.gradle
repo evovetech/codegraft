@@ -17,7 +17,7 @@
 apply from: "${configDir}/kotlin-library.gradle"
 
 dependencies {
-    implementation project(':codegen:io')
-    implementation project(':inject:annotations')
+    implementation project(':sourcerer:io')
+    implementation project(':inject-annotations')
     implementation "com.google.auto:auto-common:${app.autoCommonVersion}"
 }

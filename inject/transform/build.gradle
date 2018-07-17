@@ -35,7 +35,7 @@ configurations.compileOnly.extendsFrom(configurations.anno)
 configurations.kapt.extendsFrom(configurations.anno)
 
 dependencies {
-    api project(':inject:runtime')
+    api project(':inject-runtime')
     implementation "net.bytebuddy:byte-buddy:${app.byteBuddyVersion}"
     compileOnly("com.google.android:android:4.1.1.4")
     compileOnly("com.google.android:support-v4:r7")

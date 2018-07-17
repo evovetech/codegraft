@@ -31,8 +31,8 @@ dependencies {
     api(dagger.coreCompiler)
     kapt(dagger.coreCompiler)
     api(dagger.androidCompiler)
-    api project(':codegen:utils')
-    compileOnly project(':inject:core')
+    api project(':sourcerer:utils')
+    compileOnly project(':inject-core')
     compileOnly("com.google.android:android:4.1.1.4")
     compileOnly("com.google.android:support-v4:r7")
     anno "com.google.auto.service:auto-service:${app.autoServiceVersion}"

@@ -28,7 +28,7 @@ apply from: "${configDir}/kotlin-library.gradle"
 apply from: "${configDir}/versions/dagger.gradle"
 
 dependencies {
-    implementation project(':inject:transform')
+    implementation project(':inject-transform')
     implementation "net.bytebuddy:byte-buddy:${app.byteBuddyVersion}"
     compileOnly 'org.jetbrains.kotlin:kotlin-gradle-plugin'
     compileOnly "com.android.tools.build:gradle:${app.androidVersion}"

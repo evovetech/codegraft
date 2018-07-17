@@ -18,14 +18,13 @@ plugins {
     id("kotlin")
     id("kotlin-kapt")
     id("com.jfrog.bintray")
-    id("com.jfrog.artifactory")
+//    id("com.jfrog.artifactory")
     id("org.jetbrains.dokka")
 }
 
 apply from: "${configDir}/kotlin-library.gradle"
 
 dependencies {
-    implementation "com.google.guava:guava:${app.guavaVersion}"
-    api "com.squareup:javapoet:${app.javaPoetVersion}"
-    api "com.squareup.okio:okio:${app.okioVersion}"
+    api "com.google.auto:auto-common:${app.autoCommonVersion}"
+    api project(':sourcerer:io')
 }

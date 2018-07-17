@@ -29,8 +29,8 @@ apply from: "${configDir}/versions/dagger.gradle"
 dependencies(dagger.applyAndroid('api'))
 
 dependencies {
-    api project(':inject:annotations')
-    api project(':inject:core')
+    api project(':inject-annotations')
+    api project(':inject-core')
     api 'android.arch.lifecycle:extensions:1.1.1'
-    kapt project(':codegen:lib-processor')
+    kapt project(':codegen-lib-processor')
 }

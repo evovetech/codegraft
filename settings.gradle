@@ -25,17 +25,43 @@ buildscript {
 apply plugin: 'evovetech.settings'
 apply from: "${configDir}/evovetech/settings.gradle"
 
-include(
-        ':codegen:io',
-        ':codegen:utils',
-        ':codegen:model',
-        ':codegen:lib-processor',
-        ':codegen:app-processor',
+def add(String parent, String child) {
+    def name = "${parent}-${child}"
+    def path = ":${name}"
+    include(path)
+    project(path).projectDir = file("${parent}/${child}")
+}
 
-        ':inject:annotations',
-        ':inject:core',
-        ':inject:android',
-        ':inject:runtime',
-        ':inject:transform',
-        ':inject:plugin',
+def addAll(String parent, String... includes) {
+    includes.each { include ->
+        add(parent, include)
+    }
+}
+
+def codegen(String... includes) {
+    addAll('codegen', *includes)
+}
+
+def inject(String... includes) {
+    addAll('inject', *includes)
+}
+
+codegen(
+        'model',
+        'lib-processor',
+        'app-processor'
+)
+
+inject(
+        'annotations',
+        'core',
+        'android',
+        'runtime',
+        'transform',
+        'plugin'
+)
+
+include(
+        ':sourcerer:io',
+        ':sourcerer:utils',
 )

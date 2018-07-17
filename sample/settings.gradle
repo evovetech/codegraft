@@ -26,16 +26,7 @@ buildscript {
 apply plugin: 'evovetech.settings'
 apply from: "${configDir}/evovetech/settings.gradle"
 
-includeBuild('..') {
-    dependencySubstitution {
-        ['plugin', 'android', 'annotations', 'core', 'runtime', 'transform'].each { lib ->
-            substitute module("evovetech.codegraft:inject-${lib}") with project(":inject:${lib}")
-        }
-        ['io', 'utils', 'model', 'app-processor', 'lib-processor'].each { lib ->
-            substitute module("evovetech.codegraft:codegen-${lib}") with project(":codegen:${lib}")
-        }
-    }
-}
+includeBuild('..')
 
 include(
         // app
