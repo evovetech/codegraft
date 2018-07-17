@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package sourcerer
+package codegraft
 
 import com.google.auto.service.AutoService
-import sourcerer.bootstrap.Package
+import codegraft.bootstrap.Package
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.TypeElement

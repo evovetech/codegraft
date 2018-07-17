@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package codegraft.bootstrap
 
 import com.google.common.collect.ImmutableList
 import dagger.MembersInjector

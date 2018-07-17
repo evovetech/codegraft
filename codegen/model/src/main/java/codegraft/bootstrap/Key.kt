@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package codegraft.bootstrap
 
 import com.google.auto.common.MoreTypes
 import com.squareup.javapoet.AnnotationSpec

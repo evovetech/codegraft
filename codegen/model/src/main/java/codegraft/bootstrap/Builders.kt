@@ -14,8 +14,22 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package codegraft.bootstrap
 
-import sourcerer.processor.ProcessingEnv
+import com.google.auto.common.MoreTypes
+import com.squareup.javapoet.AnnotationSpec
+import com.squareup.javapoet.ParameterSpec
+import dagger.model.DependencyRequest
+import sourcerer.buildParameter
 
-typealias Env = ProcessingEnv
+fun DependencyRequest.buildParameter(
+    init: ParameterSpec.Builder.() -> Unit = {}
+): ParameterSpec {
+    val type = MoreTypes.asDeclared(key.type)
+    return type.buildParameter {
+        key.qualifier?.let {
+            addAnnotation(AnnotationSpec.get(it))
+        }
+        init()
+    }
+}

@@ -14,13 +14,25 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package codegraft.bootstrap
 
-import dagger.model.DependencyRequest
-import dagger.model.Key
+import sourcerer.ExactSet
+import sourcerer.processor.ProcessingEnv
+import sourcerer.toImmutableList
+import javax.annotation.processing.Processor
+import javax.inject.Inject
+import javax.inject.Singleton
 
-typealias Dependency = DependencyRequest
-
-val Dependency.key: Key
-    get() = key()
-
+@Singleton
+class ProcessData
+@Inject constructor(
+    val env: ProcessingEnv,
+    processors: ExactSet<Processor>,
+    val steps: RoundSteps,
+    val bootstrapComponentStep: BootstrapComponentStep,
+    val androidInjectStep: AndroidInjectStep,
+    val appComponentStep: AppComponentStep
+) {
+    val processors = processors
+            .toImmutableList()
+}

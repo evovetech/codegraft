@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package codegraft.bootstrap
 
 import com.google.common.collect.ImmutableSet
 import dagger.internal.codegen.AppComponentGenerator

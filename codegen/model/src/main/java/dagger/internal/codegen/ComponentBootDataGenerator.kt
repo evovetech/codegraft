@@ -24,11 +24,11 @@ import dagger.model.Key
 import sourcerer.JavaOutput
 import sourcerer.addFieldSpec
 import sourcerer.addToConstructor
-import sourcerer.bootstrap.Dependency
-import sourcerer.bootstrap.fieldName
-import sourcerer.bootstrap.getterMethod
-import sourcerer.bootstrap.qualifier
-import sourcerer.bootstrap.type
+import codegraft.bootstrap.Dependency
+import codegraft.bootstrap.fieldName
+import codegraft.bootstrap.getterMethod
+import codegraft.bootstrap.qualifier
+import codegraft.bootstrap.type
 import sourcerer.buildUnique
 import sourcerer.classBuilder
 import sourcerer.toImmutableSet

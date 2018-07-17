@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package sourcerer
+package codegraft.bootstrap
 
-import com.google.auto.service.AutoService
+import dagger.Binds
+import dagger.Module
+import dagger.multibindings.IntoSet
 import javax.annotation.processing.Processor
 
-/**
- * Created by layne on 2/20/18.
- */
-@AutoService(Processor::class)
-class LibProcessor : MainProcessor(false)
+@Module(includes = [AnnotationStepsModule::class])
+interface RoundProcessorsModule {
+    @Binds @IntoSet
+    fun bindProcessSteps(processStepsDelegate: ProcessStepsDelegate): Processor
+}

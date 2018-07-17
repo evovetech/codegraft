@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package codegraft.bootstrap
 
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoSet
-import javax.annotation.processing.Processor
+import sourcerer.processor.ProcessingEnv
 
-@Module(includes = [AnnotationStepsModule::class])
-interface RoundProcessorsModule {
-    @Binds @IntoSet
-    fun bindProcessSteps(processStepsDelegate: ProcessStepsDelegate): Processor
-}
+typealias Env = ProcessingEnv

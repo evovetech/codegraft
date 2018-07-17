@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package codegraft.bootstrap
 
 import com.google.auto.common.MoreTypes
 import com.google.common.base.Equivalence
@@ -138,7 +138,7 @@ class AndroidInjectModuleDescriptor(
     @Inject constructor(
         val elements: Elements,
         val types: Types,
-        val kindFactory: Kind.Factory
+        val kindFactory: codegraft.bootstrap.AndroidInjectModuleDescriptor.Kind.Factory
     ) {
         fun forStoredModule(
             className: ClassName

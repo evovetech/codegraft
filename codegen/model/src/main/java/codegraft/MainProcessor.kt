@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package sourcerer
+package codegraft
 
-import sourcerer.bootstrap.BootstrapProcessor
+import codegraft.bootstrap.BootstrapProcessor
 import sourcerer.processor.ProcessingEnv
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package codegraft.bootstrap
 
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
@@ -33,7 +33,7 @@ import sourcerer.SourceWriter
 import sourcerer.addAnnotation
 import sourcerer.addMethod
 import sourcerer.addTo
-import sourcerer.bootstrap.AndroidInjectModuleDescriptor.Kind.Application
+import codegraft.bootstrap.AndroidInjectModuleDescriptor.Kind.Application
 import sourcerer.classBuilder
 import sourcerer.className
 import sourcerer.inject.android.ActivityScope
@@ -90,7 +90,8 @@ class AndroidInjectModuleGenerator(
     fun applicationTypeSpec() = typeSpec {
         addModifiers(PUBLIC, STATIC)
 
-        val subcomponent = Subcomponent(this@AndroidInjectModuleGenerator)
+        val subcomponent =
+            Subcomponent(this@AndroidInjectModuleGenerator)
 
         addAnnotation(Dagger.Module) {
             subcomponent.fullType

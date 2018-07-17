@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package codegraft
 
-import com.google.auto.common.MoreTypes
-import com.squareup.javapoet.AnnotationSpec
-import com.squareup.javapoet.ParameterSpec
-import dagger.model.DependencyRequest
-import sourcerer.buildParameter
+import com.google.auto.service.AutoService
+import javax.annotation.processing.Processor
 
-fun DependencyRequest.buildParameter(
-    init: ParameterSpec.Builder.() -> Unit = {}
-): ParameterSpec {
-    val type = MoreTypes.asDeclared(key.type)
-    return type.buildParameter {
-        key.qualifier?.let {
-            addAnnotation(AnnotationSpec.get(it))
-        }
-        init()
-    }
-}
+/**
+ * Created by layne on 2/20/18.
+ */
+@AutoService(Processor::class)
+class LibProcessor : MainProcessor(false)

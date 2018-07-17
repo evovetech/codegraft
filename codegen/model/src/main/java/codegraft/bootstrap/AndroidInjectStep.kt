@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package codegraft.bootstrap
 
+import codegraft.bootstrap.AndroidInjectModuleDescriptor.Factory
 import com.google.common.collect.ImmutableSet
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationStep
@@ -32,7 +33,7 @@ import javax.inject.Singleton
 @Singleton
 class AndroidInjectStep
 @Inject constructor(
-    val descriptorFactory: AndroidInjectModuleDescriptor.Factory,
+    val descriptorFactory: Factory,
     val outputFactory: AndroidInjectModuleGenerator.Factory,
     val sourcerer: AndroidInjectSourcerer
 ) : AnnotationStep() {

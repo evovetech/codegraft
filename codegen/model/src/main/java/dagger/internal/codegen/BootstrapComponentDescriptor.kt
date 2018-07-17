@@ -36,12 +36,12 @@ import dagger.internal.codegen.Scopes.scopesOf
 import dagger.model.DependencyRequest
 import dagger.model.Scope
 import dagger.producers.ProductionComponent
-import sourcerer.bootstrap.APPLICATION_MODULES_ATTRIBUTE
-import sourcerer.bootstrap.AUTO_INCLUDE_ATTRIBUTE
+import codegraft.bootstrap.APPLICATION_MODULES_ATTRIBUTE
+import codegraft.bootstrap.AUTO_INCLUDE_ATTRIBUTE
 import sourcerer.AnnotatedTypeElement
-import sourcerer.bootstrap.BOOTSTRAP_DEPENDENCIES_ATTRIBUTE
-import sourcerer.bootstrap.BOOTSTRAP_MODULES_ATTRIBUTE
-import sourcerer.bootstrap.FLATTEN_ATTRIBUTE
+import codegraft.bootstrap.BOOTSTRAP_DEPENDENCIES_ATTRIBUTE
+import codegraft.bootstrap.BOOTSTRAP_MODULES_ATTRIBUTE
+import codegraft.bootstrap.FLATTEN_ATTRIBUTE
 import sourcerer.getAnnotationMirror
 import sourcerer.getValue
 import sourcerer.inject.BootstrapComponent

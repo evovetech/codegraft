@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sourcerer.bootstrap
+package codegraft.bootstrap
 
 import com.google.common.collect.ImmutableSet
 import dagger.internal.codegen.BootstrapComponentDescriptor
@@ -24,7 +24,8 @@ import sourcerer.AnnotationType
 import sourcerer.DeferredOutput
 import sourcerer.Output
 import sourcerer.Outputs
-import sourcerer.bootstrap.BootstrapComponentStep.Option
+import codegraft.bootstrap.BootstrapComponentStep.Option
+import codegraft.bootstrap.ComponentOutput.Factory
 import sourcerer.inject.BootstrapComponent
 import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Options
@@ -38,7 +39,7 @@ class BootstrapComponentStep
 @Inject internal
 constructor(
     val componentFactory: BootstrapComponentDescriptor.Factory,
-    val componentOutputFactory: ComponentOutput.Factory,
+    val componentOutputFactory: Factory,
     val sourcerer: BootstrapSourcerer
 ) : AnnotationStep() {
     internal
