@@ -20,13 +20,14 @@ if (!project.plugins.hasPlugin('com.jfrog.bintray')) {
 
 def pubName = ext.pubName
 def pomGroupId = pom.groupId
+def pomProjectNme = pom.projectName
 def pomArtifactId = ext.pomArtifactId
 def pomVersion = pom.version
 bintray {
     publications = [pubName]
     pkg {
         repo = app.bintrayRepo
-        name = "${pomGroupId}.${pomArtifactId()}"
+        name = pomProjectNme
         userOrg = app.bintrayOrg
         licenses = project.LICENSES
         labels =  project.LABELS
