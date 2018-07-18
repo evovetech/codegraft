@@ -15,7 +15,12 @@
  */
 
 plugins {
-    id('base')
+    id("com.android.library").apply(false)
+    id("kotlin-android").apply(false)
+    id("kotlin-kapt").apply(false)
+    id("com.jfrog.bintray").apply(false)
+    id("com.jfrog.artifactory").apply(false)
+    id("org.jetbrains.dokka").apply(false)
 }
 
 ext {
