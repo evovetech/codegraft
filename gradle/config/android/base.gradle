@@ -41,10 +41,6 @@ dependencies {
     testImplementation junitCore
     testImplementation mockitoCore
     testImplementation mockitoInline
-//    testImplementation powermockJunit
-//    testImplementation powermockJunitRule
-//    testImplementation powermockClassloading
-//    testImplementation powermockMockito
     androidTestImplementation mockitoAndroid
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

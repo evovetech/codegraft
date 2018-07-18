@@ -22,13 +22,12 @@ buildscript {
     apply from: "${root}/${version}/buildscript.gradle"
     ext.configDir = gradle.configDir
 
-
     repositories(gradle.buildscriptRepos)
     dependencies(gradle.buildscriptDependencies)
 }
 
 apply plugin: 'evovetech.settings'
-apply from: "${configDir}/evovetech/settings.gradle"
+apply from: "${configDir}/plugins.gradle"
 
 def add(String parent, String child) {
     def name = "${parent}-${child}"
