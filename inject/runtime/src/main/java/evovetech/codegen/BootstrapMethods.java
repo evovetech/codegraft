@@ -41,10 +41,10 @@ class BootstrapMethods {
 
     @NotNull
     public static
-    AndroidInjector<Application> applicationInjector(@This BootApplication<?> application) {
+    AndroidInjector<Application> getApplicationInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasApplicationInjector) {
-            return ((HasApplicationInjector) component).applicationInjector();
+            return ((HasApplicationInjector) component).getApplicationInjector();
         }
         throw new IllegalStateException(component + " does not implement " + HasApplicationInjector.class.getCanonicalName());
     }
