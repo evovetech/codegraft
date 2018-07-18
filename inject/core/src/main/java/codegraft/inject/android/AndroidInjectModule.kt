@@ -29,6 +29,7 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.multibindings.Multibinds
 
 typealias AndroidInjectorMap<T> = Map<Class<out T>, Factory<out T>>
+typealias SupportFragment = android.support.v4.app.Fragment
 
 @Module
 interface AndroidInjectModule<T : Any> {

@@ -16,45 +16,8 @@
 
 package codegraft.inject.android
 
-import android.app.Activity
-import android.app.Fragment
-import android.app.Service
-import android.content.BroadcastReceiver
-import android.content.ContentProvider
 import dagger.android.AndroidInjector
 
 interface HasApplicationInjector {
-    val applicationInjector: AndroidInjector<AndroidApplication>
+    fun applicationInjector(): AndroidInjector<AndroidApplication>
 }
-
-typealias HasActivityInjector = dagger.android.HasActivityInjector
-
-val HasActivityInjector.activityInjector: AndroidInjector<Activity>
-    get() = activityInjector()
-
-typealias HasFragmentInjector = dagger.android.HasFragmentInjector
-
-val HasFragmentInjector.fragmentInjector: AndroidInjector<Fragment>
-    get() = fragmentInjector()
-
-typealias SupportFragment = android.support.v4.app.Fragment
-
-typealias HasSupportFragmentInjector = dagger.android.support.HasSupportFragmentInjector
-
-val HasSupportFragmentInjector.supportFragmentInjector: AndroidInjector<SupportFragment>
-    get() = supportFragmentInjector()
-
-typealias HasServiceInjector = dagger.android.HasServiceInjector
-
-val HasServiceInjector.serviceInjector: AndroidInjector<Service>
-    get() = serviceInjector()
-
-typealias HasBroadcastReceiverInjector = dagger.android.HasBroadcastReceiverInjector
-
-val HasBroadcastReceiverInjector.broadcastReceiverInjector: AndroidInjector<BroadcastReceiver>
-    get() = broadcastReceiverInjector()
-
-typealias HasContentProviderInjector = dagger.android.HasContentProviderInjector
-
-val HasContentProviderInjector.contentProviderInjector: AndroidInjector<ContentProvider>
-    get() = contentProviderInjector()

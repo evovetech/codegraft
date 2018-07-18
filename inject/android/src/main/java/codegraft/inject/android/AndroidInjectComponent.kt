@@ -17,6 +17,12 @@
 package codegraft.inject.android
 
 import codegraft.inject.BootstrapComponent
+import dagger.android.HasActivityInjector
+import dagger.android.HasBroadcastReceiverInjector
+import dagger.android.HasContentProviderInjector
+import dagger.android.HasFragmentInjector
+import dagger.android.HasServiceInjector
+import dagger.android.support.HasSupportFragmentInjector
 
 @BootstrapComponent(
     applicationModules = [AndroidInjectApplicationModule::class],

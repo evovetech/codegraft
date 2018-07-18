@@ -30,7 +30,7 @@ class BootstrapProvider : EmptyContentProvider() {
                 Log.d(TAG, "Bootstrapping!!")
                 val component = app.bootstrap.component
                 if (component is HasApplicationInjector) {
-                    component.applicationInjector.inject(app)
+                    component.applicationInjector().inject(app)
                 }
             }
             else -> {

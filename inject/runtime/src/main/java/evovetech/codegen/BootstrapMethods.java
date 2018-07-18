@@ -41,17 +41,17 @@ class BootstrapMethods {
 
     @NotNull
     public static
-    AndroidInjector<Application> getApplicationInjector(@This BootApplication<?> application) {
+    AndroidInjector<Application> applicationInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasApplicationInjector) {
-            return ((HasApplicationInjector) component).getApplicationInjector();
+            return ((HasApplicationInjector) component).applicationInjector();
         }
         throw new IllegalStateException(component + " does not implement " + HasApplicationInjector.class.getCanonicalName());
     }
 
     @NotNull
     public static
-    AndroidInjector<Activity> getActivityInjector(@This BootApplication<?> application) {
+    AndroidInjector<Activity> activityInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasActivityInjector) {
             return ((HasActivityInjector) component).activityInjector();
@@ -61,7 +61,7 @@ class BootstrapMethods {
 
     @NotNull
     public static
-    AndroidInjector<Service> getServiceInjector(@This BootApplication<?> application) {
+    AndroidInjector<Service> serviceInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasServiceInjector) {
             return ((HasServiceInjector) component).serviceInjector();
@@ -71,7 +71,7 @@ class BootstrapMethods {
 
     @NotNull
     public static
-    AndroidInjector<BroadcastReceiver> getBroadcastReceiverInjector(@This BootApplication<?> application) {
+    AndroidInjector<BroadcastReceiver> broadcastReceiverInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasBroadcastReceiverInjector) {
             return ((HasBroadcastReceiverInjector) component).broadcastReceiverInjector();
@@ -81,7 +81,7 @@ class BootstrapMethods {
 
     @NotNull
     public static
-    AndroidInjector<ContentProvider> getContentProviderInjector(@This BootApplication<?> application) {
+    AndroidInjector<ContentProvider> contentProviderInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasContentProviderInjector) {
             return ((HasContentProviderInjector) component).contentProviderInjector();
@@ -91,7 +91,7 @@ class BootstrapMethods {
 
     @NotNull
     public static
-    AndroidInjector<Fragment> getFragmentInjector(@This BootApplication<?> application) {
+    AndroidInjector<Fragment> fragmentInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasFragmentInjector) {
             return ((HasFragmentInjector) component).fragmentInjector();
@@ -101,7 +101,7 @@ class BootstrapMethods {
 
     @NotNull
     public static
-    AndroidInjector<android.support.v4.app.Fragment> getSupportFragmentInjector(@This BootApplication<?> application) {
+    AndroidInjector<android.support.v4.app.Fragment> supportFragmentInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasSupportFragmentInjector) {
             return ((HasSupportFragmentInjector) component).supportFragmentInjector();
