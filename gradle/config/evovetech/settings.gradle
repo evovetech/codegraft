@@ -14,55 +14,53 @@
  * limitations under the License.
  */
 
-apply plugin: 'evovetech.settings'
-
-def androidVersion = app.androidVersion
-def codegraftVersion = app.codegraftVersion
+def app = ext.app
 
 evove {
     repos(gradle.defaultRepos)
     plugins {
         update("org.gradle.kotlin.kotlin-dsl") {
-            it.version = "0.16.3"
+            it.version = "${app.kotlinDslVersion}"
         }
         update("kotlin") {
             it.module = "org.jetbrains.kotlin:kotlin-gradle-plugin"
-            it.version = "1.2.50"
+            it.version = "${app.kotlinVersion}"
         }
         update("com.android") {
             it.module = "com.android.tools.build:gradle"
-            it.version = "${androidVersion}"
+            it.version = "${app.androidPluginVersion}"
         }
         update("realm") {
             it.module = "io.realm:realm-gradle-plugin"
-            it.version = "4.2.0"
+            it.version = "${app.realmVersion}"
         }
         update("io.fabric") {
             it.module = "io.fabric.tools:gradle"
-            it.version = "1.25.4"
+            it.version = "${app.fabricVersion}"
         }
         update("com.google.firebase") {
             it.module = "com.google.firebase:firebase-plugins"
-            it.version = "1.1.5"
+            it.version = "${app.firebasePluginsVersion}"
         }
         update("com.jfrog.bintray") {
             it.module = "com.jfrog.bintray.gradle:gradle-bintray-plugin"
-            it.version = "1.8.0"
+            it.version = "${app.bintrayPluginVersion}"
         }
         update("com.jfrog.artifactory") {
-            it.version = "4.7.5"
+            it.module = "org.jfrog.buildinfo:build-info-extractor-gradle"
+            it.version = "${app.artifactoryPluginVersion}"
         }
         update('org.jetbrains.dokka') {
             it.module = "org.jetbrains.dokka:dokka-gradle-plugin"
-            it.version = "0.9.16"
+            it.version = "${app.kotlinDokkaVersion}"
         }
         update('evovetech.settings') {
             it.module = "evovetech.gradle:gradle-plugin"
-            it.version = "0.4.2"
+            it.version = "${app.evovetechGradlePluginVersion}"
         }
         update('codegraft.inject.android') {
             it.module = "evovetech.codegraft:inject-plugin"
-            it.version = "${codegraftVersion}"
+            it.version = "${app.codegraftPluginVersion}"
         }
     }
 }

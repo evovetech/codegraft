@@ -21,5 +21,4 @@ plugins {
 ext {
     LICENSES = ['Apache-2.0']
     LABELS = ['codegraft', 'codegen', 'android', 'java', 'kotlin', 'inject', 'annotations', 'bytebuddy']
-    sourceCompatibility = JavaVersion.VERSION_1_8
 }
