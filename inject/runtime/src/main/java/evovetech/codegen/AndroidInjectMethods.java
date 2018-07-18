@@ -19,10 +19,11 @@ package evovetech.codegen;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.Service;
+import dagger.android.support.AndroidSupportInjection;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.implementation.bind.annotation.This;
 
-import static codegraft.inject.android.AndroidInjections.inject;
+import static dagger.android.AndroidInjection.inject;
 
 /**
  * Injects core Android types.
@@ -55,7 +56,7 @@ class AndroidInjectMethods {
             @This android.support.v4.app.Fragment fragment,
             @SuperCall Runnable super$call
     ) {
-        inject(fragment);
+        AndroidSupportInjection.inject(fragment);
         super$call.run();
     }
 

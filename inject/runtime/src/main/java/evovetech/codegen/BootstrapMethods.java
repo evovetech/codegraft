@@ -22,17 +22,17 @@ import android.app.Fragment;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentProvider;
+import codegraft.inject.android.BootApplication;
+import codegraft.inject.android.HasApplicationInjector;
 import dagger.android.AndroidInjector;
+import dagger.android.HasActivityInjector;
+import dagger.android.HasBroadcastReceiverInjector;
+import dagger.android.HasContentProviderInjector;
+import dagger.android.HasFragmentInjector;
+import dagger.android.HasServiceInjector;
+import dagger.android.support.HasSupportFragmentInjector;
 import net.bytebuddy.implementation.bind.annotation.This;
 import org.jetbrains.annotations.NotNull;
-import codegraft.inject.android.BootApplication;
-import codegraft.inject.android.HasActivityInjector;
-import codegraft.inject.android.HasApplicationInjector;
-import codegraft.inject.android.HasBroadcastReceiverInjector;
-import codegraft.inject.android.HasContentProviderInjector;
-import codegraft.inject.android.HasFragmentInjector;
-import codegraft.inject.android.HasServiceInjector;
-import codegraft.inject.android.HasSupportFragmentInjector;
 
 public final
 class BootstrapMethods {
@@ -54,7 +54,7 @@ class BootstrapMethods {
     AndroidInjector<Activity> getActivityInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasActivityInjector) {
-            return ((HasActivityInjector) component).getActivityInjector();
+            return ((HasActivityInjector) component).activityInjector();
         }
         throw new IllegalStateException(component + " does not implement " + HasActivityInjector.class.getCanonicalName());
     }
@@ -64,7 +64,7 @@ class BootstrapMethods {
     AndroidInjector<Service> getServiceInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasServiceInjector) {
-            return ((HasServiceInjector) component).getServiceInjector();
+            return ((HasServiceInjector) component).serviceInjector();
         }
         throw new IllegalStateException(component + " does not implement " + HasServiceInjector.class.getCanonicalName());
     }
@@ -74,7 +74,7 @@ class BootstrapMethods {
     AndroidInjector<BroadcastReceiver> getBroadcastReceiverInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasBroadcastReceiverInjector) {
-            return ((HasBroadcastReceiverInjector) component).getBroadcastReceiverInjector();
+            return ((HasBroadcastReceiverInjector) component).broadcastReceiverInjector();
         }
         throw new IllegalStateException(component + " does not implement " + HasBroadcastReceiverInjector.class.getCanonicalName());
     }
@@ -84,7 +84,7 @@ class BootstrapMethods {
     AndroidInjector<ContentProvider> getContentProviderInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasContentProviderInjector) {
-            return ((HasContentProviderInjector) component).getContentProviderInjector();
+            return ((HasContentProviderInjector) component).contentProviderInjector();
         }
         throw new IllegalStateException(component + " does not implement " + HasContentProviderInjector.class.getCanonicalName());
     }
@@ -94,7 +94,7 @@ class BootstrapMethods {
     AndroidInjector<Fragment> getFragmentInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasFragmentInjector) {
-            return ((HasFragmentInjector) component).getFragmentInjector();
+            return ((HasFragmentInjector) component).fragmentInjector();
         }
         throw new IllegalStateException(component + " does not implement " + HasFragmentInjector.class.getCanonicalName());
     }
@@ -104,7 +104,7 @@ class BootstrapMethods {
     AndroidInjector<android.support.v4.app.Fragment> getSupportFragmentInjector(@This BootApplication<?> application) {
         Object component = application.getBootstrap().getComponent();
         if (component instanceof HasSupportFragmentInjector) {
-            return ((HasSupportFragmentInjector) component).getSupportFragmentInjector();
+            return ((HasSupportFragmentInjector) component).supportFragmentInjector();
         }
         throw new IllegalStateException(component + " does not implement " + HasSupportFragmentInjector.class.getCanonicalName());
     }

@@ -18,13 +18,13 @@ package evovetech.gradle.transform
 
 import codegraft.inject.android.AndroidApplication
 import codegraft.inject.android.BootApplication
-import codegraft.inject.android.HasActivityInjector
 import codegraft.inject.android.HasApplicationInjector
-import codegraft.inject.android.HasBroadcastReceiverInjector
-import codegraft.inject.android.HasContentProviderInjector
-import codegraft.inject.android.HasFragmentInjector
-import codegraft.inject.android.HasServiceInjector
-import codegraft.inject.android.HasSupportFragmentInjector
+import dagger.android.HasActivityInjector
+import dagger.android.HasBroadcastReceiverInjector
+import dagger.android.HasContentProviderInjector
+import dagger.android.HasFragmentInjector
+import dagger.android.HasServiceInjector
+import dagger.android.support.HasSupportFragmentInjector
 import evovetech.codegen.LogMethod
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.build.EntryPoint.Default.REBASE

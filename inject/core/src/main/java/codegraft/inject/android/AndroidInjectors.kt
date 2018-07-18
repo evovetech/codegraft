@@ -27,28 +27,34 @@ interface HasApplicationInjector {
     val applicationInjector: AndroidInjector<AndroidApplication>
 }
 
-interface HasActivityInjector {
-    val activityInjector: AndroidInjector<Activity>
-}
+typealias HasActivityInjector = dagger.android.HasActivityInjector
 
-interface HasFragmentInjector {
-    val fragmentInjector: AndroidInjector<Fragment>
-}
+val HasActivityInjector.activityInjector: AndroidInjector<Activity>
+    get() = activityInjector()
+
+typealias HasFragmentInjector = dagger.android.HasFragmentInjector
+
+val HasFragmentInjector.fragmentInjector: AndroidInjector<Fragment>
+    get() = fragmentInjector()
 
 typealias SupportFragment = android.support.v4.app.Fragment
 
-interface HasSupportFragmentInjector {
-    val supportFragmentInjector: AndroidInjector<SupportFragment>
-}
+typealias HasSupportFragmentInjector = dagger.android.support.HasSupportFragmentInjector
 
-interface HasServiceInjector {
-    val serviceInjector: AndroidInjector<Service>
-}
+val HasSupportFragmentInjector.supportFragmentInjector: AndroidInjector<SupportFragment>
+    get() = supportFragmentInjector()
 
-interface HasBroadcastReceiverInjector {
-    val broadcastReceiverInjector: AndroidInjector<BroadcastReceiver>
-}
+typealias HasServiceInjector = dagger.android.HasServiceInjector
 
-interface HasContentProviderInjector {
-    val contentProviderInjector: AndroidInjector<ContentProvider>
-}
+val HasServiceInjector.serviceInjector: AndroidInjector<Service>
+    get() = serviceInjector()
+
+typealias HasBroadcastReceiverInjector = dagger.android.HasBroadcastReceiverInjector
+
+val HasBroadcastReceiverInjector.broadcastReceiverInjector: AndroidInjector<BroadcastReceiver>
+    get() = broadcastReceiverInjector()
+
+typealias HasContentProviderInjector = dagger.android.HasContentProviderInjector
+
+val HasContentProviderInjector.contentProviderInjector: AndroidInjector<ContentProvider>
+    get() = contentProviderInjector()
