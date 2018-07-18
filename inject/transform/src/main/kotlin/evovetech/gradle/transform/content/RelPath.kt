@@ -16,33 +16,49 @@
 
 package evovetech.gradle.transform.content
 
-import evovetech.gradle.transform.content.RelPath.Typed
 import java.io.File
 
 interface RelPath {
     val base: File
     val rel: File
-    val file: File
-        get() = File(base, rel.path)
-    val isRoot: Boolean
-        get() = base == file
-    val isDirectory: Boolean
-        get() = file.isDirectory
 
-    fun create(base: File, rel: File): RelPath
+    object Factory {
+        @JvmStatic
+        fun create(base: File, rel: File? = null): RelPath {
+            return DefaultRelPath(base, rel ?: File(""))
+        }
 
-    interface Typed<out T : RelPath> : RelPath {
-        override
-        fun create(base: File, rel: File): T
+        private data
+        class DefaultRelPath(
+            override val base: File,
+            override val rel: File
+        ) : RelPath
     }
 }
 
-fun <T : RelPath> Typed<T>.ensure(): T = create(
+fun File.toRelPath(): RelPath {
+    return RelPath.Factory.create(this)
+}
+
+val RelPath.file: File
+    get() = File(base, rel.path)
+
+val RelPath.isRoot: Boolean
+    get() = base == file
+
+val RelPath.isDirectory: Boolean
+    get() = file.isDirectory
+
+val RelPath.children: List<RelPath>
+    get() = file.listFiles()
+            .map(::withChild)
+
+fun RelPath.ensure(): RelPath = RelPath.Factory.create(
     base,
     rel.relativeTo(base)
 )
 
-fun <T : RelPath> Typed<T>.withChild(file: File): T = create(
+fun RelPath.withChild(file: File): RelPath = RelPath.Factory.create(
     base,
     file.relativeTo(base)
 )

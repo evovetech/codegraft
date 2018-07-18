@@ -18,7 +18,6 @@ package evovetech.gradle.transform
 
 import com.android.build.api.transform.TransformInvocation
 import evovetech.gradle.transform.content.Output
-import evovetech.gradle.transform.content.allFiles
 import evovetech.gradle.transform.content.classFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator.Compound
@@ -58,7 +57,7 @@ class InjectRunRun(
     fun run() {
         println("inject runrun! start")
         try {
-            transforms.flatMap { it.output.allFiles() }
+            transforms.flatMap { it.output.outputs() }
                     .forEach(this::write)
         } finally {
             println("inject runrun! complete")

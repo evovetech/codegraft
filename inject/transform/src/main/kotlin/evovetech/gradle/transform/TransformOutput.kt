@@ -18,8 +18,7 @@ package evovetech.gradle.transform
 
 import com.android.build.api.transform.TransformInvocation
 import evovetech.gradle.transform.content.Input
-import evovetech.gradle.transform.content.Output
-import evovetech.gradle.transform.content.allFiles
+import evovetech.gradle.transform.content.ParentOutput
 import java.io.File
 
 class TransformOutput(
@@ -29,10 +28,9 @@ class TransformOutput(
     val format = input.format
     val temp: File
         get() = context.temporaryDir
-    val output: Output by lazy {
-        Output.root(this, input)
+    val output: ParentOutput by lazy {
+        ParentOutput.root(this, input)
     }
-
-    fun copyToDest() = output.allFiles()
-            .forEach(Output::copyToDest)
+//    fun copyToDest() = output.allFiles()
+//            .forEach(Output::copyToDest)
 }

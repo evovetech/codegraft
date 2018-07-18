@@ -16,16 +16,22 @@
 
 package evovetech.gradle.transform.content
 
-import net.bytebuddy.dynamic.ClassFileLocator
-import java.io.File
+import com.android.build.api.transform.Format.JAR
+import com.android.build.api.transform.JarInput
 import java.util.jar.JarFile
 
-val File.classFileLocator: ClassFileLocator
-    get() = if (isDirectory) {
-        ClassFileLocator.ForFolder(this)
-    } else {
-        val jarFile = JarFile(this)
-        println("jarFile=$jarFile")
-        ClassFileLocator.ForJarFile(jarFile)
-    }
+class JarFileInput(
+    root: JarInput
+) : Input<JarInput>(root) {
+    override
+    val format = JAR
 
+    override
+    fun entries(): List<Entry> {
+        val root = file.toRelPath()
+        val jar = JarFile(file)
+        return jar.entries().toList().map { entry ->
+            JarPathEntry(root, jar, entry)
+        }
+    }
+}

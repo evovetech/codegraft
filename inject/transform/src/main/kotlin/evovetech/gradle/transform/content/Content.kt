@@ -20,7 +20,6 @@ import com.android.build.api.transform.Format
 import com.android.build.api.transform.Format.DIRECTORY
 import com.android.build.api.transform.QualifiedContent
 import com.android.build.api.transform.TransformInvocation
-import com.android.utils.FileUtils
 import evovetech.util.Counter
 import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator.ForFolder
@@ -29,50 +28,19 @@ import java.io.File
 import java.util.jar.JarFile
 
 sealed
-class Content : RelPath {
-    val parent: File
-        get() = base
-}
-
-abstract
-class BaseContent<out T : Content>(
-    override val base: File,
-    rel: File? = null
-) : Content(),
-    RelPath.Typed<T> {
-
-    override
-    val rel: File = rel ?: File("")
-
-    open
-    fun listFiles() = file.run {
-        if (!isDirectory) {
-            println("returning empty for $this")
-            return emptyList<T>()
-        }
-        listFiles()
-    }.map(this::withChild)
-}
-
-fun <T : BaseContent<T>> flatMapDirs(input: T): Iterable<T> {
-    if (!input.isDirectory) {
-        return listOf(input)
-    }
-    return input.listFiles()
-            .flatMap(::flatMapDirs)
-}
-
-fun <T : BaseContent<T>> T.allFiles() = listFiles()
-        .flatMap(::flatMapDirs)
+class Content(
+    val file: File
+)
 
 abstract
 class Input<out T : QualifiedContent>(
-    val root: T,
-    base: File = root.file,
-    child: File? = null
-) : BaseContent<Input<T>>(base, child) {
+    val root: T
+) : Content(root.file) {
     abstract
     val format: Format
+
+    abstract
+    fun entries(): List<Entry>
 
     val classFileLocator: ClassFileLocator by lazy {
         format.let {
@@ -86,47 +54,49 @@ class Input<out T : QualifiedContent>(
     }
 }
 
-class Output(
+class ParentOutput(
     val input: Input<*>,
-    base: File,
-    child: File? = null
-) : BaseContent<Output>(base, child) {
-    init {
-        if (input.isDirectory) {
-            file.mkdirs()
-        }
-    }
+    file: File
+) : Content(file) {
 
-    override
-    fun create(base: File, rel: File): Output {
-        return Output(input, base, rel)
-    }
-
-    override
-    fun listFiles(): List<Output> = input.listFiles().map {
-        Output(it, base, it.rel)
-    }
-
-    fun copyToDest() {
-        if (!isDirectory) {
-            val src = input.file
-            val dest = file
-            FileUtils.copyFile(src, dest)
-        }
+    fun outputs(): List<Output> {
+        return input.entries()
+                .filterNot(Entry::isDirectory)
+                .map { Output(it, file) }
     }
 
     companion object {
         @JvmStatic
         fun root(
             invocation: TransformInvocation,
-            input: Input<*>,
-            format: Format = Format.DIRECTORY
-        ): Output = invocation.run {
+            input: Input<*>
+        ): ParentOutput = invocation.run {
             val name = Counter.next
             val root = input.root
-            outputProvider.getContentLocation(name, root.contentTypes, root.scopes, format)
+            outputProvider.getContentLocation(name, root.contentTypes, root.scopes, Format.DIRECTORY)
         }.let {
-            Output(input, it)
+            ParentOutput(input, it)
+        }
+    }
+}
+
+class Output(
+    val input: Entry,
+    val root: File,
+    path: RelPath = RelPath.Factory.create(root, input.relPath.rel)
+) : Content(path.file),
+    RelPath by path {
+
+    fun copyToDest() {
+        try {
+            file.parentFile?.mkdirs()
+            input.newInputStream().use { src ->
+                file.outputStream().use { dest ->
+                    src.copyTo(dest)
+                }
+            }
+        } catch (e: Throwable) {
+            e.printStackTrace()
         }
     }
 }

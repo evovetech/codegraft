@@ -32,7 +32,7 @@ class TransformData(
     val methodTransformer = Suffixing("original")
 
     val Output.src: String
-        get() = input.rel.path
+        get() = input.path
     val Output.typeName: String?
         get() = if (src.endsWith(CLASS_FILE_EXTENSION)) {
             src.replace('/', '.')

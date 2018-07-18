@@ -16,16 +16,18 @@
 
 package evovetech.gradle.transform.content
 
-import net.bytebuddy.dynamic.ClassFileLocator
-import java.io.File
-import java.util.jar.JarFile
+import com.android.build.api.transform.DirectoryInput
+import com.android.build.api.transform.Format.DIRECTORY
 
-val File.classFileLocator: ClassFileLocator
-    get() = if (isDirectory) {
-        ClassFileLocator.ForFolder(this)
-    } else {
-        val jarFile = JarFile(this)
-        println("jarFile=$jarFile")
-        ClassFileLocator.ForJarFile(jarFile)
+class DirInput(
+    root: DirectoryInput
+) : Input<DirectoryInput>(root) {
+
+    override
+    val format = DIRECTORY
+
+    override
+    fun entries(): List<Entry> {
+        return entries(file.toRelPath())
     }
-
+}
