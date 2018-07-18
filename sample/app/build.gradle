@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-buildscript {
-    dependencies {
-        classpath "com.google.gms:google-services:${app.googleServicesVersion}"
-    }
-}
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -29,6 +23,7 @@ plugins {
     id("com.google.firebase.firebase-perf")
     id("realm-android")
     id("codegraft.inject.android")
+    id("com.google.gms.google-services").apply(false)
 }
 
 apply from: "${configDir}/android/application.gradle"
