@@ -15,5 +15,12 @@
  */
 
 plugins {
-    id('base')
+    id("com.android.library").apply(false)
+    id("kotlin-android").apply(false)
+    id("kotlin-kapt").apply(false)
+    id("codegraft.inject.android").apply(false)
+    id("io.fabric").apply(false)
+    id("com.google.firebase.firebase-perf").apply(false)
+    id("realm-android").apply(false)
+    id("com.google.gms.google-services").apply(false)
 }
