@@ -16,15 +16,35 @@
 
 package codegraft.inject
 
-import android.content.Context
-import codegraft.inject.android.AndroidApplication
-import dagger.Binds
+import dagger.MapKey
 import dagger.Module
-import javax.inject.Named
+import dagger.multibindings.Multibinds
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.annotation.AnnotationRetention.RUNTIME
+import kotlin.reflect.KClass
+
+interface Plugin
+typealias PluginMap = ClassMap<Plugin>
+typealias PluginProviderMap = ClassProviderMap<Plugin>
+
+@Singleton
+class Plugins
+@Inject constructor(
+    override val providers: PluginProviderMap
+) : ClassKeyProviderMap<Plugin>
+
+@MapKey
+@MustBeDocumented
+@Retention(RUNTIME)
+annotation
+class PluginKey(
+    val value: KClass<out Plugin>
+)
 
 @Module
-interface AppModule {
-    @Binds
-    @Named("application")
-    fun bindApplicationContext(@BootScope application: AndroidApplication): Context
+interface PluginModule {
+    @Multibinds
+    @Singleton
+    fun bindPlugins(): PluginMap
 }

@@ -87,11 +87,6 @@ class AndroidInjectModuleDescriptor(
             android.app.Fragment::class,
             AndroidInjectActivityModule::class
         ),
-        SupportFragment(
-            Any::class,
-//            codegraft.inject.SupportFragment::class,
-            AndroidInjectSupportFragmentModule::class
-        ),
         Service(
             android.app.Service::class,
             AndroidInjectServiceModule::class
@@ -103,6 +98,11 @@ class AndroidInjectModuleDescriptor(
         ContentProvider(
             android.content.ContentProvider::class,
             AndroidInjectContentProviderModule::class
+        ),
+        SupportFragment(
+            Any::class,
+//            codegraft.inject.SupportFragment::class,
+            AndroidInjectSupportFragmentModule::class
         );
 
         fun getType(elements: Elements): TypeMirror {
