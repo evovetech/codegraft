@@ -37,7 +37,6 @@ import sourcerer.KotlinOutput
 import sourcerer.Outputs
 import sourcerer.addTo
 import sourcerer.interfaceBuilder
-import sourcerer.name
 import sourcerer.typeSpec
 import java.io.Writer
 import java.lang.annotation.Documented
@@ -58,8 +57,8 @@ class GeneratePluginBindingsGenerator(
 ) {
     private val pluginType = descriptor.pluginType
     private val pluginTypeClassName: ClassName = ClassName.get(pluginType)
-    private val pluginTypeName: String = pluginTypeClassName.name
-    private val pluginMapTypeName: String = descriptor.pluralName
+    private val pluginTypeName: String = descriptor.pluginTypeName
+    private val pluginMapTypeName: String = descriptor.pluginMapTypeName
     private val scope: Scope? = descriptor.element.uniqueScope
 
     private val keyType = pluginTypeClassName.wrapClassSubtype()
@@ -149,8 +148,7 @@ class GeneratePluginBindingsGenerator(
             addModifiers(PUBLIC, STATIC)
             addAnnotation(Module::class.java)
 
-            val pluralName = descriptor.pluralName.capitalize()
-            addMethod(MethodSpec.methodBuilder("bind$pluralName").run {
+            addMethod(MethodSpec.methodBuilder("bind$pluginMapTypeName").run {
                 addModifiers(PUBLIC, ABSTRACT)
                 addAnnotation(Multibinds::class.java)
                 scope?.let {

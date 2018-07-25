@@ -25,10 +25,14 @@ import kotlin.reflect.KClass
 @MustBeDocumented
 annotation
 class GeneratePluginBindings(
+    // TODO: maybe rename
     val pluginType: KClass<*>,
 
-    // TODO: rename
-    val pluralName: String = "",
+    // TODO: maybe rename
+    val pluginTypeName: String = "",
+
+    // TODO: maybe rename
+    val pluginMapTypeName: String = "",
 
     val flattenComponent: Boolean = false
 )

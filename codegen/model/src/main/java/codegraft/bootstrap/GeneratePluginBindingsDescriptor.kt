@@ -41,7 +41,9 @@ class GeneratePluginBindingsDescriptor(
 
     val pluginType: TypeElement,
 
-    val pluralName: String,
+    val pluginTypeName: String,
+
+    val pluginMapTypeName: String,
 
     val flattenComponent: Boolean
 ) {
@@ -83,19 +85,28 @@ class GeneratePluginBindingsDescriptor(
         fun create(element: TypeElement): GeneratePluginBindingsDescriptor {
             val annotationMirror = element.getAnnotationMirror<GeneratePluginBindings>()!!
             val pluginType = asType(asDeclared(annotationMirror.getTypeValue("pluginType")).asElement())
-            val pluralName: String = (annotationMirror.getValue("pluralName") ?: "").let { name ->
+            val pluginTypeName: String = (annotationMirror.getValue("pluginTypeName") ?: "").let { name ->
                 if (name.isNotEmpty()) {
                     name
                 } else {
-                    "${pluginType.simpleName}s"
+                    "${pluginType.simpleName}"
                 }
-            }
+            }.capitalize()
+            val pluginMapTypeName: String = (annotationMirror.getValue("pluginMapTypeName") ?: "").let { name ->
+                if (name.isNotEmpty()) {
+                    name
+                } else {
+                    val defaultSuffix = "s"
+                    "$pluginTypeName$defaultSuffix"
+                }
+            }.capitalize()
             val flattenComponent = annotationMirror.getValue<Boolean>("flattenComponent") ?: false
             return GeneratePluginBindingsDescriptor(
                 element = element,
                 annotationMirror = annotationMirror,
                 pluginType = pluginType,
-                pluralName = pluralName.capitalize(),
+                pluginTypeName = pluginTypeName,
+                pluginMapTypeName = pluginMapTypeName,
                 flattenComponent = flattenComponent
             )
         }
