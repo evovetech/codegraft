@@ -18,10 +18,13 @@ package codegraft.inject
 
 import codegraft.inject.android.AndroidApplication
 
+// TODO: move plugins
 @BootstrapComponent(
+    applicationModules = [PluginModule::class],
     bootstrapModules = [AppModule::class],
     flatten = true
 )
 interface BaseComponent {
     val application: AndroidApplication
+    val plugins: Plugins
 }

@@ -37,6 +37,8 @@ interface Klass {
         get() = rawType.toString()
     val javaName: String
         get() = "$canonicalName.java"
+    val kotlinName: String
+        get() = "$canonicalName.kt"
 }
 
 fun MutableList<String>.addTo(index: Int, value: String): String {

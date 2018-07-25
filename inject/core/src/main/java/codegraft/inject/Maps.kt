@@ -18,8 +18,8 @@ package codegraft.inject
 
 import javax.inject.Provider
 
-typealias BindingMap<K, V> = Map<@JvmSuppressWildcards K, @JvmSuppressWildcards V>
-typealias BindingProviderMap<K, V> = BindingMap<K, Provider<out V>>
+typealias BindingMap<K, V> = Map<K, @JvmSuppressWildcards V>
+typealias BindingProviderMap<K, V> = BindingMap<K, Provider<V>>
 
 typealias ClassMap<T> = BindingMap<Class<out T>, T>
 typealias ClassProviderMap<T> = BindingProviderMap<Class<out T>, T>
