@@ -37,6 +37,8 @@ import sourcerer.KotlinOutput
 import sourcerer.Outputs
 import sourcerer.addTo
 import sourcerer.interfaceBuilder
+import sourcerer.name
+import sourcerer.qualifiedName
 import sourcerer.typeSpec
 import java.io.Writer
 import java.lang.annotation.Documented
@@ -55,6 +57,8 @@ val RawProviderType = ClassName.get(Provider::class.java)!!
 class GeneratePluginBindingsGenerator(
     private val descriptor: GeneratePluginBindingsDescriptor
 ) {
+    private val annotationType = descriptor.element
+    private val annotationTypeClassName = ClassName.get(annotationType)
     private val pluginType = descriptor.pluginType
     private val pluginTypeClassName: ClassName = ClassName.get(pluginType)
     private val pluginTypeName: String = descriptor.pluginTypeName
@@ -73,7 +77,7 @@ class GeneratePluginBindingsGenerator(
     }
 
     private
-    val packageName: String = pluginTypeClassName.packageName()
+    val packageName: String = annotationTypeClassName.packageName()
 
     fun process(): Outputs {
         val typeModuleGenerator = TypeModuleGenerator()
@@ -100,7 +104,8 @@ class GeneratePluginBindingsGenerator(
         fun writeTo(writer: Writer) {
             val src = aliasSrc(
                 packageName = packageName,
-                Type = pluginTypeName
+                typeName = pluginTypeClassName,
+                typeAliasName = pluginTypeName
             )
             writer.write(src)
         }
@@ -243,7 +248,8 @@ fun ClassName.wrapWildcardSubtype(
 
 fun aliasSrc(
     packageName: String,
-    Type: String
+    typeName: ClassName,
+    typeAliasName: String = typeName.name
 ): String = """
 /*
  * Copyright 2018 evove.tech
@@ -266,10 +272,11 @@ fun aliasSrc(
 //
 package $packageName
 
-import codegraft.inject.ClassKeyProviderMap
 import codegraft.inject.ClassMap
+import codegraft.inject.ClassProviderMap
+import ${typeName.qualifiedName}
 
-typealias ${Type}Map = ClassMap<$Type>
-typealias ${Type}ProviderMap = ClassProviderMap<$Type>
+typealias ${typeAliasName}Map = ClassMap<${typeName.name}>
+typealias ${typeAliasName}ProviderMap = ClassProviderMap<${typeName.name}>
 
 """.trimIndent()
