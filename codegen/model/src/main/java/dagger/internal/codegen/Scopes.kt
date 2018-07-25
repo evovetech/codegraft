@@ -16,11 +16,10 @@
 
 package dagger.internal.codegen
 
+import codegraft.inject.BootScope
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Iterables.getOnlyElement
 import dagger.model.Scope
-import codegraft.inject.BootScope
-import javax.inject.Singleton
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.util.Elements
@@ -31,7 +30,7 @@ import javax.lang.model.util.Elements
 val TypeElement.scope: Scope
     get() = Scope.scope(SimpleAnnotationMirror.of(this))
 
-/** Returns a representation for [@Singleton][Singleton] scope.  */
+/** Returns a representation for [@BootScope][BootScope] scope.  */
 val Elements.bootScope: Scope
     get() = scope(BootScope::class.java)
 

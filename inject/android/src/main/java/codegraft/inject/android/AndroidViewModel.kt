@@ -22,14 +22,14 @@ import android.arch.lifecycle.ViewModelStore
 import android.arch.lifecycle.ViewModelStoreOwner
 import android.arch.lifecycle.ViewModelStores
 import android.support.v4.app.FragmentActivity
-import dagger.Binds
-import dagger.MapKey
-import dagger.Module
-import dagger.multibindings.Multibinds
 import codegraft.inject.BootstrapComponent
 import codegraft.inject.ClassKeyProviderMap
 import codegraft.inject.ClassMap
 import codegraft.inject.ClassProviderMap
+import dagger.Binds
+import dagger.MapKey
+import dagger.Module
+import dagger.multibindings.Multibinds
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -102,7 +102,7 @@ class ViewModelDelegate<VM : ViewModel>(
 class ViewModelFactory
 @Inject constructor(
     override val providers: ViewModelProviderMap
-) : ClassKeyProviderMap<ViewModel>,
+) : ClassKeyProviderMap<ViewModel>(),
     ViewModelProvider.Factory {
     override
     fun <T : ViewModel> create(modelClass: Class<T>): T {

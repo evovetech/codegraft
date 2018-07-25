@@ -16,8 +16,8 @@
 
 package codegraft
 
-import com.google.auto.service.AutoService
 import codegraft.bootstrap.Package
+import com.google.auto.service.AutoService
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.TypeElement
@@ -61,7 +61,10 @@ class AppProcessor : MainProcessor(true) {
     }
 }
 
-fun src(packageName: String): String = """/*
+fun src(
+    packageName: String
+): String = """
+/*
  * Copyright 2018 evove.tech
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -100,5 +103,4 @@ fun BootComponent.Builder.build(
 ): AppComponent = application(init())
         .build()
         .appComponent
-
-"""
+""".trimIndent()

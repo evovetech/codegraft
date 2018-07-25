@@ -16,14 +16,15 @@
 
 package codegraft.inject
 
-import codegraft.inject.android.AndroidApplication
+import kotlin.annotation.AnnotationRetention.BINARY
+import kotlin.annotation.AnnotationTarget.ANNOTATION_CLASS
+import kotlin.reflect.KClass
 
-@BootstrapComponent(
-    applicationModules = [PluginModule::class],
-    bootstrapModules = [AppModule::class],
-    flatten = true
+@Target(ANNOTATION_CLASS)
+@Retention(BINARY)
+@MustBeDocumented
+annotation
+class GeneratePluginBindings(
+    val pluginType: KClass<*>,
+    val pluralName: String = ""
 )
-interface PluginComponent {
-    val application: AndroidApplication
-    val plugins: Plugins
-}

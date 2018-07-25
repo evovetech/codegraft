@@ -16,8 +16,6 @@
 
 package codegraft.inject
 
-import javax.inject.Provider
-
 interface ProviderMap<in K : Any, out V : Any> {
-    val providers: Map<in K, @JvmSuppressWildcards Provider<out V>>
+    val providers: BindingProviderMap<in K, out V>
 }

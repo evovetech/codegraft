@@ -16,10 +16,12 @@
 
 package codegraft.inject
 
-abstract
-class KeyProviderMap<in K : Any, out V : Any> : ProviderMap<K, V> {
-    operator
-    fun get(key: K): V? {
-        return providers[key]?.get()
-    }
+import codegraft.inject.android.AndroidApplication
+
+@BootstrapComponent(
+    bootstrapModules = [AppModule::class],
+    flatten = true
+)
+interface BaseComponent {
+    val application: AndroidApplication
 }

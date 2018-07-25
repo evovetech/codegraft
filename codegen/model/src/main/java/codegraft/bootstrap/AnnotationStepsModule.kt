@@ -34,6 +34,9 @@ interface AnnotationStepsModule {
     @Binds @IntoSet
     fun provideAndroidInjectStep(step: AndroidInjectStep): AnnotationStep
 
+    @Binds @IntoSet
+    fun provideGeneratePluginBindingsStep(step: GeneratePluginBindingsStep): AnnotationStep
+
     @Multibinds
     fun bindAnnotationSteps(): AnnotationSteps
 }

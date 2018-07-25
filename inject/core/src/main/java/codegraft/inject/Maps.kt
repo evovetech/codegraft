@@ -18,28 +18,8 @@ package codegraft.inject
 
 import javax.inject.Provider
 
-abstract
-class ClassKeyProviderMap<T : Any> : ProviderMap<Class<out T>, T> {
-    abstract override
-    val providers: ClassProviderMap<T>
+typealias BindingMap<K, V> = Map<@JvmSuppressWildcards K, @JvmSuppressWildcards V>
+typealias BindingProviderMap<K, V> = BindingMap<K, Provider<out V>>
 
-    operator
-    fun <R : T> get(key: Class<R>): R? {
-        return providers[key]?.get()?.let {
-            key.castOrNull(it)
-        }
-    }
-}
-
-inline
-fun <reified T : Any> ClassKeyProviderMap<in T>.get(): T? =
-    get(T::class.java)
-
-inline
-fun <reified T : Any> ClassKeyProviderMap<in T>.with(
-    block: T.() -> Unit
-) = provider()?.with(block)
-
-inline
-fun <reified T : Any> ClassKeyProviderMap<in T>.provider(): Provider<T>? =
-    providers[T::class.java].castOrNull()
+typealias ClassMap<T> = BindingMap<Class<out T>, T>
+typealias ClassProviderMap<T> = BindingProviderMap<Class<out T>, T>

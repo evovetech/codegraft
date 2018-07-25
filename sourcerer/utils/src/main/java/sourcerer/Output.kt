@@ -22,6 +22,7 @@ import sourcerer.io.Writer
 import javax.annotation.processing.Filer
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
+import javax.tools.StandardLocation
 
 sealed
 class Output
@@ -41,6 +42,33 @@ class BaseOutput : Output(),
 
     abstract
     fun writeTo(filer: Filer)
+}
+
+abstract
+class KotlinOutput(
+    val packageName: String,
+    val fileName: String
+) : BaseOutput() {
+    constructor(
+        className: ClassName
+    ) : this(className.packageName(), className.name)
+
+    abstract
+    fun writeTo(writer: java.io.Writer)
+
+    final override
+    fun writeTo(filer: Filer) {
+        val file = filer.createResource(
+            StandardLocation.SOURCE_OUTPUT,
+            packageName,
+            "$fileName.kt"
+        )
+
+        file.openWriter().use { writer ->
+            writeTo(writer)
+            writer.flush()
+        }
+    }
 }
 
 abstract

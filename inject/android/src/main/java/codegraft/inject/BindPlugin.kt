@@ -16,35 +16,14 @@
 
 package codegraft.inject
 
-import dagger.MapKey
-import dagger.Module
-import dagger.multibindings.Multibinds
-import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.annotation.AnnotationRetention.RUNTIME
-import kotlin.reflect.KClass
-
-interface Plugin
-typealias PluginMap = ClassMap<Plugin>
-typealias PluginProviderMap = ClassProviderMap<Plugin>
+import kotlin.annotation.AnnotationRetention.BINARY
 
 @Singleton
-class Plugins
-@Inject constructor(
-    override val providers: PluginProviderMap
-) : ClassKeyProviderMap<Plugin>
-
-@MapKey
+@GeneratePluginBindings(Plugin::class)
+@Retention(BINARY)
 @MustBeDocumented
-@Retention(RUNTIME)
 annotation
-class PluginKey(
-    val value: KClass<out Plugin>
-)
+class BindPlugin
 
-@Module
-interface PluginModule {
-    @Multibinds
-    @Singleton
-    fun bindPlugins(): PluginMap
-}
+interface Plugin
