@@ -19,17 +19,33 @@ package codegraft.bootstrap
 import codegraft.inject.GeneratePluginBindings
 import com.google.auto.common.MoreElements
 import com.google.common.collect.ImmutableSet
+import com.squareup.javapoet.AnnotationSpec
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.ParameterSpec
+import dagger.Binds
+import dagger.Module
+import dagger.multibindings.IntoMap
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationStep
 import sourcerer.AnnotationType
+import sourcerer.JavaOutput
 import sourcerer.Output
 import sourcerer.Outputs
+import sourcerer.addTo
+import sourcerer.getFieldName
+import sourcerer.interfaceBuilder
 import sourcerer.processor.ProcessingEnv
 import sourcerer.toImmutableSet
 import sourcerer.typeInputs
+import sourcerer.typeSpec
 import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject
 import javax.inject.Singleton
+import javax.lang.model.element.Modifier.ABSTRACT
+import javax.lang.model.element.Modifier.PUBLIC
+import javax.lang.model.element.Modifier.STATIC
+import javax.lang.model.element.TypeElement
 
 @Singleton
 class GeneratePluginBindingsStep
@@ -76,27 +92,70 @@ class GeneratePluginBindingsStep
     fun postRound(roundEnv: RoundEnvironment): Outputs {
         val allPlugins = plugins + storedPlugins
 
-        getEnv().log("post round")
-        val maps = allPlugins.associate { Pair(it, it.element) }
-                .mapValues { entry ->
-                    val key = entry.key.element
-                    val values = roundEnv.getElementsAnnotatedWith(key)
-                            .map(MoreElements::asType)
-                    getEnv().log("plugin entry: $key=$values")
-//                    value.map { MoreElements.asType(it) }
-//                            .onEach { getEnv().log("plugin: ${entry.key.element}=$it") }
-                    values
-                }
+        val maps2: Map<GeneratePluginBindingsDescriptor, List<TypeElement>> = allPlugins.associate { descriptor ->
+            val key = descriptor.annotationType
+            val values = roundEnv.getElementsAnnotatedWith(key)
+                    .map(MoreElements::asType)
+            Pair(descriptor, values)
+        }
+        maps2.forEach { k, v ->
+            getEnv().log("plugin entry: ${k.annotationType}=$v")
+        }
 
-//        maps.forEach { k, v ->
-//            getEnv().log("plugin maps: ${k.element}=$v")
-//        }
-//        val typeElements = allPlugins.map { it.element }
-//                .onEach { getEnv().log("plugin element: $it") }
-//                .flatMap { roundEnv.getElementsAnnotatedWith(it) }
-//                .map { MoreElements.asType(it) }
+        return maps2.flatMap { (descriptor, elements) ->
+            elements.map { element ->
+                GeneratedPluginModule(descriptor, element)
+            }
+        }
+    }
+}
 
-        // TODO:
-        return super.postRound(roundEnv)
+/*
+    @Module
+    interface DaggerModule {
+        @Binds
+        @IntoMap
+        @ViewModelKey(PlaidViewModel::class)
+        fun bindViewModel(viewModel: PlaidViewModel): ViewModel
+    }
+ */
+class GeneratedPluginModule(
+    val descriptor: GeneratePluginBindingsDescriptor,
+    val element: TypeElement
+) : JavaOutput(
+    rawType = ClassName.get(element),
+    outExt = "Module"
+) {
+    override
+    fun newBuilder() =
+        outKlass.interfaceBuilder()
+
+    override
+    fun typeSpec() = typeSpec {
+        addModifiers(PUBLIC, STATIC)
+        addAnnotation(Module::class.java)
+
+        val returnType = descriptor.pluginType.className
+        val paramType = element.className
+        val param = ParameterSpec.builder(paramType, paramType.getFieldName()).run {
+            // TODO:
+            build()
+        }
+
+        val pluginTypeName = descriptor.pluginTypeName
+        addMethod(MethodSpec.methodBuilder("bind$pluginTypeName").run {
+            addModifiers(PUBLIC, ABSTRACT)
+
+            addAnnotation(Binds::class.java)
+            addAnnotation(IntoMap::class.java)
+            addAnnotation(AnnotationSpec.builder(descriptor.mapKeyAnnotationType).run {
+                paramType.let(addTo("value"))
+                build()
+            })
+
+            addParameter(param)
+            returns(returnType)
+            build()
+        })
     }
 }

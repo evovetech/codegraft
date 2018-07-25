@@ -49,24 +49,29 @@ import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
+import javax.lang.model.element.TypeElement
 
 val RawClassType = ClassName.get(Class::class.java)!!
 val RawMapType = ClassName.get(Map::class.java)!!
 val RawProviderType = ClassName.get(Provider::class.java)!!
 
+val TypeElement.className: ClassName
+    get() = ClassName.get(this)
+
 class GeneratePluginBindingsGenerator(
     private val descriptor: GeneratePluginBindingsDescriptor
 ) {
-    private val annotationType = descriptor.element
-    private val annotationTypeClassName = ClassName.get(annotationType)
-    private val pluginType = descriptor.pluginType
-    private val pluginTypeClassName: ClassName = ClassName.get(pluginType)
-    private val pluginTypeName: String = descriptor.pluginTypeName
-    private val pluginMapTypeName: String = descriptor.pluginMapTypeName
-    private val scope: Scope? = descriptor.element.uniqueScope
+    private val packageName: String = descriptor.packageName
+    private val annotationType = descriptor.annotationType
+    private val scope: Scope? = annotationType.uniqueScope
+    private val mapKeyAnnotationType: ClassName = descriptor.mapKeyAnnotationType
 
-    private val keyType = pluginTypeClassName.wrapClassSubtype()
-    private val valueType = ClassName.get(pluginType)
+    private val pluginType = descriptor.pluginType
+    private val pluginTypeName = descriptor.pluginTypeName
+    private val pluginMapTypeName = descriptor.pluginMapTypeName
+
+    private val keyType = pluginType.className.wrapClassSubtype()
+    private val valueType = pluginType.className
     private val valueProviderType = ParameterizedTypeName.get(RawProviderType, valueType)
     private val mapType: TypeName by lazy {
         ParameterizedTypeName.get(RawMapType, keyType, valueType)
@@ -75,9 +80,6 @@ class GeneratePluginBindingsGenerator(
         val rawMapType = ClassName.get(Map::class.java)
         ParameterizedTypeName.get(rawMapType, keyType, valueProviderType)
     }
-
-    private
-    val packageName: String = annotationTypeClassName.packageName()
 
     fun process(): Outputs {
         val typeModuleGenerator = TypeModuleGenerator()
@@ -88,7 +90,7 @@ class GeneratePluginBindingsGenerator(
         )
         return listOf(
             TypeAliasGenerator(),
-            TypeMapKeyGenerator(),
+            TypeMapKeyAnnotationGenerator(),
             typeModuleGenerator,
             typeMapGenerator,
             typeComponentGenerator
@@ -104,7 +106,7 @@ class GeneratePluginBindingsGenerator(
         fun writeTo(writer: Writer) {
             val src = aliasSrc(
                 packageName = packageName,
-                typeName = pluginTypeClassName,
+                typeName = pluginType.className,
                 typeAliasName = pluginTypeName
             )
             writer.write(src)
@@ -112,12 +114,12 @@ class GeneratePluginBindingsGenerator(
     }
 
     inner
-    class TypeMapKeyGenerator : JavaOutput(
-        rawType = ClassName.get(packageName, "${pluginTypeName}Key")
+    class TypeMapKeyAnnotationGenerator : JavaOutput(
+        rawType = mapKeyAnnotationType
     ) {
         override
         fun classBuilder() =
-            TypeSpec.annotationBuilder(name)!!
+            TypeSpec.annotationBuilder(outKlass.name)!!
 
         override
         fun typeSpec() = typeSpec {
@@ -170,7 +172,7 @@ class GeneratePluginBindingsGenerator(
         rawType = ClassName.get(packageName, pluginMapTypeName)
     ) {
         val rawSuperType = ClassName.get(ClassKeyProviderMap::class.java)
-        val superType = ParameterizedTypeName.get(rawSuperType, pluginTypeClassName)
+        val superType = ParameterizedTypeName.get(rawSuperType, pluginType.className)
 
         override
         fun typeSpec() = typeSpec {

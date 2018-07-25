@@ -17,6 +17,7 @@
 package sourcerer
 
 import com.google.auto.common.BasicAnnotationProcessor.ProcessingStep
+import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Option
@@ -56,8 +57,10 @@ class RoundStep(
         nextRound.deferredElements
     }
 
-    fun postRound(roundEnv: RoundEnvironment): Outputs {
-        // TODO:
-        return step.postRound(roundEnv)
+    fun postRound(roundEnv: RoundEnvironment): Pair<Outputs, ImmutableList<Element>> {
+        val outputs = step.postRound(roundEnv)
+        val deferredElements = outputs.mapNotNull(env::mapOutput)
+                .toImmutableList()
+        return Pair(outputs, deferredElements)
     }
 }

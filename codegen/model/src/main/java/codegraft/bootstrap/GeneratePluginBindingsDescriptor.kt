@@ -35,7 +35,7 @@ import javax.lang.model.util.Types
 
 data
 class GeneratePluginBindingsDescriptor(
-    val element: TypeElement,
+    val annotationType: TypeElement,
 
     val annotationMirror: AnnotationMirror,
 
@@ -47,11 +47,15 @@ class GeneratePluginBindingsDescriptor(
 
     val flattenComponent: Boolean
 ) {
-    val type: TypeMirror = element.asType()
+    val packageName: String
+        get() = annotationType.className.packageName()
+
+    val mapKeyAnnotationType: ClassName
+        get() = ClassName.get(packageName, "${pluginTypeName}Key")
 
     private
     val typeWrapper: Equivalence.Wrapper<TypeMirror> =
-        equivalence().wrap(type)
+        equivalence().wrap(annotationType.asType())
 
     override
     fun equals(other: Any?): Boolean {
@@ -102,7 +106,7 @@ class GeneratePluginBindingsDescriptor(
             }.capitalize()
             val flattenComponent = annotationMirror.getValue<Boolean>("flattenComponent") ?: false
             return GeneratePluginBindingsDescriptor(
-                element = element,
+                annotationType = element,
                 annotationMirror = annotationMirror,
                 pluginType = pluginType,
                 pluginTypeName = pluginTypeName,

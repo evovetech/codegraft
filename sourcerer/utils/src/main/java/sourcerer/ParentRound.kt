@@ -46,25 +46,34 @@ class ParentRound(
         steps: RoundSteps,
         processFunc: () -> Boolean
     ): ParentRound {
-        val round = ParentRound(
+        val parentRound = ParentRound(
             number + 1,
             this,
             elements.toImmutableSet(),
             roundEnv.rootElements.toImmutableSet()
         )
-        steps.preRound(round)
+        steps.preRound(parentRound)
 
         processFunc()
 
-        if (!roundEnv.processingOver()) {
-            steps.postRound(roundEnv)
+        val rounds = if (!roundEnv.processingOver()) {
+            steps.map { step ->
+                val (extraOutputs, extraDeferredElements) = step.postRound(roundEnv)
+                val currentRound = step.currentRound
+                val outputs = currentRound.outputs + extraOutputs
+                val deferredElements = currentRound.deferredElements + extraDeferredElements
+                currentRound.copy(
+                    outputs = outputs.toRoundOutputs(),
+                    deferredElements = deferredElements.toImmutableSet()
+                )
+            }
+        } else {
+            steps.map(RoundStep::currentRound)
+        }.map { round ->
+            round.catchupTo(parentRound)
         }
-
-        val rounds = steps.map { step ->
-            step.currentRound.catchupTo(round)
-        }.toImmutableList()
-        return round.copy(
-            rounds = rounds
+        return parentRound.copy(
+            rounds = rounds.toImmutableList()
         )
     }
 }
