@@ -31,8 +31,8 @@ class RoundSteps(
     }
 
     open
-    fun postRound(roundEnv: RoundEnvironment) {
-        forEach { step ->
+    fun postRound(roundEnv: RoundEnvironment): Outputs {
+        return flatMap { step ->
             step.postRound(roundEnv)
         }
     }

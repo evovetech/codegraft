@@ -17,6 +17,7 @@
 package evovetech.finance.plaid.ui.plaid
 
 import android.arch.lifecycle.ViewModel
+import codegraft.inject.android.BindViewModel
 import codegraft.inject.android.ViewModelKey
 import dagger.Binds
 import dagger.Module
@@ -24,6 +25,7 @@ import dagger.multibindings.IntoMap
 import evovetech.finance.plaid.PlaidClient
 import javax.inject.Inject
 
+@BindViewModel
 class PlaidViewModel
 @Inject constructor(
     val client: PlaidClient

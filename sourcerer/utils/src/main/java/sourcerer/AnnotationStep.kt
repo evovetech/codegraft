@@ -31,6 +31,10 @@ class AnnotationStep {
         this.env = env
     }
 
+    fun getEnv(): ProcessingEnv {
+        return env
+    }
+
     protected abstract
     fun ProcessingEnv.annotations(): Set<AnnotationType>
 
@@ -46,8 +50,9 @@ class AnnotationStep {
     }
 
     open
-    fun postRound(roundEnv: RoundEnvironment): Unit {
+    fun postRound(roundEnv: RoundEnvironment): Outputs {
         // subclass override
+        return emptyList()
     }
 
     fun annotations(): Set<AnnotationType> = env.annotations()

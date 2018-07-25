@@ -55,13 +55,13 @@ class BaseProcessingEnv(
         override
         fun printMessage(kind: Kind?, msg: CharSequence?) {
             // TODO: Log level
-//            _messager.printMessage(kind, msg)
+            _messager.printMessage(kind, msg)
         }
 
         override
         fun printMessage(kind: Kind?, msg: CharSequence?, element: Element?) {
             // TODO: Log level
-//            _messager.printMessage(kind, msg, element)
+            _messager.printMessage(kind, msg, element)
 
         }
 

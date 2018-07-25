@@ -19,7 +19,6 @@ package codegraft.bootstrap
 import com.google.auto.common.BasicAnnotationProcessor
 import sourcerer.RoundStep
 import sourcerer.processor.ProcessingEnv.Option
-import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject
 import javax.lang.model.SourceVersion
 
@@ -30,13 +29,6 @@ class ProcessStepsDelegate
     override
     fun initSteps(): Iterable<ProcessingStep> {
         return steps
-    }
-
-    override
-    fun postRound(roundEnv: RoundEnvironment) {
-        steps.forEach { step ->
-            step.postRound(roundEnv)
-        }
     }
 
     override

@@ -17,6 +17,7 @@
 package codegraft.bootstrap
 
 import codegraft.inject.GeneratePluginBindings
+import com.google.auto.common.MoreElements
 import com.google.common.collect.ImmutableSet
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationStep
@@ -26,6 +27,7 @@ import sourcerer.Outputs
 import sourcerer.processor.ProcessingEnv
 import sourcerer.toImmutableSet
 import sourcerer.typeInputs
+import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -42,10 +44,11 @@ class GeneratePluginBindingsStep
     val plugins: ImmutableSet<GeneratePluginBindingsDescriptor>
         get() = _plugins.toImmutableSet()
 
-    fun storedPlugins(): ImmutableSet<GeneratePluginBindingsDescriptor> = sourcerer
-            .storedOutputs()
-            .map(descriptorFactory::forStoredModule)
-            .toImmutableSet()
+    val storedPlugins: ImmutableSet<GeneratePluginBindingsDescriptor> by lazy {
+        sourcerer.storedOutputs()
+                .map(descriptorFactory::forStoredModule)
+                .toImmutableSet()
+    }
 
     fun sourcererOutput(): Output {
         return sourcerer.output(plugins)
@@ -67,5 +70,33 @@ class GeneratePluginBindingsStep
         return descriptors
                 .map(outputFactory::create)
                 .flatMap(GeneratePluginBindingsGenerator::process)
+    }
+
+    override
+    fun postRound(roundEnv: RoundEnvironment): Outputs {
+        val allPlugins = plugins + storedPlugins
+
+        getEnv().log("post round")
+        val maps = allPlugins.associate { Pair(it, it.element) }
+                .mapValues { entry ->
+                    val key = entry.key.element
+                    val values = roundEnv.getElementsAnnotatedWith(key)
+                            .map(MoreElements::asType)
+                    getEnv().log("plugin entry: $key=$values")
+//                    value.map { MoreElements.asType(it) }
+//                            .onEach { getEnv().log("plugin: ${entry.key.element}=$it") }
+                    values
+                }
+
+//        maps.forEach { k, v ->
+//            getEnv().log("plugin maps: ${k.element}=$v")
+//        }
+//        val typeElements = allPlugins.map { it.element }
+//                .onEach { getEnv().log("plugin element: $it") }
+//                .flatMap { roundEnv.getElementsAnnotatedWith(it) }
+//                .map { MoreElements.asType(it) }
+
+        // TODO:
+        return super.postRound(roundEnv)
     }
 }

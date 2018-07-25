@@ -56,8 +56,8 @@ class RoundStep(
         nextRound.deferredElements
     }
 
-    fun postRound(roundEnv: RoundEnvironment) {
-        step.postRound(roundEnv)
+    fun postRound(roundEnv: RoundEnvironment): Outputs {
         // TODO:
+        return step.postRound(roundEnv)
     }
 }
