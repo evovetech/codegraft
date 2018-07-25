@@ -17,6 +17,7 @@
 package evovetech.sample.network
 
 import android.app.Application
+import codegraft.inject.BindPlugin
 import codegraft.inject.BootScope
 import codegraft.inject.BootstrapComponent
 import codegraft.inject.Plugin
@@ -45,6 +46,7 @@ interface ClientComponent {
 }
 
 @Singleton
+@BindPlugin
 class Client
 @Inject constructor(
     private val okhttpProvider: Provider<OkHttpClient>,

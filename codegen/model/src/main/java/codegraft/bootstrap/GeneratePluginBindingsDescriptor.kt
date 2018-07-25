@@ -41,7 +41,9 @@ class GeneratePluginBindingsDescriptor(
 
     val pluginType: TypeElement,
 
-    val pluralName: String
+    val pluralName: String,
+
+    val flattenComponent: Boolean
 ) {
     val type: TypeMirror = element.asType()
 
@@ -88,11 +90,13 @@ class GeneratePluginBindingsDescriptor(
                     "${pluginType.simpleName}s"
                 }
             }
+            val flattenComponent = annotationMirror.getValue<Boolean>("flattenComponent") ?: false
             return GeneratePluginBindingsDescriptor(
                 element = element,
                 annotationMirror = annotationMirror,
                 pluginType = pluginType,
-                pluralName = pluralName.capitalize()
+                pluralName = pluralName.capitalize(),
+                flattenComponent = flattenComponent
             )
         }
     }

@@ -16,6 +16,7 @@
 
 package codegraft.bootstrap
 
+import codegraft.inject.BootstrapComponent
 import codegraft.inject.ClassKeyProviderMap
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
@@ -34,6 +35,7 @@ import org.jetbrains.annotations.NotNull
 import sourcerer.JavaOutput
 import sourcerer.KotlinOutput
 import sourcerer.Outputs
+import sourcerer.addTo
 import sourcerer.interfaceBuilder
 import sourcerer.name
 import sourcerer.typeSpec
@@ -75,11 +77,18 @@ class GeneratePluginBindingsGenerator(
     val packageName: String = pluginTypeClassName.packageName()
 
     fun process(): Outputs {
+        val typeModuleGenerator = TypeModuleGenerator()
+        val typeMapGenerator = TypeMapGenerator()
+        val typeComponentGenerator = TypeComponentGenerator(
+            typeModuleGenerator,
+            typeMapGenerator
+        )
         return listOf(
             TypeAliasGenerator(),
             TypeMapKeyGenerator(),
-            TypeModuleCreator(),
-            TypeMapGenerator()
+            typeModuleGenerator,
+            typeMapGenerator,
+            typeComponentGenerator
         )
     }
 
@@ -129,7 +138,7 @@ class GeneratePluginBindingsGenerator(
     }
 
     inner
-    class TypeModuleCreator : JavaOutput(
+    class TypeModuleGenerator : JavaOutput(
         rawType = ClassName.get(packageName, "${pluginTypeName}Module")
     ) {
         override
@@ -177,6 +186,35 @@ class GeneratePluginBindingsGenerator(
                         .build()
                 addParameter(param)
                 addStatement("super(\$N)", param)
+                build()
+            })
+        }
+    }
+
+    inner
+    class TypeComponentGenerator(
+        val typeModuleGenerator: TypeModuleGenerator,
+        val typeMapGenerator: TypeMapGenerator
+    ) : JavaOutput(
+        rawType = ClassName.get(packageName, "${pluginTypeName}Component")
+    ) {
+        override
+        fun classBuilder() = outKlass.interfaceBuilder()
+
+        override
+        fun typeSpec() = typeSpec {
+            addModifiers(PUBLIC, STATIC)
+            addAnnotation(AnnotationSpec.builder(BootstrapComponent::class.java).run {
+                typeModuleGenerator.outKlass.rawType
+                        .let(addTo("applicationModules"))
+                addMember("autoInclude", "\$L", false)
+                addMember("flatten", "\$L", descriptor.flattenComponent)
+                build()
+            })
+
+            addMethod(MethodSpec.methodBuilder("get$pluginMapTypeName").run {
+                addModifiers(PUBLIC, ABSTRACT)
+                returns(typeMapGenerator.outKlass.rawType)
                 build()
             })
         }

@@ -26,5 +26,9 @@ import kotlin.reflect.KClass
 annotation
 class GeneratePluginBindings(
     val pluginType: KClass<*>,
-    val pluralName: String = ""
+
+    // TODO: rename
+    val pluralName: String = "",
+
+    val flattenComponent: Boolean = false
 )

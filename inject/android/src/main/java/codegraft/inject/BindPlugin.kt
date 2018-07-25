@@ -19,10 +19,13 @@ package codegraft.inject
 import javax.inject.Singleton
 import kotlin.annotation.AnnotationRetention.BINARY
 
-@Singleton
-@GeneratePluginBindings(Plugin::class)
 @Retention(BINARY)
 @MustBeDocumented
+@Singleton
+@GeneratePluginBindings(
+    pluginType = Plugin::class,
+    flattenComponent = true
+)
 annotation
 class BindPlugin
 
