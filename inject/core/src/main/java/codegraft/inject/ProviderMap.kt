@@ -16,6 +16,6 @@
 
 package codegraft.inject
 
-interface ProviderMap<in K : Any, out V : Any> {
-    val providers: BindingProviderMap<in K, out V>
+interface ProviderMap<K : Any, V : Any> {
+    val providers: BindingProviderMap<K, V>
 }

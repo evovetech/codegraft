@@ -26,6 +26,7 @@ import codegraft.inject.BootstrapComponent
 import codegraft.inject.ClassKeyProviderMap
 import codegraft.inject.ClassMap
 import codegraft.inject.ClassProviderMap
+import codegraft.inject.get
 import dagger.Binds
 import dagger.MapKey
 import dagger.Module
@@ -101,8 +102,8 @@ class ViewModelDelegate<VM : ViewModel>(
 @Singleton
 class ViewModelFactory
 @Inject constructor(
-    override val providers: ViewModelProviderMap
-) : ClassKeyProviderMap<ViewModel>(),
+    providers: ViewModelProviderMap
+) : ClassKeyProviderMap<ViewModel>(providers),
     ViewModelProvider.Factory {
     override
     fun <T : ViewModel> create(modelClass: Class<T>): T {

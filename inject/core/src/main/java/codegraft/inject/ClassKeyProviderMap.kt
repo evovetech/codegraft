@@ -18,16 +18,15 @@ package codegraft.inject
 
 import javax.inject.Provider
 
-abstract
-class ClassKeyProviderMap<T : Any> : ProviderMap<Class<out T>, T> {
-    abstract override
-    val providers: ClassProviderMap<T>
+open
+class ClassKeyProviderMap<T : Any>(
+    override val providers: ClassProviderMap<T>
+) : ProviderMap<Class<out T>, T>
 
-    operator
-    fun <R : T> get(key: Class<R>): R? {
-        return providers[key]?.get()?.let {
-            key.castOrNull(it)
-        }
+operator
+fun <T : Any, R : T> ClassKeyProviderMap<in T>.get(key: Class<R>): R? {
+    return providers[key]?.get()?.let {
+        key.castOrNull(it)
     }
 }
 

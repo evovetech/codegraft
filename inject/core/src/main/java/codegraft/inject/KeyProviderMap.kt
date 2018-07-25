@@ -16,10 +16,12 @@
 
 package codegraft.inject
 
-abstract
-class KeyProviderMap<in K : Any, out V : Any> : ProviderMap<K, V> {
-    operator
-    fun get(key: K): V? {
-        return providers[key]?.get()
-    }
+open
+class KeyProviderMap<K : Any, V : Any>(
+    override val providers: BindingProviderMap<K, V>
+) : ProviderMap<K, V>
+
+operator
+fun <K : Any, V : Any> KeyProviderMap<K, V>.get(key: K): V? {
+    return providers[key]?.get()
 }
