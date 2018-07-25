@@ -139,6 +139,7 @@ class BootstrapProcessor(
     private
     fun ProcessData.finish(): List<Output> =
         if (isApplication) {
+            // TODO: modules from plugins
             val generatedModules = androidInjectStep.modules
             val storedModules = androidInjectStep.storedModules()
             val generatedComponents = bootstrapComponentStep.generatedComponents
@@ -156,7 +157,8 @@ class BootstrapProcessor(
             // just sourcerer things
             listOf(
                 bootstrapComponentStep.sourcererOutput(),
-                androidInjectStep.sourcererOutput()
+                androidInjectStep.sourcererOutput(),
+                generatePluginBindingsStep.sourcererOutput()
             )
         }
 

@@ -31,7 +31,8 @@ class ProcessData
     val steps: RoundSteps,
     val bootstrapComponentStep: BootstrapComponentStep,
     val androidInjectStep: AndroidInjectStep,
-    val appComponentStep: AppComponentStep
+    val appComponentStep: AppComponentStep,
+    val generatePluginBindingsStep: GeneratePluginBindingsStep
 ) {
     val processors = processors
             .toImmutableList()
