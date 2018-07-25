@@ -17,35 +17,29 @@
 package codegraft.bootstrap
 
 import codegraft.inject.GeneratePluginBindings
-import com.google.auto.common.MoreElements
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.ImmutableSet
-import com.squareup.javapoet.AnnotationSpec
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.ParameterSpec
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoMap
+import com.google.common.collect.Multimap
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationStep
 import sourcerer.AnnotationType
-import sourcerer.JavaOutput
 import sourcerer.Output
 import sourcerer.Outputs
-import sourcerer.addTo
-import sourcerer.getFieldName
-import sourcerer.interfaceBuilder
 import sourcerer.processor.ProcessingEnv
+import sourcerer.toImmutableMap
 import sourcerer.toImmutableSet
 import sourcerer.typeInputs
-import sourcerer.typeSpec
 import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject
 import javax.inject.Singleton
-import javax.lang.model.element.Modifier.ABSTRACT
-import javax.lang.model.element.Modifier.PUBLIC
-import javax.lang.model.element.Modifier.STATIC
-import javax.lang.model.element.TypeElement
+
+typealias MutablePlugins = MutableSet<GeneratePluginBindingsDescriptor>
+typealias Plugins = ImmutableSet<GeneratePluginBindingsDescriptor>
+
+typealias MutableModules = Multimap<GeneratePluginBindingsDescriptor, GeneratePluginBindingsModuleDescriptor>
+typealias Modules = ImmutableMultimap<GeneratePluginBindingsDescriptor, GeneratePluginBindingsModuleDescriptor>
+typealias ModulesBuilder = ImmutableMultimap.Builder<GeneratePluginBindingsDescriptor, GeneratePluginBindingsModuleDescriptor>
 
 @Singleton
 class GeneratePluginBindingsStep
@@ -54,13 +48,20 @@ class GeneratePluginBindingsStep
     val outputFactory: GeneratePluginBindingsGenerator.Factory,
     val sourcerer: GeneratePluginBindingsSourcerer
 ) : AnnotationStep() {
+
     private
-    var _plugins: Set<GeneratePluginBindingsDescriptor> = LinkedHashSet()
+    val _plugins: MutablePlugins = LinkedHashSet()
 
-    val plugins: ImmutableSet<GeneratePluginBindingsDescriptor>
-        get() = _plugins.toImmutableSet()
+    private
+    val _modules: MutableModules = HashMultimap.create()
 
-    val storedPlugins: ImmutableSet<GeneratePluginBindingsDescriptor> by lazy {
+    val plugins: Plugins
+        get() = Plugins.copyOf(_plugins)
+
+    val modules: Modules
+        get() = Modules.copyOf(_modules)
+
+    val storedPlugins: Plugins by lazy {
         sourcerer.storedOutputs()
                 .map(descriptorFactory::forStoredModule)
                 .toImmutableSet()
@@ -82,7 +83,7 @@ class GeneratePluginBindingsStep
         val descriptors = injections
                 .map(descriptorFactory::create)
                 .toImmutableSet()
-        _plugins += descriptors
+        _plugins.addAll(descriptors)
         return descriptors
                 .map(outputFactory::create)
                 .flatMap(GeneratePluginBindingsGenerator::process)
@@ -90,72 +91,29 @@ class GeneratePluginBindingsStep
 
     override
     fun postRound(roundEnv: RoundEnvironment): Outputs {
-        val allPlugins = plugins + storedPlugins
+        val allPlugins = (plugins + storedPlugins)
+                .toImmutableSet()
+        val allModules = allPlugins.associate { descriptor ->
+            val key = descriptor
+            val value = descriptorFactory.modules(key, roundEnv)
+            Pair(key, value)
+        }.toImmutableMap()
 
-        val maps2: Map<GeneratePluginBindingsDescriptor, List<TypeElement>> = allPlugins.associate { descriptor ->
-            val key = descriptor.annotationType
-            val values = roundEnv.getElementsAnnotatedWith(key)
-                    .map(MoreElements::asType)
-            Pair(descriptor, values)
-        }
-        maps2.forEach { k, v ->
-            getEnv().log("plugin entry: ${k.annotationType}=$v")
+        allModules.map { (key, value) ->
+            _modules.putAll(key, value)
         }
 
-        return maps2.flatMap { (descriptor, elements) ->
-            elements.map { element ->
-                GeneratedPluginModule(descriptor, element)
-            }
-        }
+//        return allPlugins.associate { descriptor ->
+//            val key = descriptor.element
+//            val values = roundEnv.getElementsAnnotatedWith(key)
+//                    .map(MoreElements::asType)
+//            Pair(descriptor, values)
+//        }.flatMap { (descriptor, elements) ->
+//            elements.map { element ->
+//                GeneratePluginBindingsModuleDescriptor(descriptor, element)
+//            }
+//        }
+        return emptyList()
     }
 }
 
-/*
-    @Module
-    interface DaggerModule {
-        @Binds
-        @IntoMap
-        @ViewModelKey(PlaidViewModel::class)
-        fun bindViewModel(viewModel: PlaidViewModel): ViewModel
-    }
- */
-class GeneratedPluginModule(
-    val descriptor: GeneratePluginBindingsDescriptor,
-    val element: TypeElement
-) : JavaOutput(
-    rawType = ClassName.get(element),
-    outExt = "Module"
-) {
-    override
-    fun newBuilder() =
-        outKlass.interfaceBuilder()
-
-    override
-    fun typeSpec() = typeSpec {
-        addModifiers(PUBLIC, STATIC)
-        addAnnotation(Module::class.java)
-
-        val returnType = descriptor.pluginType.className
-        val paramType = element.className
-        val param = ParameterSpec.builder(paramType, paramType.getFieldName()).run {
-            // TODO:
-            build()
-        }
-
-        val pluginTypeName = descriptor.pluginTypeName
-        addMethod(MethodSpec.methodBuilder("bind$pluginTypeName").run {
-            addModifiers(PUBLIC, ABSTRACT)
-
-            addAnnotation(Binds::class.java)
-            addAnnotation(IntoMap::class.java)
-            addAnnotation(AnnotationSpec.builder(descriptor.mapKeyAnnotationType).run {
-                paramType.let(addTo("value"))
-                build()
-            })
-
-            addParameter(param)
-            returns(returnType)
-            build()
-        })
-    }
-}

@@ -16,68 +16,35 @@
 
 package codegraft.bootstrap
 
-import codegraft.inject.GeneratePluginBindings
-import com.google.auto.common.MoreElements.asType
-import com.google.auto.common.MoreTypes.asDeclared
-import com.google.auto.common.MoreTypes.equivalence
-import com.google.common.base.Equivalence
+import codegraft.AnnotatedElementDescriptor
+import codegraft.packageName
+import com.google.auto.common.MoreElements
 import com.squareup.javapoet.ClassName
-import dagger.internal.codegen.getTypeValue
-import sourcerer.getAnnotationMirror
-import sourcerer.getValue
 import sourcerer.qualifiedName
+import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject
-import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
-import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 
 data
 class GeneratePluginBindingsDescriptor(
-    val annotationType: TypeElement,
+    override
+    val element: TypeElement,
 
-    val annotationMirror: AnnotationMirror,
+    override
+    val annotation: GeneratePluginBindingsAnnotationDescriptor
 
-    val pluginType: TypeElement,
-
-    val pluginTypeName: String,
-
-    val pluginMapTypeName: String,
-
-    val flattenComponent: Boolean
-) {
-    val packageName: String
-        get() = annotationType.className.packageName()
+) : AnnotatedElementDescriptor<TypeElement>() {
 
     val mapKeyAnnotationType: ClassName
-        get() = ClassName.get(packageName, "${pluginTypeName}Key")
-
-    private
-    val typeWrapper: Equivalence.Wrapper<TypeMirror> =
-        equivalence().wrap(annotationType.asType())
-
-    override
-    fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as GeneratePluginBindingsDescriptor
-
-        if (typeWrapper != other.typeWrapper) return false
-
-        return true
-    }
-
-    override
-    fun hashCode(): Int {
-        return typeWrapper.hashCode()
-    }
+        get() = annotation.getMapKeyAnnotationType(packageName)
 
     class Factory
     @Inject constructor(
         val elements: Elements,
-        val types: Types
+        val types: Types,
+        val annotationFactory: GeneratePluginBindingsAnnotationDescriptor.Factory
     ) {
         fun forStoredModule(
             className: ClassName
@@ -86,33 +53,28 @@ class GeneratePluginBindingsDescriptor(
             return create(typeElement)
         }
 
-        fun create(element: TypeElement): GeneratePluginBindingsDescriptor {
-            val annotationMirror = element.getAnnotationMirror<GeneratePluginBindings>()!!
-            val pluginType = asType(asDeclared(annotationMirror.getTypeValue("pluginType")).asElement())
-            val pluginTypeName: String = (annotationMirror.getValue("pluginTypeName") ?: "").let { name ->
-                if (name.isNotEmpty()) {
-                    name
-                } else {
-                    "${pluginType.simpleName}"
-                }
-            }.capitalize()
-            val pluginMapTypeName: String = (annotationMirror.getValue("pluginMapTypeName") ?: "").let { name ->
-                if (name.isNotEmpty()) {
-                    name
-                } else {
-                    val defaultSuffix = "s"
-                    "$pluginTypeName$defaultSuffix"
-                }
-            }.capitalize()
-            val flattenComponent = annotationMirror.getValue<Boolean>("flattenComponent") ?: false
+        fun create(
+            element: TypeElement
+        ): GeneratePluginBindingsDescriptor {
+            val annotation = annotationFactory.create(element)
             return GeneratePluginBindingsDescriptor(
-                annotationType = element,
-                annotationMirror = annotationMirror,
-                pluginType = pluginType,
-                pluginTypeName = pluginTypeName,
-                pluginMapTypeName = pluginMapTypeName,
-                flattenComponent = flattenComponent
+                element = element,
+                annotation = annotation
             )
+        }
+
+        fun modules(
+            descriptor: GeneratePluginBindingsDescriptor,
+            roundEnv: RoundEnvironment
+        ): List<GeneratePluginBindingsModuleDescriptor> {
+            val annotationType = descriptor.element
+            return roundEnv.getElementsAnnotatedWith(annotationType)
+                    .map { element ->
+                        GeneratePluginBindingsModuleDescriptor(
+                            descriptor,
+                            MoreElements.asType(element)
+                        )
+                    }
         }
     }
 }

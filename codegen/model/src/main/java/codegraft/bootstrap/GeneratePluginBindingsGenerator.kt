@@ -18,6 +18,7 @@ package codegraft.bootstrap
 
 import codegraft.inject.BootstrapComponent
 import codegraft.inject.ClassKeyProviderMap
+import codegraft.packageName
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
@@ -59,16 +60,17 @@ val TypeElement.className: ClassName
     get() = ClassName.get(this)
 
 class GeneratePluginBindingsGenerator(
-    private val descriptor: GeneratePluginBindingsDescriptor
+    val descriptor: GeneratePluginBindingsDescriptor
 ) {
-    private val packageName: String = descriptor.packageName
-    private val annotationType = descriptor.annotationType
-    private val scope: Scope? = annotationType.uniqueScope
-    private val mapKeyAnnotationType: ClassName = descriptor.mapKeyAnnotationType
+    val packageName: String = descriptor.packageName
+    val annotationType = descriptor.element
+    val scope: Scope? = annotationType.uniqueScope
+    val mapKeyAnnotationType: ClassName = descriptor.mapKeyAnnotationType
 
-    private val pluginType = descriptor.pluginType
-    private val pluginTypeName = descriptor.pluginTypeName
-    private val pluginMapTypeName = descriptor.pluginMapTypeName
+    private val annotation = descriptor.annotation
+    private val pluginType = annotation.pluginType
+    private val pluginTypeName = annotation.pluginTypeName
+    private val pluginMapTypeName = annotation.pluginMapTypeName
 
     private val keyType = pluginType.className.wrapClassSubtype()
     private val valueType = pluginType.className
@@ -213,7 +215,7 @@ class GeneratePluginBindingsGenerator(
                 typeModuleGenerator.outKlass.rawType
                         .let(addTo("applicationModules"))
                 addMember("autoInclude", "\$L", false)
-                addMember("flatten", "\$L", descriptor.flattenComponent)
+                addMember("flatten", "\$L", annotation.flattenComponent)
                 build()
             })
 

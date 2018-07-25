@@ -41,7 +41,7 @@ constructor(
     internal
     fun output(modules: Collection<GeneratePluginBindingsDescriptor>): Output {
         return Output(this, modules.map {
-            ClassName.get(it.annotationType)
+            ClassName.get(it.element)
         })
     }
 
