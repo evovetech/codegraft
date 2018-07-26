@@ -16,6 +16,7 @@
 
 package evovetech.gradle.transform
 
+import android.content.Context
 import android.os.Bundle
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.description.type.TypeDescription
@@ -27,7 +28,12 @@ import net.bytebuddy.matcher.ElementMatchers.takesArguments
 fun activityOnCreate(): Junction<MethodDescription> = named<MethodDescription>("onCreate")
         .and<MethodDescription>(takesArguments(Bundle::class.java))
         .and<MethodDescription>(returns(TypeDescription.VOID))
-fun fragmentOnActivityCreated(): Junction<MethodDescription> = named<MethodDescription>("onActivityCreated")
-        .and<MethodDescription>(takesArguments(Bundle::class.java))
+
+fun fragmentOnAttach(): Junction<MethodDescription> = named<MethodDescription>("onAttach")
+        .and<MethodDescription>(takesArguments(Context::class.java))
+        .and<MethodDescription>(returns(TypeDescription.VOID))
+
+fun serviceOnCreate(): Junction<MethodDescription> = named<MethodDescription>("onCreate")
+        .and<MethodDescription>(takesArguments(0))
         .and<MethodDescription>(returns(TypeDescription.VOID))
 

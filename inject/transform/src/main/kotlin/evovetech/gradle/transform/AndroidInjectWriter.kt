@@ -16,6 +16,7 @@
 
 package evovetech.gradle.transform
 
+import codegraft.inject.AndroidInject
 import evovetech.codegen.AndroidInjectMethods
 import evovetech.codegen.Transformed
 import net.bytebuddy.build.EntryPoint
@@ -28,7 +29,6 @@ import net.bytebuddy.dynamic.DynamicType.Unloaded
 import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.matcher.ElementMatcher.Junction
 import kotlin.reflect.KClass
-import codegraft.inject.AndroidInject
 
 class AndroidInjectWriter : OutputWriter {
     private val entryPoint: EntryPoint = REBASE
@@ -61,8 +61,9 @@ class AndroidInjectType(
     val methodDelegation: MethodDelegation = methodDelegation<AndroidInjectMethods>()
 ) {
     Activity(android.app.Activity::class.java, activityOnCreate()),
-    SupportFragment(android.support.v4.app.Fragment::class.java, fragmentOnActivityCreated()),
-    Fragment(android.app.Fragment::class.java, fragmentOnActivityCreated());
+    SupportFragment(android.support.v4.app.Fragment::class.java, fragmentOnAttach()),
+    Fragment(android.app.Fragment::class.java, fragmentOnAttach()),
+    Service(android.app.Service::class.java, serviceOnCreate());
 
     fun matches(typeDescription: TypeDescription): Boolean {
         return typeDescription.isAssignableTo(componentType)
