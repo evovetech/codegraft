@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft.plugins
 
 import codegraft.inject.GeneratePluginBindings
+import codegraft.plugins.GeneratePluginBindingsDescriptor.Factory
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.ImmutableSet
@@ -44,7 +45,7 @@ typealias ModulesBuilder = ImmutableMultimap.Builder<GeneratePluginBindingsDescr
 @Singleton
 class GeneratePluginBindingsStep
 @Inject constructor(
-    val descriptorFactory: GeneratePluginBindingsDescriptor.Factory,
+    val descriptorFactory: Factory,
     val outputFactory: GeneratePluginBindingsGenerator.Factory,
     val sourcerer: GeneratePluginBindingsSourcerer
 ) : AnnotationStep() {

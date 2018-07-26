@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft.android
 
+import codegraft.inject.AndroidInject
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
 import okio.Okio
 import sourcerer.SourcererOutput
 import sourcerer.StoredFile
 import sourcerer.getResources
-import codegraft.inject.AndroidInject
 import sourcerer.io.Reader
 import sourcerer.io.Writer
 import sourcerer.metaFile

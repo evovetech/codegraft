@@ -16,6 +16,12 @@
 
 package dagger.internal.codegen
 
+import codegraft.bootstrap.APPLICATION_MODULES_ATTRIBUTE
+import codegraft.bootstrap.AUTO_INCLUDE_ATTRIBUTE
+import codegraft.bootstrap.BOOTSTRAP_DEPENDENCIES_ATTRIBUTE
+import codegraft.bootstrap.BOOTSTRAP_MODULES_ATTRIBUTE
+import codegraft.bootstrap.FLATTEN_ATTRIBUTE
+import codegraft.inject.BootstrapComponent
 import com.google.auto.common.MoreElements.isAnnotationPresent
 import com.google.auto.common.MoreTypes
 import com.google.common.base.Equivalence
@@ -36,15 +42,9 @@ import dagger.internal.codegen.Scopes.scopesOf
 import dagger.model.DependencyRequest
 import dagger.model.Scope
 import dagger.producers.ProductionComponent
-import codegraft.bootstrap.APPLICATION_MODULES_ATTRIBUTE
-import codegraft.bootstrap.AUTO_INCLUDE_ATTRIBUTE
 import sourcerer.AnnotatedTypeElement
-import codegraft.bootstrap.BOOTSTRAP_DEPENDENCIES_ATTRIBUTE
-import codegraft.bootstrap.BOOTSTRAP_MODULES_ATTRIBUTE
-import codegraft.bootstrap.FLATTEN_ATTRIBUTE
 import sourcerer.getAnnotationMirror
 import sourcerer.getValue
-import codegraft.inject.BootstrapComponent
 import sourcerer.qualifiedName
 import sourcerer.toImmutableSet
 import java.util.EnumSet
@@ -294,7 +294,8 @@ class BootstrapComponentDescriptor(
                     .map(this::forComponent)
                     .toImmutableSet()
             val modules = modulesFactory.create(componentMirror, kind.modulesAttribute)
-            val applicationModules = modulesFactory.create(componentMirror,
+            val applicationModules = modulesFactory.create(
+                componentMirror,
                 APPLICATION_MODULES_ATTRIBUTE
             )
             val autoInclude = componentMirror.getValue<Boolean>(AUTO_INCLUDE_ATTRIBUTE)!!

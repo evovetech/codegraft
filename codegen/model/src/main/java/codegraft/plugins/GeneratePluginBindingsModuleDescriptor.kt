@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft.plugins
 
 import codegraft.ElementDescriptor
-import com.google.auto.common.MoreElements
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
@@ -30,8 +29,6 @@ import sourcerer.addTo
 import sourcerer.getFieldName
 import sourcerer.interfaceBuilder
 import sourcerer.typeSpec
-import javax.annotation.processing.RoundEnvironment
-import javax.inject.Inject
 import javax.lang.model.element.Modifier.ABSTRACT
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC

@@ -16,6 +16,16 @@
 
 package dagger.internal.codegen
 
+import codegraft.android.AndroidInjectModuleDescriptor
+import codegraft.android.AndroidInjectModuleDescriptor.Kind
+import codegraft.android.AndroidInjectModuleGenerator
+import codegraft.bootstrap.ComponentOutput
+import codegraft.bootstrap.Package
+import codegraft.bootstrap.buildParameter
+import codegraft.bootstrap.getterMethod
+import codegraft.bootstrap.getterMethodName
+import codegraft.bootstrap.key
+import codegraft.inject.BootScope
 import com.google.auto.common.MoreElements.hasModifiers
 import com.google.common.collect.ImmutableSet
 import com.squareup.javapoet.ClassName
@@ -39,20 +49,10 @@ import sourcerer.addAnnotation
 import sourcerer.addFieldSpec
 import sourcerer.addTo
 import sourcerer.addToConstructor
-import codegraft.bootstrap.AndroidInjectModuleDescriptor
-import codegraft.bootstrap.AndroidInjectModuleDescriptor.Kind
-import codegraft.bootstrap.AndroidInjectModuleGenerator
-import codegraft.bootstrap.ComponentOutput
-import codegraft.bootstrap.Package
-import codegraft.bootstrap.buildParameter
-import codegraft.bootstrap.getterMethod
-import codegraft.bootstrap.getterMethodName
-import codegraft.bootstrap.key
 import sourcerer.buildUnique
 import sourcerer.buildUniquePairs
 import sourcerer.classBuilder
 import sourcerer.getFieldName
-import codegraft.inject.BootScope
 import sourcerer.interfaceBuilder
 import sourcerer.name
 import sourcerer.nestedBuilder

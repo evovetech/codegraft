@@ -16,6 +16,9 @@
 
 package codegraft.bootstrap
 
+import codegraft.bootstrap.BootstrapComponentStep.Option
+import codegraft.bootstrap.ComponentOutput.Factory
+import codegraft.inject.BootstrapComponent
 import com.google.common.collect.ImmutableSet
 import dagger.internal.codegen.BootstrapComponentDescriptor
 import sourcerer.AnnotationElements
@@ -24,9 +27,6 @@ import sourcerer.AnnotationType
 import sourcerer.DeferredOutput
 import sourcerer.Output
 import sourcerer.Outputs
-import codegraft.bootstrap.BootstrapComponentStep.Option
-import codegraft.bootstrap.ComponentOutput.Factory
-import codegraft.inject.BootstrapComponent
 import sourcerer.processor.ProcessingEnv
 import sourcerer.processor.ProcessingEnv.Options
 import sourcerer.toImmutableSet

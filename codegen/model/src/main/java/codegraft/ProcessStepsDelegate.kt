@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft
 
 import com.google.auto.common.BasicAnnotationProcessor
 import sourcerer.RoundStep

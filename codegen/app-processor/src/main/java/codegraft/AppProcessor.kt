@@ -30,15 +30,15 @@ class AppProcessor : MainProcessor(true) {
     override
     fun process(annotations: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
         val returnVal = super.process(annotations, roundEnv)
-        if (!roundEnv.processingOver() && bootstrap.isProcessed()) {
+        if (!roundEnv.processingOver() && steps.isProcessed()) {
             if (!written) {
                 written = true
 
-                val applicationOutputs = bootstrap.currentRound.parentOutputs
+                val applicationOutputs = steps.currentRound.parentOutputs
                 if (applicationOutputs.isNotEmpty()) {
                     write()
                 } else {
-                    bootstrap.env.log("no outputs")
+                    steps.env.log("no outputs")
                 }
             }
         }
@@ -47,8 +47,8 @@ class AppProcessor : MainProcessor(true) {
 
     private
     fun write() {
-        val packageName = bootstrap.options.Package
-        val file = bootstrap.processingEnv.filer.createResource(
+        val packageName = steps.options.Package
+        val file = steps.processingEnv.filer.createResource(
             StandardLocation.SOURCE_OUTPUT,
             packageName,
             "Bootstrap_Gen.kt"

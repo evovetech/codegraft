@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft.android
 
-import codegraft.bootstrap.AndroidInjectModuleDescriptor.Factory
+import codegraft.android.AndroidInjectModuleDescriptor.Factory
+import codegraft.inject.AndroidInject
 import com.google.common.collect.ImmutableSet
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationStep
 import sourcerer.AnnotationType
 import sourcerer.Output
 import sourcerer.Outputs
-import codegraft.inject.AndroidInject
 import sourcerer.processor.ProcessingEnv
 import sourcerer.toImmutableSet
 import sourcerer.typeInputs

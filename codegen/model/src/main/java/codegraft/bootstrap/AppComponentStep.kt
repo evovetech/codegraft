@@ -16,6 +16,7 @@
 
 package codegraft.bootstrap
 
+import codegraft.android.AndroidInjectModuleDescriptor
 import com.google.common.collect.ImmutableSet
 import dagger.internal.codegen.AppComponentGenerator
 import dagger.internal.codegen.BootstrapComponentDescriptor

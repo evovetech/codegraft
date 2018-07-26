@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft
 
+import codegraft.android.AndroidInjectStep
+import codegraft.bootstrap.AppComponentStep
+import codegraft.bootstrap.BootstrapComponentStep
+import codegraft.plugins.GeneratePluginBindingsStep
 import sourcerer.ExactSet
 import sourcerer.processor.ProcessingEnv
 import sourcerer.toImmutableList

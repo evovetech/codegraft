@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft
 
+import codegraft.ProcessStepsProcessor.Component.Builder
+import codegraft.bootstrap.AppComponentStep
+import codegraft.bootstrap.Env
 import com.google.common.collect.ImmutableList
 import dagger.BindsInstance
 import sourcerer.DelegatingProcessor
@@ -35,7 +38,7 @@ import javax.inject.Singleton
 import javax.lang.model.element.TypeElement
 
 open
-class BootstrapProcessor(
+class ProcessStepsProcessor(
     private val isApplication: Boolean
 ) : DelegatingProcessor() {
     private lateinit
@@ -84,7 +87,8 @@ class BootstrapProcessor(
     fun initProcessors(
         env: ProcessingEnvironment
     ): List<Processor> {
-        val builder: BootstrapProcessor.Component.Builder = DaggerBootstrapProcessor_Component.builder()
+        val builder: Builder =
+            DaggerProcessStepsProcessor_Component.builder()
         val component = builder.run {
             env(newEnv(env))
             isApplication(isApplication)
@@ -167,7 +171,7 @@ class BootstrapProcessor(
     interface Component {
         val processData: ProcessData
 
-        fun inject(processor: BootstrapProcessor)
+        fun inject(processor: ProcessStepsProcessor)
 
         @dagger.Component.Builder
         interface Builder {

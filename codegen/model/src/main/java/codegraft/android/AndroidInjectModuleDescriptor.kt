@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft.android
 
-import com.google.auto.common.MoreTypes
-import com.google.common.base.Equivalence
-import com.google.common.collect.ImmutableList
-import com.squareup.javapoet.ClassName
-import dagger.internal.codegen.getTypeListValue
-import sourcerer.getAnnotationMirror
 import codegraft.inject.AndroidInject
 import codegraft.inject.android.AndroidApplication
 import codegraft.inject.android.AndroidInjectActivityModule
@@ -31,6 +25,12 @@ import codegraft.inject.android.AndroidInjectContentProviderModule
 import codegraft.inject.android.AndroidInjectModule
 import codegraft.inject.android.AndroidInjectServiceModule
 import codegraft.inject.android.AndroidInjectSupportFragmentModule
+import com.google.auto.common.MoreTypes
+import com.google.common.base.Equivalence
+import com.google.common.collect.ImmutableList
+import com.squareup.javapoet.ClassName
+import dagger.internal.codegen.getTypeListValue
+import sourcerer.getAnnotationMirror
 import sourcerer.qualifiedName
 import sourcerer.toImmutableList
 import javax.inject.Inject
@@ -138,7 +138,7 @@ class AndroidInjectModuleDescriptor(
     @Inject constructor(
         val elements: Elements,
         val types: Types,
-        val kindFactory: codegraft.bootstrap.AndroidInjectModuleDescriptor.Kind.Factory
+        val kindFactory: codegraft.android.AndroidInjectModuleDescriptor.Kind.Factory
     ) {
         fun forStoredModule(
             className: ClassName

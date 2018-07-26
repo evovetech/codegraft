@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft.android
 
+import codegraft.android.AndroidInjectModuleDescriptor.Kind.Application
+import codegraft.inject.android.ActivityScope
+import codegraft.inject.android.AndroidApplication
+import codegraft.inject.android.ApplicationKey
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.ParameterSpec
@@ -33,12 +37,8 @@ import sourcerer.SourceWriter
 import sourcerer.addAnnotation
 import sourcerer.addMethod
 import sourcerer.addTo
-import codegraft.bootstrap.AndroidInjectModuleDescriptor.Kind.Application
 import sourcerer.classBuilder
 import sourcerer.className
-import codegraft.inject.android.ActivityScope
-import codegraft.inject.android.AndroidApplication
-import codegraft.inject.android.ApplicationKey
 import sourcerer.interfaceBuilder
 import sourcerer.name
 import sourcerer.toKlass

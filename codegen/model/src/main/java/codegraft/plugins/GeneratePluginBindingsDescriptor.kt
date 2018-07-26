@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft.plugins
 
 import codegraft.AnnotatedElementDescriptor
 import codegraft.packageName

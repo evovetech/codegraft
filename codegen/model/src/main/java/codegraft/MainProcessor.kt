@@ -16,7 +16,6 @@
 
 package codegraft
 
-import codegraft.bootstrap.BootstrapProcessor
 import sourcerer.processor.ProcessingEnv
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -24,12 +23,12 @@ import javax.lang.model.element.TypeElement
 
 open
 class MainProcessor(
-    protected val bootstrap: BootstrapProcessor
-) : Processor by bootstrap {
+    protected val steps: ProcessStepsProcessor
+) : Processor by steps {
     constructor(
         isApplication: Boolean
     ) : this(
-        BootstrapProcessor(isApplication)
+        ProcessStepsProcessor(isApplication)
     )
 
     override
@@ -38,8 +37,8 @@ class MainProcessor(
 
     override
     fun process(annotations: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        bootstrap.processingEnv.log("MainProcessor process($annotations)")
-        bootstrap.process(annotations, roundEnv)
+        steps.processingEnv.log("MainProcessor process($annotations)")
+        steps.process(annotations, roundEnv)
         return false
     }
 }

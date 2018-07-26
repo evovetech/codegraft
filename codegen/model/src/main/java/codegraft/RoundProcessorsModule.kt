@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft
 
 import dagger.Binds
 import dagger.Module

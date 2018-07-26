@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft.plugins
 
 import codegraft.inject.BootstrapComponent
 import codegraft.inject.ClassKeyProviderMap

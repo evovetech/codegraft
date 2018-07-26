@@ -16,6 +16,11 @@
 
 package dagger.internal.codegen
 
+import codegraft.bootstrap.Dependency
+import codegraft.bootstrap.fieldName
+import codegraft.bootstrap.getterMethod
+import codegraft.bootstrap.qualifier
+import codegraft.bootstrap.type
 import com.google.common.collect.ImmutableSet
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
@@ -24,11 +29,6 @@ import dagger.model.Key
 import sourcerer.JavaOutput
 import sourcerer.addFieldSpec
 import sourcerer.addToConstructor
-import codegraft.bootstrap.Dependency
-import codegraft.bootstrap.fieldName
-import codegraft.bootstrap.getterMethod
-import codegraft.bootstrap.qualifier
-import codegraft.bootstrap.type
 import sourcerer.buildUnique
 import sourcerer.classBuilder
 import sourcerer.toImmutableSet

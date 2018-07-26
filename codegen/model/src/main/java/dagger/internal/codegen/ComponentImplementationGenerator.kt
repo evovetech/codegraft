@@ -16,6 +16,9 @@
 
 package dagger.internal.codegen
 
+import codegraft.bootstrap.key
+import codegraft.bootstrap.qualifier
+import codegraft.bootstrap.type
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.CodeBlock
@@ -30,11 +33,8 @@ import dagger.internal.codegen.BootstrapComponentDescriptor.ComponentMethodKind.
 import sourcerer.JavaOutput
 import sourcerer.addFieldSpec
 import sourcerer.addToConstructor
-import codegraft.bootstrap.key
-import codegraft.bootstrap.type
 import sourcerer.classBuilder
 import sourcerer.getFieldName
-import codegraft.bootstrap.qualifier
 import sourcerer.typeSpec
 import javax.inject.Inject
 import javax.inject.Provider

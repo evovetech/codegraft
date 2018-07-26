@@ -16,7 +16,7 @@
 
 package codegraft
 
-import codegraft.bootstrap.className
+import codegraft.plugins.className
 import com.google.auto.common.MoreTypes
 import com.google.common.base.Equivalence
 import javax.lang.model.element.Element

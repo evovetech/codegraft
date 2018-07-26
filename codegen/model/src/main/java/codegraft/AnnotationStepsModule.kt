@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package codegraft.bootstrap
+package codegraft
 
+import codegraft.android.AndroidInjectStep
+import codegraft.bootstrap.BootstrapComponentStep
+import codegraft.plugins.GeneratePluginBindingsStep
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
