@@ -17,24 +17,14 @@
 package evovetech.blog.medium.ui.medium
 
 import android.arch.lifecycle.ViewModel
-import codegraft.inject.android.ViewModelKey
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoMap
+import codegraft.inject.android.BindViewModel
 import evovetech.blog.medium.MediumClient
 import javax.inject.Inject
 
-class MediumModule
+@BindViewModel
+class MediumViewModel
 @Inject constructor(
     val client: MediumClient
 ) : ViewModel() {
     // TODO: Implement the ViewModel
-
-    @Module
-    interface DaggerModule {
-        @Binds
-        @IntoMap
-        @ViewModelKey(MediumModule::class)
-        fun bindViewModel(viewModel: MediumModule): ViewModel
-    }
 }

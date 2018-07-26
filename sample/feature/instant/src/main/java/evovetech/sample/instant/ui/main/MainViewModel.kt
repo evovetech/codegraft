@@ -17,23 +17,13 @@
 package evovetech.sample.instant.ui.main
 
 import android.arch.lifecycle.ViewModel
-import codegraft.inject.android.ViewModelKey
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoMap
+import codegraft.inject.android.BindViewModel
 import javax.inject.Inject
 
+@BindViewModel
 class MainViewModel
 @Inject constructor(
 
 ) : ViewModel() {
     // TODO: Implement the ViewModel
-
-    @Module
-    interface DaggerModule {
-        @Binds
-        @IntoMap
-        @ViewModelKey(MainViewModel::class)
-        fun bindViewModel(viewModel: MainViewModel): ViewModel
-    }
 }

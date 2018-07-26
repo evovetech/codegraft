@@ -34,7 +34,7 @@ class MediumFragment : Fragment() {
     var viewModelProvider: ViewModelInstanceProvider<MediumFragment>
 
     private
-    val viewModel: MediumModule by viewModelDelegate(::viewModelProvider)
+    val viewModel: MediumViewModel by viewModelDelegate(::viewModelProvider)
 
     override
     fun onCreateView(

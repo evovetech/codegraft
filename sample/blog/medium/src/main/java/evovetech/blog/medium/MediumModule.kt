@@ -21,7 +21,6 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
-import evovetech.blog.medium.ui.medium.MediumModule.DaggerModule
 import okhttp3.OkHttpClient
 import okhttp3.OkHttpClient.Builder
 import retrofit2.Retrofit
@@ -32,7 +31,7 @@ import javax.inject.Singleton
 private const
 val AuthKey = "Bearer ${BuildConfig.API_KEY}"
 
-@Module(includes = [DaggerModule::class])
+@Module
 class MediumModule {
     @Provides
     @Singleton
