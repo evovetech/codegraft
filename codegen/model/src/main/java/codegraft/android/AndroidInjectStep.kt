@@ -38,10 +38,10 @@ class AndroidInjectStep
     val sourcerer: AndroidInjectSourcerer
 ) : AnnotationStep() {
     private
-    var _modules: Set<AndroidInjectModuleDescriptor> = LinkedHashSet()
+    var _generatedModules: Set<AndroidInjectModuleDescriptor> = LinkedHashSet()
 
-    val modules: ImmutableSet<AndroidInjectModuleDescriptor>
-        get() = _modules.toImmutableSet()
+    val generatedModules: ImmutableSet<AndroidInjectModuleDescriptor>
+        get() = _generatedModules.toImmutableSet()
 
     fun storedModules(): ImmutableSet<AndroidInjectModuleDescriptor> = sourcerer
             .storedOutputs()
@@ -49,7 +49,7 @@ class AndroidInjectStep
             .toImmutableSet()
 
     fun sourcererOutput(): Output {
-        return sourcerer.output(modules)
+        return sourcerer.output(generatedModules)
     }
 
     override
@@ -64,7 +64,7 @@ class AndroidInjectStep
         val descriptors = injections
                 .map(descriptorFactory::create)
                 .toImmutableSet()
-        _modules += descriptors
+        _generatedModules += descriptors
         return descriptors
                 .map(outputFactory::create)
     }

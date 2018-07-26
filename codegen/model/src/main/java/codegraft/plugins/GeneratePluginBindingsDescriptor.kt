@@ -20,6 +20,7 @@ import codegraft.AnnotatedElementDescriptor
 import codegraft.packageName
 import com.google.auto.common.MoreElements
 import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.TypeName
 import sourcerer.qualifiedName
 import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject
@@ -46,7 +47,7 @@ class GeneratePluginBindingsDescriptor(
         val types: Types,
         val annotationFactory: GeneratePluginBindingsAnnotationDescriptor.Factory
     ) {
-        fun forStoredModule(
+        fun stored(
             className: ClassName
         ): GeneratePluginBindingsDescriptor {
             val typeElement = elements.getTypeElement(className.qualifiedName)
@@ -61,6 +62,24 @@ class GeneratePluginBindingsDescriptor(
                 element = element,
                 annotation = annotation
             )
+        }
+
+        fun forStoredModules(
+            pair: Pair<ClassName, List<TypeName>>
+        ): Pair<GeneratePluginBindingsDescriptor, List<GeneratePluginBindingsModuleDescriptor>> {
+            val parent = stored(pair.first)
+            return forStoredModules(parent, pair.second)
+        }
+
+        private
+        fun forStoredModules(
+            parent: GeneratePluginBindingsDescriptor,
+            children: List<TypeName>
+        ): Pair<GeneratePluginBindingsDescriptor, List<GeneratePluginBindingsModuleDescriptor>> {
+            val modules = children.filterIsInstance<ClassName>()
+                    .map { className -> elements.getTypeElement(className.qualifiedName) }
+                    .map { element -> GeneratePluginBindingsModuleDescriptor(parent, element) }
+            return Pair(parent, modules)
         }
 
         fun modules(

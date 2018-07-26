@@ -17,6 +17,7 @@
 package codegraft.plugins
 
 import codegraft.inject.GeneratePluginBindings
+import com.google.common.collect.ImmutableSet
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
 import okio.Okio
@@ -27,8 +28,10 @@ import sourcerer.io.Reader
 import sourcerer.io.Writer
 import sourcerer.metaFile
 import sourcerer.processor.ProcessingEnv
+import sourcerer.toImmutableSet
 import java.net.URL
 import javax.inject.Inject
+import javax.lang.model.element.TypeElement
 
 class GeneratePluginBindingsSourcerer
 @Inject internal
@@ -39,10 +42,8 @@ constructor(
     val file = ClassName.get(GeneratePluginBindings::class.java).metaFile
 
     internal
-    fun output(modules: Collection<GeneratePluginBindingsDescriptor>): Output {
-        return Output(this, modules.map {
-            ClassName.get(it.element)
-        })
+    fun output(modules: Modules): Output {
+        return Output(this, modules)
     }
 
     internal
@@ -57,24 +58,68 @@ constructor(
     }
 
     private
-    fun StoredFile.read(): List<TypeName> = read {
-        it.readTypeNames()
+    fun StoredFile.read(): List<Pair<ClassName, List<TypeName>>> = read {
+        it.readList(ModuleReadWrite)
     }
 
     private
     fun Collection<StoredFile>.readAll() = flatMap { it.read() }
-            .mapNotNull { it as? ClassName }
 
     class Output(
-        private val bootstrap: GeneratePluginBindingsSourcerer,
-        private val typeNames: List<TypeName>
+        private val sourcerer: GeneratePluginBindingsSourcerer,
+        private val modules: Modules
     ) : SourcererOutput() {
+
         override
-        fun file() = bootstrap.file
+        fun file() = sourcerer.file
 
         override
         fun write(writer: Writer) {
-            writer.writeTypeNames(typeNames)
+            val groups = modules.groups()
+            writer.writeList(groups, ModuleReadWrite)
         }
+    }
+}
+
+internal
+class ModuleGroup(
+    val parent: GeneratePluginBindingsDescriptor,
+    val children: ImmutableSet<GeneratePluginBindingsModuleDescriptor>
+)
+
+internal
+fun Modules.groups(): List<ModuleGroup> = keySet().map { parent ->
+    val children = get(parent).toImmutableSet()
+    ModuleGroup(parent, children)
+}
+
+private
+object ModuleReadWrite :
+    Reader.Parser<Pair<ClassName, List<TypeName>>>,
+    Writer.Inker<ModuleGroup> {
+
+    override
+    fun parse(reader: Reader): Pair<ClassName, List<TypeName>> {
+        // read parent type
+        val parent = reader.readClassName()
+
+        // read children types
+        val children = reader.readTypeNames()
+
+        return Pair(parent, children)
+    }
+
+    override
+    fun pen(writer: Writer, param: ModuleGroup): Boolean {
+        // write parent type
+        param.parent.element.className
+                .let(writer::writeClassName)
+
+        // write children types
+        param.children
+                .map(GeneratePluginBindingsModuleDescriptor::element)
+                .map(TypeElement::className)
+                .let(writer::writeTypeNames)
+        return true
     }
 }

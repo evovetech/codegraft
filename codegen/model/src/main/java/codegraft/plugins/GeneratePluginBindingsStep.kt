@@ -17,11 +17,7 @@
 package codegraft.plugins
 
 import codegraft.inject.GeneratePluginBindings
-import codegraft.plugins.GeneratePluginBindingsDescriptor.Factory
 import com.google.common.collect.HashMultimap
-import com.google.common.collect.ImmutableMultimap
-import com.google.common.collect.ImmutableSet
-import com.google.common.collect.Multimap
 import sourcerer.AnnotationElements
 import sourcerer.AnnotationStep
 import sourcerer.AnnotationType
@@ -35,41 +31,42 @@ import javax.annotation.processing.RoundEnvironment
 import javax.inject.Inject
 import javax.inject.Singleton
 
-typealias MutablePlugins = MutableSet<GeneratePluginBindingsDescriptor>
-typealias Plugins = ImmutableSet<GeneratePluginBindingsDescriptor>
-
-typealias MutableModules = Multimap<GeneratePluginBindingsDescriptor, GeneratePluginBindingsModuleDescriptor>
-typealias Modules = ImmutableMultimap<GeneratePluginBindingsDescriptor, GeneratePluginBindingsModuleDescriptor>
-typealias ModulesBuilder = ImmutableMultimap.Builder<GeneratePluginBindingsDescriptor, GeneratePluginBindingsModuleDescriptor>
-
 @Singleton
 class GeneratePluginBindingsStep
 @Inject constructor(
-    val descriptorFactory: Factory,
+    val descriptorFactory: GeneratePluginBindingsDescriptor.Factory,
     val outputFactory: GeneratePluginBindingsGenerator.Factory,
     val sourcerer: GeneratePluginBindingsSourcerer
 ) : AnnotationStep() {
 
     private
-    val _plugins: MutablePlugins = LinkedHashSet()
+    val _generatedPlugins: MutablePlugins = LinkedHashSet()
 
     private
-    val _modules: MutableModules = HashMultimap.create()
+    val _generatedModules: MutableModules = HashMultimap.create()
 
-    val plugins: Plugins
-        get() = Plugins.copyOf(_plugins)
+    val generatedPlugins: Plugins
+        get() = Plugins.copyOf(_generatedPlugins)
 
-    val modules: Modules
-        get() = Modules.copyOf(_modules)
+    val generatedModules: Modules
+        get() = Modules.copyOf(_generatedModules)
+
+    val storedModules: Modules by lazy {
+        val builder: ModulesBuilder = Modules.builder()
+        sourcerer.storedOutputs()
+                .map(descriptorFactory::forStoredModules)
+                .onEach { (parent, children) ->
+                    builder.putAll(parent, children)
+                }
+        builder.build()
+    }
 
     val storedPlugins: Plugins by lazy {
-        sourcerer.storedOutputs()
-                .map(descriptorFactory::forStoredModule)
-                .toImmutableSet()
+        storedModules.keySet().toImmutableSet()
     }
 
     fun sourcererOutput(): Output {
-        return sourcerer.output(plugins)
+        return sourcerer.output(generatedModules)
     }
 
     override
@@ -84,7 +81,7 @@ class GeneratePluginBindingsStep
         val descriptors = injections
                 .map(descriptorFactory::create)
                 .toImmutableSet()
-        _plugins.addAll(descriptors)
+        _generatedPlugins.addAll(descriptors)
         return descriptors
                 .map(outputFactory::create)
                 .flatMap(GeneratePluginBindingsGenerator::process)
@@ -92,7 +89,7 @@ class GeneratePluginBindingsStep
 
     override
     fun postRound(roundEnv: RoundEnvironment): Outputs {
-        val allPlugins = (plugins + storedPlugins)
+        val allPlugins = (generatedPlugins + storedPlugins)
                 .toImmutableSet()
         val allModules = allPlugins.associate { descriptor ->
             val key = descriptor
@@ -101,20 +98,11 @@ class GeneratePluginBindingsStep
         }.toImmutableMap()
 
         allModules.map { (key, value) ->
-            _modules.putAll(key, value)
+            _generatedModules.putAll(key, value)
         }
-
-//        return allPlugins.associate { descriptor ->
-//            val key = descriptor.element
-//            val values = roundEnv.getElementsAnnotatedWith(key)
-//                    .map(MoreElements::asType)
-//            Pair(descriptor, values)
-//        }.flatMap { (descriptor, elements) ->
-//            elements.map { element ->
-//                GeneratePluginBindingsModuleDescriptor(descriptor, element)
-//            }
-//        }
-        return emptyList()
+        return allModules.flatMap {
+            it.value.flatMap { it.outputs() }
+        }
     }
 }
 

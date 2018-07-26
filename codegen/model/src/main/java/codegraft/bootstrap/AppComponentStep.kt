@@ -17,6 +17,7 @@
 package codegraft.bootstrap
 
 import codegraft.android.AndroidInjectModuleDescriptor
+import codegraft.plugins.Modules
 import com.google.common.collect.ImmutableSet
 import dagger.internal.codegen.AppComponentGenerator
 import dagger.internal.codegen.BootstrapComponentDescriptor
@@ -29,6 +30,8 @@ constructor(
 ) {
     internal
     fun process(
+        generatedPluginModules: Modules,
+        storedPluginModules: Modules,
         generatedModules: ImmutableSet<AndroidInjectModuleDescriptor>,
         storedModules: ImmutableSet<AndroidInjectModuleDescriptor>,
         generatedComponents: ImmutableSet<BootstrapComponentDescriptor>,
@@ -36,10 +39,12 @@ constructor(
     ) = listOf(
         Output(
             factory.create(
-                generatedModules,
-                storedModules,
-                generatedComponents,
-                storedComponents
+                generatedPluginModules = generatedPluginModules,
+                storedPluginModules = storedPluginModules,
+                generatedModules = generatedModules,
+                storedModules = storedModules,
+                generatedComponents = generatedComponents,
+                storedComponents = storedComponents
             )
         )
     )

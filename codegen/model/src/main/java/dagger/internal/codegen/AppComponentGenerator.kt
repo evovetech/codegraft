@@ -26,6 +26,7 @@ import codegraft.bootstrap.getterMethod
 import codegraft.bootstrap.getterMethodName
 import codegraft.bootstrap.key
 import codegraft.inject.BootScope
+import codegraft.plugins.GeneratePluginBindingsModuleDescriptor
 import com.google.auto.common.MoreElements.hasModifiers
 import com.google.common.collect.ImmutableSet
 import com.squareup.javapoet.ClassName
@@ -71,6 +72,8 @@ import kotlin.reflect.KClass
 
 internal
 class AppComponentGenerator(
+    val pluginModuleDescriptors: ImmutableSet<GeneratePluginBindingsModuleDescriptor>,
+    val pluginModules: ImmutableSet<GeneratePluginBindingsModuleDescriptor.Out>,
     val injectModuleDescriptors: ImmutableSet<AndroidInjectModuleDescriptor>,
     val injectModules: ImmutableSet<AndroidInjectModuleGenerator>,
     val componentDescriptors: ImmutableSet<BootstrapComponentDescriptor>,
@@ -195,7 +198,12 @@ class AppComponentGenerator(
                 val add = addTo("modules")
                 add(bootData.outKlass.rawType)
 
+                // injects
                 injectModules.map { it.outKlass.rawType }
+                        .map(add)
+
+                // plugins
+                pluginModules.map { it.outKlass.rawType }
                         .map(add)
             }
             descriptors.filter { it.flatten }.forEach {
@@ -432,11 +440,19 @@ class AppComponentGenerator(
         }
 
         fun create(
+            generatedPluginModules: codegraft.plugins.Modules,
+            storedPluginModules: codegraft.plugins.Modules,
             generatedModules: ImmutableSet<AndroidInjectModuleDescriptor>,
             storedModules: ImmutableSet<AndroidInjectModuleDescriptor>,
             generatedComponents: ImmutableSet<BootstrapComponentDescriptor>,
             storedComponents: ImmutableSet<BootstrapComponentDescriptor>
         ): AppComponentGenerator {
+            val pluginModuleDescriptors = (generatedPluginModules.values() + storedPluginModules.values())
+                    .toImmutableSet()
+            val pluginModules = pluginModuleDescriptors
+                    .map(GeneratePluginBindingsModuleDescriptor::output)
+                    .toImmutableSet()
+
             val injectModuleDescriptors = (generatedModules + storedModules)
                     .toImmutableSet()
             val injectModuleKinds = injectModuleDescriptors
@@ -449,6 +465,7 @@ class AppComponentGenerator(
             val injectModules = injectModuleDescriptors
                     .map(moduleOutputFactory::create)
                     .toImmutableSet()
+
             val allComponents = (generatedComponents + storedComponents)
             val componentDescriptors = allComponents
                     .filter { descriptor ->
@@ -468,7 +485,10 @@ class AppComponentGenerator(
             val components = componentDescriptors
                     .map(componentOutputFactory::create)
                     .toImmutableSet()
+
             return AppComponentGenerator(
+                pluginModuleDescriptors = pluginModuleDescriptors,
+                pluginModules = pluginModules,
                 injectModuleDescriptors = injectModuleDescriptors,
                 injectModules = injectModules,
                 componentDescriptors = componentDescriptors,

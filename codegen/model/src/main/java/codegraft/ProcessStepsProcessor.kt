@@ -143,18 +143,21 @@ class ProcessStepsProcessor(
     private
     fun ProcessData.finish(): List<Output> =
         if (isApplication) {
-            // TODO: modules from plugins
-            val generatedModules = androidInjectStep.modules
+            val generatedPluginModules = generatePluginBindingsStep.generatedModules
+            val storedPluginModules = generatePluginBindingsStep.storedModules
+            val generatedModules = androidInjectStep.generatedModules
             val storedModules = androidInjectStep.storedModules()
             val generatedComponents = bootstrapComponentStep.generatedComponents
             val storedComponents = bootstrapComponentStep.storedComponents()
 
             env.log("storedComponents = $storedComponents")
             val appComponent = appComponentStep.process(
-                generatedModules,
-                storedModules,
-                generatedComponents,
-                storedComponents
+                generatedPluginModules = generatedPluginModules,
+                storedPluginModules = storedPluginModules,
+                generatedModules = generatedModules,
+                storedModules = storedModules,
+                generatedComponents = generatedComponents,
+                storedComponents = storedComponents
             )
             appComponent.flatMap(AppComponentStep.Output::outputs)
         } else {

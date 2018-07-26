@@ -25,6 +25,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 import sourcerer.JavaOutput
+import sourcerer.Outputs
 import sourcerer.addTo
 import sourcerer.getFieldName
 import sourcerer.interfaceBuilder
@@ -42,6 +43,12 @@ class GeneratePluginBindingsModuleDescriptor(
     val element: TypeElement
 
 ) : ElementDescriptor<TypeElement>() {
+
+    fun output(): Out = Out(this)
+
+    fun outputs(): Outputs {
+        return listOf(output())
+    }
 
     class Out(
         val descriptor: GeneratePluginBindingsModuleDescriptor
