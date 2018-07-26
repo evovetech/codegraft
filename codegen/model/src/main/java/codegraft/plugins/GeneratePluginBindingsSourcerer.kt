@@ -51,13 +51,18 @@ constructor(
 
     internal
     fun storedOutputs() = env.getResources(file.extFilePath())
-            .map(this::load)
+            .mapNotNull(this::load)
             .readAll()
 
     private
-    fun load(url: URL) = Okio.buffer(Okio.source(url.openStream())).use { source ->
-        file.assertCanRead(Reader.newReader(source))
-        StoredFile(source.readByteArray())
+    fun load(url: URL) = try {
+        Okio.buffer(Okio.source(url.openStream())).use { source ->
+            file.assertCanRead(Reader.newReader(source))
+            StoredFile(source.readByteArray())
+        }
+    } catch (e: Throwable) {
+        e.printStackTrace()
+        null
     }
 
     private

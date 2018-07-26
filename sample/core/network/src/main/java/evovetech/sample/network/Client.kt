@@ -21,13 +21,10 @@ import codegraft.inject.BindPlugin
 import codegraft.inject.BootScope
 import codegraft.inject.BootstrapComponent
 import codegraft.inject.Plugin
-import codegraft.inject.PluginKey
 import codegraft.inject.Plugins
 import codegraft.inject.android.AndroidApplication
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoMap
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 import javax.inject.Named
@@ -37,7 +34,7 @@ import javax.inject.Singleton
 typealias OkHttpInit = OkHttpClient.Builder.(app: Application) -> OkHttpClient
 
 @BootstrapComponent(
-    applicationModules = [ClientPlugin::class],
+    applicationModules = [ClientModule::class],
     bootstrapModules = [OkHttpBuilderModule::class]
 )
 interface ClientComponent {
@@ -57,14 +54,6 @@ class Client
 
     val okhttpBuilder: OkHttpClient.Builder
         get() = okhttpBuilderProvider.get()
-}
-
-@Module(includes = [ClientModule::class])
-abstract
-class ClientPlugin {
-    @Binds @IntoMap
-    @PluginKey(Client::class)
-    abstract fun bindClient(client: Client): Plugin
 }
 
 @Module

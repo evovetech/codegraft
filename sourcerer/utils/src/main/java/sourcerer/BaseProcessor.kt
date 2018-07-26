@@ -89,7 +89,6 @@ class BaseProcessor : BasicAnnotationProcessor() {
             annotationElements: AnnotationElements
         ) = env.process(annotationElements)
                 .flatMap { it.value }
-                .onEach { env.log("output=$it") }
                 .mapNotNull(env::mapOutput)
                 .toSet()
     }
@@ -98,10 +97,29 @@ class BaseProcessor : BasicAnnotationProcessor() {
 fun ProcessingEnv.mapOutput(
     output: Output
 ): Element? = when (output) {
-    is DeferredOutput -> output.element
-    is NoOutput -> null
+
+    is DeferredOutput -> {
+        log("DeferredOutput=${output.element}")
+        output.element
+    }
+
+    is NoOutput -> {
+        log("NoOutput")
+        null
+    }
+
     is BaseOutput -> {
         output.writeTo(filer)
+
+        when (output) {
+            is JavaOutput -> {
+                log("JavaOutput=${output.outKlass.rawType}")
+            }
+            is SourcererOutput -> {
+                log("SourcererOutput=${output.file()}")
+            }
+        }
+
         null
     }
 }

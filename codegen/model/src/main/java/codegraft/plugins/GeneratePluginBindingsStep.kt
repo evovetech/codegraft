@@ -24,6 +24,7 @@ import sourcerer.AnnotationType
 import sourcerer.Output
 import sourcerer.Outputs
 import sourcerer.processor.ProcessingEnv
+import sourcerer.toImmutableList
 import sourcerer.toImmutableMap
 import sourcerer.toImmutableSet
 import sourcerer.typeInputs
@@ -51,18 +52,23 @@ class GeneratePluginBindingsStep
     val generatedModules: Modules
         get() = Modules.copyOf(_generatedModules)
 
-    val storedModules: Modules by lazy {
-        val builder: ModulesBuilder = Modules.builder()
+    val storedEntries by lazy {
         sourcerer.storedOutputs()
                 .map(descriptorFactory::forStoredModules)
-                .onEach { (parent, children) ->
-                    builder.putAll(parent, children)
-                }
-        builder.build()
+                .toImmutableList()
     }
 
     val storedPlugins: Plugins by lazy {
-        storedModules.keySet().toImmutableSet()
+        storedEntries.map { it.first }
+                .toImmutableSet()
+    }
+
+    val storedModules: Modules by lazy {
+        val builder: ModulesBuilder = Modules.builder()
+        storedEntries.onEach { (parent, children) ->
+            builder.putAll(parent, children)
+        }
+        builder.build()
     }
 
     fun sourcererOutput(): Output {
@@ -94,17 +100,25 @@ class GeneratePluginBindingsStep
     fun postRound(roundEnv: RoundEnvironment): Outputs {
         val allPlugins = (generatedPlugins + storedPlugins)
                 .toImmutableSet()
-        val allModules = allPlugins.associate { descriptor ->
+        getEnv().log("GenPlugin: begin postRound -->")
+        allPlugins.map { it.element }
+                .let { getEnv().log("allPlugins=$it") }
+        val generatedModules = allPlugins.associate { descriptor ->
             val key = descriptor
             val value = descriptorFactory.modules(key, roundEnv)
+            value.map { it.element }
+                    .let { getEnv().log("key=$key, value=$it") }
             Pair(key, value)
         }.toImmutableMap()
+//        getEnv().log("generatedModules=$generatedModules")
 
-        allModules.map { (key, value) ->
+        generatedModules.map { (key, value) ->
             _generatedModules.putAll(key, value)
         }
-        return allModules.flatMap {
+        return generatedModules.flatMap {
             it.value.flatMap { it.outputs() }
+        }.apply {
+            getEnv().log("<-- GenPlugin: end postRound")
         }
     }
 }

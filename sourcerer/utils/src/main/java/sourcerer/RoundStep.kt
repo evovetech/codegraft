@@ -58,6 +58,13 @@ class RoundStep(
     }
 
     fun postRound(roundEnv: RoundEnvironment): Pair<Outputs, ImmutableList<Element>> {
+        val nextRound = _currentRound.catchupTo(_parentRound)
+        _currentRound = nextRound
+
+        if (roundEnv.processingOver()) {
+            return Pair(emptyList(), ImmutableList.of())
+        }
+
         val outputs = step.postRound(roundEnv)
         val deferredElements = outputs.mapNotNull(env::mapOutput)
                 .toImmutableList()

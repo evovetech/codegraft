@@ -20,7 +20,6 @@ import codegraft.inject.BootstrapComponent
 import codegraft.inject.android.AndroidApplication
 import dagger.Module
 import dagger.Provides
-import evovetech.finance.plaid.ui.plaid.PlaidViewModel
 import evovetech.sample.network.ClientComponent
 import okhttp3.OkHttpClient
 import retrofit2.Call
@@ -46,7 +45,7 @@ class PlaidClient
     private val service: PlaidService
 ) : PlaidService by service
 
-@Module(includes = [PlaidViewModel.DaggerModule::class])
+@Module
 class PlaidModule {
     @Provides
     @Singleton

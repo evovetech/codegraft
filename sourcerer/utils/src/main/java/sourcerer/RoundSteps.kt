@@ -30,10 +30,17 @@ class RoundSteps(
         }
     }
 
-//    open
-//    fun postRound(roundEnv: RoundEnvironment): Outputs {
-//        return flatMap { step ->
-//            step.postRound(roundEnv)
-//        }
-//    }
+    open
+    fun postRound(roundEnv: RoundEnvironment): List<Round> {
+        return map { step ->
+            val (extraOutputs, extraDeferredElements) = step.postRound(roundEnv)
+            val currentRound = step.currentRound
+            val outputs = currentRound.outputs + extraOutputs
+            val deferredElements = currentRound.deferredElements + extraDeferredElements
+            currentRound.copy(
+                outputs = outputs.toRoundOutputs(),
+                deferredElements = deferredElements.toImmutableSet()
+            )
+        }
+    }
 }
