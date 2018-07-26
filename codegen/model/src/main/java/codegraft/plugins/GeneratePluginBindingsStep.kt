@@ -66,7 +66,10 @@ class GeneratePluginBindingsStep
     }
 
     fun sourcererOutput(): Output {
-        return sourcerer.output(generatedModules)
+        return sourcerer.output(
+            generatedPlugins,
+            generatedModules
+        )
     }
 
     override

@@ -42,8 +42,11 @@ constructor(
     val file = ClassName.get(GeneratePluginBindings::class.java).metaFile
 
     internal
-    fun output(modules: Modules): Output {
-        return Output(this, modules)
+    fun output(
+        plugins: Plugins,
+        modules: Modules
+    ): Output {
+        return Output(this, plugins, modules)
     }
 
     internal
@@ -67,6 +70,7 @@ constructor(
 
     class Output(
         private val sourcerer: GeneratePluginBindingsSourcerer,
+        private val plugins: Plugins,
         private val modules: Modules
     ) : SourcererOutput() {
 
@@ -75,7 +79,7 @@ constructor(
 
         override
         fun write(writer: Writer) {
-            val groups = modules.groups()
+            val groups = plugins.groups(modules)
             writer.writeList(groups, ModuleReadWrite)
         }
     }
@@ -88,9 +92,13 @@ class ModuleGroup(
 )
 
 internal
-fun Modules.groups(): List<ModuleGroup> = keySet().map { parent ->
-    val children = get(parent).toImmutableSet()
-    ModuleGroup(parent, children)
+fun Plugins.groups(modules: Modules): List<ModuleGroup> {
+    val allKeys = this + modules.keySet()
+    return allKeys.map { parent ->
+        val children = modules.get(parent)
+                .toImmutableSet()
+        ModuleGroup(parent, children)
+    }
 }
 
 private
