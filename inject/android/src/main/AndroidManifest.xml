@@ -6,6 +6,7 @@
             android:authorities="${applicationId}.BootstrapProvider"
             android:name=".BootstrapProvider"
             android:exported="false"
+            android:multiprocess="true"
             android:initOrder="0x7fffffff" />
     </application>
 </manifest>
