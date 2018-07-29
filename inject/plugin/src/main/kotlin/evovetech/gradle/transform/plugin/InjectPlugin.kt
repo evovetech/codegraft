@@ -16,34 +16,16 @@
 
 package evovetech.gradle.transform.plugin
 
-import com.android.build.gradle.BasePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.dependencies
-import org.jetbrains.kotlin.gradle.plugin.KaptExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
 
 class InjectPlugin : Plugin<Project> {
     override
     fun apply(project: Project) {
         val wrapper = ProjectWrapper(project)
-
-        project.plugins.withType(BasePlugin::class.java) {
-            project.dependencies {
-                add("implementation", "evovetech.codegraft:inject-annotations:$Version")
-                add("implementation", "evovetech.codegraft:inject-core:$Version")
-                add("implementation", "evovetech.codegraft:inject-android:$Version")
-                add("runtimeOnly", "evovetech.codegraft:inject-runtime:$Version")
-                add("kapt", "evovetech.codegraft:codegen-model:$Version")
-            }
-
-            wrapper.setup(extension)
-        }
-
-        project.plugins.withType(KotlinAndroidPluginWrapper::class.java) {
-            project.extensions.findByType(KaptExtension::class.java)
-                    ?.apply(wrapper::setup)
-        }
+        project.extensions.findByName("android")
+                ?.let(wrapper::setupAndroid)
+        project.extensions.findByName("kapt")
+                ?.let(wrapper::setupKapt)
     }
-
 }

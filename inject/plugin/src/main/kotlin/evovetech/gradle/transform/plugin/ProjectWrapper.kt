@@ -29,13 +29,16 @@ import evovetech.gradle.transform.InjectRunRunTransform
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.plugin.KaptAnnotationProcessorOptions
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 
 class ProjectWrapper(
     project: Project
 ) : Project by project {
-    fun setup(kapt: KaptExtension) {
+    fun setupKapt(obj: Any) {
+        val kapt = obj as? KaptExtension
+                   ?: return
         kapt.arguments {
             val v = variant
             when (v) {
@@ -49,7 +52,18 @@ class ProjectWrapper(
         }
     }
 
-    fun setup(android: BaseExtension) {
+    fun setupAndroid(obj: Any) {
+        val android = obj as? BaseExtension
+                      ?: return
+
+        project.dependencies {
+            add("implementation", "evovetech.codegraft:inject-annotations:$Version")
+            add("implementation", "evovetech.codegraft:inject-core:$Version")
+            add("implementation", "evovetech.codegraft:inject-android:$Version")
+            add("runtimeOnly", "evovetech.codegraft:inject-runtime:$Version")
+            add("kapt", "evovetech.codegraft:codegen-model:$Version")
+        }
+
         addTransform(android)
         addDependencies(android)
     }
