@@ -23,8 +23,7 @@ import kotlin.annotation.AnnotationRetention.BINARY
 @Retention(BINARY)
 @MustBeDocumented
 @GeneratePluginBindings(
-    pluginType = ViewModel::class,
-    flattenComponent = true
+    pluginType = ViewModel::class
 )
 annotation
 class BindViewModel

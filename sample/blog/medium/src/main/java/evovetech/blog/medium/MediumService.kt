@@ -26,7 +26,9 @@ typealias MediumCall<T> = Call<MediumResponse<T>>
 
 interface MediumService {
     @GET("{userId}")
-    fun user(@Path("userId") userId: String = "me"): MediumCall<User>
+    fun user(
+        @Path("userId") userId: String = "me"
+    ): MediumCall<User>
 
     @GET("users/{username}/publications")
     fun publications(

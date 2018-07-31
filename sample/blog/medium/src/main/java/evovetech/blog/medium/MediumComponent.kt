@@ -18,6 +18,10 @@ package evovetech.blog.medium
 
 import codegraft.inject.BootstrapComponent
 import codegraft.inject.extension.okhttp3.OkhttpComponent
+import dagger.BindsInstance
+import dagger.Module
+import dagger.Provides
+import dagger.Subcomponent
 
 @BootstrapComponent(
     bootstrapDependencies = [OkhttpComponent::class],
@@ -25,4 +29,30 @@ import codegraft.inject.extension.okhttp3.OkhttpComponent
 )
 interface MediumComponent {
     val client: MediumClient
+
+    fun newUser(): MediumUserComponent.Builder
+}
+
+@Subcomponent(modules = [MediumUserModule::class])
+interface MediumUserComponent {
+    val user: MediumCall<User>
+
+    @Subcomponent.Builder
+    interface Builder {
+        @BindsInstance
+        fun username(username: String): Builder
+
+        fun build(): MediumUserComponent
+    }
+}
+
+@Module
+class MediumUserModule {
+    @Provides
+    fun provideUserCall(
+        username: String,
+        client: MediumClient
+    ): MediumCall<User> {
+        return client.user(username)
+    }
 }

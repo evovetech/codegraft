@@ -31,7 +31,7 @@ import javax.inject.Singleton
 private const
 val AuthKey = "Bearer ${BuildConfig.API_KEY}"
 
-@Module
+@Module(subcomponents = [MediumUserComponent::class])
 class MediumModule {
     @Provides
     @Singleton
