@@ -22,14 +22,14 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
+import codegraft.inject.AndroidInject
+import codegraft.inject.Plugins
+import codegraft.inject.extension.okhttp3.Client
+import codegraft.inject.get
 import evovetech.finance.plaid.PlaidActivity
-import evovetech.sample.network.Client
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.message
 import kotlinx.android.synthetic.main.activity_main.navigation
-import codegraft.inject.AndroidInject
-import codegraft.inject.Plugins
-import codegraft.inject.get
 import javax.inject.Inject
 
 @AndroidInject

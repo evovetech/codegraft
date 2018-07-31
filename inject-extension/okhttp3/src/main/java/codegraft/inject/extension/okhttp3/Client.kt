@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package evovetech.sample.network
+package codegraft.inject.extension.okhttp3
 
 import android.app.Application
 import codegraft.inject.BindPlugin
 import codegraft.inject.BootScope
 import codegraft.inject.BootstrapComponent
 import codegraft.inject.Plugin
-import codegraft.inject.Plugins
 import codegraft.inject.android.AndroidApplication
 import dagger.Module
 import dagger.Provides
@@ -38,7 +37,6 @@ typealias OkHttpInit = OkHttpClient.Builder.(app: Application) -> OkHttpClient
     bootstrapModules = [OkHttpBuilderModule::class]
 )
 interface ClientComponent {
-    val plugins: Plugins
     val client: Client
 }
 

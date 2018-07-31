@@ -14,31 +14,9 @@
  * limitations under the License.
  */
 
-package evovetech.sample.crashes
+package evovetech.sample.network
 
-import io.fabric.sdk.android.Fabric
-import io.fabric.sdk.android.Kit
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.reflect.KClass
+import codegraft.inject.BootstrapComponent
 
-@Singleton
-class Kits
-@Inject constructor(
-    fabric: Fabric
-) {
-    private val map = fabric.kits
-            .groupBy { it::class }
-            .mapValues { it.value.first()!! }
-
-    operator
-    fun <T : Kit<*>> get(clazz: KClass<T>): T {
-        val kit = map[clazz]
-        return clazz.java.cast(kit)
-    }
-
-    inline
-    fun <reified T : Kit<*>> get(): T {
-        return get(T::class)
-    }
-}
+@BootstrapComponent
+interface RetrofitComponent

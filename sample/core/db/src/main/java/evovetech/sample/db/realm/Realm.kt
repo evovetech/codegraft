@@ -20,10 +20,10 @@ import android.app.Application
 import codegraft.inject.BootScope
 import codegraft.inject.BootstrapComponent
 import codegraft.inject.android.AndroidApplication
+import codegraft.inject.extension.crashlytics.CrashesComponent
 import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
-import evovetech.sample.crashes.CrashesComponent
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import javax.inject.Named

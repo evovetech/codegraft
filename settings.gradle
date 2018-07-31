@@ -50,6 +50,10 @@ def inject(String... includes) {
     addAll('inject', *includes)
 }
 
+def inject_extension(String... includes) {
+    addAll('inject-extension', *includes)
+}
+
 codegen(
         'model',
         'lib-processor',
@@ -62,7 +66,12 @@ inject(
         'android',
         'runtime',
         'transform',
-        'plugin'
+        'plugin',
+)
+
+inject_extension(
+        'crashlytics',
+        'okhttp3'
 )
 
 include(

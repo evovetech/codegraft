@@ -14,21 +14,31 @@
  * limitations under the License.
  */
 
-package evovetech.sample.crashes
+package codegraft.inject.extension.crashlytics
 
-import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import codegraft.inject.AndroidInject
-import com.crashlytics.android.Crashlytics
+import io.fabric.sdk.android.Fabric
+import io.fabric.sdk.android.Kit
 import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.reflect.KClass
 
-@AndroidInject
-class CrashesActivity : AppCompatActivity() {
-    @Inject lateinit
-    var crashes: Crashlytics
+@Singleton
+class Kits
+@Inject constructor(
+    fabric: Fabric
+) {
+    private val map = fabric.kits
+            .groupBy { it::class }
+            .mapValues { it.value.first()!! }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_crashes)
+    operator
+    fun <T : Kit<*>> get(clazz: KClass<T>): T {
+        val kit = map[clazz]
+        return clazz.java.cast(kit)
+    }
+
+    inline
+    fun <reified T : Kit<*>> get(): T {
+        return get(T::class)
     }
 }

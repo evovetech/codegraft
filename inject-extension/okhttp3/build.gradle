@@ -17,18 +17,26 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    id("kotlin-android-extensions")
     id("kotlin-kapt")
-    id("codegraft.inject.android")
+    id("com.jfrog.bintray")
+    id("com.jfrog.artifactory")
+    id("org.jetbrains.dokka")
 }
 
 apply from: "${configDir}/android/base.gradle"
-apply from: "${configDir}/versions/retrofit2.gradle"
+apply from: "${configDir}/android-library.gradle"
 
-apply from: "${configDir}/versions/rx2.gradle"
-dependencies(rx2.android.apply('api'))
+android {
+    defaultConfig {
+        minSdkVersion 15
+    }
+}
+
+apply from: "${configDir}/versions/okhttp3.gradle"
 
 dependencies {
-    api "evovetech.codegraft:inject-extension-okhttp3"
-    implementation(retrofit2.core)
+    api project(':inject-android')
+    api(okhttp3.core)
+
+    kapt project(':codegen-lib-processor')
 }

@@ -24,11 +24,7 @@ plugins {
 
 apply from: "${configDir}/android/base.gradle"
 
-apply from: "${configDir}/versions/crashlytics.gradle"
-dependencies(crashlytics.apply('api'))
-
 dependencies {
-    api project(':core:annotations')
-    implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"
+    api "evovetech.codegraft:inject-extension-crashlytics"
     implementation "com.android.support.constraint:constraint-layout:1.1.2"
 }

@@ -18,9 +18,9 @@ package evovetech.finance.plaid
 
 import codegraft.inject.BootstrapComponent
 import codegraft.inject.android.AndroidApplication
+import codegraft.inject.extension.okhttp3.ClientComponent
 import dagger.Module
 import dagger.Provides
-import evovetech.sample.network.ClientComponent
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit

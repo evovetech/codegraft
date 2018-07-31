@@ -17,7 +17,7 @@
 package evovetech.blog.medium
 
 import codegraft.inject.BootstrapComponent
-import evovetech.sample.network.ClientComponent
+import codegraft.inject.extension.okhttp3.ClientComponent
 
 @BootstrapComponent(
     bootstrapDependencies = [ClientComponent::class],

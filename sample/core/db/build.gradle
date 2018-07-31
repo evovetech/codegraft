@@ -24,18 +24,7 @@ plugins {
 }
 
 apply from: "${configDir}/android/base.gradle"
-apply from: "${configDir}/versions/okhttp3.gradle"
-apply from: "${configDir}/versions/retrofit2.gradle"
-
-apply from: "${configDir}/versions/rx2.gradle"
-dependencies(rx2.android.apply('api'))
-
-apply from: "${configDir}/versions/crashlytics.gradle"
-dependencies(crashlytics.apply('implementation'))
 
 dependencies {
-    api project(':core:crashes')
-    api(okhttp3.core)
-    implementation(retrofit2.core)
-    implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"
+    api "evovetech.codegraft:inject-extension-crashlytics"
 }

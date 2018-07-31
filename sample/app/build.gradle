@@ -41,7 +41,6 @@ ext {
     byteBuddyVersion = '1.8.10'
 }
 dependencies {
-    implementation project(':core:network')
     implementation project(':core:db')
     implementation project(':finance:plaid')
     implementation project(':blog:medium')

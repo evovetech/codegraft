@@ -49,8 +49,5 @@ include(
         ':blog:medium',
 
         // libs
-        ':core:annotations',
         ':core:db',
-        ':core:crashes',
-        ':core:network',
 )

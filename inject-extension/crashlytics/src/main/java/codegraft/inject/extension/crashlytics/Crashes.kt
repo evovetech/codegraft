@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package evovetech.sample.crashes
+package codegraft.inject.extension.crashlytics
 
 import codegraft.inject.BootScope
 import codegraft.inject.BootstrapComponent
@@ -23,27 +23,18 @@ import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
 import io.fabric.sdk.android.Fabric
-import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
 typealias FabricInit = Fabric.Builder.() -> Fabric
-
-class Sample {
-    @Inject lateinit
-    var app: AndroidApplication
-}
 
 @BootstrapComponent(
     bootstrapModules = [CrashesBootstrapModule::class],
     applicationModules = [Crashes::class]
 )
 interface CrashesComponent {
-    val app: AndroidApplication
     val fabric: Fabric
     val crashlytics: Crashlytics
-
-    fun inject(sample: Sample)
 }
 
 @Module
