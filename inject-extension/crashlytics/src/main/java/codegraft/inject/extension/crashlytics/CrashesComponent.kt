@@ -16,17 +16,15 @@
 
 package codegraft.inject.extension.crashlytics
 
+import codegraft.inject.BootstrapComponent
 import com.crashlytics.android.Crashlytics
-import dagger.Module
-import dagger.Provides
 import io.fabric.sdk.android.Fabric
-import javax.inject.Singleton
 
-@Module
-class Crashes {
-    @Provides
-    @Singleton
-    fun provideCrashlytics(kits: Kits): Crashlytics {
-        return kits.get()
-    }
+@BootstrapComponent(
+    bootstrapModules = [CrashesBootstrapModule::class],
+    applicationModules = [Crashes::class]
+)
+interface CrashesComponent {
+    val fabric: Fabric
+    val crashlytics: Crashlytics
 }
