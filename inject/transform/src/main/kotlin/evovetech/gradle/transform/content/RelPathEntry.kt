@@ -16,13 +16,21 @@
 
 package evovetech.gradle.transform.content
 
+import com.android.build.api.transform.Status
 import java.io.FileInputStream
 import java.io.InputStream
 
 class RelPathEntry(
     override
-    val relPath: RelPath
+    val relPath: RelPath,
+
+    override
+    val status: Status
 ) : Entry {
+
+    constructor(
+        relPath: RelPath
+    ) : this(relPath, Status.ADDED)
 
     override
     val path: String

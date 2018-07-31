@@ -48,7 +48,7 @@ class AbstractTransform(
 
     override
     fun isIncremental(): Boolean {
-        return false
+        return true
     }
 
     override

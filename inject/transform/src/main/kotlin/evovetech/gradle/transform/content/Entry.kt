@@ -16,11 +16,13 @@
 
 package evovetech.gradle.transform.content
 
+import com.android.build.api.transform.Status
 import java.io.InputStream
 
 interface Entry {
     val path: String
     val relPath: RelPath
     val isDirectory: Boolean
+    val status: Status
     fun newInputStream(): InputStream
 }

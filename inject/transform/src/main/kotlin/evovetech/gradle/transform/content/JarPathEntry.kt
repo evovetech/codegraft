@@ -16,6 +16,7 @@
 
 package evovetech.gradle.transform.content
 
+import com.android.build.api.transform.Status
 import evovetech.gradle.transform.content.RelPath.Factory
 import java.io.File
 import java.io.InputStream
@@ -25,7 +26,10 @@ import java.util.jar.JarFile
 class JarPathEntry(
     private val root: RelPath,
     private val jar: JarFile,
-    private val actual: JarEntry
+    private val actual: JarEntry,
+
+    override
+    val status: Status
 ) : Entry {
 
     override
