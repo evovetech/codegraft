@@ -16,17 +16,13 @@
 
 package codegraft.inject.extension.okhttp3
 
-import dagger.Module
-import dagger.Provides
-import okhttp3.OkHttpClient
-import okhttp3.OkHttpClient.Builder
+import codegraft.inject.BootstrapComponent
 
-@Module
-class ClientModule {
-    @Provides
-    fun provideDefaultOkhttpBuilder(
-        okhttp: OkHttpClient
-    ): Builder {
-        return okhttp.newBuilder()
-    }
+@BootstrapComponent(
+    applicationModules = [OkhttpModule::class],
+    bootstrapModules = [OkhttpBootstrapModule::class],
+    autoInclude = false
+)
+interface OkhttpComponent {
+    val okhttp: Okhttp
 }

@@ -16,27 +16,17 @@
 
 package codegraft.inject.extension.okhttp3
 
-import android.app.Application
-import codegraft.inject.BootScope
-import codegraft.inject.android.AndroidApplication
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
 import okhttp3.OkHttpClient.Builder
-import javax.inject.Named
-
-typealias OkHttpInit = OkHttpClient.Builder.(app: Application) -> OkHttpClient
 
 @Module
-class DefaultOkhttpModule {
+class OkhttpModule {
     @Provides
-    @BootScope
-    fun provideDefaultOkhttp(
-        @BootScope app: AndroidApplication,
-        @Named("okhttp") init: OkHttpInit
-    ): OkHttpClient {
-        val builder = Builder()
-        builder.init(app)
-        return builder.build()
+    fun provideDefaultOkhttpBuilder(
+        okhttp: OkHttpClient
+    ): Builder {
+        return okhttp.newBuilder()
     }
 }

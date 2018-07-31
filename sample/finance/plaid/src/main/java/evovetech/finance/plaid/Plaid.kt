@@ -18,7 +18,7 @@ package evovetech.finance.plaid
 
 import codegraft.inject.BootstrapComponent
 import codegraft.inject.android.AndroidApplication
-import codegraft.inject.extension.okhttp3.ClientComponent
+import codegraft.inject.extension.okhttp3.OkhttpComponent
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -30,7 +30,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @BootstrapComponent(
-    bootstrapDependencies = [ClientComponent::class],
+    bootstrapDependencies = [OkhttpComponent::class],
     applicationModules = [PlaidModule::class]
 )
 interface PlaidComponent {

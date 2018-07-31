@@ -25,15 +25,15 @@ import javax.inject.Singleton
 
 @Singleton
 @BindPlugin
-class Client
+class Okhttp
 @Inject constructor(
     private val okhttpProvider: Provider<OkHttpClient>,
     private val okhttpBuilderProvider: Provider<OkHttpClient.Builder>
 ) : Plugin {
-    val okhttp: OkHttpClient
+    val client: OkHttpClient
         get() = okhttpProvider.get()
 
-    val okhttpBuilder: OkHttpClient.Builder
+    val builder: OkHttpClient.Builder
         get() = okhttpBuilderProvider.get()
 }
 

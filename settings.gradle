@@ -29,6 +29,12 @@ buildscript {
 apply plugin: 'evovetech.settings'
 apply from: "${configDir}/plugins.gradle"
 
+def sourcerer(String... libs) {
+    libs.each { lib ->
+        include(":sourcerer:${lib}")
+    }
+}
+
 def add(String parent, String child) {
     def name = "${parent}-${child}"
     def path = ":${name}"
@@ -36,23 +42,28 @@ def add(String parent, String child) {
     project(path).projectDir = file("${parent}/${child}")
 }
 
-def addAll(String parent, String... includes) {
-    includes.each { include ->
-        add(parent, include)
+def addAll(String parent, String... libs) {
+    libs.each { lib ->
+        add(parent, lib)
     }
 }
 
-def codegen(String... includes) {
-    addAll('codegen', *includes)
+def codegen(String... libs) {
+    addAll('codegen', *libs)
 }
 
-def inject(String... includes) {
-    addAll('inject', *includes)
+def inject(String... libs) {
+    addAll('inject', *libs)
 }
 
-def inject_extension(String... includes) {
-    addAll('inject-extension', *includes)
+def inject_extension(String... libs) {
+    addAll('inject-extension', *libs)
 }
+
+sourcerer(
+        'io',
+        'utils',
+)
 
 codegen(
         'model',
@@ -71,10 +82,5 @@ inject(
 
 inject_extension(
         'crashlytics',
-        'okhttp3'
-)
-
-include(
-        ':sourcerer:io',
-        ':sourcerer:utils',
+        'okhttp3',
 )

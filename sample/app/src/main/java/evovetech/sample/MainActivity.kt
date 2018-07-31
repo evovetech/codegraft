@@ -24,7 +24,7 @@ import android.util.Log
 import android.widget.Toast
 import codegraft.inject.AndroidInject
 import codegraft.inject.Plugins
-import codegraft.inject.extension.okhttp3.Client
+import codegraft.inject.extension.okhttp3.Okhttp
 import codegraft.inject.get
 import evovetech.finance.plaid.PlaidActivity
 import io.realm.Realm
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
-        val client = plugins.get<Client>()!!
+        val client = plugins.get<Okhttp>()!!
         Log.d("tag", "client = $client")
         Toast.makeText(this, "client = $client", Toast.LENGTH_LONG)
                 .show()

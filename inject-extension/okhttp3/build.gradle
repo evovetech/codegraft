@@ -26,12 +26,6 @@ plugins {
 apply from: "${configDir}/android/base.gradle"
 apply from: "${configDir}/android-library.gradle"
 
-android {
-    defaultConfig {
-        minSdkVersion 15
-    }
-}
-
 apply from: "${configDir}/versions/okhttp3.gradle"
 
 dependencies {

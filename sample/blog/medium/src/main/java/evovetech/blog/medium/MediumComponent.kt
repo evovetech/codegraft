@@ -17,10 +17,10 @@
 package evovetech.blog.medium
 
 import codegraft.inject.BootstrapComponent
-import codegraft.inject.extension.okhttp3.ClientComponent
+import codegraft.inject.extension.okhttp3.OkhttpComponent
 
 @BootstrapComponent(
-    bootstrapDependencies = [ClientComponent::class],
+    bootstrapDependencies = [OkhttpComponent::class],
     applicationModules = [MediumModule::class]
 )
 interface MediumComponent {
