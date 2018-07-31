@@ -26,7 +26,6 @@ import com.android.build.api.transform.Status.NOTCHANGED
 import com.android.build.api.transform.Status.REMOVED
 import com.android.build.api.transform.TransformInvocation
 import com.android.utils.FileUtils
-import evovetech.util.Counter
 import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator.ForFolder
 import net.bytebuddy.dynamic.ClassFileLocator.ForJarFile
@@ -127,9 +126,8 @@ class ParentOutput(
             invocation: TransformInvocation,
             input: Input<*>
         ): ParentOutput = invocation.run {
-            val name = Counter.next
             val root = input.root
-            outputProvider.getContentLocation(name, root.contentTypes, root.scopes, Format.DIRECTORY)
+            outputProvider.getContentLocation(root.name, root.contentTypes, root.scopes, Format.DIRECTORY)
         }.let {
             ParentOutput(input, it)
         }
