@@ -16,24 +16,12 @@
 
 package codegraft.inject.extension.okhttp3
 
-import codegraft.inject.BindPlugin
-import codegraft.inject.Plugin
-import okhttp3.OkHttpClient
-import javax.inject.Inject
-import javax.inject.Provider
-import javax.inject.Singleton
+import codegraft.inject.BootstrapComponent
 
-@Singleton
-@BindPlugin
-class Client
-@Inject constructor(
-    private val okhttpProvider: Provider<OkHttpClient>,
-    private val okhttpBuilderProvider: Provider<OkHttpClient.Builder>
-) : Plugin {
-    val okhttp: OkHttpClient
-        get() = okhttpProvider.get()
-
-    val okhttpBuilder: OkHttpClient.Builder
-        get() = okhttpBuilderProvider.get()
+@BootstrapComponent(
+    applicationModules = [ClientModule::class],
+    bootstrapModules = [DefaultOkhttpModule::class]
+)
+interface ClientComponent {
+    val client: Client
 }
-
