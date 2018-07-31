@@ -18,6 +18,7 @@ package evovetech.gradle.transform.content
 
 import com.android.build.api.transform.Format.JAR
 import com.android.build.api.transform.JarInput
+import com.android.build.api.transform.Status.ADDED
 import java.util.jar.JarFile
 
 class JarFileInput(
@@ -27,11 +28,17 @@ class JarFileInput(
     val format = JAR
 
     override
-    fun entries(): List<Entry> {
-        val root = file.toRelPath()
+    fun entries(incremental: Boolean): List<Entry> {
+        val parent = file.toRelPath()
+        val status = if (incremental) {
+            root.status
+        } else {
+            ADDED
+        }
+
         val jar = JarFile(file)
         return jar.entries().toList().map { entry ->
-            JarPathEntry(root, jar, entry)
+            JarPathEntry(parent, jar, entry, status)
         }
     }
 }

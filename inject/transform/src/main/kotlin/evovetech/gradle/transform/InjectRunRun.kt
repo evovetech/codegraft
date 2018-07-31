@@ -16,7 +16,10 @@
 
 package evovetech.gradle.transform
 
+import com.android.build.api.transform.Status.NOTCHANGED
+import com.android.build.api.transform.Status.REMOVED
 import com.android.build.api.transform.TransformInvocation
+import com.android.utils.FileUtils
 import evovetech.gradle.transform.content.Output
 import evovetech.gradle.transform.content.classFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator
@@ -57,7 +60,7 @@ class InjectRunRun(
     fun run() {
         println("inject runrun! start")
         try {
-            transforms.flatMap { it.output.outputs() }
+            transforms.flatMap { it.output.outputs(isIncremental) }
                     .forEach(this::write)
         } finally {
             println("inject runrun! complete")
@@ -68,6 +71,22 @@ class InjectRunRun(
     fun write(output: Output): Unit = transformData.run {
         val copy: () -> Unit = {
             output.copyToDest()
+        }
+
+        val input = output.input
+        val status = input.status
+        when (status) {
+            NOTCHANGED -> {
+                // nothing
+                return
+            }
+            REMOVED -> {
+                FileUtils.deleteRecursivelyIfExists(output.file)
+                return
+            }
+            else -> {
+                // continue
+            }
         }
 
         try {

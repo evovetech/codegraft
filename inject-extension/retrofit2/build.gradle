@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package evovetech.gradle.transform.content
+plugins {
+    id("com.android.library")
+    id("kotlin-android")
+    id("kotlin-kapt")
+    id("com.jfrog.bintray")
+    id("com.jfrog.artifactory")
+    id("org.jetbrains.dokka")
+}
 
-import com.android.build.api.transform.Status
-import java.io.InputStream
+apply from: "${configDir}/android/base.gradle"
+apply from: "${configDir}/android-library.gradle"
 
-interface Entry {
-    val path: String
-    val relPath: RelPath
-    val isDirectory: Boolean
-    val status: Status
-    fun newInputStream(): InputStream
+apply from: "${configDir}/versions/retrofit2.gradle"
+
+dependencies {
+    api project(':inject-extension-okhttp3')
+    api retrofit2.core
+
+    kapt project(':codegen-lib-processor')
 }
