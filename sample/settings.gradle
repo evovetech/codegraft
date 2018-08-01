@@ -47,7 +47,4 @@ include(
 
         // blog
         ':blog:medium',
-
-        // libs
-        ':core:db',
 )

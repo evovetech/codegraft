@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    id("kotlin-android-extensions")
-    id("kotlin-kapt")
-    id("realm-android")
-    id("codegraft.inject.android")
-}
+package codegraft.inject.extension.realm
 
-apply from: "${configDir}/android/base.gradle"
+import codegraft.inject.BootstrapComponent
+import io.realm.Realm
 
-dependencies {
-    api "evovetech.codegraft:inject-extension-crashlytics"
+@BootstrapComponent(
+    bootstrapModules = [RealmBootstrapModule::class],
+    applicationModules = [RealmModule::class]
+)
+interface RealmComponent {
+    val realm: Realm
 }

@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-plugins {
-    id("com.android.library").apply(false)
-    id("kotlin-android").apply(false)
-    id("kotlin-kapt").apply(false)
-    id("com.jfrog.bintray").apply(false)
-    id("com.jfrog.artifactory").apply(false)
-    id("org.jetbrains.dokka").apply(false)
+package codegraft.inject.extension.realm
 
-    id("com.google.firebase.firebase-perf").apply(false)
-    id("com.google.gms.google-services").apply(false)
-    id("io.fabric").apply(false)
+import dagger.Module
+import dagger.Provides
+import io.realm.Realm
+import io.realm.RealmConfiguration
 
-    id("realm-android").apply(false)
-}
+typealias RealmInit = RealmConfiguration.Builder.() -> RealmConfiguration
 
-ext {
-    LICENSES = ['Apache-2.0']
-    LABELS = ['codegraft', 'codegen', 'android', 'java', 'kotlin', 'inject', 'annotations', 'bytebuddy']
+@Module
+class RealmModule {
+    @Provides
+    fun provideRealm(config: RealmConfiguration): Realm {
+        return Realm.getInstance(config)
+    }
 }

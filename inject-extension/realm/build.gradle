@@ -17,34 +17,18 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    id("kotlin-android-extensions")
     id("kotlin-kapt")
-    id("codegraft.inject.android")
+    id("realm-android")
+    id("com.jfrog.bintray")
+    id("com.jfrog.artifactory")
+    id("org.jetbrains.dokka")
 }
 
 apply from: "${configDir}/android/base.gradle"
-apply from: "${configDir}/versions/retrofit2.gradle"
-
-String getApiToken() {
-    if (project.hasProperty('mediumApiToken')) {
-        return project.mediumApiToken
-    }
-    return ""
-}
-
-android {
-    defaultConfig {
-        buildConfigField "String", "API_KEY", "\"${apiToken}\""
-    }
-}
+apply from: "${configDir}/android-library.gradle"
 
 dependencies {
-    api "evovetech.codegraft:inject-extension-crashlytics"
-    api "evovetech.codegraft:inject-extension-okhttp3"
+    api project(':inject-android')
 
-    api 'android.arch.lifecycle:extensions:1.1.1'
-
-    // TODO:
-    api retrofit2.core
-    api retrofit2.gson
+    kapt project(':codegen-lib-processor')
 }

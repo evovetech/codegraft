@@ -84,4 +84,5 @@ inject_extension(
         'crashlytics',
         'okhttp3',
         'retrofit2',
+        'realm',
 )

@@ -41,10 +41,12 @@ ext {
     byteBuddyVersion = '1.8.10'
 }
 dependencies {
-    implementation project(':core:db')
+    implementation "evovetech.codegraft:inject-extension-realm"
+
     implementation project(':finance:plaid')
     implementation project(':blog:medium')
     implementation project(':feature:instant')
+
     implementation("com.android.support:design:${app.androidSupportVersion}")
     implementation("com.android.support.constraint:constraint-layout:1.1.2")
     implementation "com.google.firebase:firebase-core:${app.firebaseVersion}"

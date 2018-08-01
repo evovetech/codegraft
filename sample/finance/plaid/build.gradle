@@ -28,7 +28,6 @@ apply from: "${configDir}/versions/retrofit2.gradle"
 dependencies {
     api "evovetech.codegraft:inject-extension-crashlytics"
     api "evovetech.codegraft:inject-extension-okhttp3"
-    implementation project(':core:db')
 
     api 'android.arch.lifecycle:extensions:1.1.1'
 

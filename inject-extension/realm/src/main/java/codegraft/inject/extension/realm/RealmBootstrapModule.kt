@@ -14,32 +14,16 @@
  * limitations under the License.
  */
 
-package evovetech.sample.db.realm
+package codegraft.inject.extension.realm
 
-import android.app.Application
 import codegraft.inject.BootScope
-import codegraft.inject.BootstrapComponent
 import codegraft.inject.android.AndroidApplication
-import codegraft.inject.extension.crashlytics.CrashesComponent
-import com.crashlytics.android.Crashlytics
 import dagger.Module
 import dagger.Provides
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.RealmConfiguration.Builder
 import javax.inject.Named
-
-typealias RealmInit = RealmConfiguration.Builder.() -> RealmConfiguration
-
-@BootstrapComponent(
-    bootstrapDependencies = [CrashesComponent::class],
-    bootstrapModules = [RealmBootstrapModule::class],
-    applicationModules = [RealmModule::class]
-)
-interface RealmComponent {
-    val application: Application
-    val realm: Realm
-    val crashlytics: Crashlytics
-}
 
 @Module
 class RealmBootstrapModule {
@@ -50,17 +34,9 @@ class RealmBootstrapModule {
         @Named("realmInit") realmInit: RealmInit?
     ): RealmConfiguration {
         Realm.init(app)
-        val builder = RealmConfiguration.Builder()
+        val builder = Builder()
         val realmConfiguration = realmInit?.let { it(builder) } ?: builder.build()
         Realm.setDefaultConfiguration(realmConfiguration)
         return realmConfiguration
-    }
-}
-
-@Module
-class RealmModule {
-    @Provides
-    fun provideRealm(config: RealmConfiguration): Realm {
-        return Realm.getInstance(config)
     }
 }
