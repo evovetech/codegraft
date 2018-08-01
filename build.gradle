@@ -15,9 +15,14 @@
  */
 
 plugins {
+    id("org.gradle.kotlin.kotlin-dsl").apply(false)
+
+    id("kotlin").apply(false)
+    id("kotlin-kapt").apply(false)
+
     id("com.android.library").apply(false)
     id("kotlin-android").apply(false)
-    id("kotlin-kapt").apply(false)
+
     id("com.jfrog.bintray").apply(false)
     id("com.jfrog.artifactory").apply(false)
     id("org.jetbrains.dokka").apply(false)
