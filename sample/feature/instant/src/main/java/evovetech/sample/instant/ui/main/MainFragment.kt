@@ -24,17 +24,17 @@ import android.view.View
 import android.view.ViewGroup
 import codegraft.inject.AndroidInject
 import codegraft.inject.android.ViewModelInstanceProvider
-import codegraft.inject.android.viewModelDelegate
+import codegraft.inject.android.delegate
 import evovetech.sample.instant.R
 import javax.inject.Inject
 
 @AndroidInject
 class MainFragment : Fragment() {
     @Inject lateinit
-    var viewModelProvider: ViewModelInstanceProvider<MainFragment>
+    var viewModels: ViewModelInstanceProvider
 
     private
-    val viewModel: MainViewModel by viewModelDelegate(::viewModelProvider)
+    val viewModel: MainViewModel by ::viewModels.delegate()
 
     override
     fun onCreateView(

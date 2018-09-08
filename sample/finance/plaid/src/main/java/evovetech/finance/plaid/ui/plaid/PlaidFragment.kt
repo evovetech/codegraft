@@ -24,17 +24,17 @@ import android.view.View
 import android.view.ViewGroup
 import codegraft.inject.AndroidInject
 import codegraft.inject.android.ViewModelInstanceProvider
-import codegraft.inject.android.viewModelDelegate
+import codegraft.inject.android.delegate
 import evovetech.finance.plaid.R
 import javax.inject.Inject
 
 @AndroidInject
 class PlaidFragment : Fragment() {
     @Inject lateinit
-    var viewModelProvider: ViewModelInstanceProvider<PlaidFragment>
+    var viewModels: ViewModelInstanceProvider
 
     private
-    val viewModel: PlaidViewModel by viewModelDelegate(::viewModelProvider)
+    val viewModel: PlaidViewModel by ::viewModels.delegate()
 
     override
     fun onCreateView(

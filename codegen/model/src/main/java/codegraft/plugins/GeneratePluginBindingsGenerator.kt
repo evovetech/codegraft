@@ -79,8 +79,7 @@ class GeneratePluginBindingsGenerator(
         ParameterizedTypeName.get(RawMapType, keyType, valueType)
     }
     private val mapProviderType: TypeName by lazy {
-        val rawMapType = ClassName.get(Map::class.java)
-        ParameterizedTypeName.get(rawMapType, keyType, valueProviderType)
+        ParameterizedTypeName.get(RawMapType, keyType, valueProviderType)
     }
 
     fun process(): Outputs {

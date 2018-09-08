@@ -17,27 +17,30 @@
 package codegraft.inject.android
 
 import android.arch.lifecycle.ViewModel
+import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 class ViewModelDelegate<VM : ViewModel>(
     private val viewModelType: KClass<VM>,
-    private val providerFunc: () -> ViewModelInstanceProvider<*>
-) {
-    private
-    val viewModel: VM by lazy {
-        providerFunc()[viewModelType]
-    }
+    private val provider: () -> ViewModelInstanceProvider
+) : ReadOnlyProperty<Any?, VM> {
+    @Volatile private lateinit
+    var viewModel: VM
 
-    operator
+    override operator
     fun getValue(thisRef: Any?, property: KProperty<*>): VM {
+        if (!this::viewModel.isInitialized) {
+            provider().get(thisRef, viewModelType).let { vm ->
+                viewModel = vm
+                return vm
+            }
+        }
         return viewModel
     }
 }
 
 inline
-fun <reified VM : ViewModel> viewModelDelegate(
-    noinline provider: () -> ViewModelInstanceProvider<*>
-): ViewModelDelegate<VM> {
-    return ViewModelDelegate(VM::class, provider)
+fun <reified VM : ViewModel> (() -> ViewModelInstanceProvider).delegate(): ViewModelDelegate<VM> {
+    return ViewModelDelegate(VM::class, this)
 }

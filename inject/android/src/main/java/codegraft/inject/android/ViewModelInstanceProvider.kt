@@ -25,28 +25,27 @@ import android.support.v4.app.FragmentActivity
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-class ViewModelInstanceProvider<T : Any>
+class ViewModelInstanceProvider
 @Inject constructor(
-    val factory: ViewModelFactory,
-    val instance: T
+    val factory: ViewModelFactory
 ) {
-    val provider: ViewModelProvider by lazy {
-        val store = instance.getViewModelStore()!!
-        ViewModelProvider(store, factory)
-    }
+    @Volatile private lateinit
+    var provider: ViewModelProvider
 
-    operator
-    fun <VM : ViewModel> get(type: KClass<VM>): VM {
-        return provider.get(type.java)
-    }
+    fun <VM : ViewModel> get(thisRef: Any?, type: KClass<VM>): VM {
+        if (!::provider.isInitialized) {
+            val store = thisRef.getViewModelStore()!!
+            ViewModelProvider(store, factory).let { p ->
+                provider = p
+                return p[type.java]
+            }
+        }
 
-    inline
-    fun <reified VM : ViewModel> get(): VM {
-        return this[VM::class]
+        return provider[type.java]
     }
 }
 
-fun Any.getViewModelStore(): ViewModelStore? = when (this) {
+fun Any?.getViewModelStore(): ViewModelStore? = when (this) {
     is ViewModelStoreOwner -> this.viewModelStore
     is FragmentActivity -> ViewModelStores.of(this)
     is SupportFragment -> ViewModelStores.of(this)
