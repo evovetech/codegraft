@@ -17,7 +17,9 @@
 package evovetech.gradle.transform.content
 
 import com.android.build.api.transform.Status
+import java.io.File
 import java.io.InputStream
+import java.io.OutputStream
 
 interface Entry {
     val path: String
@@ -26,3 +28,21 @@ interface Entry {
     val status: Status
     fun newInputStream(): InputStream
 }
+
+fun InputStream.copyTo(
+    dest: OutputStream
+): Long = copyTo(out = dest)
+
+fun InputStream.copyTo(
+    file: File
+): Long = file.outputStream()
+        .use(this::copyTo)
+
+fun File.copyFrom(
+    src: InputStream
+): Long = src.copyTo(this)
+
+fun Entry.copyTo(
+    file: File
+): Long = newInputStream()
+        .use(file::copyFrom)

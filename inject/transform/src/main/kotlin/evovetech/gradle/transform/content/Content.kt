@@ -125,12 +125,10 @@ class ParentOutput(
         fun root(
             invocation: TransformInvocation,
             input: Input<*>
-        ): ParentOutput = invocation.run {
+        ): ParentOutput = ParentOutput(input, invocation.run {
             val root = input.root
             outputProvider.getContentLocation(root.name, root.contentTypes, root.scopes, Format.DIRECTORY)
-        }.let {
-            ParentOutput(input, it)
-        }
+        })
     }
 }
 
@@ -141,16 +139,11 @@ class Output(
 ) : Content(path.file),
     RelPath by path {
 
-    fun copyToDest() {
-        try {
-            file.parentFile?.mkdirs()
-            input.newInputStream().use { src ->
-                file.outputStream().use { dest ->
-                    src.copyTo(dest)
-                }
-            }
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
+    fun copyToDest(): Long = try {
+        file.parentFile?.mkdirs()
+        input.copyTo(file)
+    } catch (e: Throwable) {
+        // TODO:
+        e.printStackTrace(); 0
     }
 }
