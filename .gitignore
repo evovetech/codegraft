@@ -10,9 +10,24 @@
 
 # Gradle cache
 .gradle
-build/
 local.properties
 *.iml
 
-/sample2/*
-/sourcerer2/*
+
+# Build gen for display
+
+/**/build/*
+!/**/build/generated
+
+/**/build/generated/*
+!/**/build/generated/source
+
+/**/build/generated/source/*
+!/**/build/generated/source/kapt
+
+/**/build/generated/source/kapt/*
+!/**/build/generated/source/kapt/debug
+
+/**/build/generated/source/kapt/debug/*
+!/**/build/generated/source/kapt/debug/codegraft
+!/**/build/generated/source/kapt/debug/evovetech
