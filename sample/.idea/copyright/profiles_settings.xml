@@ -1,7 +1,7 @@
 <component name="CopyrightManager">
-  <settings default="evovetech">
+  <settings default="codegraft">
     <module2copyright>
-      <element module="All" copyright="evovetech" />
+      <element module="All" copyright="codegraft" />
     </module2copyright>
     <LanguageOptions name="HTML">
       <option name="fileTypeOverride" value="1" />
