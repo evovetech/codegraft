@@ -382,8 +382,9 @@ class Okhttp
 
 The ultimate outcome is a generated bootstrap component & builder that is intended to allow configuration (and sometime eager initialization in the case of crash framework, etc.) of the application component which will be a singleton.
 
+#### (User bootstrap)
 ```kotlin
-/// App.kt (User bootstrap)
+/// App.kt
 
 @AndroidInject
 class App : Application(), BootApplication<AppComponent> {
@@ -399,10 +400,11 @@ fun OkHttpClient.Builder.bootstrap(app: AndroidApplication): OkHttpClient {
     // TODO
     return build()
 }
+```
 
-
+#### (Generated)
+```kotlin
 /// Generated
-
 typealias BootstrapInit = BootComponent.Builder.() -> AndroidApplication
 
 fun bootstrap(
@@ -418,7 +420,10 @@ fun BootComponent.Builder.build(
 ): AppComponent = application(init())
         .build()
         .appComponent
+```
 
+```java
+/// Generated
 @BootScope
 @Component(
     modules = BootModule.class
