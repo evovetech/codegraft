@@ -527,4 +527,40 @@ public interface AppComponent extends ApplicationInjectorComponent, ActivityInje
   }
 }
 
+@Module(
+    includes = {
+        OkhttpComponent_Module.class,
+        MediumComponent_Module.class,
+        AndroidInjectApplicationModule.class,
+        ViewModelComponent_Module.class,
+        AndroidInjectActivityModule.class,
+        AndroidInjectSupportFragmentModule.class,
+        PluginModule.class
+    }
+)
+class AppComponent_BootData {
+  private final OkhttpComponent_BootData okhttpComponent_BootData;
+
+  private final BaseComponent_BootData baseComponent_BootData;
+
+  @Inject
+  AppComponent_BootData(OkhttpComponent_BootData okhttpComponent_BootData,
+      BaseComponent_BootData baseComponent_BootData) {
+    this.okhttpComponent_BootData = okhttpComponent_BootData;
+    this.baseComponent_BootData = baseComponent_BootData;
+  }
+
+  @Provides
+  @Singleton
+  Application getApplication() {
+    return realmComponent_BootData.getApplication();
+  }
+
+  @Provides
+  @Singleton
+  OkHttpClient getOkHttpClient() {
+    return okhttpComponent_BootData.getOkHttpClient();
+  }
+}
+
 ```
