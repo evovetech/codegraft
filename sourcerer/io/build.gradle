@@ -29,5 +29,4 @@ dependencies {
     implementation "com.google.guava:guava:${app.guavaVersion}"
     api "com.squareup:javapoet:${app.javaPoetVersion}"
     api "com.squareup.okio:okio:${app.okioVersion}"
-    api "com.squareup:kotlinpoet:${app.kotlinPoetVersion}"
 }
