@@ -3,6 +3,53 @@ Codegraft
 
 [ ![Download](https://api.bintray.com/packages/evove-tech/maven/codegraft/images/download.svg) ](https://bintray.com/evove-tech/maven/codegraft/_latestVersion)
 
+## Android Components & View Models
+
+Usually wiring up android components takes a lot of boilerplate. With Codegraft, you can skip the mundane and focus on the code that really matters.
+
+```kotlin
+// View Model
+@BindViewModel
+class MediumViewModel
+@Inject constructor(
+    val client: MediumClient
+) : ViewModel() {
+    // TODO: Implement the ViewModel
+}
+
+// Fragment with a view model
+@AndroidInject
+class MediumFragment : Fragment() {
+    @Inject lateinit
+    var viewModels: ViewModelInstanceProvider
+
+    private
+    val viewModel: MediumViewModel by ::viewModels.delegate()
+
+    override
+    fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return inflater.inflate(R.layout.medium_fragment, container, false)
+    }
+
+    override
+    fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel.apply {
+            Log.d("MediumFragment", "medium view model = $this, medium client = $client}")
+        }
+        // TODO: Use the ViewModel
+    }
+
+    companion object {
+        fun newInstance() = MediumFragment()
+    }
+}
+```
+
 ## Basics
 
 Codgraft uses dagger in a way that allows you to compose multiple kotlin modules together into a generated component for use in the application and also in tests. This was built specifically for android and its needs.
@@ -168,53 +215,6 @@ class BootstrapProvider : EmptyContentProvider() {
             }
         }
         return true
-    }
-}
-```
-
-## Android Components & View Models
-
-Usually wiring up android components takes a lot of boilerplate. With Codegraft, you can skip the mundane and focus on the code that really matters.
-
-```kotlin
-// View Model
-@BindViewModel
-class MediumViewModel
-@Inject constructor(
-    val client: MediumClient
-) : ViewModel() {
-    // TODO: Implement the ViewModel
-}
-
-// Fragment with a view model
-@AndroidInject
-class MediumFragment : Fragment() {
-    @Inject lateinit
-    var viewModels: ViewModelInstanceProvider
-
-    private
-    val viewModel: MediumViewModel by ::viewModels.delegate()
-
-    override
-    fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.medium_fragment, container, false)
-    }
-
-    override
-    fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel.apply {
-            Log.d("MediumFragment", "medium view model = $this, medium client = $client}")
-        }
-        // TODO: Use the ViewModel
-    }
-
-    companion object {
-        fun newInstance() = MediumFragment()
     }
 }
 ```
