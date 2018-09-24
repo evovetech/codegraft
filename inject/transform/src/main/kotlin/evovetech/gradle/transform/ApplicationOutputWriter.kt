@@ -26,14 +26,12 @@ import dagger.android.HasContentProviderInjector
 import dagger.android.HasFragmentInjector
 import dagger.android.HasServiceInjector
 import dagger.android.support.HasSupportFragmentInjector
-import evovetech.codegen.LogMethod
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.build.EntryPoint.Default.REBASE
 import net.bytebuddy.description.modifier.Visibility
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType.Unloaded
 import net.bytebuddy.implementation.MethodDelegation
-import net.bytebuddy.matcher.ElementMatchers
 
 class ApplicationOutputWriter : OutputWriter {
     private val entryPoint: EntryPoint = REBASE
@@ -63,7 +61,6 @@ class ApplicationOutputWriter : OutputWriter {
                 .addInjector<HasServiceInjector>(this, componentType)
                 .addInjector<HasContentProviderInjector>(this, componentType)
                 .addInjector<HasBroadcastReceiverInjector>(this, componentType)
-                .method(ElementMatchers.named("onCreate")).intercept(methodDelegation<LogMethod>())
                 .make()
     }
 }

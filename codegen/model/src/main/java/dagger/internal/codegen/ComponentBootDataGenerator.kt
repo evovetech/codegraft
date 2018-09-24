@@ -63,8 +63,8 @@ class ComponentBootDataGenerator(
                 .toImmutableSet()
     }
     private val scopedDependencies: ImmutableSet<DependencyRequest> by lazy {
-        dependencies.filter {
-            it.requestElement().map {
+        dependencies.filter { dep ->
+            dep.requestElement().map {
                 it.uniqueScope
             }.isPresent
         }.toImmutableSet()

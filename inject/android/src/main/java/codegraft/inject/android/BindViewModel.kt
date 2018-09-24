@@ -19,10 +19,12 @@ package codegraft.inject.android
 
 import android.arch.lifecycle.ViewModel
 import codegraft.inject.GeneratePluginBindings
+import javax.inject.Singleton
 import kotlin.annotation.AnnotationRetention.BINARY
 
 @Retention(BINARY)
 @MustBeDocumented
+@Singleton
 @GeneratePluginBindings(
     pluginType = ViewModel::class
 )
