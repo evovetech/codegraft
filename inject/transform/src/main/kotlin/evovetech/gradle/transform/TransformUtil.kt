@@ -38,12 +38,8 @@ val Collection<TransformInput>.jarInputs
 
 val Collection<TransformInput>.all
     get() = flatMap {
-        val dirs = it.directoryInputs.map {
-            DirInput(it)
-        }
-        val jars = it.jarInputs.map {
-            JarFileInput(it)
-        }
+        val dirs = it.directoryInputs.map(::DirInput)
+        val jars = it.jarInputs.map(::JarFileInput)
         dirs + jars
     }
 

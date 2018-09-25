@@ -96,6 +96,17 @@ class InjectRunRun(
                     .forEach { output ->
                         output.perform(transformData)
                     }
+
+            // TODO:
+
+            val i2 = primaryInputs.map(isIncremental)
+            val unmod2: Map<Input<*>, List<Entry>> = i2.mapValues { it.value.first }
+            val mod2: Map<OutputWriter, List<Entry>> = i2.map { it.value.second }
+                    .flatMap { it.map { (k, v) -> Pair(k, v) } }
+                    .groupBy({ (k, _) -> k }, { (_, v) -> v })
+                    .mapValues { (_, v) -> v.flatMap { it } }
+            // TODO: for each mod2 entry, graph all supertypes (i.e. for Activity inject()), and only
+            // modify the parent classes. will also need to pull out those super classes from unmods
         } finally {
             println("inject runrun! complete")
         }
@@ -109,6 +120,15 @@ class InjectRunRun(
     } catch (exception: Throwable) {
         exception.printStackTrace()
         null
+    }
+
+    private
+    fun Collection<Input<*>>.map(
+        isIncremental: Boolean
+    ) = groupBy { input ->
+        input
+    }.mapValues { (input, _) ->
+        input.map(isIncremental)
     }
 
     private
