@@ -28,19 +28,19 @@ class DirInput(
     val format = DIRECTORY
 
     override
-    fun entries(incremental: Boolean): List<Entry> {
+    val entries: List<Entry>
+        get() = entries(file.toRelPath())
+
+    override
+    fun changedFiles(
+        incremental: Boolean
+    ): List<Entry> = if (incremental) {
         val parent = file.toRelPath()
-        if (!incremental) {
-            return entries(parent)
-        }
-
-        if (!file.exists()) {
-            return emptyList()
-        }
-
-        return root.changedFiles.map { (file, status) ->
+        root.changedFiles.map { (file, status) ->
             val path = parent.withChild(file)
             RelPathEntry(path, status)
         }
+    } else {
+        entries
     }
 }

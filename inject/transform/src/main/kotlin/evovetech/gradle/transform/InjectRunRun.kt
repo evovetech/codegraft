@@ -17,11 +17,10 @@
 
 package evovetech.gradle.transform
 
-import com.android.build.api.transform.Status.NOTCHANGED
-import com.android.build.api.transform.Status.REMOVED
 import com.android.build.api.transform.TransformInvocation
-import com.android.utils.FileUtils
-import evovetech.gradle.transform.content.Output
+import evovetech.gradle.transform.content.Entry
+import evovetech.gradle.transform.content.ParentOutput
+import evovetech.gradle.transform.content.ParentOutput2
 import evovetech.gradle.transform.content.classFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator.Compound
@@ -61,46 +60,53 @@ class InjectRunRun(
     fun run() {
         println("inject runrun! start")
         try {
-            transforms.flatMap { it.output.outputs(isIncremental) }
-                    .forEach(this::write)
+            val inputs = primaryInputs
+                    .groupBy { it }
+                    .mapValues { (input, _) ->
+                        val all = input.changedFiles(isIncremental).map { e ->
+                            val writer = transformData.outputWriter(e)
+                            Pair(e, writer)
+                        }
+                        val copies = all.filter { it.second == null }
+                                .map { it.first }
+                        val transforms = all.filter { it.second != null }
+                        Pair(copies, transforms)
+                    }
+
+            // unmods
+            val unmods = inputs.mapValues { (_, pairs) -> pairs.first }
+                    .filter { it.value.isNotEmpty() }
+                    .map { (i, e) -> ParentOutput.root(this, i, e) }
+                    .flatMap { it.outputs(isIncremental) }
+            // mods
+            val mods = inputs.mapValues { (_, pairs) ->
+                pairs.second.mapNotNull { (e, w) ->
+                    w?.let { Pair(e, it) }
+                }
+            }.filter { it.value.isNotEmpty() }
+
+            // TODO: group by writer
+            unmods.forEach { output ->
+                output.perform(transformData)
+            }
+
+            ParentOutput2.root("mods", this, mods)
+                    .outputs(isIncremental)
+                    .forEach { output ->
+                        output.perform(transformData)
+                    }
         } finally {
             println("inject runrun! complete")
         }
     }
 
     private
-    fun write(output: Output): Unit = transformData.run {
-        val copy: () -> Unit = {
-            output.copyToDest()
+    fun TransformData.outputWriter(input: Entry): OutputWriter? = try {
+        input.typeDescription?.let { type ->
+            outputWriters.firstOrNull { writer -> writer.canTransform(type) }
         }
-
-        val input = output.input
-        val status = input.status
-        when (status) {
-            NOTCHANGED -> {
-                // nothing
-                return
-            }
-            REMOVED -> {
-                FileUtils.deleteRecursivelyIfExists(output.file)
-                return
-            }
-            else -> {
-                // continue
-            }
-        }
-
-        try {
-            val type = output.typeDescription
-                       ?: return copy()
-            outputWriters.find { writer -> writer.canTransform(type) }
-                    ?.transform(type)
-                    ?.saveIn(output.base)
-                    ?.also { maps -> println("maps=$maps") }
-            ?: return copy()
-        } catch (exception: Throwable) {
-            exception.printStackTrace()
-            return copy()
-        }
+    } catch (exception: Throwable) {
+        exception.printStackTrace()
+        null
     }
 }

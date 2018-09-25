@@ -72,7 +72,7 @@ class ProjectWrapper(
     private
     fun addTransform(android: BaseExtension) {
         val isLibrary = when (android) {
-            is LibraryExtension -> true
+            is LibraryExtension -> return
             else -> false
         }
         val transform = InjectRunRunTransform(isLibrary, android::getBootClasspath)

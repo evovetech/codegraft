@@ -29,7 +29,13 @@ class JarFileInput(
     val format = JAR
 
     override
-    fun entries(incremental: Boolean): List<Entry> {
+    val entries: List<Entry>
+        get() = changedFiles(false)
+
+    override
+    fun changedFiles(
+        incremental: Boolean
+    ): List<Entry> {
         val parent = file.toRelPath()
         val status = if (incremental) {
             root.status

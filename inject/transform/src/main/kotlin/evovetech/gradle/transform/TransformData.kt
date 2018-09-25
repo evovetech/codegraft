@@ -18,6 +18,7 @@
 package evovetech.gradle.transform
 
 import evovetech.codegen.BootstrapMethods
+import evovetech.gradle.transform.content.Entry
 import evovetech.gradle.transform.content.Output
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.ClassFileVersion
@@ -48,17 +49,24 @@ class TransformData(
     }
     val methodTransformer = Suffixing("original")
 
-    val Output.src: String
-        get() = input.path
-    val Output.typeName: String?
+    val Entry.src: String
+        get() = path
+    val Entry.typeName: String?
         get() = if (src.endsWith(CLASS_FILE_EXTENSION)) {
             src.replace('/', '.')
                     .substring(0, src.length - CLASS_FILE_EXTENSION.length)
         } else {
             null
         }
-    val Output.typeDescription: TypeDescription?
+    val Entry.typeDescription: TypeDescription?
         get() = typeName?.let { type -> typePool.describe(type).resolve() }
+
+    val Output.src: String
+        get() = input.src
+    val Output.typeName: String?
+        get() = input.typeName
+    val Output.typeDescription: TypeDescription?
+        get() = input.typeDescription
 
     fun EntryPoint.newByteBuddy(): ByteBuddy =
         byteBuddy(classFileVersion)

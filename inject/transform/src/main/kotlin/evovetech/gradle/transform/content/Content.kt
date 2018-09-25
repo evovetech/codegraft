@@ -21,12 +21,16 @@ import com.android.build.api.transform.Format
 import com.android.build.api.transform.Format.DIRECTORY
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.QualifiedContent
+import com.android.build.api.transform.Status
 import com.android.build.api.transform.Status.ADDED
 import com.android.build.api.transform.Status.CHANGED
 import com.android.build.api.transform.Status.NOTCHANGED
 import com.android.build.api.transform.Status.REMOVED
 import com.android.build.api.transform.TransformInvocation
 import com.android.utils.FileUtils
+import evovetech.gradle.transform.OutputWriter
+import evovetech.gradle.transform.TransformData
+import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator.ForFolder
 import net.bytebuddy.dynamic.ClassFileLocator.ForJarFile
@@ -46,7 +50,12 @@ class Input<out T : QualifiedContent>(
     val format: Format
 
     abstract
-    fun entries(incremental: Boolean): List<Entry>
+    val entries: List<Entry>
+
+    abstract
+    fun changedFiles(
+        incremental: Boolean
+    ): List<Entry>
 
     val classFileLocator: ClassFileLocator by lazy {
         format.let {
@@ -62,15 +71,16 @@ class Input<out T : QualifiedContent>(
 
 class ParentOutput(
     val input: Input<*>,
+    entries: List<Entry>,
     file: File
 ) : Content(file) {
+
+    val inputs = entries.filterNot { it.isDirectory }
 
     fun outputs(incremental: Boolean): List<Output> {
         if (!incremental) {
             FileUtils.deleteRecursivelyIfExists(file)
-            return input.entries(incremental)
-                    .filterNot(Entry::isDirectory)
-                    .map { Output(it, file) }
+            return inputs.map { Output(it, file, Status.ADDED) }
         }
 
         val rootStatus = when (input) {
@@ -85,48 +95,25 @@ class ParentOutput(
             else -> return emptyList()
         }
 
-        when (rootStatus) {
+        return when (rootStatus) {
             REMOVED -> {
                 FileUtils.deleteRecursivelyIfExists(file)
-                return emptyList()
+                emptyList()
             }
-            NOTCHANGED -> {
-                return emptyList()
-            }
-            CHANGED -> {
-                FileUtils.deleteRecursivelyIfExists(file)
-                // continue
-            }
-            else -> {
-                // continue
+            NOTCHANGED -> emptyList()
+            else -> inputs.map { e ->
+                Output(e, file, e.status)
             }
         }
-
-        return input.entries(incremental)
-                .filter { entry ->
-                    val status = entry.status
-                    when (status) {
-                        REMOVED -> {
-                            FileUtils.deleteRecursivelyIfExists(entry.relPath.file)
-                            false
-                        }
-
-                        NOTCHANGED -> false
-
-                        ADDED,
-                        CHANGED -> true
-                    }
-                }
-                .filterNot(Entry::isDirectory)
-                .map { Output(it, file) }
     }
 
     companion object {
         @JvmStatic
         fun root(
             invocation: TransformInvocation,
-            input: Input<*>
-        ): ParentOutput = ParentOutput(input, invocation.run {
+            input: Input<*>,
+            entries: List<Entry>
+        ): ParentOutput = ParentOutput(input, entries, invocation.run {
             val root = input.root
             outputProvider.getContentLocation(root.name, root.contentTypes, root.scopes, Format.DIRECTORY)
         })
@@ -136,15 +123,81 @@ class ParentOutput(
 class Output(
     val input: Entry,
     val root: File,
+    val status: Status = input.status,
+    val writer: OutputWriter? = null,
     path: RelPath = RelPath.Factory.create(root, input.relPath.rel)
 ) : Content(path.file),
     RelPath by path {
 
-    fun copyToDest(): Long = try {
-        file.parentFile?.mkdirs()
-        input.copyTo(file)
-    } catch (e: Throwable) {
-        // TODO:
-        e.printStackTrace(); 0
+    fun perform(
+        t: TransformData
+    ): Map<TypeDescription?, File> = when (status) {
+        REMOVED -> {
+            FileUtils.delete(file)
+            emptyMap()
+        }
+        NOTCHANGED -> emptyMap()
+        ADDED,
+        CHANGED -> writer?.let { w ->
+            t.transform(w)
+        } ?: t.copyToDest()
+    }
+
+    private
+    fun TransformData.copyToDest(): Map<TypeDescription?, File> = file.let { f ->
+        try {
+            f.parentFile?.mkdirs()
+            input.copyTo(f)
+            mapOf(Pair(typeDescription, f))
+        } catch (e: Throwable) {
+            // TODO:
+            e.printStackTrace(); emptyMap()
+        }
+    }
+
+    private
+    fun TransformData.transform(
+        w: OutputWriter
+    ): Map<TypeDescription?, File> = w.transform(typeDescription!!)
+            .saveIn(base)
+            .also { maps -> println("maps=$maps") }
+}
+
+class ParentOutput2(
+    inputs: Map<Input<*>, List<Pair<Entry, OutputWriter>>>,
+    file: File
+) : Content(file) {
+
+    val inputs = inputs
+            .flatMap { (_, v) -> v }
+            .filterNot { it.first.isDirectory }
+
+    fun outputs(
+        incremental: Boolean
+    ): List<Output> = if (incremental) {
+        inputs.map { (e, w) ->
+            Output(e, file, Status.ADDED, w)
+        }
+    } else {
+        inputs.map { (e, w) ->
+            Output(e, file, e.status, w)
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun root(
+            name: String,
+            invocation: TransformInvocation,
+            inputs: Map<Input<*>, List<Pair<Entry, OutputWriter>>>
+        ): ParentOutput2 = ParentOutput2(inputs, invocation.run {
+            val contentTypes = inputs.keys.flatMap {
+                it.root.contentTypes
+            }.toSet()
+            val scopes = inputs.keys.flatMap {
+                it.root.scopes.filterIsInstance<QualifiedContent.Scope>()
+            }.toMutableSet()
+            outputProvider.getContentLocation(name, contentTypes, scopes, Format.DIRECTORY)
+        })
     }
 }

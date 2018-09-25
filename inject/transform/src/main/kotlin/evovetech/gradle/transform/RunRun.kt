@@ -30,11 +30,6 @@ class RunRun(
     val primaryInputs by lazy {
         inputs.all
     }
-    val transforms by lazy {
-        primaryInputs.map { input ->
-            TransformOutput(input, this)
-        }
-    }
 
     init {
         if (!isIncremental) {
