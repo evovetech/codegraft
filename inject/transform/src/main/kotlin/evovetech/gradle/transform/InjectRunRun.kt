@@ -19,6 +19,7 @@ package evovetech.gradle.transform
 
 import com.android.build.api.transform.TransformInvocation
 import evovetech.gradle.transform.content.Entry
+import evovetech.gradle.transform.content.Input
 import evovetech.gradle.transform.content.ParentOutput
 import evovetech.gradle.transform.content.ParentOutput2
 import evovetech.gradle.transform.content.classFileLocator
@@ -109,4 +110,34 @@ class InjectRunRun(
         exception.printStackTrace()
         null
     }
+
+    private
+    fun Input<*>.map(
+        isIncremental: Boolean
+    ) = changedFiles(isIncremental)
+            .map { e -> val w = transformData.outputWriter(e); Pair(e, w) }
+            .partition { (_, w) -> w == null }
+            .let { (copy, mod) ->
+                val copies = copy.first()
+                val mods = mod.notNull()
+                        .groupBySecond()
+                Pair(copies, mods)
+            }
 }
+
+fun <A : Any, B : Any> Collection<Pair<A?, B?>>.notNull(): List<Pair<A, B>> = mapNotNull { (a, b) ->
+    if (a == null || b == null) {
+        null
+    } else {
+        Pair(a, b)
+    }
+}
+
+fun <T> Collection<Pair<T, *>>.first(): List<T> = map { (f, _) -> f }
+fun <T> Collection<Pair<*, T>>.second(): List<T> = map { (_, s) -> s }
+
+fun <A, B> Collection<Pair<A, B>>.groupByFirst(): Map<A, List<B>> = groupBy { (a, _) -> a }
+        .mapValues { (_, v) -> v.second() }
+
+fun <A, B> Collection<Pair<A, B>>.groupBySecond(): Map<B, List<A>> = groupBy { (_, b) -> b }
+        .mapValues { (_, v) -> v.first() }
