@@ -30,6 +30,7 @@ import com.android.build.api.transform.TransformInvocation
 import com.android.utils.FileUtils
 import evovetech.gradle.transform.OutputWriter
 import evovetech.gradle.transform.TransformData
+import evovetech.gradle.transform.TransformStep
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator.ForFolder
@@ -66,57 +67,6 @@ class Input<out T : QualifiedContent>(
                 ForJarFile(jarFile)
             }
         }
-    }
-}
-
-class ParentOutput(
-    val input: Input<*>,
-    entries: List<Entry>,
-    file: File
-) : Content(file) {
-
-    val inputs = entries.filterNot { it.isDirectory }
-
-    fun outputs(incremental: Boolean): List<Output> {
-        if (!incremental) {
-            FileUtils.deleteRecursivelyIfExists(file)
-            return inputs.map { Output(it, file, Status.ADDED) }
-        }
-
-        val rootStatus = when (input) {
-            is DirInput -> {
-                if (input.file.exists()) {
-                    ADDED
-                } else {
-                    REMOVED
-                }
-            }
-            is JarInput -> input.status
-            else -> return emptyList()
-        }
-
-        return when (rootStatus) {
-            REMOVED -> {
-                FileUtils.deleteRecursivelyIfExists(file)
-                emptyList()
-            }
-            NOTCHANGED -> emptyList()
-            else -> inputs.map { e ->
-                Output(e, file, e.status)
-            }
-        }
-    }
-
-    companion object {
-        @JvmStatic
-        fun root(
-            invocation: TransformInvocation,
-            input: Input<*>,
-            entries: List<Entry>
-        ): ParentOutput = ParentOutput(input, entries, invocation.run {
-            val root = input.root
-            outputProvider.getContentLocation(root.name, root.contentTypes, root.scopes, Format.DIRECTORY)
-        })
     }
 }
 
@@ -163,34 +113,32 @@ class Output(
             .also { maps -> println("maps=$maps") }
 }
 
-class ParentOutput2(
-    inputs: Map<Input<*>, List<Pair<Entry, OutputWriter>>>,
+sealed
+class ParentOutput(
     file: File
 ) : Content(file) {
-
-    val inputs = inputs
-            .flatMap { (_, v) -> v }
-            .filterNot { it.first.isDirectory }
-
+    abstract
     fun outputs(
         incremental: Boolean
-    ): List<Output> = if (incremental) {
-        inputs.map { (e, w) ->
-            Output(e, file, Status.ADDED, w)
-        }
-    } else {
-        inputs.map { (e, w) ->
-            Output(e, file, e.status, w)
-        }
-    }
+    ): List<Output>
 
     companion object {
         @JvmStatic
-        fun root(
+        fun copy(
+            invocation: TransformInvocation,
+            input: Input<*>,
+            entries: List<Entry>
+        ): ParentOutput = CopyOutput(input, entries, invocation.run {
+            val root = input.root
+            outputProvider.getContentLocation(root.name, root.contentTypes, root.scopes, Format.DIRECTORY)
+        })
+
+        @JvmStatic
+        fun transform(
             name: String,
             invocation: TransformInvocation,
-            inputs: Map<Input<*>, List<Pair<Entry, OutputWriter>>>
-        ): ParentOutput2 = ParentOutput2(inputs, invocation.run {
+            inputs: Map<Input<*>, List<Pair<Entry, TransformStep>>>
+        ): ParentOutput = TransformOutput(inputs, invocation.run {
             val contentTypes = inputs.keys.flatMap {
                 it.root.contentTypes
             }.toSet()
@@ -199,5 +147,69 @@ class ParentOutput2(
             }.toMutableSet()
             outputProvider.getContentLocation(name, contentTypes, scopes, Format.DIRECTORY)
         })
+    }
+}
+
+private
+class CopyOutput(
+    val input: Input<*>,
+    entries: List<Entry>,
+    file: File
+) : ParentOutput(file) {
+
+    val inputs = entries.filterNot { it.isDirectory }
+
+    override
+    fun outputs(incremental: Boolean): List<Output> {
+        if (!incremental) {
+            FileUtils.deleteRecursivelyIfExists(file)
+            return inputs.map { Output(it, file, Status.ADDED) }
+        }
+
+        val rootStatus = when (input) {
+            is DirInput -> {
+                if (input.file.exists()) {
+                    ADDED
+                } else {
+                    REMOVED
+                }
+            }
+            is JarInput -> input.status
+            else -> return emptyList()
+        }
+
+        return when (rootStatus) {
+            REMOVED -> {
+                FileUtils.deleteRecursivelyIfExists(file)
+                emptyList()
+            }
+            NOTCHANGED -> emptyList()
+            else -> inputs.map { e ->
+                Output(e, file, e.status)
+            }
+        }
+    }
+}
+
+private
+class TransformOutput(
+    inputs: Map<Input<*>, List<Pair<Entry, TransformStep>>>,
+    file: File
+) : ParentOutput(file) {
+    val inputs = inputs
+            .flatMap { (_, v) -> v }
+            .filterNot { it.first.isDirectory }
+
+    override
+    fun outputs(
+        incremental: Boolean
+    ): List<Output> = if (incremental) {
+        inputs.map { (e, t) ->
+            Output(e, file, Status.ADDED, t.writer)
+        }
+    } else {
+        inputs.map { (e, t) ->
+            Output(e, file, e.status, t.writer)
+        }
     }
 }

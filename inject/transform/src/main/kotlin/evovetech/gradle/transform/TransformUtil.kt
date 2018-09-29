@@ -22,6 +22,7 @@ import com.android.build.api.transform.TransformInput
 import com.android.build.api.transform.TransformInvocation
 import evovetech.gradle.transform.content.DirInput
 import evovetech.gradle.transform.content.JarFileInput
+import net.bytebuddy.description.type.TypeDefinition
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.pool.TypePool
@@ -59,6 +60,11 @@ val TypePool.androidApplication: TypeDescription
 fun TypePool.resolve(
     type: KClass<*>
 ): TypeDescription = describe(type.java.canonicalName)
+        .resolve()
+
+fun TypePool.resolve(
+    type: TypeDefinition
+): TypeDescription = describe(type.typeName)
         .resolve()
 
 inline

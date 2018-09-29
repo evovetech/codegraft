@@ -21,7 +21,6 @@ import com.android.build.api.transform.TransformInvocation
 import evovetech.gradle.transform.content.Entry
 import evovetech.gradle.transform.content.Input
 import evovetech.gradle.transform.content.ParentOutput
-import evovetech.gradle.transform.content.ParentOutput2
 import evovetech.gradle.transform.content.classFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator
 import net.bytebuddy.dynamic.ClassFileLocator.Compound
@@ -47,11 +46,14 @@ class InjectRunRun(
 
     private
     val classFileLocator: ClassFileLocator by lazy {
-        (refInputs + primaryInputs).map {
+        Compound((refInputs + primaryInputs).map {
             it.classFileLocator
-        }.let {
-            Compound(it + bootClassFileLocator)
-        }
+        } + bootClassFileLocator)
+    }
+
+    private
+    val localClassFileLocator: ClassFileLocator by lazy {
+        Compound(primaryInputs.map { it.classFileLocator })
     }
 
     private val outputWriters = writers.toSet()
@@ -61,54 +63,47 @@ class InjectRunRun(
     fun run() {
         println("inject runrun! start")
         try {
-            val inputs = primaryInputs
-                    .groupBy { it }
-                    .mapValues { (input, _) ->
-                        val all = input.changedFiles(isIncremental).map { e ->
-                            val writer = transformData.outputWriter(e)
-                            Pair(e, writer)
-                        }
-                        val copies = all.filter { it.second == null }
-                                .map { it.first }
-                        val transforms = all.filter { it.second != null }
-                        Pair(copies, transforms)
-                    }
-
-            // unmods
-            val unmods = inputs.mapValues { (_, pairs) -> pairs.first }
-                    .filter { it.value.isNotEmpty() }
-                    .map { (i, e) -> ParentOutput.root(this, i, e) }
-                    .flatMap { it.outputs(isIncremental) }
-            // mods
-            val mods = inputs.mapValues { (_, pairs) ->
-                pairs.second.mapNotNull { (e, w) ->
-                    w?.let { Pair(e, it) }
-                }
-            }.filter { it.value.isNotEmpty() }
-
-            // TODO: group by writer
-            unmods.forEach { output ->
-                output.perform(transformData)
-            }
-
-            ParentOutput2.root("mods", this, mods)
-                    .outputs(isIncremental)
-                    .forEach { output ->
-                        output.perform(transformData)
-                    }
-
-            // TODO:
-
-            val i2 = primaryInputs.map(isIncremental)
-            val unmod2: Map<Input<*>, List<Entry>> = i2.mapValues { it.value.first }
-            val mod2: Map<OutputWriter, List<Entry>> = i2.map { it.value.second }
-                    .flatMap { it.map { (k, v) -> Pair(k, v) } }
-                    .groupBy({ (k, _) -> k }, { (_, v) -> v })
-                    .mapValues { (_, v) -> v.flatMap { it } }
-            // TODO: for each mod2 entry, graph all supertypes (i.e. for Activity inject()), and only
-            // modify the parent classes. will also need to pull out those super classes from unmods
+            transformData.run()
         } finally {
             println("inject runrun! complete")
+        }
+    }
+
+    private
+    fun TransformData.run() {
+        val invocation = this@InjectRunRun
+        val entryMap: Map<Input<*>, List<Entry>> = primaryInputs.groupBy(
+            { it },
+            { input -> input.changedFiles(isIncremental) }
+        ).mapValues { it.value.flatten() }
+
+        val entryList = entryMap.flatMap { it.value }
+        val transforms = entryList.writers().flatMap { w ->
+            w.transform(transformData, localClassFileLocator)
+        }
+        val transformTypes = transforms.flatMap(TransformStep::type)
+
+        // Split work
+        val unmods = entryMap.map { (i, e) ->
+            ParentOutput.copy(invocation, i, e.filterNot {
+                transformTypes.contains(it.typeDescription)
+            })
+        }
+        val mods = entryMap.mapValues { (_, entries) ->
+            entries.mapNotNull { e ->
+                transforms.find { it.type == e.typeDescription }?.let { t ->
+                    Pair(e, t)
+                }
+            }
+        }.let { m ->
+            ParentOutput.transform("mods", invocation, m)
+        }
+
+        // Write outputs
+        val outputs = (unmods + mods)
+                .flatMap { it.outputs(isIncremental) }
+        outputs.forEach { output ->
+            output.perform(transformData)
         }
     }
 
@@ -123,19 +118,12 @@ class InjectRunRun(
     }
 
     private
-    fun Collection<Input<*>>.map(
-        isIncremental: Boolean
-    ) = groupBy { input ->
-        input
-    }.mapValues { (input, _) ->
-        input.map(isIncremental)
+    fun TransformData.mapOutputWriter() = { input: Entry ->
+        Pair(input, outputWriter(input))
     }
 
     private
-    fun Input<*>.map(
-        isIncremental: Boolean
-    ) = changedFiles(isIncremental)
-            .map { e -> val w = transformData.outputWriter(e); Pair(e, w) }
+    fun List<Entry>.split() = map(transformData.mapOutputWriter())
             .partition { (_, w) -> w == null }
             .let { (copy, mod) ->
                 val copies = copy.first()
@@ -143,6 +131,10 @@ class InjectRunRun(
                         .groupBySecond()
                 Pair(copies, mods)
             }
+
+    private
+    fun List<Entry>.writers() = split().second
+            .map(::TransformWriter)
 }
 
 fun <A : Any, B : Any> Collection<Pair<A?, B?>>.notNull(): List<Pair<A, B>> = mapNotNull { (a, b) ->
