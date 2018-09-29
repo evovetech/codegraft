@@ -73,15 +73,21 @@ class Input<out T : QualifiedContent>(
 val Input<*>.modName: String
     get() = "${root.name}_mod"
 
+abstract
+class RelPathContent(
+    path: RelPath
+) : Content(path.file),
+    RelPath by path
+
+data
 class Output(
     val input: Entry,
     val root: File,
     val status: Status = input.status,
-    val writer: OutputWriter? = null,
-    path: RelPath = RelPath.Factory.create(root, input.relPath.rel)
-) : Content(path.file),
-    RelPath by path {
-
+    val writer: OutputWriter? = null
+) : RelPathContent(
+    path = RelPath.Factory.create(root, input.relPath.rel)
+) {
     fun perform(
         t: TransformData
     ): Map<TypeDescription?, File> = when (status) {
@@ -118,51 +124,16 @@ class Output(
 
 sealed
 class ParentOutput(
+    val input: Input<*>,
     file: File
 ) : Content(file) {
-    abstract
+
     fun outputs(
         incremental: Boolean
-    ): List<Output>
-
-    companion object {
-        @JvmStatic
-        fun copy(
-            invocation: TransformInvocation,
-            input: Input<*>,
-            entries: List<Entry>
-        ): ParentOutput = CopyOutput(input, entries, invocation.run {
-            val root = input.root
-            outputProvider.getContentLocation(root.name, root.contentTypes, root.scopes, Format.DIRECTORY)
-        })
-
-        @JvmStatic
-        fun transform(
-            invocation: TransformInvocation,
-            input: Input<*>,
-            transforms: List<Pair<Entry, TransformStep>>
-        ): ParentOutput = TransformOutput(transforms, invocation.run {
-            val root = input.root
-            val name = input.modName
-            outputProvider.getContentLocation(name, root.contentTypes, root.scopes, Format.DIRECTORY)
-        })
-    }
-}
-
-private
-class CopyOutput(
-    val input: Input<*>,
-    entries: List<Entry>,
-    file: File
-) : ParentOutput(file) {
-
-    val inputs = entries.filterNot { it.isDirectory }
-
-    override
-    fun outputs(incremental: Boolean): List<Output> {
+    ): List<Output> {
         if (!incremental) {
             FileUtils.deleteRecursivelyIfExists(file)
-            return inputs.map { Output(it, file, Status.ADDED) }
+            return allOutputs()
         }
 
         val rootStatus = when (input) {
@@ -183,31 +154,76 @@ class CopyOutput(
                 emptyList()
             }
             NOTCHANGED -> emptyList()
-            else -> inputs.map { e ->
-                Output(e, file, e.status)
-            }
+            else -> incrementalOutputs()
         }
+    }
+
+    protected abstract
+    fun outputs(
+        statusOverride: Entry.() -> Status
+    ): List<Output>
+
+    private
+    fun incrementalOutputs(): List<Output> =
+        outputs { status }
+
+    private
+    fun allOutputs(): List<Output> =
+        outputs { ADDED }
+
+    companion object {
+        @JvmStatic
+        fun copy(
+            invocation: TransformInvocation,
+            input: Input<*>,
+            entries: List<Entry>
+        ): ParentOutput = CopyOutput(input, entries, invocation.run {
+            val root = input.root
+            outputProvider.getContentLocation(root.name, root.contentTypes, root.scopes, Format.DIRECTORY)
+        })
+
+        @JvmStatic
+        fun transform(
+            invocation: TransformInvocation,
+            input: Input<*>,
+            transforms: List<Pair<Entry, TransformStep>>
+        ): ParentOutput = TransformOutput(input, transforms, invocation.run {
+            val root = input.root
+            outputProvider.getContentLocation(input.modName, root.contentTypes, root.scopes, Format.DIRECTORY)
+        })
+    }
+}
+
+private
+class CopyOutput(
+    input: Input<*>,
+    entries: List<Entry>,
+    file: File
+) : ParentOutput(input, file) {
+
+    val inputs = entries.filterNot { it.isDirectory }
+
+    override
+    fun outputs(
+        statusOverride: Entry.() -> Status
+    ): List<Output> = inputs.map { e ->
+        Output(e, file, e.statusOverride())
     }
 }
 
 private
 class TransformOutput(
+    input: Input<*>,
     transforms: List<Pair<Entry, TransformStep>>,
     file: File
-) : ParentOutput(file) {
+) : ParentOutput(input, file) {
     val transforms = transforms
             .filterNot { it.first.isDirectory }
 
     override
     fun outputs(
-        incremental: Boolean
-    ): List<Output> = if (incremental) {
-        transforms.map { (e, t) ->
-            Output(e, file, Status.ADDED, t.writer)
-        }
-    } else {
-        transforms.map { (e, t) ->
-            Output(e, file, e.status, t.writer)
-        }
+        statusOverride: Entry.() -> Status
+    ): List<Output> = transforms.map { (e, t) ->
+        Output(e, file, e.statusOverride(), t.writer)
     }
 }

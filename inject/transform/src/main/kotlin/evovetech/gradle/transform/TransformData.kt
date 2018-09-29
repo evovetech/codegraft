@@ -68,8 +68,8 @@ class TransformData(
     val Output.typeDescription: TypeDescription?
         get() = input.typeDescription
 
-    fun EntryPoint.newByteBuddy(): ByteBuddy =
-        byteBuddy(classFileVersion)
+    fun EntryPoint.newByteBuddy(): ByteBuddy = byteBuddy(classFileVersion)
+            .with { type -> "${type.name}\$Codegrafter" }
 
     fun EntryPoint.transform(
         typeDescription: TypeDescription
@@ -93,6 +93,10 @@ class TransformData(
     ): Unloaded<*> {
         return this@TransformData.transform(typeDescription)
     }
+
+    fun TransformWriter.transform(
+        localClassFileLoader: ClassFileLocator
+    ): List<TransformStep> = this@TransformData.transform(localClassFileLoader)
 }
 
 inline

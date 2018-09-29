@@ -73,21 +73,21 @@ class InjectRunRun(
     fun TransformData.run() {
         val invocation = this@InjectRunRun
         val entryMap: Map<Input<*>, List<Entry>> = primaryInputs.groupBy(
-            { it },
+            { input -> input },
             { input -> input.changedFiles(isIncremental) }
-        ).mapValues { it.value.flatten() }
+        ).flattenValues()
 
         val entryList = entryMap.flatMap { it.value }
-        val transformWriters = entryList.writers()
-        val modEntries = transformWriters.flatMap { w ->
-            w.entries()
-        }.toSet()
-
+        val transformWriters = writers(entryList)
         val transforms = transformWriters.flatMap { w ->
-            w.transform(transformData, localClassFileLocator)
+            w.transform(localClassFileLocator)
         }
         val transformTypes = transforms.flatMap(TransformStep::type)
-//        val modTypes = transformTypes + modEntries.flatMap { e -> e.typeDescription!! }
+        val modParents = entryMap.mapValues { (_, entries) ->
+            group(entries, transforms) { e, t ->
+                e.typeDescription == t.type
+            }
+        }.filterNotEmpty()
 
         // Split work
         val unmods = entryMap.map { (i, e) ->
@@ -95,14 +95,6 @@ class InjectRunRun(
                 transformTypes.contains(it.typeDescription)
             })
         }
-
-        val modParents = entryMap.mapValues { (_, entries) ->
-            entries.mapNotNull { e ->
-                transforms.find { it.type == e.typeDescription }?.let { t ->
-                    Pair(e, t)
-                }
-            }
-        }.filter { it.value.isNotEmpty() }
         val mods = modParents.map { (input, entries) ->
             ParentOutput.transform(invocation, input, entries)
         }
@@ -116,6 +108,21 @@ class InjectRunRun(
     }
 
     private
+    fun TransformData.writers(
+        entries: List<Entry>
+    ) = entries.asSequence()
+            .mapNotNull(mapOutputWriter())
+            .groupBySecond()
+            .map(::TransformWriter)
+
+    private
+    fun TransformData.mapOutputWriter() = { input: Entry ->
+        outputWriter(input)?.let { w ->
+            Pair(input, w)
+        }
+    }
+
+    private
     fun TransformData.outputWriter(input: Entry): OutputWriter? = try {
         input.typeDescription?.let { type ->
             outputWriters.firstOrNull { writer -> writer.canTransform(type) }
@@ -124,25 +131,6 @@ class InjectRunRun(
         exception.printStackTrace()
         null
     }
-
-    private
-    fun TransformData.mapOutputWriter() = { input: Entry ->
-        Pair(input, outputWriter(input))
-    }
-
-    private
-    fun List<Entry>.split() = map(transformData.mapOutputWriter())
-            .partition { (_, w) -> w == null }
-            .let { (copy, mod) ->
-                val copies = copy.first()
-                val mods = mod.notNull()
-                        .groupBySecond()
-                Pair(copies, mods)
-            }
-
-    private
-    fun List<Entry>.writers() = split().second
-            .map(::TransformWriter)
 }
 
 fun <A : Any, B : Any> Collection<Pair<A?, B?>>.notNull(): List<Pair<A, B>> = mapNotNull { (a, b) ->
@@ -156,8 +144,39 @@ fun <A : Any, B : Any> Collection<Pair<A?, B?>>.notNull(): List<Pair<A, B>> = ma
 fun <T> Collection<Pair<T, *>>.first(): List<T> = map { (f, _) -> f }
 fun <T> Collection<Pair<*, T>>.second(): List<T> = map { (_, s) -> s }
 
-fun <A, B> Collection<Pair<A, B>>.groupByFirst(): Map<A, List<B>> = groupBy { (a, _) -> a }
-        .mapValues { (_, v) -> v.second() }
+fun <A, B> Collection<Pair<A, B>>.groupByFirst(): Map<A, List<B>> = groupBy(
+    { (a, _) -> a },
+    { (_, b) -> b }
+)
 
-fun <A, B> Collection<Pair<A, B>>.groupBySecond(): Map<B, List<A>> = groupBy { (_, b) -> b }
-        .mapValues { (_, v) -> v.first() }
+fun <A, B> Collection<Pair<A, B>>.groupBySecond(): Map<B, List<A>> = groupBy(
+    { (_, b) -> b },
+    { (a, _) -> a }
+)
+
+fun <A, B> Sequence<Pair<A, B>>.groupByFirst(): Map<A, List<B>> = groupBy(
+    { (a, _) -> a },
+    { (_, b) -> b }
+)
+
+fun <A, B> Sequence<Pair<A, B>>.groupBySecond(): Map<B, List<A>> = groupBy(
+    { (_, b) -> b },
+    { (a, _) -> a }
+)
+
+fun <K, C : Collection<*>> Map<K, C>.filterNotEmpty() = filter { (_, v) ->
+    v.isNotEmpty()
+}
+
+fun <K, V> Map<K, Collection<Collection<V>>>.flattenValues() = mapValues { (_, v) ->
+    v.flatten()
+}
+
+fun <A, B> group(
+    collectA: Collection<A>,
+    collectB: Collection<B>,
+    filter: (A, B) -> Boolean
+): List<Pair<A, B>> = collectA.mapNotNull { a ->
+    collectB.find { b -> filter(a, b) }
+            ?.let { b -> Pair(a, b) }
+}

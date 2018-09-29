@@ -43,31 +43,19 @@ class TransformWriter(
         entry: Map.Entry<OutputWriter, List<Entry>>
     ) : this(entry.key, entry.value)
 
-    fun entries() = entries.toList()
-
-    fun transform(
-        transformData: TransformData,
+    fun TransformData.transform(
         localClassFileLoader: ClassFileLocator
-    ): List<TransformStep> = transformData.run {
-        val types = entries
-                .asSequence()
-                .map { it.typeDescription!! }
-                .map { type ->
-                    val supers = type.flatten().asReversed()
-                    Pair(type, supers)
-                }
-                .toList()
-                .groupByFirst()
-                .mapValues {
-                    it.value.flatten()
-                            .toSet()
-                            .mapNotNull { type -> resolve(type, localClassFileLoader) }
-                            .first()
-                }
-                .map { TransformType(it.key, it.value) }
-        val (parents, unmods) = types.split()
-        parents.map(writer::transformStep)
-    }
+    ) = entries.asSequence()
+            .map { it.typeDescription!! }
+            .map { type ->
+                val supers = type.flatten()
+                        .asReversed()
+                supers.asSequence()
+                        .mapNotNull { t -> resolve(t, localClassFileLoader) }
+                        .first()
+            }
+            .toSet()
+            .map(writer::transformStep)
 }
 
 fun OutputWriter.transformStep(
@@ -79,25 +67,6 @@ class TransformStep(
     val writer: OutputWriter,
     val type: TypeDescription
 )
-
-data
-class TransformType(
-    val type: TypeDescription,
-    val parent: TypeDescription
-)
-
-fun Collection<TransformType>.split(): Pair<Set<TypeDescription>, List<TypeDescription>> {
-    val mods = map { it.parent }
-            .toSet()
-    val unmods = map { it.type }
-            .toSet()
-            .filter { !mods.contains(it) }
-    return Pair(mods, unmods)
-}
-
-fun OutputWriter.transformWriter(
-    entries: List<Entry>
-) = TransformWriter(this, entries)
 
 fun ClassFileLocator.canResolve(type: TypeDefinition): Boolean = try {
     locate(type.typeName).isResolved
