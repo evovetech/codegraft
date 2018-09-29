@@ -78,10 +78,16 @@ class InjectRunRun(
         ).mapValues { it.value.flatten() }
 
         val entryList = entryMap.flatMap { it.value }
-        val transforms = entryList.writers().flatMap { w ->
+        val transformWriters = entryList.writers()
+        val modEntries = transformWriters.flatMap { w ->
+            w.entries()
+        }.toSet()
+
+        val transforms = transformWriters.flatMap { w ->
             w.transform(transformData, localClassFileLocator)
         }
         val transformTypes = transforms.flatMap(TransformStep::type)
+//        val modTypes = transformTypes + modEntries.flatMap { e -> e.typeDescription!! }
 
         // Split work
         val unmods = entryMap.map { (i, e) ->
@@ -89,14 +95,16 @@ class InjectRunRun(
                 transformTypes.contains(it.typeDescription)
             })
         }
-        val mods = entryMap.mapValues { (_, entries) ->
+
+        val modParents = entryMap.mapValues { (_, entries) ->
             entries.mapNotNull { e ->
                 transforms.find { it.type == e.typeDescription }?.let { t ->
                     Pair(e, t)
                 }
             }
-        }.let { m ->
-            ParentOutput.transform("mods", invocation, m)
+        }.filter { it.value.isNotEmpty() }
+        val mods = modParents.map { (input, entries) ->
+            ParentOutput.transform(invocation, input, entries)
         }
 
         // Write outputs

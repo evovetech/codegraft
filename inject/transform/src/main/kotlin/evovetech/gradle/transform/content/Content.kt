@@ -70,6 +70,9 @@ class Input<out T : QualifiedContent>(
     }
 }
 
+val Input<*>.modName: String
+    get() = "${root.name}_mod"
+
 class Output(
     val input: Entry,
     val root: File,
@@ -135,17 +138,13 @@ class ParentOutput(
 
         @JvmStatic
         fun transform(
-            name: String,
             invocation: TransformInvocation,
-            inputs: Map<Input<*>, List<Pair<Entry, TransformStep>>>
-        ): ParentOutput = TransformOutput(inputs, invocation.run {
-            val contentTypes = inputs.keys.flatMap {
-                it.root.contentTypes
-            }.toSet()
-            val scopes = inputs.keys.flatMap {
-                it.root.scopes.filterIsInstance<QualifiedContent.Scope>()
-            }.toMutableSet()
-            outputProvider.getContentLocation(name, contentTypes, scopes, Format.DIRECTORY)
+            input: Input<*>,
+            transforms: List<Pair<Entry, TransformStep>>
+        ): ParentOutput = TransformOutput(transforms, invocation.run {
+            val root = input.root
+            val name = input.modName
+            outputProvider.getContentLocation(name, root.contentTypes, root.scopes, Format.DIRECTORY)
         })
     }
 }
@@ -193,22 +192,21 @@ class CopyOutput(
 
 private
 class TransformOutput(
-    inputs: Map<Input<*>, List<Pair<Entry, TransformStep>>>,
+    transforms: List<Pair<Entry, TransformStep>>,
     file: File
 ) : ParentOutput(file) {
-    val inputs = inputs
-            .flatMap { (_, v) -> v }
+    val transforms = transforms
             .filterNot { it.first.isDirectory }
 
     override
     fun outputs(
         incremental: Boolean
     ): List<Output> = if (incremental) {
-        inputs.map { (e, t) ->
+        transforms.map { (e, t) ->
             Output(e, file, Status.ADDED, t.writer)
         }
     } else {
-        inputs.map { (e, t) ->
+        transforms.map { (e, t) ->
             Output(e, file, e.status, t.writer)
         }
     }

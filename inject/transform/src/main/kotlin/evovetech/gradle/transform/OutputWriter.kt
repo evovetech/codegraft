@@ -43,6 +43,8 @@ class TransformWriter(
         entry: Map.Entry<OutputWriter, List<Entry>>
     ) : this(entry.key, entry.value)
 
+    fun entries() = entries.toList()
+
     fun transform(
         transformData: TransformData,
         localClassFileLoader: ClassFileLocator
