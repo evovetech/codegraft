@@ -53,12 +53,10 @@ class TransformWriter(
                 .map { type ->
                     val supers = type.toList()
                             .asReversed()
-                    println("supers=$supers")
                     supers.asSequence()
                             .mapNotNull { t -> resolve(t, localClassFileLoader) }
                             .filterNot { skips.contains(it) }
                             .first()
-                            .apply { println("found super=$this") }
                 }
                 .toSet()
                 .map(writer::transformStep)

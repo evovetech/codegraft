@@ -151,18 +151,25 @@ interface ProcessingEnv {
     }
 }
 
+// TODO: allow variance
+const val DEBUG = false
+
 fun Processor.newEnv(
     processingEnvironment: ProcessingEnvironment
 ): ProcessingEnv = BaseProcessingEnv(this, processingEnvironment)
 
 fun Messager.log(element: Element, message: String, vararg args: Any) {
-    val msg = msg(message, args)
-    printMessage(NOTE, msg, element)
+    if (DEBUG) {
+        val msg = msg(message, args)
+        printMessage(NOTE, msg, element)
+    }
 }
 
 fun Messager.log(message: String, vararg args: Any) {
-    val msg = msg(message, args)
-    printMessage(NOTE, msg)
+    if (DEBUG) {
+        val msg = msg(message, args)
+        printMessage(NOTE, msg)
+    }
 }
 
 fun Messager.error(element: Element, message: String, vararg args: Any) {
