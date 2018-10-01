@@ -17,56 +17,27 @@
 
 package evovetech.codegen;
 
-import android.app.Activity;
 import android.app.Fragment;
-import android.app.Service;
-import dagger.android.support.AndroidSupportInjection;
-import net.bytebuddy.implementation.bind.annotation.SuperCall;
-import net.bytebuddy.implementation.bind.annotation.This;
+import android.content.Context;
+import net.bytebuddy.asm.Advice;
 
 import static dagger.android.AndroidInjection.inject;
+import static net.bytebuddy.asm.Advice.*;
 
 /**
  * Injects core Android types.
  */
 public final
-class AndroidInjectMethods {
+class FragmentInjector {
     private
-    AndroidInjectMethods() {}
+    FragmentInjector() {}
 
-    public static
-    void onCreate(
-            @This Activity activity,
-            @SuperCall Runnable super$call
-    ) {
-        inject(activity);
-        super$call.run();
-    }
-
+    @OnMethodEnter
     public static
     void onAttach(
             @This Fragment fragment,
-            @SuperCall Runnable super$call
+            @Argument(0) Context ignored
     ) {
         inject(fragment);
-        super$call.run();
-    }
-
-    public static
-    void onAttach(
-            @This android.support.v4.app.Fragment fragment,
-            @SuperCall Runnable super$call
-    ) {
-        AndroidSupportInjection.inject(fragment);
-        super$call.run();
-    }
-
-    public static
-    void onCreate(
-            @This Service service,
-            @SuperCall Runnable super$call
-    ) {
-        inject(service);
-        super$call.run();
     }
 }

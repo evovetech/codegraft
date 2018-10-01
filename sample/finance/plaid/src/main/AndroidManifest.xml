@@ -4,6 +4,12 @@
 
     <application>
         <activity android:name=".PlaidActivity" />
+        <provider
+            android:authorities="${applicationId}.PlaidProvider"
+            android:name=".PlaidProvider"
+            android:exported="false" />
+        <receiver android:name=".PlaidReceiver" />
+        <service android:name=".PlaidService" />
     </application>
 
 </manifest>

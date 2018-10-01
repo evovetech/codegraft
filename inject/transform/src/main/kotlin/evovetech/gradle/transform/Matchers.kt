@@ -18,6 +18,7 @@
 package evovetech.gradle.transform
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.description.type.TypeDescription
@@ -25,6 +26,10 @@ import net.bytebuddy.matcher.ElementMatcher.Junction
 import net.bytebuddy.matcher.ElementMatchers.named
 import net.bytebuddy.matcher.ElementMatchers.returns
 import net.bytebuddy.matcher.ElementMatchers.takesArguments
+
+private
+val booleanType = TypeDescription.ForLoadedType(Boolean::class.java)
+        .asUnboxed()!!
 
 fun activityOnCreate(): Junction<MethodDescription> = named<MethodDescription>("onCreate")
         .and<MethodDescription>(takesArguments(Bundle::class.java))
@@ -37,4 +42,12 @@ fun fragmentOnAttach(): Junction<MethodDescription> = named<MethodDescription>("
 fun serviceOnCreate(): Junction<MethodDescription> = named<MethodDescription>("onCreate")
         .and<MethodDescription>(takesArguments(0))
         .and<MethodDescription>(returns(TypeDescription.VOID))
+
+fun broadcastOnReceive(): Junction<MethodDescription> = named<MethodDescription>("onReceive")
+        .and<MethodDescription>(takesArguments(Context::class.java, Intent::class.java))
+        .and<MethodDescription>(returns(TypeDescription.VOID))
+
+fun contentProviderOnCreate(): Junction<MethodDescription> = named<MethodDescription>("onCreate")
+        .and<MethodDescription>(takesArguments(0))
+        .and<MethodDescription>(returns(booleanType))
 

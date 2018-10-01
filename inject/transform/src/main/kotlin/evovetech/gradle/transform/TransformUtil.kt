@@ -22,6 +22,7 @@ import com.android.build.api.transform.TransformInput
 import com.android.build.api.transform.TransformInvocation
 import evovetech.gradle.transform.content.DirInput
 import evovetech.gradle.transform.content.JarFileInput
+import net.bytebuddy.asm.Advice
 import net.bytebuddy.description.type.TypeDefinition
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.implementation.MethodDelegation
@@ -70,3 +71,7 @@ fun TypePool.resolve(
 inline
 fun <reified T> methodDelegation(): MethodDelegation =
     MethodDelegation.to(T::class.java)
+
+inline
+fun <reified T> methodAdvice(): Advice =
+    Advice.to(T::class.java)

@@ -18,8 +18,14 @@
 package evovetech.gradle.transform
 
 import codegraft.inject.AndroidInject
-import evovetech.codegen.AndroidInjectMethods
+import evovetech.codegen.ActivityInjector
+import evovetech.codegen.BroadcastReceiverInjector
+import evovetech.codegen.ContentProviderInjector
+import evovetech.codegen.FragmentInjector
+import evovetech.codegen.ServiceInjector
+import evovetech.codegen.SupportFragmentInjector
 import evovetech.codegen.Transformed
+import net.bytebuddy.asm.Advice
 import net.bytebuddy.build.EntryPoint
 import net.bytebuddy.build.EntryPoint.Default.REBASE
 import net.bytebuddy.description.annotation.AnnotationDescription
@@ -27,7 +33,6 @@ import net.bytebuddy.description.method.MethodDescription
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.dynamic.DynamicType.Unloaded
-import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.matcher.ElementMatcher.Junction
 import kotlin.reflect.KClass
 
@@ -59,12 +64,38 @@ enum
 class AndroidInjectType(
     val componentType: Class<*>,
     val methodFilter: Junction<MethodDescription>,
-    val methodDelegation: MethodDelegation = methodDelegation<AndroidInjectMethods>()
+    val methodAdvice: Advice
 ) {
-    Activity(android.app.Activity::class.java, activityOnCreate()),
-    SupportFragment(android.support.v4.app.Fragment::class.java, fragmentOnAttach()),
-    Fragment(android.app.Fragment::class.java, fragmentOnAttach()),
-    Service(android.app.Service::class.java, serviceOnCreate());
+    Activity(
+        android.app.Activity::class.java,
+        activityOnCreate(),
+        methodAdvice<ActivityInjector>()
+    ),
+    SupportFragment(
+        android.support.v4.app.Fragment::class.java,
+        fragmentOnAttach(),
+        methodAdvice<SupportFragmentInjector>()
+    ),
+    Fragment(
+        android.app.Fragment::class.java,
+        fragmentOnAttach(),
+        methodAdvice<FragmentInjector>()
+    ),
+    Service(
+        android.app.Service::class.java,
+        serviceOnCreate(),
+        methodAdvice<ServiceInjector>()
+    ),
+    BroadcastReceiver(
+        android.content.BroadcastReceiver::class.java,
+        broadcastOnReceive(),
+        methodAdvice<BroadcastReceiverInjector>()
+    ),
+    ContentProvider(
+        android.content.ContentProvider::class.java,
+        contentProviderOnCreate(),
+        methodAdvice<ContentProviderInjector>()
+    );
 
     fun matches(typeDescription: TypeDescription): Boolean {
         return typeDescription.isAssignableTo(componentType)
@@ -78,7 +109,7 @@ class AndroidInjectType(
 
     fun DynamicType.Builder<*>.inject(): DynamicType.Builder<*> {
         return method(methodFilter)
-                .intercept(methodDelegation)
+                .intercept(methodAdvice)
                 .annotateType(annotationDescription<Transformed>())
     }
 

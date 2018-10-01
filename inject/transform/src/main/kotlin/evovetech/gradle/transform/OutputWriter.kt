@@ -17,6 +17,7 @@
 
 package evovetech.gradle.transform
 
+import codegraft.inject.android.EmptyContentProvider
 import evovetech.gradle.transform.content.Entry
 import net.bytebuddy.description.type.TypeDefinition
 import net.bytebuddy.description.type.TypeDescription
@@ -45,17 +46,28 @@ class TransformWriter(
 
     fun TransformData.transform(
         localClassFileLoader: ClassFileLocator
-    ) = entries.asSequence()
-            .map { it.typeDescription!! }
-            .map { type ->
-                val supers = type.flatten()
-                        .asReversed()
-                supers.asSequence()
-                        .mapNotNull { t -> resolve(t, localClassFileLoader) }
-                        .first()
-            }
-            .toSet()
-            .map(writer::transformStep)
+    ): List<TransformStep> {
+        val skips = skipTypes()
+        return entries.asSequence()
+                .map { it.typeDescription!! }
+                .map { type ->
+                    val supers = type.toList()
+                            .asReversed()
+                    println("supers=$supers")
+                    supers.asSequence()
+                            .mapNotNull { t -> resolve(t, localClassFileLoader) }
+                            .filterNot { skips.contains(it) }
+                            .first()
+                            .apply { println("found super=$this") }
+                }
+                .toSet()
+                .map(writer::transformStep)
+    }
+
+    private
+    fun TransformData.skipTypes() = setOf(
+        typePool.resolve<EmptyContentProvider>()
+    )
 }
 
 fun OutputWriter.transformStep(

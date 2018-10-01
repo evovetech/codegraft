@@ -82,7 +82,7 @@ class InjectRunRun(
         val transforms = transformWriters.flatMap { w ->
             w.transform(localClassFileLocator)
         }
-        val transformTypes = transforms.flatMap(TransformStep::type)
+        val transformTypes = transforms.map(TransformStep::type)
         val modParents = entryMap.mapValues { (_, entries) ->
             group(entries, transforms) { e, t ->
                 e.typeDescription == t.type
