@@ -47,17 +47,10 @@ class TransformWriter(
     fun TransformData.transform(
         localClassFileLoader: ClassFileLocator
     ): List<TransformStep> {
-        val skips = skipTypes()
         return entries.asSequence()
                 .map { it.typeDescription!! }
-                .map { type ->
-                    val supers = type.toList()
-                            .asReversed()
-                    supers.asSequence()
-                            .mapNotNull { t -> resolve(t, localClassFileLoader) }
-                            .filterNot { skips.contains(it) }
-                            .first()
-                }
+                // TODO: need to modify injection code in order to do inject parent classes
+//                .parent(this, localClassFileLoader)
                 .toSet()
                 .map(writer::transformStep)
     }
@@ -66,6 +59,22 @@ class TransformWriter(
     fun TransformData.skipTypes() = setOf(
         typePool.resolve<EmptyContentProvider>()
     )
+
+    private
+    fun Sequence<TypeDescription>.parent(
+        transformData: TransformData,
+        localClassFileLoader: ClassFileLocator
+    ): Sequence<TypeDescription> = transformData.run {
+        val skips = skipTypes()
+        map { type ->
+            val supers = type.toList()
+                    .asReversed()
+            supers.asSequence()
+                    .mapNotNull { t -> resolve(t, localClassFileLoader) }
+                    .filterNot { skips.contains(it) }
+                    .first()
+        }
+    }
 }
 
 fun OutputWriter.transformStep(
