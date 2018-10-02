@@ -50,6 +50,63 @@ class MediumFragment : Fragment() {
 }
 ```
 
+## Gradle Setup
+
+example project structure:
+```
+project/
+    app/
+        src/
+        build.gradle
+    lib/
+        src/
+        build.gradle
+    build.gradle
+    settings.gradle
+```
+
+project/build.gradle
+```gradle
+buildscript {
+    ext {
+        codegraftVersion = '0.8.3'
+    }
+    dependencies {
+        classpath "evovetech.codegraft:inject-plugin:${codegraftVersion}"
+    }
+}
+```
+
+app/build.gradle
+```gradle
+apply plugin: 'com.android.application'
+// ...
+apply plugin: 'codegraft.inject.android'
+```
+
+lib/build.gradle
+
+```gradle
+apply plugin: 'com.android.library'
+// ...
+apply plugin: 'codegraft.inject.android'
+
+// optional extensions
+dependencies {
+    // Crashlytics extension
+    api "evovetech.codegraft:inject-extension-crashlytics:${codegraftVersion}"
+    
+    // Okhttp extension
+    api "evovetech.codegraft:inject-extension-okhttp3:${codegraftVersion}"
+    
+    // Retrofit extension
+    api "evovetech.codegraft:inject-extension-retrofit2:${codegraftVersion}"
+    
+    // Realm extension
+    api "evovetech.codegraft:inject-extension-realm:${codegraftVersion}"
+}
+```
+
 ## Basics
 
 Codgraft uses dagger in a way that allows you to compose multiple kotlin modules together into a generated component for use in the application and also in tests. This was built specifically for android and its needs.
