@@ -17,3 +17,29 @@
 
 package evovetech.sample.helpers
 
+import android.app.Application
+import codegraft.inject.BootScope
+import codegraft.inject.BootstrapComponent
+import dagger.Module
+import dagger.Provides
+
+@BootstrapComponent(
+    bootstrapModules = [DummyModule::class]
+)
+interface DummyComponent {
+    val dummy: Dummy
+}
+
+data
+class Dummy(
+    val app: Application
+)
+
+@Module
+class DummyModule {
+    @Provides
+    @BootScope
+    fun provideDummy(
+        @BootScope app: Application
+    ): Dummy = Dummy(app)
+}

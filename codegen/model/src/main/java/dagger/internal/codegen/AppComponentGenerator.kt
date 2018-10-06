@@ -23,6 +23,7 @@ import codegraft.android.AndroidInjectModuleGenerator
 import codegraft.bootstrap.ComponentOutput
 import codegraft.bootstrap.Package
 import codegraft.bootstrap.buildParameter
+import codegraft.bootstrap.equality
 import codegraft.bootstrap.getterMethod
 import codegraft.bootstrap.getterMethodName
 import codegraft.bootstrap.key
@@ -149,7 +150,7 @@ class AppComponentGenerator(
                         }
                     }
                     .flatMap { it }
-                    .groupBy { it.key }
+                    .groupBy { it.key.equality }
                     .mapValues { it.value.first() }
                     .values
                     .map { (key, fieldSpec) ->
@@ -207,16 +208,16 @@ class AppComponentGenerator(
                 pluginModules.map { it.outKlass.rawType }
                         .map(add)
             }
-            descriptors.filter { it.flatten }.forEach {
-                addSuperinterface(TypeName.get(it.componentDefinitionType.asType()))
-                it.componentMethods.map {
+            descriptors.filter { it.flatten }.forEach { descriptor ->
+                addSuperinterface(TypeName.get(descriptor.componentDefinitionType.asType()))
+                descriptor.componentMethods.map {
                     MethodSpec.overriding(it.methodElement)
                             .addModifiers(ABSTRACT)
                             .build()
                 }.map(this::addMethod)
             }
-            descriptors.filterNot { it.flatten }.forEach {
-                val type = it.componentDefinitionType
+            descriptors.filterNot { it.flatten }.forEach { descriptor ->
+                val type = descriptor.componentDefinitionType
                 val name = type.asType().getFieldName()
                 val getter = MethodSpec.methodBuilder("get${name.capitalize()}")
                         .addModifiers(PUBLIC, ABSTRACT)
@@ -402,7 +403,7 @@ class AppComponentGenerator(
                 val dependencies = descriptors
                         .flatMap { it.modules }
                         .flatMap { it.dependencies }
-                        .groupBy { it.key }
+                        .groupBy { it.key.equality }
                         .mapValues { it.value.first() }
                         .values
                 val dependencyMethods = dependencies.map { dep ->
