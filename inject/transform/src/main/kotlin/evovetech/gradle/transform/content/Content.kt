@@ -177,21 +177,20 @@ class ParentOutput(
             invocation: TransformInvocation,
             input: Input<*>,
             entries: List<Entry>
-        ): ParentOutput = CopyOutput(input, entries, invocation.run {
-            val root = input.root
-            outputProvider.getContentLocation(root.name, root.contentTypes, root.scopes, Format.DIRECTORY)
-        })
+        ): ParentOutput = CopyOutput(input, entries, invocation.getContentLocation(input))
 
         @JvmStatic
         fun transform(
             invocation: TransformInvocation,
             input: Input<*>,
             transforms: List<Pair<Entry, TransformStep>>
-        ): ParentOutput = TransformOutput(input, transforms, invocation.run {
-            val root = input.root
-            outputProvider.getContentLocation(input.modName, root.contentTypes, root.scopes, Format.DIRECTORY)
-        })
+        ): ParentOutput = TransformOutput(input, transforms, invocation.getContentLocation(input))
     }
+}
+
+fun TransformInvocation.getContentLocation(input: Input<*>): File {
+    val root = input.root
+    return outputProvider.getContentLocation(root.name, root.contentTypes, root.scopes, Format.DIRECTORY)
 }
 
 private
