@@ -82,6 +82,12 @@ app/build.gradle
 apply plugin: 'com.android.application'
 // ...
 apply plugin: 'codegraft.inject.android'
+
+// optional
+codegraft {
+    // turn off incremental transform
+    incremental = false
+}
 ```
 
 lib/build.gradle
