@@ -15,26 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package evovetech.gradle.transform
+package evovetech.gradle.transform.plugin
 
-import com.android.build.api.transform.TransformInvocation
-import java.io.File
+import org.gradle.api.logging.Logger
 
-class InjectRunRunTransform(
-    isLibrary: Boolean,
-    incremental: () -> Boolean,
-    private val bootClasspath: () -> List<File>
-) : AbstractTransform(
-    name = "evovetechInjectTransform",
-    isLibrary = isLibrary,
-    incremental = incremental
+open
+class InjectExtension(
+    private val logger: Logger
 ) {
-    override
-    fun TransformInvocation.runRun(): RunRun {
-        return InjectRunRun(
-            bootClasspath, this,
-            ApplicationOutputWriter(),
-            AndroidInjectWriter()
-        )
-    }
+    var incremental: Boolean = true
+        get() {
+            logger.lifecycle("Codegraft.incremental.get() = $field")
+            return field
+        }
+        set(value) {
+            logger.lifecycle("Codegraft.incremental.set(value = $value)")
+            field = value
+        }
 }

@@ -19,14 +19,25 @@ package evovetech.gradle.transform.plugin
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.model.ObjectFactory
+import javax.inject.Inject
 
-class InjectPlugin : Plugin<Project> {
+class InjectPlugin
+@Inject constructor(
+    private val objectFactory: ObjectFactory
+) : Plugin<Project> {
     override
     fun apply(project: Project) {
-        val wrapper = ProjectWrapper(project)
+        val extension = project.extensions.create(
+            "codegraft",
+            InjectExtension::class.java,
+            project.logger
+        )
+        val wrapper = ProjectWrapper(project, extension)
         project.extensions.findByName("android")
                 ?.let(wrapper::setupAndroid)
         project.extensions.findByName("kapt")
                 ?.let(wrapper::setupKapt)
     }
 }
+

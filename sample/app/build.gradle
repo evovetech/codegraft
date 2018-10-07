@@ -35,6 +35,10 @@ android {
     }
 }
 
+codegraft {
+    incremental = false
+}
+
 apply from: "${configDir}/versions/crashlytics.gradle"
 dependencies(crashlytics.apply('implementation'))
 

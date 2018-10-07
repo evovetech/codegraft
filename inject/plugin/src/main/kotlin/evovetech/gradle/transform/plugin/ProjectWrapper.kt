@@ -35,8 +35,10 @@ import org.jetbrains.kotlin.gradle.plugin.KaptAnnotationProcessorOptions
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 
 class ProjectWrapper(
-    project: Project
+    project: Project,
+    private val extension: InjectExtension
 ) : Project by project {
+
     fun setupKapt(obj: Any) {
         val kapt = obj as? KaptExtension
                    ?: return
@@ -75,7 +77,11 @@ class ProjectWrapper(
             is LibraryExtension -> return
             else -> false
         }
-        val transform = InjectRunRunTransform(isLibrary, android::getBootClasspath)
+        val transform = InjectRunRunTransform(
+            isLibrary = isLibrary,
+            incremental = extension::incremental,
+            bootClasspath = android::getBootClasspath
+        )
         android.registerTransform(transform)
     }
 

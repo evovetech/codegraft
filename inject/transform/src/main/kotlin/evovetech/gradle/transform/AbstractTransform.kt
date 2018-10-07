@@ -29,7 +29,8 @@ import com.android.build.api.transform.TransformInvocation
 abstract
 class AbstractTransform(
     private val name: String,
-    private val isLibrary: Boolean
+    private val isLibrary: Boolean,
+    private val incremental: () -> Boolean
 ) : Transform() {
 
     override
@@ -49,7 +50,7 @@ class AbstractTransform(
 
     override
     fun isIncremental(): Boolean {
-        return true
+        return incremental()
     }
 
     override
