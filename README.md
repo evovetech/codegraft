@@ -69,7 +69,7 @@ project/build.gradle
 ```gradle
 buildscript {
     ext {
-        codegraftVersion = '0.8.6'
+        codegraftVersion = '0.9.0-SNAPSHOT'
     }
     dependencies {
         classpath "evovetech.codegraft:inject-plugin:${codegraftVersion}"
