@@ -101,8 +101,7 @@ class AndroidInjectModuleDescriptor(
             AndroidInjectContentProviderModule::class
         ),
         SupportFragment(
-            Any::class,
-//            codegraft.inject.SupportFragment::class,
+            android.support.v4.app.Fragment::class,
             AndroidInjectSupportFragmentModule::class
         );
 
