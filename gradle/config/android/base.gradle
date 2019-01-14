@@ -36,7 +36,8 @@ apply from: "${configDir}/versions/testing.gradle"
 
 dependencies {
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${app.kotlinVersion}")
-    api "com.android.support:appcompat-v7:${app.androidSupportVersion}"
+    api("com.android.support:appcompat-v7:${app.androidSupportVersion}")
+    api("com.android.support.constraint:constraint-layout:1.1.2")
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${app.kotlinVersion}"
     testImplementation junitCore
     testImplementation mockitoCore

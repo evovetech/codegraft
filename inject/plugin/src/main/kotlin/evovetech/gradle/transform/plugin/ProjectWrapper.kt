@@ -74,7 +74,7 @@ class ProjectWrapper(
     private
     fun addTransform(android: BaseExtension) {
         val isLibrary = when (android) {
-            is LibraryExtension -> return
+            is LibraryExtension -> true
             else -> false
         }
         val transform = InjectRunRunTransform(
@@ -115,6 +115,9 @@ class ProjectWrapper(
     private
     fun LibraryExtension.setup() {
         libraryVariants.libSetup()
+        packagingOptions {
+            merge("**/*.srcr")
+        }
     }
 
     private
