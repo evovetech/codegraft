@@ -31,6 +31,6 @@ dependencies {
     compileOnly(dagger.androidSupportJar)
     compileOnly("com.google.android:android:4.1.1.4")
     compileOnly("com.google.android:support-v4:r7")
-    implementation "net.bytebuddy:byte-buddy:${app.byteBuddyVersion}"
+    compileOnly("net.bytebuddy:byte-buddy:${app.byteBuddyVersion}")
     api project(':inject-core')
 }

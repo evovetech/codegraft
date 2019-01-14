@@ -18,10 +18,8 @@
 package evovetech.blog.medium
 
 import codegraft.inject.android.AndroidApplication
-import evovetech.sample.crashes.CrashesBootstrapModule
-import evovetech.sample.db.realm.RealmBootstrapModule
+import codegraft.inject.extension.crashlytics.CrashesBootstrapModule
 import io.fabric.sdk.android.Fabric
-import io.realm.RealmConfiguration
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
@@ -45,12 +43,6 @@ class ApiTest : BaseTest() {
     @Mock lateinit
     var fabric: Fabric
 
-    @Mock lateinit
-    var realmBootstrapModule: RealmBootstrapModule
-
-    @Mock lateinit
-    var realm: RealmConfiguration
-
     @Before
     fun setup() {
         val app = this.app
@@ -63,20 +55,9 @@ class ApiTest : BaseTest() {
             fabric
         }
 
-        `when`(
-            realmBootstrapModule.provideRealmConfiguration(
-                notNull<AndroidApplication>().let { app },
-                any()
-            )
-        ).thenAnswer {
-            realm
-        }
-
         val bootstrap = bootstrap {
             fabricBuilderFunction1 { fabric }
             crashesBootstrapModule(crashesBootstrapModule)
-            realmConfigurationBuilderFunction1 { realm }
-            realmBootstrapModule(realmBootstrapModule)
             okHttpClientApplicationBuilderFunction2 { builder, _ ->
                 builder.build()
             }

@@ -9,7 +9,7 @@
             android:name=".PlaidProvider"
             android:exported="false" />
         <receiver android:name=".PlaidReceiver" />
-        <service android:name=".PlaidService" />
+        <service android:name=".PlaidIntentService" />
     </application>
 
 </manifest>
