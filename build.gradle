@@ -24,15 +24,15 @@ plugins {
     id("com.android.library").apply(false)
     id("kotlin-android").apply(false)
 
-    id("com.jfrog.bintray").apply(false)
-    id("com.jfrog.artifactory").apply(false)
+//    id("com.jfrog.bintray").apply(false)
+//    id("com.jfrog.artifactory").apply(false)
     id("org.jetbrains.dokka").apply(false)
 
     id("com.google.firebase.firebase-perf").apply(false)
     id("com.google.gms.google-services").apply(false)
     id("io.fabric").apply(false)
 
-    id("realm-android").apply(false)
+//    id("realm-android").apply(false)
 }
 
 ext {

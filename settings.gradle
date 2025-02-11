@@ -23,6 +23,7 @@ buildscript {
     apply from: "${root}/${version}/buildscript.gradle"
     ext.configDir = gradle.configDir
 
+    repositories { maven { url "${rootDir}/repo" } }
     repositories(gradle.buildscriptRepos)
     dependencies(gradle.buildscriptDependencies)
 }
