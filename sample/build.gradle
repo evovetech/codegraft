@@ -25,5 +25,5 @@ plugins {
     id("com.google.gms.google-services").apply(false)
     id("io.fabric").apply(false)
 
-    id("realm-android").apply(false)
+//    id("realm-android").apply(false)
 }
