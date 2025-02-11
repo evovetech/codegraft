@@ -28,7 +28,7 @@ import codegraft.inject.Plugins
 import codegraft.inject.extension.okhttp3.Okhttp
 import codegraft.inject.get
 import evovetech.finance.plaid.PlaidActivity
-import io.realm.Realm
+//import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.message
 import kotlinx.android.synthetic.main.activity_main.navigation
 import javax.inject.Inject
@@ -38,11 +38,11 @@ class MainActivity : AppCompatActivity() {
     @Inject lateinit
     var plugins: Plugins
 
-    @Inject lateinit
-    var realm: Realm
+//    @Inject lateinit
+//    var realm: Realm
 
-    @Inject lateinit
-    var userManager: User.Manager
+//    @Inject lateinit
+//    var userManager: User.Manager
 
     override
     fun onCreate(savedInstanceState: Bundle?) {
@@ -59,8 +59,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         // TODO: ugly having to do this twice
-        realm.close()
-        userManager.realm.close()
+//        realm.close()
+//        userManager.realm.close()
         super.onDestroy()
     }
 
@@ -72,11 +72,11 @@ class MainActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_dashboard -> {
-                val user = userManager.getOrCreate("laynepenney@gmail.com") {
-                    firstName = "Layne"
-                    lastName = "Penney"
-                }
-                val text = getString(R.string.title_dashboard) + "\n\nUser: " + user.toString()
+//                val user = userManager.getOrCreate("laynepenney@gmail.com") {
+//                    firstName = "Layne"
+//                    lastName = "Penney"
+//                }
+                val text = getString(R.string.title_dashboard)// + "\n\nUser: " + user.toString()
                 message.text = text
                 return@OnNavigationItemSelectedListener true
             }

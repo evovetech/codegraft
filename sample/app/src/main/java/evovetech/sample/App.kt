@@ -24,7 +24,7 @@ import codegraft.inject.android.AndroidApplication
 import codegraft.inject.android.BootApplication
 import com.crashlytics.android.Crashlytics
 import io.fabric.sdk.android.Fabric
-import io.realm.RealmConfiguration
+//import io.realm.RealmConfiguration
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
@@ -36,7 +36,7 @@ class App : Application(), BootApplication<AppComponent> {
     override
     val bootstrap = bootstrap {
         fabricBuilderFunction1(Fabric.Builder::bootstrap)
-        realmConfigurationBuilderFunction1(RealmConfiguration.Builder::bootstrap)
+//        realmConfigurationBuilderFunction1(RealmConfiguration.Builder::bootstrap)
         okHttpClientApplicationBuilderFunction2(OkHttpClient.Builder::bootstrap)
         this@App
     }
@@ -66,11 +66,11 @@ fun Fabric.Builder.bootstrap(): Fabric {
             .build()
 }
 
-fun RealmConfiguration.Builder.bootstrap(): RealmConfiguration {
-    return name("app.realm")
-            .schemaVersion(1)
-            .build()
-}
+//fun RealmConfiguration.Builder.bootstrap(): RealmConfiguration {
+//    return name("app.realm")
+//            .schemaVersion(1)
+//            .build()
+//}
 
 fun OkHttpClient.Builder.bootstrap(app: AndroidApplication): OkHttpClient {
     // TODO

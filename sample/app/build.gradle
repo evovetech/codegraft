@@ -43,7 +43,7 @@ apply from: "${configDir}/versions/crashlytics.gradle"
 dependencies(crashlytics.apply('implementation'))
 
 dependencies {
-    implementation "evovetech.codegraft:inject-extension-realm"
+//    implementation "evovetech.codegraft:inject-extension-realm"
 
     implementation project(':finance:plaid')
     implementation project(':blog:medium')
