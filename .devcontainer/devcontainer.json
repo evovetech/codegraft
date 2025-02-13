@@ -5,7 +5,8 @@
     "ghcr.io/devcontainers-extra/features/gradle-sdkman:2": {
       "jdkVersion": "8",
       "jdkDistro": "tem"
-    }
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   "customizations": {
     "vscode": {
