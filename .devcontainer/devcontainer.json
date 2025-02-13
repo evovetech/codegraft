@@ -6,5 +6,12 @@
       "jdkVersion": "8",
       "jdkDistro": "tem"
     }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "fwcd.kotlin"
+      ]
+    }
   }
 }
