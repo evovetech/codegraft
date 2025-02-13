@@ -1,5 +1,5 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "image": "mcr.microsoft.com/devcontainers/base:1.2.3-jammy",
   "features": {
     "ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {},
     "ghcr.io/devcontainers-extra/features/gradle-sdkman:2": {
